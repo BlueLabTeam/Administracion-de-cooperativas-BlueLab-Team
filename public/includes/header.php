@@ -2,7 +2,7 @@
       <h2 class="header__title">Conviconsu</h2>
       <nav>
         <ul>
-          <li><a href="#">inicio</a></li>
+          <li><a href="index.php">inicio</a></li>
           <li><a href="#">servicios</a></li>
           <li><a href="#">nosotros</a></li>
           <li><a href="#">contacto</a></li>

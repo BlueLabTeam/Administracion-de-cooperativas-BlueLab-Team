@@ -18,7 +18,7 @@
           beatae?
         </p>
       </section>
-      <form action="/app/controllers/usuarioController.php" method="post" class="registro__formulario">
+      <form action="/pruebas/app/controllers/usuarioController.php" method="post" class="registro__formulario">
         <label for="nombre_completo" class="formulario__label label--nombre_completo">Nombre completo</label>
         <input type="text" name="nombre_completo" class="formulario__input input--nombre_completo"/>
         <label for="CI" class="formulario__label label--CI">Carnet de identidad</label>
