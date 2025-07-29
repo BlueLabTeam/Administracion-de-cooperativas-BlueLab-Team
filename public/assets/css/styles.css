@@ -1,11 +1,27 @@
 :root {
+  /* GENERAL */
   --color-primary: #006eff;
   --color-secondary: #ffffff;
   --color-tertiary: #46a2ff;
   --color-gradient: linear-gradient(270deg, #03366B, #256AB1);
   --color-gradient-cuadrado: linear-gradient(270deg, #0B4580, #3783D0);
   --color-gradient-secondary: linear-gradient(90deg, #1664B3, #26A9CD);
-  --text-color: #333;
+
+  /* texto */
+  --text-color-primary: #333;
+  --text-color-secondary: #666;
+  --text-color-tertiary: #006eff;
+  --text-color-soft: #999;
+
+
+
+  /* Login */
+/* inputs */
+  --login-color-input: #f0f0f0;
+  --login-color-input-border: #ccc;
+  --login-color-input-focus: #c7dcf8;
+  --login-color-input-error: #ffcccc;
+
 }
 body {
   margin: 0;
@@ -272,4 +288,74 @@ footer ul{
 
 footer li{
     text-align: center;
+}
+
+
+/* Login */
+
+.login__main{
+  background: var(--color-primary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.login__container{
+background: var(--color-secondary);
+padding: 10%;
+border-radius: 30px;
+}
+
+.login__subcontainer{
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+}
+
+.login__titulo{
+  color: var(--color-primary);
+  margin-bottom: auto;
+}
+
+.login__subtitulo{
+  color: var(--text-color-soft);
+}
+
+.login__formulario{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1rem;
+  margin: 20px;
+  width: 100%;
+}
+
+.formulario__label{
+  font-weight: 900;
+
+}
+
+.login__input{
+  border: var(--login-color-input-border) 1px solid;
+  border-radius: 5px;
+  padding: 10px;
+  background: var(--login-color-input);
+  transition: all 0.3s ease;
+}
+
+.login__input:focus{
+  border: var(--login-color-input-focus) 1px solid;
+  outline: none;
+}
+
+.login__submit{
+  background: var(--color-gradient-cuadrado);
+  color: var(--color-secondary);
+  border: none;
+  padding: 10px;
+  border-radius: 15px;
+  font-size: 30px;
+  cursor: pointer;
 }
