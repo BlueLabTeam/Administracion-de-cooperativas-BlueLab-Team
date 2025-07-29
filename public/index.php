@@ -7,18 +7,7 @@
     <link rel="stylesheet" href="assets/css/index.css" />
   </head>
   <body>
-    <header>
-      <h2 class="header__title">Conviconsu</h2>
-      <nav>
-        <ul>
-          <li><a href="#">inicio</a></li>
-          <li><a href="#">servicios</a></li>
-          <li><a href="#">nosotros</a></li>
-          <li><a href="#">contacto</a></li>
-        </ul>
-      </nav>
-      <a href="login.html" class="header__login"><button class="button__ingresar">INGRESAR</button></a>
-    </header>
+    <?php include 'includes/header.php'; ?>
     <main>
       <div class="bienvenida">
         <h1>Bienvenido a Conviconsu</h1>
@@ -137,21 +126,6 @@
         <button class="motivacion__button">Solicitar ingreso</button>
       </div>
     </main>
-    <footer>
-      <ul>
-        <li>
-          <h2>lorem ipsum</h2>
-          <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit.</p>
-        </li>
-        <li>
-          <h2>lorem ipsum</h2>
-          <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit.</p>
-        </li>
-        <li>
-          <h2>lorem ipsum</h2>
-          <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit.</p>
-        </li>
-      </ul>
-    </footer>
+    <?php include 'includes/footer.php'; ?>
   </body>
 </html>
