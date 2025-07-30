@@ -1,7 +1,9 @@
 <?php
+session_start(); // Esto siempre debe ir antes de cualquier HTML o echo
+
 include_once '../config/database.php';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_GET['action'] === 'register') {
     $nombre_completo = $_POST['nombre_completo'];
     $CI = $_POST['CI'];
     // $telefono = $_POST['telefono']; Para más adelante, si se requiere
@@ -52,3 +54,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo "Por favor, complete todos los campos requeridos.";
     }
 }
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_GET['action'] === 'login') {
+    $email = $_POST['usuario'];
+    $contrasena = $_POST['contrasenia'];
+
+    if (!empty($email) && !empty($contrasena)) {
+        $sql = "SELECT * FROM usuario WHERE email = ?";
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindParam(1, $email);
+        $stmt->execute();
+
+        $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($usuario && password_verify($contrasena, $usuario['contrasena'])) {
+            // Usuario y contraseña correctos
+            $_SESSION['usuario_id'] = $usuario['id_usuario'];
+            $_SESSION['nombre'] = $usuario['nombre_completo'];
+            $_SESSION['rol'] = $usuario['id_rol']; // si querés después usar permisos
+
+            echo "Inicio de sesión exitoso. Bienvenido, " . $usuario['nombre_completo'];
+            // header('Location: dashboard.php'); // redirigí si querés
+        } else {
+            echo "Correo o contraseña incorrectos.";
+        }
+    } else {
+        echo "Por favor complete todos los campos.";
+    }
+}
+

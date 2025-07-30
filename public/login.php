@@ -15,8 +15,9 @@
           <h1 class="login__titulo">Cooperativa de Viviendas</h1>
           <p class="login__subtitulo">Sistema Administrativo</p>
           <form
-            action="/app/controllers/usuarioController.php"
+            action="/pruebas/app/controllers/usuarioController.php?action=login"
             class="login__formulario"
+            method="post"
           >
             <label for="usuario" class="formulario__label">Usuario</label>
             <input
