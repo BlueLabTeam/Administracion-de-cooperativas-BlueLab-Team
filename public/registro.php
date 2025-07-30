@@ -30,7 +30,9 @@
         <label for="direccion" class="formulario__label label--direccion">Dirección</label>
         <input type="text" name="direccion" class="formulario__input input--direccion"/>
         <label for="fecha_nacimiento" class="formulario__label label--fecha_nacimiento">Fecha de nacimiento</label>
-        <input type="text" name="fecha_nacimiento" class="formulario__input input--fecha_nacimiento" placeholder="dd/mm/aaaa"/>
+        <input type="date" name="fecha_nacimiento" class="formulario__input input--fecha_nacimiento" placeholder="dd/mm/aaaa"/>
+        <label for="contrasena" class="formulario__label label--contrasena">Contraseña</label>
+        <input type="password" name="contrasena" class="formulario__input input--contrasena"/>
         <input type="submit" class="formulario__submit" value="Enviar Solicitud"/>
       </form>
     </main>

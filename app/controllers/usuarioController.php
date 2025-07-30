@@ -11,21 +11,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Login // Sección comentada para futura implementación
     // $usuario = $_POST['usuario'];
-    // $contrasena = $_POST['contrasena'];
+    $contrasena = $_POST['contrasena'];
     // Validar que los campos requeridos no estén vacíos
     if (
         !empty($nombre_completo) &&
         !empty($CI) &&
         !empty($email) &&
         !empty($direccion) &&
-        !empty($fecha_nacimiento)
+        !empty($fecha_nacimiento) &&
+        !empty($contrasena)
     ) {
         // Preparar la consulta SQL para insertar el usuario
-        $sql = "INSERT INTO usuario (nombre_completo, cedula, direccion, estado, fecha_ingreso, fecha_nacimiento, email) VALUES (?, ?, ?, ?, NOW(), ?, ?)";
+        $sql = "INSERT INTO usuario (nombre_completo, cedula, contrasena, direccion, estado, fecha_ingreso, fecha_nacimiento, email) VALUES (?, ?, ?, ?, ?, NOW(), ?, ?)";
         $stmt = $pdo->prepare($sql);
 
         // Encriptar la contraseña antes de guardarla
-        // $hashed_password = password_hash($contrasena, PASSWORD_DEFAULT); mas adelante
+        $hashed_password = password_hash($contrasena, PASSWORD_DEFAULT);
 
         if ($stmt) {
             $estado = 'pendiente'; // esto lo necesitás para enlazar el valor
@@ -33,10 +34,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $stmt->bindParam(1, $nombre_completo);
             $stmt->bindParam(2, $CI);
-            $stmt->bindParam(3, $direccion);
-            $stmt->bindParam(4, $estado);
-            $stmt->bindParam(5, $fecha_nacimiento);
-            $stmt->bindParam(6, $email);
+            $stmt->bindParam(3, $hashed_password);
+            $stmt->bindParam(4, $direccion);
+            $stmt->bindParam(5, $estado);
+            $stmt->bindParam(6, $fecha_nacimiento);
+            $stmt->bindParam(7, $email);
 
             if ($stmt->execute()) {
                 echo "Usuario registrado exitosamente.";
