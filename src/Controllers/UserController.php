@@ -2,4 +2,10 @@
 
 namespace App\Controllers;
 
-class DashboardController {}
+class UserController
+{
+    public function create() {}
+    public function read() {}
+    public function update() {}
+    public function delete() {}
+}

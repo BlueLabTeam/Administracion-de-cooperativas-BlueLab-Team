@@ -1,0 +1,5 @@
+# UNICAMENTE SE USARA SI SE NECESITAN EXTENSIONES DE PHP
+
+FROM php:8.2-fpm
+
+RUN docker-php-ext-install pdo pdo_mysql

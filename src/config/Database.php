@@ -1,6 +1,6 @@
 <?php
 
-namespace APP\Config;
+namespace App\config;
 
 use PDO;
 use PDOException;
@@ -12,12 +12,11 @@ class Database
     public static function getConnection(): PDO
     {
         if (self::$instance === null) {
-            $env = parse_ini_file(__DIR__ . '/../../.env');
 
-            $host = $env['DB_HOST'];
-            $db   = $env['DB_NAME'];
-            $user = $env['DB_USER'];
-            $pass = $env['DB_PASSWORD'];
+            $host = getenv('DB_HOST');
+            $db   = getenv('DB_NAME');
+            $user = getenv('DB_USER');
+            $pass = getenv('DB_PASSWORD');
             $charset = 'utf8mb4';
 
             $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
