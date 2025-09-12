@@ -1,12 +1,69 @@
-    <header>
-      <h2 class="header__title">Conviconsu</h2>
-      <nav>
-        <ul>
-          <li><a href="index.php">inicio</a></li>
-          <li><a href="#">servicios</a></li>
-          <li><a href="#">nosotros</a></li>
-          <li><a href="#">contacto</a></li>
-        </ul>
-      </nav>
-      <a href="login.php" class="header__login"><button class="button__ingresar">INGRESAR</button></a>
-    </header>
+<header>
+  <h2 class="header__title">
+    <a href="/index.php" style="text-decoration: none; color: var(--color-primary);">
+      Conviconsu
+    </a>
+  </h2>
+  <nav>
+    <ul>
+      <li><a href="/index.php">Inicio</a></li>
+      <li><a href="#">Servicios</a></li>
+      <li><a href="#">Nosotros</a></li>
+      <li><a href="#">Contacto</a></li>
+    </ul>
+  </nav>
+  <a href="/login.php" class="header__login">
+    <button class="button__ingresar">INGRESAR</button>
+  </a>
+</header>
+
+<style>
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background-color: #ffffff; /* Fondo blanco */
+    position: relative;
+    z-index: 10; /* siempre encima de animaciones */
+  }
+
+  .header__title {
+    font-size: 1.5rem;
+    color: var(--color-primary);
+  }
+
+  nav ul {
+    list-style: none;
+    display: flex;
+    gap: 1rem;
+  }
+
+  a {
+    margin: 5px;
+    text-decoration: none;
+    color: var(--text-color-primary);
+  }
+
+  .header__login {
+    font-size: 1rem;
+    color: var(--color-secondary);
+    background-color: var(--color-primary);
+    padding: 0rem 2rem;
+    border-radius: 50px;
+  }
+
+  .button__ingresar {
+    background-color: var(--color-primary);
+    color: var(--color-secondary);
+    padding: 0.5rem 1rem;
+    border: none;
+    cursor: pointer;
+    border-radius: 50px;
+  }
+
+  /* evita que la animación de fondo bloquee los clics */
+  .background-animation {
+    pointer-events: none;
+  }
+</style>
