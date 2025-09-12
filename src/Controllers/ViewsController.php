@@ -2,8 +2,6 @@
 
 namespace App\controllers;
 
-use App\utils\Validaciones;
-
 class ViewsController
 {
 
@@ -22,7 +20,14 @@ class ViewsController
     }
     public function showDashboard()
     {
-        Validaciones::validarUsuario();
         require __DIR__ . '/../Views/dashboardUsuario.php';
+    }
+    public function showRegistrarPago()
+    {
+        require __DIR__ . '/../Views/registrarPago.php';
+    }
+    public function showSalaEspera()
+    {
+        require __DIR__ . '/../Views/salaEspera.php';
     }
 }

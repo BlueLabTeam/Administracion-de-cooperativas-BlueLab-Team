@@ -1,6 +1,6 @@
 .env
 /vendor/
-/backup/
+/backups/
 /data/
 composer.lock
 *.log

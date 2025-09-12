@@ -2,6 +2,8 @@
 
 namespace App\controllers;
 
+use App\models\User;
+
 class AuthController
 {
     public function login()
@@ -24,9 +26,12 @@ class AuthController
         $userModel = new \App\Models\User();
         $user = $userModel->findByEmail($email);
         if ($user && password_verify($password, $user->getPasswordHash())) {
-
-            session_start();
             $_SESSION['user_id'] = $user->getId();
+            $_SESSION['nombre_completo'] = $user->getNombreCompleto();
+            $_SESSION['direccion'] = $user->getDireccion();
+            $_SESSION['estado'] = $user->getEstado();
+            $_SESSION['fecha_nacimiento'] = $user->getFechaNacimiento();
+            $_SESSION['email'] = $user->getEmail();
 
             echo json_encode([
                 'success' => true,

@@ -39,34 +39,30 @@
   <?php include 'includes/footer.html'; ?>
   <script>
     document.querySelector("#form-login").addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const formData = new FormData(e.target);
-        try {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      try {
+        const response = await fetch("/api/login", {
+          method: "POST",
+          body: formData
+        })
 
+        const data = await response.json();
 
-          const response = await fetch("/api/login", {
-            method: "POST",
-            body: formData
-          })
+        if (!data.success) {
+          alert(data.message);
+          if (data.redirect) window.location.href = data.redirect;
 
-          const data = await response.json();
-
-          if (!data.success) {
-            alert(data.message);
-            if (data.redirect) window.location.href = data.redirect;
-
-          } else {
-            alert(data.message);
-            window.location.href = data.redirect;
-          }
-
-        } catch (error) {
-          console.error("error en la petición", error);
-          alert("Hubo un problema con el servidor")
+        } else {
+          alert(data.message);
+          window.location.href = data.redirect;
         }
-      }
 
-    )
+      } catch (error) {
+        console.error("error en la petición", error);
+        alert("Hubo un problema con el servidor")
+      }
+    });
   </script>
 </body>
 

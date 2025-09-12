@@ -2,6 +2,8 @@
 
 require __DIR__ . '/../vendor/autoload.php';
 
+use App\middlewares\Middleware;
+use App\utils\Herramientas;
 // // Cargar variables de entorno pruebas prometheus
 // use Prometheus\CollectorRegistry;
 // use Prometheus\RenderTextFormat;
@@ -20,6 +22,12 @@ require __DIR__ . '/../vendor/autoload.php';
 //app 
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
+Herramientas::startSession();
+
+$publicRoutes = ['/login', '/register', '/api/login', '/api/register', '/home', '/', '/api/pay/firstPay', '/api/logout'];
+if (!in_array($uri, $publicRoutes)) {
+    Middleware::handle();
+}
 
 switch ($uri) {
 
@@ -43,6 +51,15 @@ switch ($uri) {
         $controller = new App\Controllers\ViewsController();
         $controller->showDashboard();
         break;
+    case '/pagoPendiente':
+        $controller = new App\controllers\ViewsController();
+        $controller->showRegistrarPago();
+        break;
+    case '/pagoEnviado':
+        $controller = new App\controllers\ViewsController;
+        $controller->showSalaEspera();
+        break;
+
 
     // APIS
 
@@ -57,6 +74,11 @@ switch ($uri) {
     case '/api/logout':
         $logout = new App\Controllers\AuthController();
         $logout->logout();
+        break;
+
+    case '/api/pay/firstPay':
+        $pay = new App\controllers\PaymentsController();
+        $pay->addPay();
         break;
 
     default:

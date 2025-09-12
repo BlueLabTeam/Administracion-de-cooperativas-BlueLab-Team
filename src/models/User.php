@@ -3,6 +3,7 @@
 namespace App\models;
 
 use App\config\Database;
+use PDOException;
 
 class User
 {
@@ -10,8 +11,10 @@ class User
     private $nombre_completo;
     private $passwordHash;
     private $email;
+    private $estado;
     private $ci;
     private $fecha_nacimiento;
+    private $fecha_ingreso;
     private $direccion;
 
 
@@ -53,6 +56,8 @@ class User
             $user->nombre_completo = $data['nombre_completo'];
             $user->passwordHash = $data['contrasena'];
             $user->email = $data['email'];
+            $user->estado = $data['estado'];
+            $user->fecha_ingreso = $data['fecha_ingreso'];
             $user->ci = $data['cedula'];
             $user->fecha_nacimiento = $data['fecha_nacimiento'];
             $user->direccion = $data['direccion'];
@@ -60,25 +65,21 @@ class User
         }
     }
 
-    public function update($id, $nombre_completo, $password, $email)
+    public function updateEstado($id, $nuevoEstado)
     {
-        // Aquí iría la lógica para actualizar un usuario en la base de datos
-        $this->id = $id;
-        $this->nombre_completo = $nombre_completo;
-        if ($password) {
-            $this->passwordHash = password_hash($password, PASSWORD_BCRYPT);
+        try {
+            $pdo = Database::getConnection();
+            $stmt = $pdo->prepare('UPDATE Usuario SET estado = ? WHERE id_usuario = ?');
+            return $stmt->execute([$nuevoEstado, $id]);
+        } catch (PDOException $e) {
+            error_log($e->getMessage());
+            return false;
         }
-        $this->email = $email;
     }
     public function delete($id)
     {
         // Aquí iría la lógica para eliminar un usuario de la base de datos
-        $this->id = $id;
     }
-
-    public function registrarHoras() {}
-
-    public function registrarPagos() {}
 
     // getters
     public function getId()
@@ -113,5 +114,9 @@ class User
     public function getDireccion()
     {
         return $this->direccion;
+    }
+    public function getEstado()
+    {
+        return $this->estado;
     }
 }
