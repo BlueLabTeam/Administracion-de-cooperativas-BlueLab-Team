@@ -1,0 +1,10 @@
+{
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "require": {
+        "jimdo/prometheus_client_php": "^0.9.1"
+    }
+}

@@ -1,0 +1,16 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"] # Prometheus se auto-monitorea
+  - job_name: "docker-app"
+    static_configs:
+      - targets: ["gestcoop_web:80"] # aquí iría un endpoint /metrics si tu app lo expone
+  - job_name: "mysql"
+    static_configs:
+      - targets: ["gestcoop_db:9104"] # si tienes un exporter de MySQL
+  - job_name: "cadvisor"
+    static_configs:
+      - targets: ["cadvisor:8080"] # si usas cadvisor para monitorear contenedores

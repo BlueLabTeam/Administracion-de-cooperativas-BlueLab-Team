@@ -1,0 +1,7 @@
+.env
+/vendor/
+/backups/
+/data/
+composer.lock
+*.log
+/storage/

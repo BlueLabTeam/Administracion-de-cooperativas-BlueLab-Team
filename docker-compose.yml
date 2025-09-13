@@ -1,29 +1,110 @@
 services:
-  Gestcoop-app:
-    image: php:8.2-apache
-    container_name: gestcoop-app
+  # usar cuando se haga la separacion de contenedores
+  gestcoop_apache:
+    image: httpd:2.4
+    container_name: gestcoop_apache
+    restart: unless-stopped
     ports:
-      - "8080:80"
+      - "80:80"
     volumes:
-      - ./public:/var/www/html
-      - ./app:/var/www/html/app
-    environment:
-      - APACHE_DOCUMENT_ROOT=/var/www/html/public
+      - ./public:/var/www/public
+      
+      - ./docker/apache/apache.conf:/usr/local/apache2/conf/extra/apache-custom.conf
+      - ./docker/apache/gestcoop.conf:/usr/local/apache2/conf/extra/gestcoop.conf
+      - ./docker/apache/httpd.conf:/usr/local/apache2/conf/httpd.conf
+
+    depends_on:
+      - gestcoop_php
     networks:
-      - gestcoop-network
-  Gestcoop-db:
+      - app-network
+
+  gestcoop_php:
+    build:
+      context: ./docker/php
+      dockerfile: dockerfile
+    container_name: gestcoop_php
+    restart: unless-stopped
+    volumes:
+      - ./public:/var/www/public
+      - ./src:/var/www/src
+      - ./storage/uploads:/var/www/storage/uploads
+      - ./vendor:/var/www/vendor
+    depends_on:
+      - gestcoop_db
+    env_file:
+      - .env
+    networks:
+      - app-network
+
+  gestcoop_db:
     image: mysql:8.0
-    container_name: gestcoop-db
-    ports:
-      - "3306:3306"
+    container_name: gestcoop_db
+    restart: unless-stopped
+    env_file:
+      - .env
     environment:
-      - MYSQL_ROOT_PASSWORD=root
-      - MYSQL_DATABASE=cooperativa
-      - MYSQL_USER=bluelab2025
-      - MYSQL_PASSWORD=bluelab2025
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    expose:
+      - "3306"
+    ports:
+      - "3306:3306" #solo para usar workbench y otros
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./sql/seeds.sql:/docker-entrypoint-initdb.d/seeds.sql
     networks:
-      - gestcoop-network
+      - app-network
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    restart: on-failure:5
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - app-network
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    restart: on-failure:5
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    depends_on:
+      - prometheus
+    networks:
+      - app-network
+      # cadvisor (aun no se sabe si se usara realmente en el proyecto)
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    restart: on-failure:5
+    expose:
+      - "8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+  rsync:
+    build:
+      context: ./docker/rsync
+      dockerfile: dockerfile
+    container_name: rsync
+    restart: on-failure:5
+    command: tail -f /dev/null
+    volumes:
+      - ./data:/data
+      - ./backups:/backups
+
+volumes:
+  db_data:
 
 networks:
-  gestcoop-network:
+  app-network:
     driver: bridge
