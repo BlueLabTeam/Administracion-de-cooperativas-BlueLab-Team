@@ -5,3 +5,5 @@
 composer.lock
 *.log
 /storage/
+provision.sh
+provisionNoDocker.sh
