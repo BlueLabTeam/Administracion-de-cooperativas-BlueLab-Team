@@ -24,8 +24,8 @@ $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
 Herramientas::startSession();
 
-$publicRoutes = ['/login', '/register', '/api/login', '/api/register', '/home', '/', '/api/pay/firstPay', '/api/logout'];
-if (!in_array($uri, $publicRoutes)) {
+$privateRoutes = ['/dashboard', '/pagoPendiente', '/pagoEnviado', 'api/pay/firstPay'];
+if (in_array($uri, $privateRoutes)) {
     Middleware::handle();
 }
 
