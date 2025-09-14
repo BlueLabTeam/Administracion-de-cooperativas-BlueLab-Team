@@ -356,27 +356,7 @@
   <?php include __DIR__ . '/includes/footer.html'; ?>
 
   <script>
-    // Función para alternar servicios
-    function toggleServicio(index) {
-      const servicios = document.querySelectorAll('.servicios ul li');
-      const detalles = document.querySelectorAll('.servicio-detalle');
-      
-      // Cerrar todos los otros detalles
-      detalles.forEach((detalle, i) => {
-        if (i !== index) {
-          detalle.classList.remove('active');
-        }
-      });
-      
-      // Alternar el detalle actual
-      detalles[index].classList.toggle('active');
-      
-      // Añadir efecto de bounce al servicio clickeado
-      servicios[index].style.animation = 'none';
-      setTimeout(() => {
-        servicios[index].style.animation = 'bounceIn 0.3s ease';
-      }, 10);
-    }
+    
 
     // Función para alternar preguntas
     function togglePregunta(index) {
@@ -547,20 +527,6 @@
         incorporacionSection.style.borderRadius = '15px';
         incorporacionSection.style.padding = '20px';
         
-        // Mostrar mensaje de felicitación
-        const mensajeFelicitacion = document.createElement('div');
-        mensajeFelicitacion.innerHTML = `
-          <div style="background: #28a745; color: white; padding: 15px; border-radius: 10px; margin-top: 20px; text-align: center; animation: bounceIn 0.5s ease;">
-            <h3>¡Felicitaciones! 🎉</h3>
-            <p>Has completado todos los pasos del proceso de incorporación</p>
-          </div>
-        `;
-        
-        if (!incorporacionSection.querySelector('[style*="28a745"]')) {
-          incorporacionSection.appendChild(mensajeFelicitacion.firstElementChild);
-        }
-      }
-    };
 
     // Modificar la función togglePaso para actualizar progreso
     const originalTogglePaso = togglePaso;
