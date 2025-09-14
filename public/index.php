@@ -83,6 +83,6 @@ switch ($uri) {
 
     default:
         http_response_code(404);
-        include __DIR__ . '/../src/views/404error.html';
+        include __DIR__ . '/../src/views/404error.php';
         break;
 }

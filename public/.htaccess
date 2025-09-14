@@ -7,3 +7,4 @@ RewriteCond %{REQUEST_FILENAME} !-d
 
 RewriteRule ^ index.php [L]
 
+ErrorDocument 404 /../src/Views/404error.html
