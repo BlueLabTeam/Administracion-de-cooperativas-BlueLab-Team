@@ -132,10 +132,13 @@ services:
       dockerfile: dockerfile
     container_name: rsync
     restart: on-failure:5
-    command: tail -f /dev/null
     volumes:
-      - ./data:/data
+      - ./storage/uploads:/data/uploads
       - ./backups:/backups
+    # entrypoint: ["sh", "-c", "crond -f -l 8"]
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      DB_NAME: ${DB_NAME}
 
     logging:
       driver: syslog
