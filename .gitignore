@@ -5,3 +5,9 @@
 composer.lock
 *.log
 /storage/
+/logs/
+provisionNoDocker.sh
+
+# para mas adelante con https
+
+default-ssl.conf
