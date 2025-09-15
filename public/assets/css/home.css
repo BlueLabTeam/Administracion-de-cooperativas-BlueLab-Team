@@ -1,0 +1,171 @@
+  
+   
+    .servicios ul li {
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border-radius: 8px;
+      padding: 15px;
+      margin: 10px 0;
+      
+    
+    }
+    
+    .servicios ul li:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      
+    }
+    
+    .servicio-detalle {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease, padding 0.3s ease;
+      background: #3373b5;
+      margin-top: 10px;
+      
+    }
+    
+    .servicio-detalle.active {
+      max-height: 200px;
+      padding: 15px;
+    }
+    
+    .incorporacion ol li {
+      cursor: pointer;
+      transition: all 0.3s ease;
+      padding: 20px;
+      margin: 15px 0;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      border: 2px solid transparent;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .incorporacion ol li:hover {
+      transform: scale(1.02);
+      border-color: #007bff;
+      box-shadow: 0 8px 25px rgba(0,123,255,0.15);
+    }
+    
+    .incorporacion ol li.completed {
+      background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+      border-color: #28a745;
+    }
+    
+    .incorporacion ol li::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+      transition: left 0.5s;
+    }
+    
+    .incorporacion ol li:hover::before {
+      left: 100%;
+    }
+    
+    .numero {
+      transition: all 0.3s ease;
+    }
+    
+    .incorporacion ol li:hover .numero {
+      transform: scale(1.2) rotate(360deg);
+      background: #007bff;
+      color: white;
+    }
+    
+    .preguntas ul li {
+      cursor: pointer;
+      transition: all 0.3s ease;
+      padding: 15px 20px;
+      margin: 8px 0;
+      background: #f8f9fa;
+      border-radius: 8px;
+      border-left: 4px solid #6c757d;
+      position: relative;
+    }
+    
+    .preguntas ul li:hover {
+      background: #e9ecef;
+      color: #3373b5;
+      border-left-color: #007bff;
+      transform: translateX(5px);
+    }
+    
+    .preguntas ul li::after {
+      content: '+';
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 24px;
+      font-weight: bold;
+      color: #6c757d;
+      transition: all 0.3s ease;
+    }
+    
+    .preguntas ul li.active::after {
+      transform: translateY(-50%) rotate(45deg);
+      color: #007bff;
+    }
+    
+    .pregunta-respuesta {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease, padding 0.3s ease;
+      background: #ffffff;
+      margin-top: 10px;
+      border-radius: 4px;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .pregunta-respuesta.active {
+      max-height: 150px;
+      padding: 15px;
+      border: 1px solid #dee2e6;
+    }
+    
+    .button--primary, .button--secondary, .motivacion__button {
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .button--primary:hover, .motivacion__button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0,123,255,0.4);
+    }
+    
+    .button--secondary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(108,117,125,0.4);
+    }
+    
+    .fade-in {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 0.6s ease forwards;
+    }
+    
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .bounce-in {
+      animation: bounceIn 0.6s ease;
+    }
+    
+    @keyframes bounceIn {
+      0% { transform: scale(0.3); opacity: 0; }
+      50% { transform: scale(1.05); }
+      70% { transform: scale(0.9); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+ 
