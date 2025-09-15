@@ -758,6 +758,7 @@ main {
   }
 }
 
+<<<<<<< HEAD
 /* UTILIDADES */
 .text-center { text-align: center; }
 .mb-0 { margin-bottom: 0; }
@@ -766,3 +767,5 @@ main {
 .mt-0 { margin-top: 0; }
 .mt-1 { margin-top: 1rem; }
 .mt-2 { margin-top: 2rem; }
+=======
+>>>>>>> 8fc8a4de417dd0df769a6a1448381c08e2c2275a
