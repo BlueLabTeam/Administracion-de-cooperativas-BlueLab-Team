@@ -7,7 +7,6 @@
   <title>Gestcoop</title>
   <link rel="stylesheet" href="/assets/css/styles.css" />
   <link rel="stylesheet" href="/assets/css/home.css" />
-
 </head>
 
 <body>
@@ -171,7 +170,7 @@
     
     <div class="motivacion fade-in">
       <h2 class="motivacion__titulo">
-        Comienza tu camino hacia la vivienda propia!
+        ¡Comienza tu camino hacia la vivienda propia!
       </h2>
       <p>
         Contáctanos para más información sobre nuestros servicios de
@@ -187,8 +186,6 @@
   <?php include __DIR__ . '/includes/footer.html'; ?>
 
   <script>
-    
-
     // Función para alternar preguntas
     function togglePregunta(index) {
       const preguntas = document.querySelectorAll('.preguntas ul li');
@@ -357,7 +354,8 @@
         incorporacionSection.style.border = '2px solid #28a745';
         incorporacionSection.style.borderRadius = '15px';
         incorporacionSection.style.padding = '20px';
-        
+      }
+    };
 
     // Modificar la función togglePaso para actualizar progreso
     const originalTogglePaso = togglePaso;

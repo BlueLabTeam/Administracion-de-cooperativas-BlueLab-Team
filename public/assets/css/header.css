@@ -1,50 +1,80 @@
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background-color: #ffffff;
+  position: relative;
+  z-index: 10;
+  flex-wrap: wrap; 
+}
 
-  header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.header__title {
+  font-size: 1.5rem;
+  color: var(--color-primary);
+}
+
+nav ul {
+  list-style: none;
+  display: flex;
+  gap: 1rem;
+}
+
+a {
+  margin: 5px;
+  text-decoration: none;
+  color: var(--text-color-primary);
+}
+
+.header__login {
+  font-size: 1rem;
+  color: var(--color-secondary);
+  background-color: var(--color-primary);
+  padding: 0rem 2rem;
+  border-radius: 50px;
+}
+
+.button__ingresar {
+  background-color: var(--color-primary);
+  color: var(--color-secondary);
+  padding: 0.5rem 1rem;
+  border: none;
+  cursor: pointer;
+  border-radius: 50px;
+}
+
+
+.background-animation {
+  pointer-events: none;
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 768px) {
+  nav ul {
+    flex-direction: column;
+    gap: 0.5rem;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: #fff;
+    width: 100%;
     padding: 1rem;
-    background-color: #ffffff; /* Fondo blanco */
-    position: relative;
-    z-index: 10; /* siempre encima de animaciones */
+    display: none; 
   }
 
-  .header__title {
+  nav ul.active {
+    display: flex; 
+  }
+
+  .menu-toggle {
+    display: block;
+    cursor: pointer;
     font-size: 1.5rem;
     color: var(--color-primary);
   }
+}
 
-  nav ul {
-    list-style: none;
-    display: flex;
-    gap: 1rem;
-  }
 
-  a {
-    margin: 5px;
-    text-decoration: none;
-    color: var(--text-color-primary);
-  }
-
-  .header__login {
-    font-size: 1rem;
-    color: var(--color-secondary);
-    background-color: var(--color-primary);
-    padding: 0rem 2rem;
-    border-radius: 50px;
-  }
-
-  .button__ingresar {
-    background-color: var(--color-primary);
-    color: var(--color-secondary);
-    padding: 0.5rem 1rem;
-    border: none;
-    cursor: pointer;
-    border-radius: 50px;
-  }
-
-  /* evita que la animación de fondo bloquee los clics */
-  .background-animation {
-    pointer-events: none;
-  }
-
+.menu-toggle {
+  display: none;
+}
