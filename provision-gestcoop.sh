@@ -46,8 +46,8 @@ update_and_install(){
       $SUDO apt-get update -y
       $SUDO apt-get install -y curl git wget ca-certificates gnupg lsb-release unzip netcat-openbsd
       ;;
-    centos|rhel)
-      $SUDO yum install -y curl git wget ca-certificates unzip nc
+    centos|rhel|rocky)
+      $SUDO dnf install -y curl git wget ca-certificates unzip nc
       ;;
     fedora)
       $SUDO dnf install -y curl git wget ca-certificates unzip nc
@@ -64,7 +64,8 @@ install_docker(){
     log "Docker ya instalado: $(docker --version)"
     return
   fi
-  log "Instalando Docker (modo automático para Debian/Ubuntu)..."
+  log "Instalando Docker (modo automático para Debian/Ubuntu/Rocky)..."
+
   if [[ "$OS" == "ubuntu" || "$OS" == "debian" ]]; then
     $SUDO apt-get remove -y docker docker-engine docker.io containerd runc || true
     $SUDO apt-get update -y
@@ -76,6 +77,13 @@ install_docker(){
       $(lsb_release -cs) stable" | $SUDO tee /etc/apt/sources.list.d/docker.list > /dev/null
     $SUDO apt-get update -y
     $SUDO apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+  elif [[ "$OS" == "rocky" || "$OS" == "centos" || "$OS" == "rhel" ]]; then
+    log "Instalando Docker en $OS vía repos oficial"
+    $SUDO dnf remove -y docker docker-client docker-client-latest docker-common docker-latest docker-latest-logrotate docker-logrotate docker-engine || true
+    $SUDO dnf -y install dnf-plugins-core
+    $SUDO dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+    $SUDO dnf install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+    $SUDO systemctl enable --now docker
   else
     err "Instalación automática de Docker no implementada para $OS. Instálalo manualmente."
   fi
@@ -83,11 +91,6 @@ install_docker(){
   # Añadir usuario al grupo docker
   $SUDO usermod -aG docker "$REAL_USER" || true
 
-  # Enable/start
-  if command -v systemctl >/dev/null 2>&1; then
-    $SUDO systemctl enable docker || true
-    $SUDO systemctl start docker || true
-  fi
   log "Docker instalado (versión: $(docker --version || echo 'no disponible'))"
 }
 
