@@ -171,6 +171,11 @@ setup_project(){
     $SUDO chmod -R 755 public || true
   fi
 
+  if [ -d logs ]; then
+    log "Ajustando permisos en logs..."
+    chmod -R 775 logs || true
+  fi
+
   log "Setup del proyecto finalizado."
 }
 

@@ -10,15 +10,13 @@ services:
     volumes:
       - ./public:/var/www/public
 
+# Funcionalidad a futuro
       - ./certs:/etc/apache2/certs
       - ./docker/apache/default-ssl.conf:/usr/local/apache2/conf/extra/httpd-ssl.conf
 
       - ./docker/apache/apache.conf:/usr/local/apache2/conf/extra/apache-custom.conf
       - ./docker/apache/gestcoop.conf:/usr/local/apache2/conf/extra/gestcoop.conf
       - ./docker/apache/httpd.conf:/usr/local/apache2/conf/httpd.conf
-
-    # command: >
-    #   /bin/bash -c "echo 'Include conf/extra/httpd-ssl.conf' >> /usr/local/apache2/conf/httpd.conf && httpd-foreground"
     depends_on:
       syslog:
         condition: service_healthy
@@ -150,12 +148,14 @@ services:
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
       DB_NAME: ${DB_NAME}
 
+# NO FUNCIONA AUN LOS LOGS
     # logging:
     #   driver: syslog
     #   options:
     #     syslog-address: "tcp://syslog:514"
     #     tag: "rsync"
 
+# NO FUNCIONA AUN LOS LOGS
   syslog:
     build:
       context: docker/syslog
