@@ -29,7 +29,7 @@
         Más información
       </button>
     </div>
-    
+
     <div class="servicios fade-in">
       <h2>Nuestros Servicios</h2>
       <p>
@@ -90,7 +90,7 @@
         </li>
       </ul>
     </div>
-    
+
     <div class="incorporacion fade-in">
       <h2>Proceso de incorporación</h2>
       <p>Para unirte a nuestro equipo, sigue estos pasos:</p>
@@ -137,37 +137,41 @@
         </li>
       </ol>
     </div>
-    
+
     <div class="preguntas fade-in">
       <h2>Preguntas Frecuentes</h2>
       <ul>
         <li onclick="togglePregunta(0)">
           ¿Cómo puedo solicitar un servicio?
           <div class="pregunta-respuesta">
-            Puedes solicitar nuestros servicios a través del botón "Solicitar ingreso" o contactándonos directamente por teléfono. Nuestro equipo te guiará en todo el proceso.
+            Puedes solicitar nuestros servicios a través del botón "Solicitar ingreso" o contactándonos directamente por
+            teléfono. Nuestro equipo te guiará en todo el proceso.
           </div>
         </li>
         <li onclick="togglePregunta(1)">
           ¿Cuáles son los métodos de pago aceptados?
           <div class="pregunta-respuesta">
-            Aceptamos transferencias bancarias, pagos en efectivo, tarjetas de crédito y débito. También ofrecemos planes de pago flexibles según tus necesidades.
+            Aceptamos transferencias bancarias, pagos en efectivo, tarjetas de crédito y débito. También ofrecemos
+            planes de pago flexibles según tus necesidades.
           </div>
         </li>
         <li onclick="togglePregunta(2)">
           ¿Ofrecen soporte después de la consultoría?
           <div class="pregunta-respuesta">
-            Sí, brindamos soporte continuo durante 6 meses después de completar la consultoría. Esto incluye consultas telefónicas y seguimiento de tu progreso.
+            Sí, brindamos soporte continuo durante 6 meses después de completar la consultoría. Esto incluye consultas
+            telefónicas y seguimiento de tu progreso.
           </div>
         </li>
         <li onclick="togglePregunta(3)">
           ¿Puedo cancelar mi solicitud?
           <div class="pregunta-respuesta">
-            Puedes cancelar tu solicitud en cualquier momento antes de la firma del contrato. Si ya iniciamos el trabajo, aplicarán las condiciones establecidas en el contrato.
+            Puedes cancelar tu solicitud en cualquier momento antes de la firma del contrato. Si ya iniciamos el
+            trabajo, aplicarán las condiciones establecidas en el contrato.
           </div>
         </li>
       </ul>
     </div>
-    
+
     <div class="motivacion fade-in">
       <h2 class="motivacion__titulo">
         ¡Comienza tu camino hacia la vivienda propia!
@@ -190,7 +194,7 @@
     function togglePregunta(index) {
       const preguntas = document.querySelectorAll('.preguntas ul li');
       const respuestas = document.querySelectorAll('.pregunta-respuesta');
-      
+
       // Cerrar todas las otras respuestas
       respuestas.forEach((respuesta, i) => {
         if (i !== index) {
@@ -198,7 +202,7 @@
           preguntas[i].classList.remove('active');
         }
       });
-      
+
       // Alternar la respuesta actual
       respuestas[index].classList.toggle('active');
       preguntas[index].classList.toggle('active');
@@ -207,10 +211,10 @@
     // Función para alternar pasos de incorporación
     function togglePaso(index) {
       const pasos = document.querySelectorAll('.incorporacion ol li');
-      
+
       // Marcar el paso como completado
       pasos[index].classList.toggle('completed');
-      
+
       // Efecto de celebración si se completa un paso
       if (pasos[index].classList.contains('completed')) {
         confetti(pasos[index]);
@@ -232,9 +236,9 @@
           animation: confettiFall 1s ease-out forwards;
           z-index: 1000;
         `;
-        
+
         element.parentElement.appendChild(confettiPiece);
-        
+
         setTimeout(() => {
           confettiPiece.remove();
         }, 1000);
@@ -277,16 +281,16 @@
     // Efectos de botones
     document.addEventListener('DOMContentLoaded', () => {
       const buttons = document.querySelectorAll('button');
-      
+
       buttons.forEach(button => {
-        button.addEventListener('click', function(e) {
+        button.addEventListener('click', function (e) {
           // Efecto ripple
           const ripple = document.createElement('span');
           const rect = this.getBoundingClientRect();
           const size = Math.max(rect.width, rect.height);
           const x = e.clientX - rect.left - size / 2;
           const y = e.clientY - rect.top - size / 2;
-          
+
           ripple.style.cssText = `
             position: absolute;
             width: ${size}px;
@@ -299,17 +303,17 @@
             animation: ripple 0.6s ease-out;
             pointer-events: none;
           `;
-          
+
           this.style.position = 'relative';
           this.style.overflow = 'hidden';
           this.appendChild(ripple);
-          
+
           setTimeout(() => {
             ripple.remove();
           }, 600);
         });
       });
-      
+
       // Añadir animación ripple
       const rippleStyle = document.createElement('style');
       rippleStyle.textContent = `
@@ -328,7 +332,7 @@
       const titulo = document.querySelector('.bienvenida h1');
       const textoOriginal = titulo.textContent;
       titulo.textContent = '';
-      
+
       let i = 0;
       const typeWriter = () => {
         if (i < textoOriginal.length) {
@@ -337,7 +341,7 @@
           setTimeout(typeWriter, 100);
         }
       };
-      
+
       setTimeout(typeWriter, 500);
     });
 
@@ -347,7 +351,7 @@
 
     const actualizarProgreso = () => {
       pasosCompletados = document.querySelectorAll('.incorporacion ol li.completed').length;
-      
+
       if (pasosCompletados === totalPasos) {
         const incorporacionSection = document.querySelector('.incorporacion');
         incorporacionSection.style.background = 'linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%)';
@@ -359,7 +363,7 @@
 
     // Modificar la función togglePaso para actualizar progreso
     const originalTogglePaso = togglePaso;
-    togglePaso = function(index) {
+    togglePaso = function (index) {
       originalTogglePaso(index);
       setTimeout(actualizarProgreso, 100);
     };

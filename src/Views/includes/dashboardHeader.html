@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cooperativa de Viviendas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/assets/css/dashboardHeader.css" />
+    <link rel="stylesheet" href="/assets/css/dashboardUsuario.css" />
+    <link rel="stylesheet" href="/assets/css/dashboardNotificaciones.css" />
+</head>
+
+<body>
+
+    <header class="header">
+        <div class="logo">
+            <h1>Cooperativa de Viviendas</h1>
+        </div>
+
+        <div class="user-controls">
+            <a href="/api/logout" class="logout-link">
+                <button class="btn-logout">Logout</button>
+            </a>
+            <button class="btn-usuario">Usuario</button>
+            <button class="btn-admin">Admin</button>
+            <span class="nombre">Nombre</span>
+            <div class="icono-usuario">
+                <img src="https://cdn-icons-png.flaticon.com/512/847/847969.png" alt="Usuario">
+            </div>
+        </div>
+    </header>
+
+    <nav class="menu">
+        <ul>
+            <li class="activo">
+                <a href="#perfil">
+                    <i class="fas fa-user"></i>
+                    <small>Perfil</small>
+                </a>
+            </li>
+            <li>
+                <a href="#solicitudes">
+                    <i class="fas fa-file-alt"></i>
+                    <small>Solicitudes</small>
+                </a>
+            </li>
+            <li>
+                <a href="#vivienda">
+                    <i class="fas fa-home"></i>
+                    <small>Vivienda</small>
+                </a>
+            </li>
+            <li>
+                <a href="#inicio">
+                    <i class="fas fa-house-user"></i>
+                    <small>Inicio</small>
+                </a>
+            </li>
+            <li>
+                <a href="#aportes">
+                    <i class="fas fa-hand-holding-usd"></i>
+                    <small>Aportes</small>
+                </a>
+            </li>
+            <li>
+                <a href="#horas">
+                    <i class="fas fa-clock"></i>
+                    <small>Horas</small>
+                </a>
+            </li>
+            <li>
+                <a href="#docs">
+                    <i class="fas fa-folder-open"></i>
+                    <small>Docs</small>
+                </a>
+            </li>
+        </ul>
+    </nav>
