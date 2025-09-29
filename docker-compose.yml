@@ -1,5 +1,4 @@
 services:
-  # usar cuando se haga la separacion de contenedores
   gestcoop_apache:
     image: httpd:2.4
     container_name: gestcoop_apache
@@ -10,30 +9,19 @@ services:
     volumes:
       - ./public:/var/www/public
 
-# Funcionalidad a futuro
-      - ./certs:/etc/apache2/certs
-      - ./docker/apache/default-ssl.conf:/usr/local/apache2/conf/extra/httpd-ssl.conf
+      # # Funcionalidad a futuro
+      # - ./certs:/etc/apache2/certs
+      # - ./docker/apache/default-ssl.conf:/usr/local/apache2/conf/extra/httpd-ssl.conf
 
+      #configuraciones apache
       - ./docker/apache/apache.conf:/usr/local/apache2/conf/extra/apache-custom.conf
       - ./docker/apache/gestcoop.conf:/usr/local/apache2/conf/extra/gestcoop.conf
       - ./docker/apache/httpd.conf:/usr/local/apache2/conf/httpd.conf
     depends_on:
-      syslog:
-        condition: service_healthy
       gestcoop_php:
         condition: service_started
-
-    # logging:
-    #   driver: syslog
-    #   options:
-    #     syslog-address: "tcp://syslog:514" #cambiar a tcp en prod
-    #     tag: "gestcoop_apache"
-
     networks:
       - app-network
-      #Se intenta implementar el sistema de logs
-      - logs-net
-
   gestcoop_php:
     build:
       context: ./docker/php
@@ -46,23 +34,12 @@ services:
       - ./storage/uploads:/var/www/storage/uploads
       - ./vendor:/var/www/vendor
     depends_on:
-      syslog:
-        condition: service_healthy
       gestcoop_db:
         condition: service_started
     env_file:
       - .env
-
-    # logging:
-    #   driver: syslog
-    #   options:
-    #     syslog-address: "tcp://syslog:514" #cambiar a tcp en prod
-    #     tag: "gestcoop_php"
-
     networks:
       - app-network
-      - logs-net
-
   gestcoop_db:
     image: mysql:8.0
     container_name: gestcoop_db
@@ -74,119 +51,112 @@ services:
       MYSQL_DATABASE: ${DB_NAME}
       MYSQL_USER: ${DB_USER}
       MYSQL_PASSWORD: ${DB_PASSWORD}
-    depends_on:
-      syslog:
-        condition: service_healthy
     # expose:
     #   - "3306"
-    # # ports:
-    # #   - "3306:3306" #solo para usar workbench y otros
+    # ports:
+    #   - "127.0.0.1:3306:3306" # Solo accesible desde localhost
     volumes:
       - db_data:/var/lib/mysql
       - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql
       - ./sql/seeds.sql:/docker-entrypoint-initdb.d/seeds.sql
-
-    # logging:
-    #   driver: syslog
-    #   options:
-    #     syslog-address: "tcp://syslog:514" #cambiar a tcp en prod
-    #     tag: "gestcoop_db"
-
     networks:
       - app-network
-      - logs-net
-  prometheus:
-    image: prom/prometheus
-    container_name: prometheus
-    restart: on-failure:5
-    ports:
-      - "9090:9090"
-    volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
 
-    networks:
-      - app-network
-  grafana:
-    image: grafana/grafana
-    container_name: grafana
-    restart: on-failure:5
-    ports:
-      - "3000:3000"
+  # # Servicios de monitoreo (se pueden activar si se desea)
+  # prometheus:
+  #   image: prom/prometheus
+  #   container_name: prometheus
+  #   restart: on-failure:5
+  #   ports:
+  #     - "9090:9090"
+  #   volumes:
+  #     - ./prometheus.yml:/etc/prometheus/prometheus.yml
+
+  #   networks:
+  #     - app-network
+  # grafana:
+  #   image: grafana/grafana
+  #   container_name: grafana
+  #   restart: on-failure:5
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     - GF_SECURITY_ADMIN_PASSWORD=admin
+  #   depends_on:
+  #     - prometheus
+
+  #   networks:
+  #     - app-network
+
+  #     # cadvisor (aun no se sabe si se usara realmente en el proyecto)
+  # cadvisor:
+  #   image: gcr.io/cadvisor/cadvisor:latest
+  #   container_name: cadvisor
+  #   restart: on-failure:5
+  #   expose:
+  #     - "8080"
+  #   volumes:
+  #     - /:/rootfs:ro
+  #     - /var/run:/var/run:ro
+  #     - /sys:/sys:ro
+  #     - /var/lib/docker/:/var/lib/docker:ro
+  #   networks:
+  #     - app-network
+
+  # # SERVICIO PARA BACKUPS DE LA BASE DE DATOS Y UPLOADS
+  # # no funciona aun
+  # rsync:
+  #   build:
+  #     context: ./docker/rsync
+  #     dockerfile: dockerfile
+  #   container_name: rsync
+  #   restart: on-failure:5
+  #   volumes:
+  #     - ./storage/uploads:/data/uploads
+  #     - ./backups:/backups
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+  #     DB_NAME: ${DB_NAME}
+  #   logging:
+  #     driver: syslog
+  #     options:
+  #       syslog-address: "tcp://syslog:514"
+  #       tag: "rsync"
+
+  # CENTRALIZACION DE LOGS ELASTICSEARCH + KIBANA + LOGSTASH
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.15.0
+    container_name: elasticsearch
     environment:
-      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+    ports:
+      - "9200:9200"
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.15.0
+    container_name: kibana
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:8.15.0
+    container_name: filebeat
+    user: root # para leer logs del host/otros contenedores
+    volumes:
+      - ./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     depends_on:
-      - prometheus
-
-    networks:
-      - app-network
-
-      # cadvisor (aun no se sabe si se usara realmente en el proyecto)
-  cadvisor:
-    image: gcr.io/cadvisor/cadvisor:latest
-    container_name: cadvisor
-    restart: on-failure:5
-    expose:
-      - "8080"
-    volumes:
-      - /:/rootfs:ro
-      - /var/run:/var/run:ro
-      - /sys:/sys:ro
-      - /var/lib/docker/:/var/lib/docker:ro
-    networks:
-      - app-network
-
-  rsync:
-    build:
-      context: ./docker/rsync
-      dockerfile: dockerfile
-    container_name: rsync
-    restart: on-failure:5
-    volumes:
-      - ./storage/uploads:/data/uploads
-      - ./backups:/backups
-    environment:
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
-      DB_NAME: ${DB_NAME}
-
-# NO FUNCIONA AUN LOS LOGS
-    # logging:
-    #   driver: syslog
-    #   options:
-    #     syslog-address: "tcp://syslog:514"
-    #     tag: "rsync"
-
-# NO FUNCIONA AUN LOS LOGS
-  syslog:
-    build:
-      context: docker/syslog
-      dockerfile: dockerfile
-    container_name: syslog-server
-    restart: unless-stopped
-    networks:
-      - logs-net
-    healthcheck:
-      test: ["CMD-SHELL", "nc -z 127.0.0.1 514"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 5s
-    cap_add:
-      - NET_BIND_SERVICE # opcional si necesitas binding a puertos <1024
-    environment:
-      SYSLOG_TLS: "no" # depende de la imagen
-
-    ports:
-      - "514:514/udp" # Puerto estándar syslog udp
-      - "514:514/tcp" # Opcional, si quieres TCP
-    volumes:
-      - ./docker/syslog/syslog-ng.conf:/etc/syslog-ng/syslog-ng.conf:ro
-      - ./logs:/var/log/syslog-ng # Carpeta local para guardar logs
+      - elasticsearch
 
 volumes:
   db_data:
-
+  es_data:
 networks:
   app-network:
-    driver: bridge
-  logs-net:
     driver: bridge
