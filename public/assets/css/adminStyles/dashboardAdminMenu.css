@@ -1,0 +1,71 @@
+.menu {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: center;
+}
+
+.menu ul {
+    display: flex;
+    list-style: none;
+    gap: 1rem;
+    padding: 0;
+    margin: 0;
+}
+
+.menu ul li {
+    text-align: center;
+}
+
+.menu ul li button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+
+    background: #f0f0f0;
+    color: #333;
+    font-size: 0.75rem;
+    border: none;
+    cursor: pointer;
+
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.menu ul li button i {
+    font-size: 1.2rem;
+    margin-bottom: 0.3rem;
+    background: linear-gradient(90deg, #1283DA, #2DADDC);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.menu ul li button small {
+    font-size: 0.7rem;
+    font-weight: 500;
+
+    background: linear-gradient(90deg, #1283DA, #2DADDC);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Hover efecto */
+.menu ul li button:hover {
+    transform: scale(1.05);
+}
+
+/* Activo (seleccionado) */
+.menu ul li button.active {
+    background: linear-gradient(135deg, #1283DA, #2DADDC);
+    color: #fff;
+}
+
+.menu ul li button.active i,
+.menu ul li button.active small {
+    background: none;
+    -webkit-text-fill-color: #fff;
+}

@@ -20,7 +20,7 @@ class ViewsController
     }
     public function showDashboard()
     {
-        require __DIR__ . '/../Views/dashboardUsuario.php';
+        require __DIR__ . '/../Views/dashboardBackoffice.php';
     }
     public function showRegistrarPago()
     {

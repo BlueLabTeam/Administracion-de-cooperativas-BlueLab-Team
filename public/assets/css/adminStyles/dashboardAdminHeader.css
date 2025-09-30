@@ -1,0 +1,59 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  background-color: #00529b;
+  color: white;
+}
+
+.header .logo h1 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.header .user-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logout-link {
+  text-decoration: none;
+}
+
+.btn-logout {
+  background-color: #d9534f;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.btn-logout:hover {
+  background-color: #c9302c;
+}
+
+.btn-usuario,
+.btn-admin {
+  background-color: #ffffff33;
+  border: none;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.nombre {
+  color: white;
+  font-size: 14px;
+}
+
+.icono-usuario img {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+}

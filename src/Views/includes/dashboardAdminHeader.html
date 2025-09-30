@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Administrador - Cooperativa de Viviendas</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/assets/css/adminStyles/dashboardAdminHeader.css">
+    <link rel="stylesheet" href="/assets/css/adminStyles/dashboardAdminMenu.css">
+    <link rel="stylesheet" href="/assets/css/adminStyles/dashboardAdminMain.css">
+</head>
+
+<body>
+
+    <header>
+        <div class="header-top">
+            <h2>Panel Administrador - Cooperativa de Viviendas</h2>
+            <a href="/api/logout">
+                <button class="btn-logout">Logout</button>
+            </a>
+        </div>
+
+        <nav class="menu">
+    <ul>
+        <li><a href="#" data-page="reportes"><i class="fas fa-chart-line"></i><small>Reportes</small></a></li>
+        <li><a href="#" data-page="usuarios"><i class="fas fa-users"></i><small>Usuarios</small></a></li>
+        <li><a href="#" data-page="nucleo"><i class="fas fa-network-wired"></i><small>Núcleo</small></a></li>
+        <li><a href="#" data-page="viviendas"><i class="fas fa-home"></i><small>Viviendas</small></a></li>
+        <li><a href="#" data-page="inicio"><i class="fas fa-house-user"></i><small>Inicio</small></a></li>
+        <li><a href="#" data-page="facturacion"><i class="fas fa-file-invoice-dollar"></i><small>Facturación</small></a></li>
+        <li><a href="#" data-page="notificaciones"><i class="fas fa-bell"></i><small>Notificaciones</small></a></li>
+        <li><a href="#" data-page="inventario"><i class="fas fa-boxes"></i><small>Inventario</small></a></li>
+        <li><a href="#" data-page="tareas"><i class="fas fa-tasks"></i><small>Tareas</small></a></li>
+    </ul>
+</nav>
+    </header>
+
+    <script src="/assets/js/dashboardAdmin.js"></script>
+
+</body>
+
+</html>
