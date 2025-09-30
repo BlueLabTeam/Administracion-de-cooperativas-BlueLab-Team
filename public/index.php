@@ -4,27 +4,13 @@ require __DIR__ . '/../vendor/autoload.php';
 
 use App\middlewares\Middleware;
 use App\utils\Herramientas;
-// // Cargar variables de entorno pruebas prometheus
-// use Prometheus\CollectorRegistry;
-// use Prometheus\RenderTextFormat;
-
-// $registry = new CollectorRegistry(new \Prometheus\Storage\InMemory());
-// $counter = $registry->getOrRegisterCounter('app', 'requests_total', 'Total de requests', ['method']);
-// $counter->inc(['GET']);
-
-// if ($_SERVER['REQUEST_URI'] === '/metrics') {
-//     header('Content-Type: ' . RenderTextFormat::MIME_TYPE);
-//     echo (new RenderTextFormat())->render($registry->getMetricFamilySamples());
-//     exit;
-// }
-
 
 //app 
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
 Herramientas::startSession();
 
-$privateRoutes = ['/dashboard', '/pagoPendiente', '/pagoEnviado', 'api/pay/firstPay'];
+$privateRoutes = ['/dashboard', '/dashboard-admin', '/pagoPendiente', '/pagoEnviado', 'api/pay/firstPay'];
 if (in_array($uri, $privateRoutes)) {
     Middleware::handle();
 }
@@ -51,6 +37,10 @@ switch ($uri) {
         $controller = new App\Controllers\ViewsController();
         $controller->showDashboard();
         break;
+    case '/dashboard-admin':
+        $controller = new App\Controllers\ViewsController();
+        $controller->showDashboardAdmin();
+        break;
     case '/pagoPendiente':
         $controller = new App\controllers\ViewsController();
         $controller->showRegistrarPago();
@@ -64,13 +54,14 @@ switch ($uri) {
     // APIS
 
     case '/api/login':
-        $login = new App\Controllers\AuthController();
-        $login->login($_POST);
-        break;
-    case '/api/register':
-        $register = new App\Controllers\AuthController();
-        $register->register($_POST);
-        break;
+    $login = new App\Controllers\AuthController();
+    $login->login();  // ✅ Sin parámetros
+    break;
+case '/api/register':
+    $register = new App\Controllers\AuthController();
+    $register->register();  // ✅ Sin parámetros
+    break;
+    
     case '/api/logout':
         $logout = new App\Controllers\AuthController();
         $logout->logout();
@@ -80,6 +71,16 @@ switch ($uri) {
         $pay = new App\controllers\PaymentsController();
         $pay->addPay();
         break;
+
+        case '/api/payment/approve':
+    $payments = new App\Controllers\PaymentsController();
+    $payments->approvePayment();
+    break;
+
+case '/api/payment/reject':
+    $payments = new App\Controllers\PaymentsController();
+    $payments->rejectPayment();
+    break;
 
     default:
         http_response_code(404);

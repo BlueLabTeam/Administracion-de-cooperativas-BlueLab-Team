@@ -268,27 +268,33 @@
 
   <script>
     // lógica fetch original
-    document.querySelector("#form-login").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const formData = new FormData(e.target);
-      try {
-        const response = await fetch("/api/login", {
-          method: "POST",
-          body: formData
-        });
-        const data = await response.json();
+   document.querySelector("#form-login").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const formData = new FormData(e.target);
+  try {
+    const response = await fetch("/api/login", {
+      method: "POST",
+      body: formData
+    });
+    
+    // DEBUG: Ver qué responde el servidor
+    console.log("Status:", response.status);
+    const text = await response.text();
+    console.log("Respuesta del servidor:", text);
+    
+    const data = JSON.parse(text);
 
-        if (!data.success) {
-          alert(data.message);
-          if (data.redirect) window.location.href = data.redirect;
-        } else {
-          alert(data.message);
-          window.location.href = data.redirect;
-        }
-      } catch (error) {
-        console.error("error en la petición", error);
-        alert("Hubo un problema con el servidor")
-      }
+    if (!data.success) {
+      alert(data.message);
+      if (data.redirect) window.location.href = data.redirect;
+    } else {
+      alert(data.message);
+      window.location.href = data.redirect;
+    }
+  } catch (error) {
+    console.error("error en la petición", error);
+    alert("Hubo un problema con el servidor: " + error.message)
+  }
     });
 
     // partículas

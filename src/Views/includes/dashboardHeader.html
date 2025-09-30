@@ -22,9 +22,17 @@
             <a href="/api/logout" class="logout-link">
                 <button class="btn-logout">Logout</button>
             </a>
-            <button class="btn-usuario">Usuario</button>
-            <button class="btn-admin">Admin</button>
-            <span class="nombre">Nombre</span>
+            <a href="/dashboard" style="text-decoration: none;">
+                <button class="btn-usuario">Usuario</button>
+            </a>
+            <?php if (isset($_SESSION['is_admin']) && $_SESSION['is_admin']): ?>
+                <a href="/dashboard-admin" style="text-decoration: none;" onclick="console.log('Click en Admin'); return true;">
+                    <button class="btn-admin" type="button">Admin</button>
+                </a>
+            <?php else: ?>
+                <button class="btn-admin" style="display: none;" type="button">Admin</button>
+            <?php endif; ?>
+            <span class="nombre"><?php echo htmlspecialchars($_SESSION['nombre_completo'] ?? 'Usuario'); ?></span>
             <div class="icono-usuario">
                 <img src="https://cdn-icons-png.flaticon.com/512/847/847969.png" alt="Usuario">
             </div>
@@ -77,3 +85,6 @@
             </li>
         </ul>
     </nav>
+
+</body>
+</html>

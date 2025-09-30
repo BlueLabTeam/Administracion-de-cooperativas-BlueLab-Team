@@ -1,87 +1,164 @@
 <?php
 
-namespace App\models;
+namespace App\Models;
 
 use App\config\Database;
+use PDO;
 use PDOException;
 
 class User
 {
     private $id;
     private $nombre_completo;
-    private $passwordHash;
-    private $email;
-    private $estado;
-    private $ci;
-    private $fecha_nacimiento;
-    private $fecha_ingreso;
+    private $cedula;
+    private $password_hash;
     private $direccion;
-
-
-    // CRUD
-
-    public function create($nombre_completo, $password, $email, $ci, $fecha_nacimiento, $direccion)
-    {
-        // Aquí iría la lógica para crear un usuario en la base de datos
-        $this->nombre_completo = $nombre_completo;
-        $this->passwordHash = password_hash($password, PASSWORD_BCRYPT);
-        $this->email = $email;
-        $this->ci = $ci;
-        $this->fecha_nacimiento = $fecha_nacimiento;
-        $this->direccion = $direccion;
-
-        $pdo = Database::getConnection();
-        $stmt = $pdo->prepare('INSERT INTO Usuario (nombre_completo, contrasena, email, cedula, fecha_nacimiento, direccion) VALUES (:nombre_completo, :contrasena, :email, :cedula, :fecha_nacimiento, :direccion)');
-        $stmt->execute([
-            'nombre_completo' => $this->nombre_completo,
-            'contrasena' => $this->passwordHash,
-            'email' => $this->email,
-            'cedula' => $this->ci,
-            'fecha_nacimiento' => $this->fecha_nacimiento,
-            'direccion' => $this->direccion
-        ]);
-        $this->id = $pdo->lastInsertId();
-    }
-
+    private $estado;
+    private $fecha_ingreso;
+    private $fecha_nacimiento;
+    private $email;
+    private $id_nucleo;
+    private $id_rol;
 
     public function findByEmail($email)
     {
-        $pdo = Database::getConnection();
-        $stmt = $pdo->prepare('SELECT * FROM Usuario WHERE email = :email');
-        $stmt->execute(['email' => $email]);
-        $data = $stmt->fetch();
-        if ($data) {
-            $user = new User();
-            $user->id = $data['id_usuario'];
-            $user->nombre_completo = $data['nombre_completo'];
-            $user->passwordHash = $data['contrasena'];
-            $user->email = $data['email'];
-            $user->estado = $data['estado'];
-            $user->fecha_ingreso = $data['fecha_ingreso'];
-            $user->ci = $data['cedula'];
-            $user->fecha_nacimiento = $data['fecha_nacimiento'];
-            $user->direccion = $data['direccion'];
-            return $user;
+        try {
+            $pdo = Database::getConnection();
+            $stmt = $pdo->prepare('SELECT * FROM Usuario WHERE email = ?');
+            $stmt->execute([$email]);
+            $userData = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($userData) {
+                $this->id = $userData['id_usuario'];
+                $this->nombre_completo = $userData['nombre_completo'];
+                $this->cedula = $userData['cedula'];
+                $this->password_hash = $userData['contrasena'];
+                $this->direccion = $userData['direccion'];
+                $this->estado = $userData['estado'];
+                $this->fecha_ingreso = $userData['fecha_ingreso'];
+                $this->fecha_nacimiento = $userData['fecha_nacimiento'];
+                $this->email = $userData['email'];
+                $this->id_nucleo = $userData['id_nucleo'];
+                $this->id_rol = $userData['id_rol'];
+
+                return $this;
+            }
+            return null;
+        } catch (PDOException $e) {
+            error_log($e->getMessage());
+            return null;
         }
     }
 
-    public function updateEstado($id, $nuevoEstado)
+    public function findById($id)
     {
         try {
             $pdo = Database::getConnection();
-            $stmt = $pdo->prepare('UPDATE Usuario SET estado = ? WHERE id_usuario = ?');
-            return $stmt->execute([$nuevoEstado, $id]);
+            $stmt = $pdo->prepare('SELECT * FROM Usuario WHERE id_usuario = ?');
+            $stmt->execute([$id]);
+            $userData = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($userData) {
+                $this->id = $userData['id_usuario'];
+                $this->nombre_completo = $userData['nombre_completo'];
+                $this->cedula = $userData['cedula'];
+                $this->password_hash = $userData['contrasena'];
+                $this->direccion = $userData['direccion'];
+                $this->estado = $userData['estado'];
+                $this->fecha_ingreso = $userData['fecha_ingreso'];
+                $this->fecha_nacimiento = $userData['fecha_nacimiento'];
+                $this->email = $userData['email'];
+                $this->id_nucleo = $userData['id_nucleo'];
+                $this->id_rol = $userData['id_rol'];
+
+                return $this;
+            }
+            return null;
+        } catch (PDOException $e) {
+            error_log($e->getMessage());
+            return null;
+        }
+    }
+
+    public function create($nombre_completo, $password, $email, $cedula, $fecha_nacimiento, $direccion)
+    {
+        try {
+            $pdo = Database::getConnection();
+            $password_hash = password_hash($password, PASSWORD_DEFAULT);
+            
+            $stmt = $pdo->prepare('INSERT INTO Usuario (nombre_completo, cedula, contrasena, direccion, fecha_nacimiento, email) VALUES (?, ?, ?, ?, ?, ?)');
+            return $stmt->execute([$nombre_completo, $cedula, $password_hash, $direccion, $fecha_nacimiento, $email]);
         } catch (PDOException $e) {
             error_log($e->getMessage());
             return false;
         }
     }
-    public function delete($id)
+
+    public function updateEstado($id_usuario, $nuevo_estado)
     {
-        // Aquí iría la lógica para eliminar un usuario de la base de datos
+        try {
+            $pdo = Database::getConnection();
+            $stmt = $pdo->prepare('UPDATE Usuario SET estado = ? WHERE id_usuario = ?');
+            return $stmt->execute([$nuevo_estado, $id_usuario]);
+        } catch (PDOException $e) {
+            error_log($e->getMessage());
+            return false;
+        }
     }
 
-    // getters
+    public function getPendingPayments()
+    {
+        try {
+            $pdo = Database::getConnection();
+            $stmt = $pdo->prepare('
+                SELECT 
+                    u.id_usuario,
+                    u.nombre_completo,
+                    u.email,
+                    u.cedula,
+                    u.estado,
+                    cp.id_comprobante,
+                    cp.fecha_pago,
+                    cp.archivo
+                FROM Usuario u
+                INNER JOIN Comprobante_Pago cp ON u.id_usuario = cp.id_usuario
+                WHERE u.estado = "enviado"
+                ORDER BY cp.fecha_pago DESC
+            ');
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log($e->getMessage());
+            return [];
+        }
+    }
+
+    public function isAdmin()
+    {
+        // Asumiendo que el rol de admin tiene id_rol = 1
+        // Ajusta según tu base de datos
+        return $this->id_rol !== null && $this->id_rol == 1;
+    }
+
+    public function getRoleName()
+    {
+        if ($this->id_rol === null) {
+            return null;
+        }
+        
+        try {
+            $pdo = Database::getConnection();
+            $stmt = $pdo->prepare('SELECT nombre_rol FROM Rol WHERE id_rol = ?');
+            $stmt->execute([$this->id_rol]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $result ? $result['nombre_rol'] : null;
+        } catch (PDOException $e) {
+            error_log($e->getMessage());
+            return null;
+        }
+    }
+
+    // Getters
     public function getId()
     {
         return $this->id;
@@ -92,9 +169,34 @@ class User
         return $this->nombre_completo;
     }
 
+    public function getCedula()
+    {
+        return $this->cedula;
+    }
+
     public function getPasswordHash()
     {
-        return $this->passwordHash;
+        return $this->password_hash;
+    }
+
+    public function getDireccion()
+    {
+        return $this->direccion;
+    }
+
+    public function getEstado()
+    {
+        return $this->estado;
+    }
+
+    public function getFechaIngreso()
+    {
+        return $this->fecha_ingreso;
+    }
+
+    public function getFechaNacimiento()
+    {
+        return $this->fecha_nacimiento;
     }
 
     public function getEmail()
@@ -102,21 +204,13 @@ class User
         return $this->email;
     }
 
-    public function getCi()
+    public function getIdNucleo()
     {
-        return $this->ci;
+        return $this->id_nucleo;
     }
 
-    public function getFechaNacimiento()
+    public function getIdRol()
     {
-        return $this->fecha_nacimiento;
-    }
-    public function getDireccion()
-    {
-        return $this->direccion;
-    }
-    public function getEstado()
-    {
-        return $this->estado;
+        return $this->id_rol;
     }
 }

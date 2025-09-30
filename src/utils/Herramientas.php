@@ -38,6 +38,13 @@ class Herramientas
     {
         self::startSession();
 
+        $currentURL = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+        
+        // Si es admin y está intentando acceder al dashboard-admin, NO redirigir
+        if ($currentURL === '/dashboard-admin' && isset($_SESSION['is_admin']) && $_SESSION['is_admin']) {
+            return; // Permitir acceso sin redirección
+        }
+
         $estado = $_SESSION['estado'] ?? 'pendiente';
 
         // Si existe ruta para el estado, redirige automáticamente
