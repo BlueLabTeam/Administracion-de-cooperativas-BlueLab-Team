@@ -47,17 +47,15 @@ class ViewsController
             session_start();
         }
         
-        // DEBUG
-        echo "<pre style='background: yellow; padding: 20px;'>";
-        echo "=== DEBUG showDashboardAdmin ===\n";
-        echo "user_id en sesión: " . ($_SESSION['user_id'] ?? 'NO EXISTE') . "\n";
-        echo "is_admin en sesión: " . (isset($_SESSION['is_admin']) ? ($_SESSION['is_admin'] ? 'TRUE' : 'FALSE') : 'NO EXISTE') . "\n";
-        echo "id_rol en sesión: " . ($_SESSION['id_rol'] ?? 'NO EXISTE') . "\n\n";
+        // DEBUG (oculto - solo en logs del servidor)
+        error_log("=== DEBUG showDashboardAdmin ===");
+        error_log("user_id en sesión: " . ($_SESSION['user_id'] ?? 'NO EXISTE'));
+        error_log("is_admin en sesión: " . (isset($_SESSION['is_admin']) ? ($_SESSION['is_admin'] ? 'TRUE' : 'FALSE') : 'NO EXISTE'));
+        error_log("id_rol en sesión: " . ($_SESSION['id_rol'] ?? 'NO EXISTE'));
         
         // Verificar que el usuario esté autenticado
         if (!isset($_SESSION['user_id'])) {
-            echo "❌ NO HAY user_id - Redirigiendo a login\n";
-            echo "</pre>";
+            error_log("❌ NO HAY user_id - Redirigiendo a login");
             header('Location: /login');
             exit();
         }
@@ -66,24 +64,20 @@ class ViewsController
         $userModel = new \App\Models\User();
         $user = $userModel->findById($_SESSION['user_id']);
         
-        echo "Usuario encontrado en BD: " . ($user ? 'SÍ' : 'NO') . "\n";
+        error_log("Usuario encontrado en BD: " . ($user ? 'SÍ' : 'NO'));
         
         if ($user) {
-            echo "id_rol del usuario en BD: " . $user->getIdRol() . "\n";
-            echo "isAdmin() devuelve: " . ($user->isAdmin() ? 'TRUE' : 'FALSE') . "\n";
+            error_log("id_rol del usuario en BD: " . $user->getIdRol());
+            error_log("isAdmin() devuelve: " . ($user->isAdmin() ? 'TRUE' : 'FALSE'));
         }
         
         if (!$user || !$user->isAdmin()) {
-            echo "\n❌ NO ES ADMIN - Redirigiendo a dashboard\n";
-            echo "</pre>";
-            // Comenta temporalmente esta línea para ver el debug
-            // header('Location: /dashboard');
-            die("STOP - Usuario NO es admin");
+            error_log("❌ NO ES ADMIN - Redirigiendo a dashboard");
+            header('Location: /dashboard');
             exit();
         }
         
-        echo "\n✅ ES ADMIN - Cargando dashboardBackoffice.php\n";
-        echo "</pre>";
+        error_log("✅ ES ADMIN - Cargando dashboardBackoffice.php");
         
         // Actualizar sesión
         $_SESSION['is_admin'] = true;

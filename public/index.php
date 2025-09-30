@@ -8,6 +8,62 @@ use App\utils\Herramientas;
 //app 
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
+// Manejo de archivos estáticos ANTES de iniciar sesión
+if (strpos($uri, '/files/') === 0) {
+    $path = $_GET['path'] ?? '';
+    
+    if (empty($path)) {
+        http_response_code(400);
+        die('Ruta no especificada');
+    }
+    
+    $fullPath = __DIR__ . '/../storage/' . $path;
+    $realPath = realpath($fullPath);
+    $storageDir = realpath(__DIR__ . '/../storage');
+    
+    if (!$realPath || !file_exists($realPath) || !is_file($realPath)) {
+        http_response_code(404);
+        die('Archivo no encontrado');
+    }
+    
+    if (strpos($realPath, $storageDir) !== 0) {
+        http_response_code(403);
+        die('Acceso denegado');
+    }
+    
+    $extension = strtolower(pathinfo($realPath, PATHINFO_EXTENSION));
+    $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'pdf', 'webp'];
+    
+    if (!in_array($extension, $allowedExtensions)) {
+        http_response_code(403);
+        die('Tipo de archivo no permitido');
+    }
+    
+    $mimeTypes = [
+        'jpg'  => 'image/jpeg',
+        'jpeg' => 'image/jpeg',
+        'png'  => 'image/png',
+        'gif'  => 'image/gif',
+        'pdf'  => 'application/pdf',
+        'webp' => 'image/webp'
+    ];
+    
+    $mimeType = $mimeTypes[$extension] ?? 'application/octet-stream';
+    
+    header('Content-Type: ' . $mimeType);
+    header('Content-Length: ' . filesize($realPath));
+    header('Cache-Control: public, max-age=86400');
+    header('Content-Disposition: inline; filename="' . basename($realPath) . '"');
+    
+    if (ob_get_level()) {
+        ob_clean();
+        flush();
+    }
+    
+    readfile($realPath);
+    exit;
+}
+
 Herramientas::startSession();
 
 $privateRoutes = ['/dashboard', '/dashboard-admin', '/pagoPendiente', '/pagoEnviado', 'api/pay/firstPay'];
@@ -54,13 +110,13 @@ switch ($uri) {
     // APIS
 
     case '/api/login':
-    $login = new App\Controllers\AuthController();
-    $login->login();  // ✅ Sin parámetros
-    break;
-case '/api/register':
-    $register = new App\Controllers\AuthController();
-    $register->register();  // ✅ Sin parámetros
-    break;
+        $login = new App\Controllers\AuthController();
+        $login->login();
+        break;
+    case '/api/register':
+        $register = new App\Controllers\AuthController();
+        $register->register();
+        break;
     
     case '/api/logout':
         $logout = new App\Controllers\AuthController();
@@ -72,15 +128,15 @@ case '/api/register':
         $pay->addPay();
         break;
 
-        case '/api/payment/approve':
-    $payments = new App\Controllers\PaymentsController();
-    $payments->approvePayment();
-    break;
+    case '/api/payment/approve':
+        $payments = new App\Controllers\PaymentsController();
+        $payments->approvePayment();
+        break;
 
-case '/api/payment/reject':
-    $payments = new App\Controllers\PaymentsController();
-    $payments->rejectPayment();
-    break;
+    case '/api/payment/reject':
+        $payments = new App\Controllers\PaymentsController();
+        $payments->rejectPayment();
+        break;
 
     default:
         http_response_code(404);

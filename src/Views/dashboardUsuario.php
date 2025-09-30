@@ -5,23 +5,15 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-// DEBUG - ELIMINAR DESPUÉS
-echo "<pre style='background: yellow; padding: 10px; margin: 10px;'>";
-echo "DEBUG INFO:\n";
-echo "user_id: " . ($_SESSION['user_id'] ?? 'NO DEFINIDO') . "\n";
-echo "is_admin: " . (isset($_SESSION['is_admin']) ? ($_SESSION['is_admin'] ? 'TRUE' : 'FALSE') : 'NO DEFINIDO') . "\n";
-echo "id_rol: " . ($_SESSION['id_rol'] ?? 'NO DEFINIDO') . "\n";
-echo "</pre>";
-// FIN DEBUG
-?>
-
-
-<?php
-// Verificar que el usuario esté autenticado
-if (!isset($_SESSION['user_id'])) {
-    header('Location: /login');
-    exit();
-}
+// Debug en consola del navegador (invisible en la página)
+echo "<script>
+console.log('DEBUG INFO:', {
+    user_id: " . json_encode($_SESSION['user_id'] ?? null) . ",
+    is_admin: " . json_encode($_SESSION['is_admin'] ?? null) . ",
+    id_rol: " . json_encode($_SESSION['id_rol'] ?? null) . ",
+    nombre: " . json_encode($_SESSION['nombre_completo'] ?? null) . "
+});
+</script>";
 ?>
 <!DOCTYPE html>
 <html lang="es">
