@@ -334,24 +334,6 @@ $pagosPendientes = $userModel->getPendingPayments();
 			padding: 20px;
 			text-align: center;
 		}
-
-		.debug-info {
-			background: #f8f9fa;
-			border: 1px solid #dee2e6;
-			border-radius: 5px;
-			padding: 15px;
-			margin: 20px 0;
-			font-family: monospace;
-			font-size: 12px;
-			max-height: 300px;
-			overflow: auto;
-		}
-
-		.debug-info pre {
-			margin: 0;
-			white-space: pre-wrap;
-			word-wrap: break-word;
-		}
 	</style>
 </head>
 
@@ -438,12 +420,6 @@ $pagosPendientes = $userModel->getPendingPayments();
 		<!-- SECCIÓN NOTIFICACIONES -->
 		<section id="notificaciones-section" class="section-content">
 			<h2 class="section-title">Gestión de Notificaciones</h2>
-			
-			<!-- DEBUG INFO -->
-			<div class="debug-info" id="debugInfo" style="display: none;">
-				<h4>Información de Debug:</h4>
-				<pre id="debugContent"></pre>
-			</div>
 			
 			<div class="info-card">
 				<h3>Enviar Nueva Notificación</h3>
@@ -537,14 +513,6 @@ $pagosPendientes = $userModel->getPendingPayments();
 	</div>
 
 	<script>
-		// Función de debug mejorada
-		function addDebugInfo(title, content) {
-			const debugDiv = document.getElementById('debugInfo');
-			const debugContent = document.getElementById('debugContent');
-			debugDiv.style.display = 'block';
-			debugContent.innerHTML += `\n=== ${title} ===\n${JSON.stringify(content, null, 2)}\n`;
-		}
-
 		// Sistema SPA - Navegación entre secciones
 		document.addEventListener('DOMContentLoaded', function() {
 			console.log('Dashboard Admin cargado');
@@ -590,18 +558,12 @@ $pagosPendientes = $userModel->getPendingPayments();
 			}
 		});
 
-		// Cargar usuarios para el selector - CON DEBUG COMPLETO
+		// Cargar usuarios para el selector
 		async function loadUsers() {
-			console.log('=== INICIANDO loadUsers() ===');
+			console.log('Cargando usuarios...');
 			const usersList = document.getElementById('usersList');
 			
-			// Limpiar debug anterior
-			document.getElementById('debugContent').innerHTML = '';
-			
 			try {
-				console.log('Haciendo fetch a: /api/notifications/users');
-				addDebugInfo('URL Solicitada', '/api/notifications/users');
-				
 				const response = await fetch('/api/notifications/users', {
 					method: 'GET',
 					headers: {
@@ -610,70 +572,23 @@ $pagosPendientes = $userModel->getPendingPayments();
 					credentials: 'same-origin'
 				});
 				
-				console.log('Response recibido:', {
-					status: response.status,
-					statusText: response.statusText,
-					ok: response.ok,
-					contentType: response.headers.get('content-type'),
-					url: response.url
-				});
-				
-				addDebugInfo('Response Status', {
-					status: response.status,
-					statusText: response.statusText,
-					ok: response.ok,
-					contentType: response.headers.get('content-type'),
-					url: response.url
-				});
-				
-				// Obtener respuesta como texto primero
-				const textResponse = await response.text();
-				console.log('RAW Response (primeros 500 chars):', textResponse.substring(0, 500));
-				addDebugInfo('RAW Response', textResponse.substring(0, 1000));
-				
-				// Intentar parsear JSON
-				let data;
-				try {
-					data = JSON.parse(textResponse);
-					console.log('JSON parseado correctamente:', data);
-					addDebugInfo('Datos Parseados', data);
-				} catch (parseError) {
-					console.error('Error al parsear JSON:', parseError);
-					addDebugInfo('Error de Parseo', {
-						error: parseError.message,
-						response: textResponse
-					});
-					throw new Error('La respuesta no es JSON válido. Revisa el debug info arriba.');
-				}
+				console.log('Response status:', response.status);
 				
 				if (!response.ok) {
 					throw new Error(`HTTP error! status: ${response.status}`);
 				}
 				
+				const data = await response.json();
+				console.log('Datos recibidos:', data);
+				
 				if (data.success) {
-					console.log('Usuarios cargados:', data.users.length);
 					renderUsersList(data.users);
 				} else {
 					usersList.innerHTML = `<p class="error">Error: ${data.message || 'No se pudieron cargar los usuarios'}</p>`;
 				}
 			} catch (error) {
-				console.error('=== ERROR EN loadUsers() ===');
-				console.error('Tipo de error:', error.constructor.name);
-				console.error('Mensaje:', error.message);
-				console.error('Stack:', error.stack);
-				
-				addDebugInfo('Error Capturado', {
-					tipo: error.constructor.name,
-					mensaje: error.message,
-					stack: error.stack
-				});
-				
-				usersList.innerHTML = `
-					<p class="error">Error de conexión: ${error.message}</p>
-					<p style="font-size: 12px; margin-top: 10px;">
-						Revisa la información de debug arriba para más detalles.
-					</p>
-				`;
+				console.error('Error completo:', error);
+				usersList.innerHTML = `<p class="error">Error de conexión: ${error.message}</p>`;
 			}
 		}
 

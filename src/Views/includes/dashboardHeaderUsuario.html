@@ -9,6 +9,10 @@
     <link rel="stylesheet" href="/assets/css/dashboardHeader.css" />
     <link rel="stylesheet" href="/assets/css/dashboardUsuario.css" />
     <link rel="stylesheet" href="/assets/css/dashboardNotificaciones.css" />
+    <style>
+        .seccion { display: none; }
+        .seccion.activa { display: block; }
+    </style>
 </head>
 
 <body>
@@ -26,7 +30,7 @@
                 <button class="btn-usuario">Usuario</button>
             </a>
             <?php if (isset($_SESSION['is_admin']) && $_SESSION['is_admin']): ?>
-                <a href="/dashboard-admin" style="text-decoration: none;" onclick="console.log('Click en Admin'); return true;">
+                <a href="/dashboard-admin" style="text-decoration: none;">
                     <button class="btn-admin" type="button">Admin</button>
                 </a>
             <?php else: ?>
@@ -41,50 +45,61 @@
 
     <nav class="menu">
         <ul>
-            <li class="activo">
-                <a href="#perfil">
-                    <i class="fas fa-user"></i>
-                    <small>Perfil</small>
-                </a>
+            <li class="activo" data-section="perfil">
+                <a href="#perfil"><i class="fas fa-user"></i><small>Perfil</small></a>
             </li>
-            <li>
-                <a href="#solicitudes">
-                    <i class="fas fa-file-alt"></i>
-                    <small>Solicitudes</small>
-                </a>
+            <li data-section="solicitudes">
+                <a href="#solicitudes"><i class="fas fa-file-alt"></i><small>Solicitudes</small></a>
             </li>
-            <li>
-                <a href="#vivienda">
-                    <i class="fas fa-home"></i>
-                    <small>Vivienda</small>
-                </a>
+            <li data-section="vivienda">
+                <a href="#vivienda"><i class="fas fa-home"></i><small>Vivienda</small></a>
             </li>
-            <li>
-                <a href="#inicio">
-                    <i class="fas fa-house-user"></i>
-                    <small>Inicio</small>
-                </a>
+            <li data-section="inicio">
+                <a href="#inicio"><i class="fas fa-house-user"></i><small>Inicio</small></a>
             </li>
-            <li>
-                <a href="#aportes">
-                    <i class="fas fa-hand-holding-usd"></i>
-                    <small>Aportes</small>
-                </a>
+            <li data-section="aportes">
+                <a href="#aportes"><i class="fas fa-hand-holding-usd"></i><small>Aportes</small></a>
             </li>
-            <li>
-                <a href="#horas">
-                    <i class="fas fa-clock"></i>
-                    <small>Horas</small>
-                </a>
+            <li data-section="horas">
+                <a href="#horas"><i class="fas fa-clock"></i><small>Horas</small></a>
             </li>
-            <li>
-                <a href="#docs">
-                    <i class="fas fa-folder-open"></i>
-                    <small>Docs</small>
-                </a>
+            <li data-section="docs">
+                <a href="#docs"><i class="fas fa-folder-open"></i><small>Docs</small></a>
             </li>
         </ul>
     </nav>
+
+    <!-- Contenido de cada sección -->
+    <main>
+        <section id="perfil" class="seccion activa"></section>
+        <section id="solicitudes" class="seccion"></section>
+        <section id="vivienda" class="seccion"></section>
+        <section id="inicio" class="seccion"></section>
+        <section id="aportes" class="seccion"></section>
+        <section id="horas" class="seccion"></section>
+        <section id="docs" class="seccion"></section>
+    </main>
+
+    <script>
+        // Script igual que en backoffice
+        const links = document.querySelectorAll(".menu li");
+        const secciones = document.querySelectorAll(".seccion");
+
+        links.forEach(li => {
+            li.addEventListener("click", e => {
+                e.preventDefault();
+                const sectionId = li.getAttribute("data-section");
+
+                // Ocultar todas
+                secciones.forEach(sec => sec.classList.remove("activa"));
+                links.forEach(l => l.classList.remove("activo"));
+
+                // Mostrar la seleccionada
+                document.getElementById(sectionId).classList.add("activa");
+                li.classList.add("activo");
+            });
+        });
+    </script>
 
 </body>
 </html>
