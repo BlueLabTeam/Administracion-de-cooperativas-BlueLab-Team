@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Administrativo - Cooperativa</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/assets/css/dashboardHeader.css" />
+
+</head>
+
+<body>
+
+    <header class="header">
+        <div class="logo">
+            <h1>🔧 Panel de Administración</h1>
+        </div>
+
+        <div class="user-controls">
+            <a href="/api/logout" class="logout-link">
+                <button class="btn-logout">Logout</button>
+            </a>
+            <a href="/dashboard" style="text-decoration: none;">
+                <button class="btn-usuario">Vista Usuario</button>
+            </a>
+            <span class="nombre"><?php echo htmlspecialchars($_SESSION['nombre_completo'] ?? 'Administrador'); ?></span>
+            <div class="icono-usuario">
+                <img src="https://cdn-icons-png.flaticon.com/512/847/847969.png" alt="Admin">
+            </div>
+        </div>
+    </header>
+
+    <nav class="menu">
+        <ul>
+            <li class="activo" data-section="inicio">
+                <a href="#inicio">
+                    <i class="fas fa-house-user"></i>
+                    <small>Inicio</small>
+                </a>
+            </li>
+            <li data-section="reportes">
+                <a href="#reportes">
+                    <i class="fas fa-chart-line"></i>
+                    <small>Reportes</small>
+                </a>
+            </li>
+            <li data-section="usuarios">
+                <a href="#usuarios">
+                    <i class="fas fa-users"></i>
+                    <small>Usuarios</small>
+                </a>
+            </li>
+            <li data-section="nucleo">
+                <a href="#nucleo">
+                    <i class="fas fa-users-cog"></i>
+                    <small>Núcleo</small>
+                </a>
+            </li>
+            <li data-section="viviendas">
+                <a href="#viviendas">
+                    <i class="fas fa-building"></i>
+                    <small>Viviendas</small>
+                </a>
+            </li>
+            <li data-section="facturacion">
+                <a href="#facturacion">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                    <small>Facturación</small>
+                </a>
+            </li>
+            <li data-section="notificaciones">
+                <a href="#notificaciones">
+                    <i class="fas fa-bell"></i>
+                    <small>Notificaciones</small>
+                </a>
+            </li>
+            <li data-section="inventario">
+                <a href="#inventario">
+                    <i class="fas fa-boxes"></i>
+                    <small>Inventario</small>
+                </a>
+            </li>
+            <li data-section="tareas">
+                <a href="#tareas">
+                    <i class="fas fa-tasks"></i>
+                    <small>Tareas</small>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+</body>
+</html>

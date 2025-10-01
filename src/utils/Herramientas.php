@@ -40,9 +40,24 @@ class Herramientas
 
         $currentURL = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
         
-        // Si es admin y está intentando acceder al dashboard-admin, NO redirigir
+        // ✅ NO VALIDAR ESTADO EN RUTAS DE API Y ADMIN
+        $rutasExcluidas = [
+            '/dashboard-admin',
+            '/api/notifications/users',
+            '/api/notifications/create',
+            '/api/notifications/user',
+            '/api/notifications/mark-read',
+            '/api/payment/approve',
+            '/api/payment/reject'
+        ];
+        
+        if (in_array($currentURL, $rutasExcluidas)) {
+            return; // Permitir acceso sin validar estado
+        }
+
+        // Si es admin y está en dashboard-admin, no redirigir
         if ($currentURL === '/dashboard-admin' && isset($_SESSION['is_admin']) && $_SESSION['is_admin']) {
-            return; // Permitir acceso sin redirección
+            return;
         }
 
         $estado = $_SESSION['estado'] ?? 'pendiente';

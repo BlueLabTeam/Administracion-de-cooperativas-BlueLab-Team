@@ -66,7 +66,7 @@ if (strpos($uri, '/files/') === 0) {
 
 Herramientas::startSession();
 
-$privateRoutes = ['/dashboard', '/dashboard-admin', '/pagoPendiente', '/pagoEnviado', 'api/pay/firstPay'];
+$privateRoutes = ['/dashboard', '/dashboard-admin', '/pagoPendiente', '/pagoEnviado', 'api/pay/firstPay', '/api/notifications/users', '/api/notifications/create', '/api/notifications/user', '/api/notifications/mark-read'];
 if (in_array($uri, $privateRoutes)) {
     Middleware::handle();
 }
@@ -136,6 +136,26 @@ switch ($uri) {
     case '/api/payment/reject':
         $payments = new App\Controllers\PaymentsController();
         $payments->rejectPayment();
+        break;
+
+    case '/api/notifications/create':
+        $notification = new App\Controllers\NotificationController();
+        $notification->create();
+        break;
+
+    case '/api/notifications/user':
+        $notification = new App\Controllers\NotificationController();
+        $notification->getUserNotifications();
+        break;
+
+    case '/api/notifications/mark-read':
+        $notification = new App\Controllers\NotificationController();
+        $notification->markAsRead();
+        break;
+
+    case '/api/notifications/users':
+        $notification = new App\Controllers\NotificationController();
+        $notification->getUsers();
         break;
 
     default:

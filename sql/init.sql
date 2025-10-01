@@ -175,3 +175,28 @@ CREATE TABLE Deudas (
     id_nucleo INT,
     FOREIGN KEY (id_nucleo) REFERENCES Nucleo_Familiar (id_nucleo)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+
+-- NOTIFICACIONES
+CREATE TABLE IF NOT EXISTS notificaciones (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    titulo VARCHAR(100) NOT NULL,
+    mensaje TEXT NOT NULL,
+    tipo ENUM('info', 'importante', 'urgente', 'exito') DEFAULT 'info',
+    fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_fecha (fecha_creacion)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Relación Usuario - Notificaciones
+CREATE TABLE IF NOT EXISTS usuario_notificaciones (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT NOT NULL,
+    id_notificacion INT NOT NULL,
+    leida TINYINT(1) DEFAULT 0,
+    fecha_asignacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+    fecha_lectura DATETIME NULL,
+    FOREIGN KEY (id_usuario) REFERENCES Usuario(id_usuario) ON DELETE CASCADE,
+    FOREIGN KEY (id_notificacion) REFERENCES notificaciones(id) ON DELETE CASCADE,
+    UNIQUE KEY unique_user_notification (id_usuario, id_notificacion),
+    INDEX idx_usuario_leida (id_usuario, leida),
+    INDEX idx_notificacion (id_notificacion)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
