@@ -43,31 +43,17 @@
         </div>
     </header>
 
-    <nav class="menu">
-        <ul>
-            <li class="activo" data-section="perfil">
-                <a href="#perfil"><i class="fas fa-user"></i><small>Perfil</small></a>
-            </li>
-            <li data-section="solicitudes">
-                <a href="#solicitudes"><i class="fas fa-file-alt"></i><small>Solicitudes</small></a>
-            </li>
-            <li data-section="vivienda">
-                <a href="#vivienda"><i class="fas fa-home"></i><small>Vivienda</small></a>
-            </li>
-            <li data-section="inicio">
-                <a href="#inicio"><i class="fas fa-house-user"></i><small>Inicio</small></a>
-            </li>
-            <li data-section="aportes">
-                <a href="#aportes"><i class="fas fa-hand-holding-usd"></i><small>Aportes</small></a>
-            </li>
-            <li data-section="horas">
-                <a href="#horas"><i class="fas fa-clock"></i><small>Horas</small></a>
-            </li>
-            <li data-section="docs">
-                <a href="#docs"><i class="fas fa-folder-open"></i><small>Docs</small></a>
-            </li>
-        </ul>
-    </nav>
+   <nav class="menu">
+    <ul>
+        <li data-section="perfil"><a href="#"><i class="fas fa-user"></i><small>Perfil</small></a></li>
+        <li data-section="solicitudes"><a href="#"><i class="fas fa-file-alt"></i><small>Solicitudes</small></a></li>
+        <li data-section="vivienda"><a href="#"><i class="fas fa-home"></i><small>Vivienda</small></a></li>
+        <li data-section="inicio"><a href="#"><i class="fas fa-house-user"></i><small>Inicio</small></a></li>
+        <li data-section="aportes"><a href="#"><i class="fas fa-hand-holding-usd"></i><small>Aportes</small></a></li>
+        <li data-section="horas"><a href="#"><i class="fas fa-clock"></i><small>Horas</small></a></li>
+        <li data-section="documentos"><a href="#"><i class="fas fa-folder-open"></i><small>Docs</small></a></li>
+    </ul>
+</nav>
 
     <!-- Contenido de cada sección -->
     <main>
@@ -79,6 +65,42 @@
         <section id="horas" class="seccion"></section>
         <section id="docs" class="seccion"></section>
     </main>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const menuItems = document.querySelectorAll('.menu li');
+        const sections = document.querySelectorAll('.section-content');
+
+        // Por defecto, mostrar "Inicio"
+        let defaultSection = 'inicio';
+
+        menuItems.forEach(li => {
+            // Agregar click
+            li.addEventListener('click', function(e) {
+                e.preventDefault();
+
+                // Limpiar activo
+                menuItems.forEach(mi => mi.classList.remove('activo'));
+                sections.forEach(sec => sec.classList.remove('active'));
+
+                // Activar seleccionado
+                this.classList.add('activo');
+                const sectionId = this.getAttribute('data-section') + '-section';
+                const targetSection = document.getElementById(sectionId);
+                if (targetSection) targetSection.classList.add('active');
+            });
+
+            // Inicializar clase activo en el menú según defaultSection
+            if (li.getAttribute('data-section') === defaultSection) {
+                li.classList.add('activo');
+            }
+        });
+
+        // Inicializar sección activa según defaultSection
+        const initSection = document.getElementById(defaultSection + '-section');
+        if (initSection) initSection.classList.add('active');
+    });
+    </script>
 
     <script>
         // Script igual que en backoffice

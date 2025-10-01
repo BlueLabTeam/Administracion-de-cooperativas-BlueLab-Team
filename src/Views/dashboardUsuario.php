@@ -116,7 +116,7 @@ if (!isset($_SESSION['user_id'])) {
 	<!-- Notificaciones -->
 	<div class="notifications-container">
 		<div class="notifications-header">
-			<h3>🔔 Notificaciones</h3>
+			<h3> Notificaciones</h3>
 			<span class="notifications-badge" id="notificationsBadge">0</span>
 		</div>
 		<div id="notificationsList" class="notifications-list">
@@ -412,124 +412,124 @@ async function markAsRead(notifId, element) {
 </script>
 
 		<!-- MI PERFIL -->
-		<section id="perfil-section" class="section-content">
-			<h2 class="section-title">👤 Mi Perfil</h2>
-			<div class="info-card">
-				<h3>Información Personal</h3>
-				<p><strong>Nombre:</strong> <?php echo htmlspecialchars($_SESSION['nombre_completo'] ?? 'Usuario'); ?></p>
-				<p><strong>Email:</strong> <?php echo htmlspecialchars($_SESSION['email'] ?? 'No disponible'); ?></p>
-				<p><strong>Estado:</strong> <?php echo htmlspecialchars($_SESSION['estado'] ?? 'pendiente'); ?></p>
-			</div>
-		</section>
+<section id="perfil-section" class="section-content">
+    <h2 class="section-title">👤 Mi Perfil</h2>
+    <div class="info-card">
+        <h3>Información Personal</h3>
+        <p><strong>Nombre:</strong> <?php echo htmlspecialchars($_SESSION['nombre_completo'] ?? 'Usuario'); ?></p>
+        <p><strong>Email:</strong> <?php echo htmlspecialchars($_SESSION['email'] ?? 'No disponible'); ?></p>
+        <p><strong>Estado:</strong> <?php echo htmlspecialchars($_SESSION['estado'] ?? 'pendiente'); ?></p>
+    </div>
+</section>
 
-		<!-- SOLICITUDES -->
-		<section id="solicitudes-section" class="section-content">
-			<h2 class="section-title">📝 Mis Solicitudes</h2>
-			<div class="info-card">
-				<h3>Solicitudes Realizadas</h3>
-				<p>Aquí podrás ver el estado de tus solicitudes a la cooperativa.</p>
-				<p><em>No tienes solicitudes pendientes.</em></p>
-			</div>
-		</section>
+<!-- SOLICITUDES -->
+<section id="solicitudes-section" class="section-content">
+    <h2 class="section-title">📝 Mis Solicitudes</h2>
+    <div class="info-card">
+        <h3>Solicitudes Realizadas</h3>
+        <p>Aquí podrás ver el estado de tus solicitudes a la cooperativa.</p>
+        <p><em>No tienes solicitudes pendientes.</em></p>
+    </div>
+</section>
 
-		<!-- MI VIVIENDA -->
-		<section id="vivienda-section" class="section-content">
-			<h2 class="section-title">🏡 Mi Vivienda</h2>
-			<div class="info-card">
-				<h3>Información de tu Vivienda</h3>
-				<p>Aquí encontrarás toda la información relacionada con tu vivienda asignada.</p>
-				<p><em>Aún no tienes una vivienda asignada.</em></p>
-			</div>
-		</section>
+<!-- MI VIVIENDA -->
+<section id="vivienda-section" class="section-content">
+    <h2 class="section-title">🏡 Mi Vivienda</h2>
+    <div class="info-card">
+        <h3>Información de tu Vivienda</h3>
+        <p>Aquí encontrarás toda la información relacionada con tu vivienda asignada.</p>
+        <p><em>Aún no tienes una vivienda asignada.</em></p>
+    </div>
+</section>
 
-		<!-- APORTES -->
-		<section id="aportes-section" class="section-content">
-			<h2 class="section-title">💰 Mis Aportes</h2>
-			<div class="info-card">
-				<h3>Historial de Aportes</h3>
-				<p>Registro de todos tus aportes económicos a la cooperativa.</p>
-			</div>
-			<div class="stats-grid">
-				<div class="stat-card">
-					<i class="fas fa-calendar-check"></i>
-					<h4>Aportes Realizados</h4>
-					<p>0</p>
-				</div>
-				<div class="stat-card">
-					<i class="fas fa-dollar-sign"></i>
-					<h4>Total Aportado</h4>
-					<p>$0</p>
-				</div>
-				<div class="stat-card">
-					<i class="fas fa-calendar-times"></i>
-					<h4>Aportes Pendientes</h4>
-					<p>0</p>
-				</div>
-			</div>
-		</section>
+<!-- APORTES -->
+<section id="aportes-section" class="section-content">
+    <h2 class="section-title">💰 Mis Aportes</h2>
+    <div class="info-card">
+        <h3>Historial de Aportes</h3>
+        <p>Registro de todos tus aportes económicos a la cooperativa.</p>
+    </div>
+    <div class="stats-grid">
+        <div class="stat-card">
+            <i class="fas fa-calendar-check"></i>
+            <h4>Aportes Realizados</h4>
+            <p>0</p>
+        </div>
+        <div class="stat-card">
+            <i class="fas fa-dollar-sign"></i>
+            <h4>Total Aportado</h4>
+            <p>$0</p>
+        </div>
+        <div class="stat-card">
+            <i class="fas fa-calendar-times"></i>
+            <h4>Aportes Pendientes</h4>
+            <p>0</p>
+        </div>
+    </div>
+</section>
 
-		<!-- HORAS -->
-		<section id="horas-section" class="section-content">
-			<h2 class="section-title">⏰ Registro de Horas</h2>
-			<div class="info-card">
-				<h3>Horas de Trabajo Cooperativo</h3>
-				<p>Registro de las horas trabajadas en actividades de la cooperativa.</p>
-			</div>
-			<div class="stats-grid">
-				<div class="stat-card">
-					<i class="fas fa-clock"></i>
-					<h4>Horas Totales</h4>
-					<p>0h</p>
-				</div>
-				<div class="stat-card">
-					<i class="fas fa-calendar-week"></i>
-					<h4>Este Mes</h4>
-					<p>0h</p>
-				</div>
-				<div class="stat-card">
-					<i class="fas fa-hourglass-half"></i>
-					<h4>Horas Requeridas</h4>
-					<p>0h</p>
-				</div>
-			</div>
-		</section>
+<!-- HORAS -->
+<section id="horas-section" class="section-content">
+    <h2 class="section-title">⏰ Registro de Horas</h2>
+    <div class="info-card">
+        <h3>Horas de Trabajo Cooperativo</h3>
+        <p>Registro de las horas trabajadas en actividades de la cooperativa.</p>
+    </div>
+    <div class="stats-grid">
+        <div class="stat-card">
+            <i class="fas fa-clock"></i>
+            <h4>Horas Totales</h4>
+            <p>0h</p>
+        </div>
+        <div class="stat-card">
+            <i class="fas fa-calendar-week"></i>
+            <h4>Este Mes</h4>
+            <p>0h</p>
+        </div>
+        <div class="stat-card">
+            <i class="fas fa-hourglass-half"></i>
+            <h4>Horas Requeridas</h4>
+            <p>0h</p>
+        </div>
+    </div>
+</section>
 
-		<!-- TAREAS -->
-		<section id="tareas-section" class="section-content">
-			<h2 class="section-title">✅ Mis Tareas</h2>
-			<div class="info-card">
-				<h3>Tareas Asignadas</h3>
-				<p>Lista de tareas que tienes asignadas en la cooperativa.</p>
-				<p><em>No tienes tareas asignadas en este momento.</em></p>
-			</div>
-		</section>
+<!-- TAREAS -->
+<section id="tareas-section" class="section-content">
+    <h2 class="section-title">✅ Mis Tareas</h2>
+    <div class="info-card">
+        <h3>Tareas Asignadas</h3>
+        <p>Lista de tareas que tienes asignadas en la cooperativa.</p>
+        <p><em>No tienes tareas asignadas en este momento.</em></p>
+    </div>
+</section>
 
-		<!-- DOCUMENTOS -->
-		<section id="documentos-section" class="section-content">
-			<h2 class="section-title">📁 Mis Documentos</h2>
-			<div class="info-card">
-				<h3>Documentación</h3>
-				<p>Accede a todos tus documentos relacionados con la cooperativa.</p>
-			</div>
-			<div class="stats-grid">
-				<div class="stat-card">
-					<i class="fas fa-file-alt"></i>
-					<h4>Documentos</h4>
-					<p>0</p>
-				</div>
-				<div class="stat-card">
-					<i class="fas fa-file-contract"></i>
-					<h4>Contratos</h4>
-					<p>0</p>
-				</div>
-				<div class="stat-card">
-					<i class="fas fa-file-invoice"></i>
-					<h4>Facturas</h4>
-					<p>0</p>
-				</div>
-			</div>
-		</section>
-	</main>
+<!-- DOCUMENTOS -->
+<section id="documentos-section" class="section-content">
+    <h2 class="section-title">📁 Mis Documentos</h2>
+    <div class="info-card">
+        <h3>Documentación</h3>
+        <p>Accede a todos tus documentos relacionados con la cooperativa.</p>
+    </div>
+    <div class="stats-grid">
+        <div class="stat-card">
+            <i class="fas fa-file-alt"></i>
+            <h4>Documentos</h4>
+            <p>0</p>
+        </div>
+        <div class="stat-card">
+            <i class="fas fa-file-contract"></i>
+            <h4>Contratos</h4>
+            <p>0</p>
+        </div>
+        <div class="stat-card">
+            <i class="fas fa-file-invoice"></i>
+            <h4>Facturas</h4>
+            <p>0</p>
+        </div>
+    </div>
+</section>
+
 
 	<script>
 		// Sistema SPA - Navegación entre secciones
