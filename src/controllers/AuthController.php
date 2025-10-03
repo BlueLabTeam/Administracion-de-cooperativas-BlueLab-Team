@@ -38,7 +38,7 @@ class AuthController
             exit();
         }
 
-        $userModel = new \App\Models\User();
+        $userModel = new \App\models\User();
         $user = $userModel->findByEmail($email);
 
         if ($user && password_verify($password, $user->getPasswordHash())) {
@@ -99,7 +99,7 @@ class AuthController
             exit();
         }
 
-        $userModel = new \App\Models\User();
+        $userModel = new \App\models\User();
         $existingUser = $userModel->findByEmail($email);
 
         if ($existingUser) {

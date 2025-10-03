@@ -26,7 +26,7 @@
         try {
           const response = await fetch("/api/pay/firstPay", {
             method: "POST",
-            body: formData,
+            body: formData
           });
 
           const data = await response.json();
@@ -36,6 +36,7 @@
             window.location.href = data.redirect;
           } else {
             alert("Error:" + data.message);
+            window.location.href = data.redirect;
           }
         } catch (error) {
           console.error(error);

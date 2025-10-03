@@ -93,27 +93,27 @@ if (in_array($uri, $privateRoutes)) {
 switch ($uri) {
     // VISTAS
     case '/':
-        $controller = new App\Controllers\ViewsController();
+        $controller = new App\controllers\ViewsController();
         $controller->index();
         break;
     case '/home':
-        $controller = new App\Controllers\ViewsController();
+        $controller = new App\controllers\ViewsController();
         $controller->index();
         break;
     case '/login':
-        $controller = new App\Controllers\ViewsController();
+        $controller = new App\controllers\ViewsController();
         $controller->showLoginForm();
         break;
     case '/register':
-        $controller = new App\Controllers\ViewsController();
+        $controller = new App\controllers\ViewsController();
         $controller->showRegistrationForm();
         break;
     case '/dashboard':
-        $controller = new App\Controllers\ViewsController();
+        $controller = new App\controllers\ViewsController();
         $controller->showDashboard();
         break;
     case '/dashboard-admin':
-        $controller = new App\Controllers\ViewsController();
+        $controller = new App\controllers\ViewsController();
         $controller->showDashboardAdmin();
         break;
     case '/pagoPendiente':
@@ -127,15 +127,15 @@ switch ($uri) {
 
     // API AUTH
     case '/api/login':
-        $login = new App\Controllers\AuthController();
+        $login = new App\controllers\AuthController();
         $login->login();
         break;
     case '/api/register':
-        $register = new App\Controllers\AuthController();
+        $register = new App\controllers\AuthController();
         $register->register();
         break;
     case '/api/logout':
-        $logout = new App\Controllers\AuthController();
+        $logout = new App\controllers\AuthController();
         $logout->logout();
         break;
 
@@ -145,67 +145,67 @@ switch ($uri) {
         $pay->addPay();
         break;
     case '/api/payment/approve':
-        $payments = new App\Controllers\PaymentsController();
+        $payments = new App\controllers\PaymentsController();
         $payments->approvePayment();
         break;
     case '/api/payment/reject':
-        $payments = new App\Controllers\PaymentsController();
+        $payments = new App\controllers\PaymentsController();
         $payments->rejectPayment();
         break;
 
     // API NOTIFICACIONES
     case '/api/notifications/create':
-        $notification = new App\Controllers\NotificationController();
+        $notification = new App\controllers\NotificationController();
         $notification->create();
         break;
     case '/api/notifications/user':
-        $notification = new App\Controllers\NotificationController();
+        $notification = new App\controllers\NotificationController();
         $notification->getUserNotifications();
         break;
     case '/api/notifications/mark-read':
-        $notification = new App\Controllers\NotificationController();
+        $notification = new App\controllers\NotificationController();
         $notification->markAsRead();
         break;
     case '/api/notifications/users':
-        $notification = new App\Controllers\NotificationController();
+        $notification = new App\controllers\NotificationController();
         $notification->getUsers();
         break;
 
     // API TAREAS
     case '/api/tasks/create':
-        $task = new App\Controllers\TaskController();
+        $task = new App\controllers\TaskController();
         $task->create();
         break;
     case '/api/tasks/user':
-        $task = new App\Controllers\TaskController();
+        $task = new App\controllers\TaskController();
         $task->getUserTasks();
         break;
     case '/api/tasks/all':
-        $task = new App\Controllers\TaskController();
+        $task = new App\controllers\TaskController();
         $task->getAllTasks();
         break;
     case '/api/tasks/update-progress':
-        $task = new App\Controllers\TaskController();
+        $task = new App\controllers\TaskController();
         $task->updateProgress();
         break;
     case '/api/tasks/add-avance':
-        $task = new App\Controllers\TaskController();
+        $task = new App\controllers\TaskController();
         $task->addAvance();
         break;
     case '/api/tasks/details':
-        $task = new App\Controllers\TaskController();
+        $task = new App\controllers\TaskController();
         $task->getTaskDetails();
         break;
     case '/api/tasks/users':
-        $task = new App\Controllers\TaskController();
+        $task = new App\controllers\TaskController();
         $task->getUsers();
         break;
     case '/api/tasks/nucleos':
-        $task = new App\Controllers\TaskController();
+        $task = new App\controllers\TaskController();
         $task->getNucleos();
         break;
     case '/api/tasks/cancel':
-        $task = new App\Controllers\TaskController();
+        $task = new App\controllers\TaskController();
         $task->cancelTask();
         break;
 

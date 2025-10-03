@@ -31,7 +31,7 @@ class ViewsController
         }
         
         // Verificar y actualizar el estado de admin desde la BD
-        $userModel = new \App\Models\User();
+        $userModel = new \App\models\User();
         $user = $userModel->findById($_SESSION['user_id']);
         if ($user) {
             $_SESSION['is_admin'] = $user->isAdmin();

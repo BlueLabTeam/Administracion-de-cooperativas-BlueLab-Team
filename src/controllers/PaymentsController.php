@@ -34,6 +34,7 @@ class PaymentsController
             exit;
         }
 
+        // Para guardar en la BD
         $pay = new Pay();
         $resultado = $pay->addPay($usuario_id, $rutaRelativa);
 

@@ -91,16 +91,16 @@ services:
       - /var/run:/var/run:ro
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
-  rsync:
-    build:
-      context: ./docker/rsync
-      dockerfile: dockerfile
-    container_name: rsync
-    restart: on-failure:5
-    command: tail -f /dev/null
-    volumes:
-      - ./data:/data
-      - ./backups:/backups
+  # rsync:
+  #   build:
+  #     context: ./docker/rsync
+  #     dockerfile: dockerfile
+  #   container_name: rsync
+  #   restart: on-failure:5
+  #   command: tail -f /dev/null
+  #   volumes:
+  #     - ./data:/data
+  #     - ./backups:/backups
 
 volumes:
   db_data:
