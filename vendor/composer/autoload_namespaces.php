@@ -6,5 +6,4 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
-    'Prometheus\\' => array($vendorDir . '/jimdo/prometheus_client_php/src'),
 );

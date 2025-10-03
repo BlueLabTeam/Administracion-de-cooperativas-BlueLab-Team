@@ -22,6 +22,12 @@ services:
         condition: service_started
     networks:
       - app-network
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: localhost:24224
+        tag: gestcoop_apache
+
   gestcoop_php:
     build:
       context: ./docker/php
@@ -40,6 +46,11 @@ services:
       - .env
     networks:
       - app-network
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: localhost:24224
+        tag: gestcoop_php
   gestcoop_db:
     image: mysql:8.0
     container_name: gestcoop_db
@@ -61,50 +72,51 @@ services:
       - ./sql/seeds.sql:/docker-entrypoint-initdb.d/seeds.sql
     networks:
       - app-network
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: localhost:24224
+        tag: gestcoop_db
+  # Servicios de monitoreo (se pueden activar si se desea)
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    restart: on-failure:5
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - app-network
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    restart: on-failure:5
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    depends_on:
+      - prometheus
+    networks:
+      - app-network
 
-  # # Servicios de monitoreo (se pueden activar si se desea)
-  # prometheus:
-  #   image: prom/prometheus
-  #   container_name: prometheus
-  #   restart: on-failure:5
-  #   ports:
-  #     - "9090:9090"
-  #   volumes:
-  #     - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      # cadvisor (aun no se sabe si se usara realmente en el proyecto)
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    restart: on-failure:5
+    expose:
+      - "8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    networks:
+      - app-network
 
-  #   networks:
-  #     - app-network
-  # grafana:
-  #   image: grafana/grafana
-  #   container_name: grafana
-  #   restart: on-failure:5
-  #   ports:
-  #     - "3000:3000"
-  #   environment:
-  #     - GF_SECURITY_ADMIN_PASSWORD=admin
-  #   depends_on:
-  #     - prometheus
-
-  #   networks:
-  #     - app-network
-
-  #     # cadvisor (aun no se sabe si se usara realmente en el proyecto)
-  # cadvisor:
-  #   image: gcr.io/cadvisor/cadvisor:latest
-  #   container_name: cadvisor
-  #   restart: on-failure:5
-  #   expose:
-  #     - "8080"
-  #   volumes:
-  #     - /:/rootfs:ro
-  #     - /var/run:/var/run:ro
-  #     - /sys:/sys:ro
-  #     - /var/lib/docker/:/var/lib/docker:ro
-  #   networks:
-  #     - app-network
-
-  # # SERVICIO PARA BACKUPS DE LA BASE DE DATOS Y UPLOADS
-  # # no funciona aun
+  # SERVICIO PARA BACKUPS DE LA BASE DE DATOS Y UPLOADS
   # rsync:
   #   build:
   #     context: ./docker/rsync
@@ -117,46 +129,11 @@ services:
   #   environment:
   #     MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
   #     DB_NAME: ${DB_NAME}
-  #   logging:
-  #     driver: syslog
-  #     options:
-  #       syslog-address: "tcp://syslog:514"
-  #       tag: "rsync"
 
-  # CENTRALIZACION DE LOGS ELASTICSEARCH + KIBANA + LOGSTASH
-
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.15.0
-    container_name: elasticsearch
-    environment:
-      - discovery.type=single-node
-      - ES_JAVA_OPTS=-Xms1g -Xmx1g
-    ports:
-      - "9200:9200"
-    volumes:
-      - es_data:/usr/share/elasticsearch/data
-
-  kibana:
-    image: docker.elastic.co/kibana/kibana:8.15.0
-    container_name: kibana
-    environment:
-      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-    ports:
-      - "5601:5601"
-  filebeat:
-    image: docker.elastic.co/beats/filebeat:8.15.0
-    container_name: filebeat
-    user: root # para leer logs del host/otros contenedores
-    volumes:
-      - ./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
-      - /var/lib/docker/containers:/var/lib/docker/containers:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    depends_on:
-      - elasticsearch
+  #Servicio para logs centralizados
 
 volumes:
   db_data:
-  es_data:
 networks:
   app-network:
     driver: bridge
