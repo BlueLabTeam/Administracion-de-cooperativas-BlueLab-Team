@@ -5,7 +5,6 @@ require __DIR__ . '/../vendor/autoload.php';
 use App\middlewares\Middleware;
 use App\utils\Herramientas;
 
-//app 
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
 // Manejo de archivos estáticos ANTES de iniciar sesión
@@ -66,13 +65,33 @@ if (strpos($uri, '/files/') === 0) {
 
 Herramientas::startSession();
 
-$privateRoutes = ['/dashboard', '/dashboard-admin', '/pagoPendiente', '/pagoEnviado', 'api/pay/firstPay', '/api/notifications/users', '/api/notifications/create', '/api/notifications/user', '/api/notifications/mark-read'];
+$privateRoutes = [
+    '/dashboard', 
+    '/dashboard-admin', 
+    '/pagoPendiente', 
+    '/pagoEnviado', 
+    '/api/pay/firstPay', 
+    '/api/notifications/users', 
+    '/api/notifications/create', 
+    '/api/notifications/user', 
+    '/api/notifications/mark-read',
+    '/api/tasks/create',
+    '/api/tasks/user',
+    '/api/tasks/all',
+    '/api/tasks/update-progress',
+    '/api/tasks/add-avance',
+    '/api/tasks/details',
+    '/api/tasks/users',
+    '/api/tasks/nucleos',
+    '/api/tasks/cancel'
+];
+
 if (in_array($uri, $privateRoutes)) {
     Middleware::handle();
 }
 
 switch ($uri) {
-
+    // VISTAS
     case '/':
         $controller = new App\Controllers\ViewsController();
         $controller->index();
@@ -106,9 +125,7 @@ switch ($uri) {
         $controller->showSalaEspera();
         break;
 
-
-    // APIS
-
+    // API AUTH
     case '/api/login':
         $login = new App\Controllers\AuthController();
         $login->login();
@@ -117,45 +134,79 @@ switch ($uri) {
         $register = new App\Controllers\AuthController();
         $register->register();
         break;
-    
     case '/api/logout':
         $logout = new App\Controllers\AuthController();
         $logout->logout();
         break;
 
+    // API PAGOS
     case '/api/pay/firstPay':
         $pay = new App\controllers\PaymentsController();
         $pay->addPay();
         break;
-
     case '/api/payment/approve':
         $payments = new App\Controllers\PaymentsController();
         $payments->approvePayment();
         break;
-
     case '/api/payment/reject':
         $payments = new App\Controllers\PaymentsController();
         $payments->rejectPayment();
         break;
 
+    // API NOTIFICACIONES
     case '/api/notifications/create':
         $notification = new App\Controllers\NotificationController();
         $notification->create();
         break;
-
     case '/api/notifications/user':
         $notification = new App\Controllers\NotificationController();
         $notification->getUserNotifications();
         break;
-
     case '/api/notifications/mark-read':
         $notification = new App\Controllers\NotificationController();
         $notification->markAsRead();
         break;
-
     case '/api/notifications/users':
         $notification = new App\Controllers\NotificationController();
         $notification->getUsers();
+        break;
+
+    // API TAREAS
+    case '/api/tasks/create':
+        $task = new App\Controllers\TaskController();
+        $task->create();
+        break;
+    case '/api/tasks/user':
+        $task = new App\Controllers\TaskController();
+        $task->getUserTasks();
+        break;
+    case '/api/tasks/all':
+        $task = new App\Controllers\TaskController();
+        $task->getAllTasks();
+        break;
+    case '/api/tasks/update-progress':
+        $task = new App\Controllers\TaskController();
+        $task->updateProgress();
+        break;
+    case '/api/tasks/add-avance':
+        $task = new App\Controllers\TaskController();
+        $task->addAvance();
+        break;
+    case '/api/tasks/details':
+        $task = new App\Controllers\TaskController();
+        $task->getTaskDetails();
+        break;
+    case '/api/tasks/users':
+        $task = new App\Controllers\TaskController();
+        $task->getUsers();
+        break;
+    case '/api/tasks/nucleos':
+        $task = new App\Controllers\TaskController();
+        $task->getNucleos();
+        break;
+    case '/api/tasks/cancel':
+        $task = new App\Controllers\TaskController();
+        $task->cancelTask();
         break;
 
     default:

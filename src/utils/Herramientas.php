@@ -40,7 +40,7 @@ class Herramientas
 
         $currentURL = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
         
-        // ✅ NO VALIDAR ESTADO EN RUTAS DE API Y ADMIN
+      
         $rutasExcluidas = [
             '/dashboard-admin',
             '/api/notifications/users',
@@ -48,7 +48,16 @@ class Herramientas
             '/api/notifications/user',
             '/api/notifications/mark-read',
             '/api/payment/approve',
-            '/api/payment/reject'
+            '/api/payment/reject',
+            '/api/tasks/create',
+            '/api/tasks/user',
+            '/api/tasks/all',
+            '/api/tasks/update-progress',
+            '/api/tasks/add-avance',
+            '/api/tasks/details',
+            '/api/tasks/users',
+            '/api/tasks/nucleos',
+            '/api/tasks/cancel'
         ];
         
         if (in_array($currentURL, $rutasExcluidas)) {

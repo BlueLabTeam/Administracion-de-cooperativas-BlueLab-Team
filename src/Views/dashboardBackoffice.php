@@ -498,13 +498,626 @@ $pagosPendientes = $userModel->getPendingPayments();
 			</div>
 		</section>
 
-		<section id="tareas-section" class="section-content">
-			<h2 class="section-title">Tareas</h2>
-			<div class="info-card">
-				<p>Gestión de tareas en desarrollo...</p>
+<!-- SECCIÓN TAREAS -->
+<section id="tareas-section" class="section-content">
+	<h2 class="section-title">📋 Gestión de Tareas</h2>
+
+	
+	
+	<!-- Formulario para crear nueva tarea -->
+	<div class="info-card">
+		<h3>Crear Nueva Tarea</h3>
+		
+		<form id="taskForm" onsubmit="createTask(event)">
+			<div class="form-group">
+				<label for="titulo_tarea">Título:</label>
+				<input type="text" id="titulo_tarea" name="titulo" required>
 			</div>
-		</section>
-	</main>
+
+			<div class="form-group">
+				<label for="descripcion_tarea">Descripción:</label>
+				<textarea id="descripcion_tarea" name="descripcion" rows="4" required></textarea>
+			</div>
+
+			<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+				<div class="form-group">
+					<label for="fecha_inicio">Fecha de Inicio:</label>
+					<input type="date" id="fecha_inicio" name="fecha_inicio" required>
+				</div>
+
+				<div class="form-group">
+					<label for="fecha_fin">Fecha de Finalización:</label>
+					<input type="date" id="fecha_fin" name="fecha_fin" required>
+				</div>
+			</div>
+
+			<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+				<div class="form-group">
+					<label for="prioridad">Prioridad:</label>
+					<select id="prioridad" name="prioridad">
+						<option value="baja">Baja</option>
+						<option value="media" selected>Media</option>
+						<option value="alta">Alta</option>
+					</select>
+				</div>
+
+				<div class="form-group">
+					<label for="tipo_asignacion">Asignar a:</label>
+					<select id="tipo_asignacion" name="tipo_asignacion" onchange="toggleAsignacion()">
+						<option value="usuario">Usuarios Individuales</option>
+						<option value="nucleo">Núcleos Familiares</option>
+					</select>
+				</div>
+			</div>
+
+			<!-- Selector de usuarios -->
+			<div class="form-group" id="usuarios-selector">
+				<label>Seleccionar Usuarios:</label>
+				<div class="user-selection">
+					<button type="button" onclick="toggleAllUsers()" class="btn-secondary">
+						Seleccionar Todos
+					</button>
+					<div id="taskUsersList" class="users-checkboxes">
+						<p class="loading">Cargando usuarios...</p>
+					</div>
+				</div>
+			</div>
+
+			<!-- Selector de núcleos -->
+			<div class="form-group" id="nucleos-selector" style="display: none;">
+				<label>Seleccionar Núcleos Familiares:</label>
+				<div class="user-selection">
+					<button type="button" onclick="toggleAllNucleos()" class="btn-secondary">
+						Seleccionar Todos
+					</button>
+					<div id="taskNucleosList" class="users-checkboxes">
+						<p class="loading">Cargando núcleos...</p>
+					</div>
+				</div>
+			</div>
+
+			<button type="submit" class="btn btn-primary">Crear Tarea</button>
+		</form>
+	</div>
+
+	<!-- Lista de tareas existentes -->
+	<div class="info-card" style="margin-top: 30px;">
+		<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+			<h3>Tareas Creadas</h3>
+			<div>
+				<select id="filtro-estado" onchange="loadAllTasks()" style="padding: 8px; border-radius: 5px; border: 1px solid #ddd;">
+					<option value="">Todas</option>
+					<option value="pendiente">Pendientes</option>
+					<option value="en_progreso">En Progreso</option>
+					<option value="completada">Completadas</option>
+					<option value="cancelada">Canceladas</option>
+				</select>
+			</div>
+		</div>
+		
+		<div id="tasksList">
+			<p class="loading">Cargando tareas...</p>
+		</div>
+	</div>
+</section>
+
+<?php
+// Agregar estilos CSS adicionales al final del archivo, antes del cierre de </style>
+?>
+<style>
+/* Estilos para Tareas */
+.task-item {
+	background: #f8f9fa;
+	border-left: 4px solid #007bff;
+	padding: 20px;
+	margin-bottom: 15px;
+	border-radius: 6px;
+	transition: all 0.3s;
+}
+
+.task-item:hover {
+	transform: translateX(5px);
+	box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.task-item.prioridad-alta {
+	border-left-color: #dc3545;
+}
+
+.task-item.prioridad-media {
+	border-left-color: #ffc107;
+}
+
+.task-item.prioridad-baja {
+	border-left-color: #28a745;
+}
+
+.task-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	margin-bottom: 10px;
+}
+
+.task-title {
+	font-size: 18px;
+	font-weight: bold;
+	color: #333;
+	margin: 0;
+}
+
+.task-badges {
+	display: flex;
+	gap: 8px;
+}
+
+.task-badge {
+	padding: 4px 10px;
+	border-radius: 12px;
+	font-size: 12px;
+	font-weight: bold;
+}
+
+.badge-estado {
+	background: #17a2b8;
+	color: white;
+}
+
+.badge-prioridad {
+	background: #6c757d;
+	color: white;
+}
+
+.badge-prioridad.alta {
+	background: #dc3545;
+}
+
+.badge-prioridad.media {
+	background: #ffc107;
+	color: #333;
+}
+
+.badge-prioridad.baja {
+	background: #28a745;
+}
+
+.task-description {
+	color: #666;
+	margin: 10px 0;
+	line-height: 1.5;
+}
+
+.task-meta {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+	gap: 10px;
+	margin: 15px 0;
+	font-size: 14px;
+	color: #666;
+}
+
+.task-meta-item {
+	display: flex;
+	align-items: center;
+	gap: 5px;
+}
+
+.task-actions {
+	display: flex;
+	gap: 10px;
+	margin-top: 15px;
+}
+
+.btn-cancel {
+	background-color: #dc3545;
+	color: white;
+	padding: 8px 16px;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+	font-size: 14px;
+}
+
+.btn-cancel:hover {
+	background-color: #c82333;
+}
+
+.btn-view {
+	background-color: #007bff;
+	color: white;
+	padding: 8px 16px;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+	font-size: 14px;
+}
+
+.btn-view:hover {
+	background-color: #0056b3;
+}
+</style>
+
+<?php
+// Agregar JavaScript al final del archivo, antes del cierre de </script>
+?>
+<script>
+// ========== GESTIÓN DE TAREAS ==========
+
+// Cargar usuarios y núcleos al abrir la sección de tareas
+const tareasMenuItemAdmin = document.querySelector('.menu li[data-section="tareas"]');
+if (tareasMenuItemAdmin) {
+	tareasMenuItemAdmin.addEventListener('click', function() {
+		loadTaskUsers();
+		loadNucleos();
+		loadAllTasks();
+	});
+}
+
+// Cambiar entre usuarios y núcleos
+function toggleAsignacion() {
+	const tipo = document.getElementById('tipo_asignacion').value;
+	const usuariosSelector = document.getElementById('usuarios-selector');
+	const nucleosSelector = document.getElementById('nucleos-selector');
+	
+	if (tipo === 'usuario') {
+		usuariosSelector.style.display = 'block';
+		nucleosSelector.style.display = 'none';
+	} else {
+		usuariosSelector.style.display = 'none';
+		nucleosSelector.style.display = 'block';
+	}
+}
+
+// Cargar usuarios para tareas
+async function loadTaskUsers() {
+	const container = document.getElementById('taskUsersList');
+	
+	try {
+		const response = await fetch('/api/tasks/users');
+		const data = await response.json();
+		
+		if (data.success) {
+			renderTaskUsers(data.usuarios);
+		} else {
+			container.innerHTML = '<p class="error">Error al cargar usuarios</p>';
+		}
+	} catch (error) {
+		console.error('Error:', error);
+		container.innerHTML = '<p class="error">Error de conexión</p>';
+	}
+}
+
+function renderTaskUsers(usuarios) {
+	const container = document.getElementById('taskUsersList');
+	
+	if (!usuarios || usuarios.length === 0) {
+		container.innerHTML = '<p>No hay usuarios disponibles</p>';
+		return;
+	}
+	
+	container.innerHTML = usuarios.map(user => `
+		<div class="user-checkbox">
+			<label>
+				<input type="checkbox" name="usuarios[]" value="${user.id_usuario}">
+				${user.nombre_completo} (${user.email})
+			</label>
+		</div>
+	`).join('');
+}
+
+// Cargar núcleos familiares
+async function loadNucleos() {
+	const container = document.getElementById('taskNucleosList');
+	
+	try {
+		const response = await fetch('/api/tasks/nucleos');
+		const data = await response.json();
+		
+		if (data.success) {
+			renderNucleos(data.nucleos);
+		} else {
+			container.innerHTML = '<p class="error">Error al cargar núcleos</p>';
+		}
+	} catch (error) {
+		console.error('Error:', error);
+		container.innerHTML = '<p class="error">Error de conexión</p>';
+	}
+}
+
+function renderNucleos(nucleos) {
+	const container = document.getElementById('taskNucleosList');
+	
+	if (!nucleos || nucleos.length === 0) {
+		container.innerHTML = '<p>No hay núcleos familiares disponibles</p>';
+		return;
+	}
+	
+	container.innerHTML = nucleos.map(nucleo => `
+		<div class="user-checkbox">
+			<label>
+				<input type="checkbox" name="nucleos[]" value="${nucleo.id_nucleo}">
+				${nucleo.nombre_nucleo || 'Núcleo sin nombre'} 
+				(${nucleo.total_miembros} miembro${nucleo.total_miembros != 1 ? 's' : ''})
+			</label>
+		</div>
+	`).join('');
+}
+
+function toggleAllTaskUsers() {
+	const checkboxes = document.querySelectorAll('input[name="usuarios[]"]');
+	const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+	checkboxes.forEach(cb => cb.checked = !allChecked);
+}
+
+function toggleAllNucleos() {
+	const checkboxes = document.querySelectorAll('input[name="nucleos[]"]');
+	const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+	checkboxes.forEach(cb => cb.checked = !allChecked);
+}
+
+// Crear nueva tarea
+async function createTask(event) {
+	event.preventDefault();
+	
+	const form = event.target;
+	const formData = new FormData(form);
+	const tipoAsignacion = formData.get('tipo_asignacion');
+	
+	// Obtener usuarios o núcleos seleccionados
+	let seleccionados;
+	if (tipoAsignacion === 'usuario') {
+		seleccionados = Array.from(document.querySelectorAll('input[name="usuarios[]"]:checked'))
+			.map(cb => cb.value);
+		formData.delete('usuarios[]');
+		seleccionados.forEach(id => formData.append('usuarios[]', id));
+	} else {
+		seleccionados = Array.from(document.querySelectorAll('input[name="nucleos[]"]:checked'))
+			.map(cb => cb.value);
+		formData.delete('nucleos[]');
+		seleccionados.forEach(id => formData.append('nucleos[]', id));
+	}
+	
+	if (seleccionados.length === 0) {
+		alert('Debes seleccionar al menos un ' + (tipoAsignacion === 'usuario' ? 'usuario' : 'núcleo familiar'));
+		return;
+	}
+	
+	try {
+		const response = await fetch('/api/tasks/create', {
+			method: 'POST',
+			body: formData
+		});
+		
+		const data = await response.json();
+		
+		if (data.success) {
+			alert(data.message);
+			form.reset();
+			document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+			loadAllTasks();
+		} else {
+			alert('Error: ' + data.message);
+		}
+	} catch (error) {
+		console.error('Error:', error);
+		alert('Error al crear tarea');
+	}
+}
+
+// Cargar todas las tareas
+async function loadAllTasks() {
+	const container = document.getElementById('tasksList');
+	const filtro = document.getElementById('filtro-estado')?.value || '';
+	
+	try {
+		const url = filtro ? `/api/tasks/all?estado=${filtro}` : '/api/tasks/all';
+		const response = await fetch(url);
+		const data = await response.json();
+		
+		if (data.success) {
+			renderTasksList(data.tareas);
+		} else {
+			container.innerHTML = '<p class="error">Error al cargar tareas</p>';
+		}
+	} catch (error) {
+		console.error('Error:', error);
+		container.innerHTML = '<p class="error">Error de conexión</p>';
+	}
+}
+
+function renderTasksList(tareas) {
+	const container = document.getElementById('tasksList');
+	
+	if (!tareas || tareas.length === 0) {
+		container.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">No hay tareas creadas</p>';
+		return;
+	}
+	
+	container.innerHTML = tareas.map(tarea => {
+		const fechaInicio = new Date(tarea.fecha_inicio).toLocaleDateString('es-UY');
+		const fechaFin = new Date(tarea.fecha_fin).toLocaleDateString('es-UY');
+		const asignados = tarea.tipo_asignacion === 'usuario' ? 
+			`${tarea.total_usuarios} usuario(s)` : 
+			`${tarea.total_nucleos} núcleo(s)`;
+		
+		return `
+			<div class="task-item prioridad-${tarea.prioridad}">
+				<div class="task-header">
+					<h4 class="task-title">${tarea.titulo}</h4>
+					<div class="task-badges">
+						<span class="task-badge badge-estado">${formatEstado(tarea.estado)}</span>
+						<span class="task-badge badge-prioridad ${tarea.prioridad}">${formatPrioridad(tarea.prioridad)}</span>
+					</div>
+				</div>
+				
+				<p class="task-description">${tarea.descripcion}</p>
+				
+				<div class="task-meta">
+					<div class="task-meta-item">
+						<strong>📅 Inicio:</strong> ${fechaInicio}
+					</div>
+					<div class="task-meta-item">
+						<strong>⏰ Fin:</strong> ${fechaFin}
+					</div>
+					<div class="task-meta-item">
+						<strong>👤 Creado por:</strong> ${tarea.creador}
+					</div>
+					<div class="task-meta-item">
+						<strong>👥 Asignado a:</strong> ${asignados}
+					</div>
+				</div>
+				
+				${tarea.estado !== 'cancelada' ? `
+					<div class="task-actions">
+						<button class="btn-view" onclick="viewTaskDetails(${tarea.id_tarea})">
+							Ver Detalles
+						</button>
+						<button class="btn-cancel" onclick="cancelTask(${tarea.id_tarea})">
+							Cancelar Tarea
+						</button>
+					</div>
+				` : '<p style="color: #dc3545; margin-top: 10px;"><strong>Esta tarea ha sido cancelada</strong></p>'}
+			</div>
+		`;
+	}).join('');
+}
+
+function formatEstado(estado) {
+	const estados = {
+		'pendiente': 'Pendiente',
+		'en_progreso': 'En Progreso',
+		'completada': 'Completada',
+		'cancelada': 'Cancelada'
+	};
+	return estados[estado] || estado;
+}
+
+function formatPrioridad(prioridad) {
+	const prioridades = {
+		'baja': 'Baja',
+		'media': 'Media',
+		'alta': 'Alta'
+	};
+	return prioridades[prioridad] || prioridad;
+}
+
+// Cancelar tarea
+async function cancelTask(tareaId) {
+	if (!confirm('¿Estás seguro de cancelar esta tarea? Esta acción no se puede deshacer.')) {
+		return;
+	}
+	
+	try {
+		const formData = new FormData();
+		formData.append('tarea_id', tareaId);
+		
+		const response = await fetch('/api/tasks/cancel', {
+			method: 'POST',
+			body: formData
+		});
+		
+		const data = await response.json();
+		
+		if (data.success) {
+			alert(data.message);
+			loadAllTasks();
+		} else {
+			alert('Error: ' + data.message);
+		}
+	} catch (error) {
+		console.error('Error:', error);
+		alert('Error al cancelar tarea');
+	}
+}
+
+// Ver detalles de tarea
+async function viewTaskDetails(tareaId) {
+	try {
+		const response = await fetch(`/api/tasks/details?tarea_id=${tareaId}`);
+		const data = await response.json();
+		
+		if (data.success) {
+			mostrarDetallesTarea(data.tarea, data.avances);
+		} else {
+			alert('Error al cargar detalles');
+		}
+	} catch (error) {
+		console.error('Error:', error);
+		alert('Error de conexión');
+	}
+}
+
+function mostrarDetallesTarea(tarea, avances) {
+	const modal = `
+		<div id="taskDetailModal" style="
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background: rgba(0,0,0,0.7);
+			z-index: 9999;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			padding: 20px;
+		" onclick="if(event.target.id==='taskDetailModal') this.remove()">
+			<div style="
+				background: white;
+				border-radius: 8px;
+				max-width: 800px;
+				max-height: 90vh;
+				overflow-y: auto;
+				padding: 30px;
+				position: relative;
+			">
+				<button onclick="document.getElementById('taskDetailModal').remove()" style="
+					position: absolute;
+					top: 15px;
+					right: 15px;
+					background: none;
+					border: none;
+					font-size: 24px;
+					cursor: pointer;
+				">&times;</button>
+				
+				<h2 style="margin-bottom: 20px;">${tarea.titulo}</h2>
+				
+				<div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+					<p><strong>Descripción:</strong></p>
+					<p>${tarea.descripcion}</p>
+				</div>
+				
+				<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+					<div><strong>Fecha Inicio:</strong> ${new Date(tarea.fecha_inicio).toLocaleDateString('es-UY')}</div>
+					<div><strong>Fecha Fin:</strong> ${new Date(tarea.fecha_fin).toLocaleDateString('es-UY')}</div>
+					<div><strong>Prioridad:</strong> ${formatPrioridad(tarea.prioridad)}</div>
+					<div><strong>Estado:</strong> ${formatEstado(tarea.estado)}</div>
+					<div><strong>Creado por:</strong> ${tarea.creador}</div>
+					<div><strong>Asignación:</strong> ${tarea.tipo_asignacion === 'usuario' ? 'Usuarios' : 'Núcleos'}</div>
+				</div>
+				
+				${avances && avances.length > 0 ? `
+					<h3 style="margin-top: 30px; margin-bottom: 15px;">Avances Reportados</h3>
+					${avances.map(avance => `
+						<div style="background: #e9ecef; padding: 15px; border-radius: 5px; margin-bottom: 10px;">
+							<div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+								<strong>${avance.nombre_completo}</strong>
+								<span style="color: #666; font-size: 14px;">${new Date(avance.fecha_avance).toLocaleString('es-UY')}</span>
+							</div>
+							<p>${avance.comentario}</p>
+							${avance.progreso_reportado > 0 ? `<p style="margin-top: 5px;"><strong>Progreso:</strong> ${avance.progreso_reportado}%</p>` : ''}
+							${avance.archivo ? `<p style="margin-top: 5px;"><a href="/files/?path=${avance.archivo}" target="_blank">Ver archivo adjunto</a></p>` : ''}
+						</div>
+					`).join('')}
+				` : '<p style="color: #666; text-align: center; padding: 20px;">No hay avances reportados aún</p>'}
+			</div>
+		</div>
+	`;
+	
+	document.body.insertAdjacentHTML('beforeend', modal);
+}
+</script>
 
 	<!-- Modal para ver imagen en grande -->
 	<div id="imageModal" class="modal" onclick="closeModal()">

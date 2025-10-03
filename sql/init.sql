@@ -200,3 +200,66 @@ CREATE TABLE IF NOT EXISTS usuario_notificaciones (
     INDEX idx_usuario_leida (id_usuario, leida),
     INDEX idx_notificacion (id_notificacion)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS Tareas (
+    id_tarea INT PRIMARY KEY AUTO_INCREMENT,
+    titulo VARCHAR(200) NOT NULL,
+    descripcion TEXT NOT NULL,
+    fecha_inicio DATE NOT NULL,
+    fecha_fin DATE NOT NULL,
+    prioridad ENUM('baja', 'media', 'alta') DEFAULT 'media',
+    estado ENUM('pendiente', 'en_progreso', 'completada', 'cancelada') DEFAULT 'pendiente',
+    tipo_asignacion ENUM('usuario', 'nucleo') DEFAULT 'usuario',
+    id_creador INT NOT NULL,
+    fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_creador) REFERENCES Usuario(id_usuario),
+    INDEX idx_estado (estado),
+    INDEX idx_fechas (fecha_inicio, fecha_fin)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ASIGNACION DE TAREAS A USUARIOS
+CREATE TABLE IF NOT EXISTS Tarea_Usuario (
+    id_asignacion INT PRIMARY KEY AUTO_INCREMENT,
+    id_tarea INT NOT NULL,
+    id_usuario INT NOT NULL,
+    progreso INT DEFAULT 0,
+    estado_usuario ENUM('pendiente', 'en_progreso', 'completada') DEFAULT 'pendiente',
+    fecha_asignacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+    fecha_completada DATETIME NULL,
+    FOREIGN KEY (id_tarea) REFERENCES Tareas(id_tarea) ON DELETE CASCADE,
+    FOREIGN KEY (id_usuario) REFERENCES Usuario(id_usuario) ON DELETE CASCADE,
+    UNIQUE KEY unique_tarea_usuario (id_tarea, id_usuario),
+    INDEX idx_usuario (id_usuario),
+    INDEX idx_estado (estado_usuario)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ASIGNACION DE TAREAS A NUCLEOS FAMILIARES
+CREATE TABLE IF NOT EXISTS Tarea_Nucleo (
+    id_asignacion INT PRIMARY KEY AUTO_INCREMENT,
+    id_tarea INT NOT NULL,
+    id_nucleo INT NOT NULL,
+    progreso INT DEFAULT 0,
+    estado_nucleo ENUM('pendiente', 'en_progreso', 'completada') DEFAULT 'pendiente',
+    fecha_asignacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+    fecha_completada DATETIME NULL,
+    FOREIGN KEY (id_tarea) REFERENCES Tareas(id_tarea) ON DELETE CASCADE,
+    FOREIGN KEY (id_nucleo) REFERENCES Nucleo_Familiar(id_nucleo) ON DELETE CASCADE,
+    UNIQUE KEY unique_tarea_nucleo (id_tarea, id_nucleo),
+    INDEX idx_nucleo (id_nucleo),
+    INDEX idx_estado (estado_nucleo)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- AVANCES/COMENTARIOS DE TAREAS
+CREATE TABLE IF NOT EXISTS Tarea_Avances (
+    id_avance INT PRIMARY KEY AUTO_INCREMENT,
+    id_tarea INT NOT NULL,
+    id_usuario INT NOT NULL,
+    comentario TEXT NOT NULL,
+    progreso_reportado INT DEFAULT 0,
+    archivo VARCHAR(200) NULL,
+    fecha_avance DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_tarea) REFERENCES Tareas(id_tarea) ON DELETE CASCADE,
+    FOREIGN KEY (id_usuario) REFERENCES Usuario(id_usuario),
+    INDEX idx_tarea (id_tarea),
+    INDEX idx_fecha (fecha_avance)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
