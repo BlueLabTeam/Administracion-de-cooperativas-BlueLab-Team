@@ -65,16 +65,23 @@ if (strpos($uri, '/files/') === 0) {
 
 Herramientas::startSession();
 
+// Rutas que solo requieren login (no validación de estado)
+$loginOnlyRoutes = [
+    '/api/pay/firstPay',  // Esta ruta SOLO valida login, NO estado
+];
+
+// Rutas que requieren login Y validación de estado
 $privateRoutes = [
     '/dashboard', 
     '/dashboard-admin', 
     '/pagoPendiente', 
-    '/pagoEnviado', 
-    '/api/pay/firstPay', 
+    '/pagoEnviado',
     '/api/notifications/users', 
     '/api/notifications/create', 
     '/api/notifications/user', 
     '/api/notifications/mark-read',
+    '/api/payment/approve',
+    '/api/payment/reject',
     '/api/tasks/create',
     '/api/tasks/user',
     '/api/tasks/all',
@@ -86,7 +93,12 @@ $privateRoutes = [
     '/api/tasks/cancel'
 ];
 
-if (in_array($uri, $privateRoutes)) {
+// Aplicar middleware según el tipo de ruta
+if (in_array($uri, $loginOnlyRoutes)) {
+    // Solo validar login, NO estado
+    Herramientas::validarLogin();
+} elseif (in_array($uri, $privateRoutes)) {
+    // Validar login Y estado
     Middleware::handle();
 }
 

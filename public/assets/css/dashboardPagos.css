@@ -1,0 +1,134 @@
+/* ==========================================
+   PAGOS - ESTILOS ESPECÍFICOS (ADMIN)
+   ========================================== */
+
+.payments-container {
+    width: 100%;
+}
+
+.payment-card {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.payment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.payment-info {
+    flex: 1;
+}
+
+.payment-info h3 {
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.payment-info p {
+    margin: 5px 0;
+    color: #666;
+}
+
+.payment-image {
+    margin: 20px 0;
+}
+
+.payment-image > p {
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.image-preview {
+    max-width: 100%;
+    max-height: 500px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.image-preview:hover {
+    transform: scale(1.02);
+    border-color: #007bff;
+}
+
+.image-link {
+    display: inline-block;
+    margin-top: 10px;
+    color: #007bff;
+    text-decoration: none;
+}
+
+.image-link:hover {
+    text-decoration: underline;
+}
+
+.payment-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    flex-wrap: wrap;
+}
+
+.btn-approve {
+    background-color: #28a745;
+    color: white;
+}
+
+.btn-approve:hover {
+    background-color: #218838;
+}
+
+.btn-reject {
+    background-color: #dc3545;
+    color: white;
+}
+
+.btn-reject:hover {
+    background-color: #c82333;
+}
+
+.admin-banner {
+    padding: 15px 20px;
+    background-color: #fff3cd;
+    border-radius: 5px;
+    border: 2px solid #ffc107;
+    margin-bottom: 20px;
+}
+
+.admin-banner p {
+    margin: 0;
+    font-weight: bold;
+    color: #856404;
+}
+
+/* RESPONSIVE - PAGOS */
+@media (max-width: 768px) {
+    .payment-header {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .payment-actions {
+        flex-direction: column;
+    }
+
+    .btn-approve,
+    .btn-reject {
+        width: 100%;
+    }
+
+    .image-preview {
+        max-height: 300px;
+    }
+}
