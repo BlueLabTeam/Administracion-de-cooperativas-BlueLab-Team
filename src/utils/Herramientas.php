@@ -20,21 +20,9 @@ class Herramientas
     public static function safeRedirect(string $ruta)
     {
         $currentURL = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-        self::safeRedirectAPI($ruta);
         if ($currentURL !== $ruta) {
             header("Location: $ruta");
             exit();
-        }
-    }
-
-    public static function safeRedirectAPI(string $ruta)
-    {
-        $currentURL = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-        if (str_starts_with($currentURL, '/api/')) {
-            header('Content-Type: application/json');
-            http_response_code(401);
-            echo json_encode(['success' => false, 'message' => 'No autenticado', 'redirect' => $ruta]);
-            exit;
         }
     }
 
@@ -48,47 +36,50 @@ class Herramientas
 
     public static function validarEstado()
     {
-        // self::startSession();
+        self::startSession();
 
-        // $currentURL = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+        $currentURL = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
+        $rutasExcluidas = [
+            '/api/pay/firstPay',
+            '/dashboard-admin',
+            '/api/notifications/users',
+            '/api/notifications/create',
+            '/api/notifications/user',
+            '/api/notifications/mark-read',
+            '/api/payment/approve',
+            '/api/payment/reject',
+            '/api/tasks/create',
+            '/api/tasks/user',
+            '/api/tasks/all',
+            '/api/tasks/update-progress',
+            '/api/tasks/add-avance',
+            '/api/tasks/details',
+            '/api/tasks/users',
+            '/api/tasks/nucleos',
+            '/api/tasks/cancel'
+        ];
 
-        // $rutasExcluidas = [
-        //     '/dashboard-admin',
-        //     '/api/notifications/users',
-        //     '/api/notifications/create',
-        //     '/api/notifications/user',
-        //     '/api/notifications/mark-read',
-        //     '/api/payment/approve',
-        //     '/api/payment/reject',
-        //     '/api/tasks/create',
-        //     '/api/tasks/user',
-        //     '/api/tasks/all',
-        //     '/api/tasks/update-progress',
-        //     '/api/tasks/add-avance',
-        //     '/api/tasks/details',
-        //     '/api/tasks/users',
-        //     '/api/tasks/nucleos',
-        //     '/api/tasks/cancel'
-        // ];
+        if (in_array($currentURL, $rutasExcluidas)) {
+            return; // Permitir acceso sin validar estado
+        }
 
-        // if (in_array($currentURL, $rutasExcluidas)) {
-        //     return; // Permitir acceso sin validar estado
-        // }
+        // Si es admin y está en dashboard-admin, no redirigir
+        if ($currentURL === '/dashboard-admin' && isset($_SESSION['is_admin']) && $_SESSION['is_admin']) {
+            return;
+        }
 
-        // // Si es admin y está en dashboard-admin, no redirigir
-        // if ($currentURL === '/dashboard-admin' && isset($_SESSION['is_admin']) && $_SESSION['is_admin']) {
-        //     return;
-        // }
+        $estado = $_SESSION['estado'] ?? 'pendiente';
 
-        // $estado = $_SESSION['estado'] ?? 'pendiente';
-
-        // // Si existe ruta para el estado, redirige automáticamente
-        // if (isset(self::$estadoRutas[$estado])) {
-        //     self::safeRedirect(self::$estadoRutas[$estado]);
-        // } else {
-        //     // Por seguridad, si el estado es inesperado
-        //     self::safeRedirect('/login');
-        // }
+        // Si existe ruta para el estado, redirige automáticamente
+        if (isset(self::$estadoRutas[$estado])) {
+            if ($currentURL === self::$estadoRutas[$estado]) {
+                return; // Ya está en la ruta correcta
+            }
+            self::safeRedirect(self::$estadoRutas[$estado]);
+        } else {
+            // Por seguridad, si el estado es inesperado
+            self::safeRedirect('/login');
+        }
     }
 }

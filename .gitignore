@@ -2,8 +2,17 @@
 /vendor/
 /backups/
 /data/
-composer.lock
 *.log
-/storage/
 provision.sh
 provisionNoDocker.sh
+
+# # Ignorar todo dentro de storage
+# /storage/*
+
+# # Pero no ignorar los .gitkeep
+# !/storage/.gitkeep
+# !/storage/uploads/.gitkeep
+# !/storage/uploads/pagos/.gitkeep
+
+/storage/*
+!/storage/**/.gitkeep

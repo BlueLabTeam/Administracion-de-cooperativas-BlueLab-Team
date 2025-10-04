@@ -217,6 +217,7 @@
     }
 
     @keyframes float {
+
       0%,
       100% {
         transform: translateY(0px) rotate(0deg);
@@ -258,43 +259,43 @@
             placeholder="Ingrese su contraseña" />
 
           <input type="submit" class="login__submit" value="Ingresar" />
-          
+
         </form>
       </div>
     </div>
   </main>
 
-   <?php include __DIR__ . '/includes/footer.html'; ?>
+  <?php include __DIR__ . '/includes/footer.html'; ?>
 
   <script>
     // lógica fetch original
-   document.querySelector("#form-login").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const formData = new FormData(e.target);
-  try {
-    const response = await fetch("/api/login", {
-      method: "POST",
-      body: formData
-    });
-    
-    // DEBUG: Ver qué responde el servidor
-    console.log("Status:", response.status);
-    const text = await response.text();
-    console.log("Respuesta del servidor:", text);
-    
-    const data = JSON.parse(text);
+    document.querySelector("#form-login").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      try {
+        const response = await fetch("/api/login", {
+          method: "POST",
+          body: formData
+        });
 
-    if (!data.success) {
-      alert(data.message);
-      if (data.redirect) window.location.href = data.redirect;
-    } else {
-      alert(data.message);
-      window.location.href = data.redirect;
-    }
-  } catch (error) {
-    console.error("error en la petición", error);
-    alert("Hubo un problema con el servidor: " + error.message)
-  }
+        // DEBUG: Ver qué responde el servidor
+        console.log("Status:", response.status);
+        const text = await response.text();
+        console.log("Respuesta del servidor:", text);
+
+        const data = JSON.parse(text);
+
+        if (!data.success) {
+          alert(data.message);
+          if (data.redirect) window.location.href = data.redirect;
+        } else {
+          alert(data.message);
+          window.location.href = data.redirect;
+        }
+      } catch (error) {
+        console.error("error en la petición", error);
+        alert("Hubo un problema con el servidor: " + error.message)
+      }
     });
 
     // partículas
@@ -318,7 +319,7 @@
     // ripple efecto botón
     function addButtonEffects() {
       const submitBtn = document.querySelector('.login__submit');
-      submitBtn.addEventListener('click', function (e) {
+      submitBtn.addEventListener('click', function(e) {
         const ripple = document.createElement('span');
         const rect = this.getBoundingClientRect();
         const size = Math.max(rect.width, rect.height);
@@ -350,16 +351,18 @@
     document.head.appendChild(style);
 
     // inicializar animaciones
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
       createParticles();
       addButtonEffects();
       document.body.style.opacity = '0';
       document.body.style.transition = 'opacity 0.5s ease';
-      setTimeout(() => { document.body.style.opacity = '1'; }, 100);
+      setTimeout(() => {
+        document.body.style.opacity = '1';
+      }, 100);
     });
 
     // paralaje
-    document.addEventListener('mousemove', function (e) {
+    document.addEventListener('mousemove', function(e) {
       const container = document.getElementById('loginBox');
       const x = (e.clientX / window.innerWidth) * 2 - 1;
       const y = (e.clientY / window.innerHeight) * 2 - 1;

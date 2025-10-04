@@ -19,7 +19,7 @@ class PaymentsController
         $nombreArchivo = time() . '_' . basename($archivo['name']);
 
         // para que se guarde en storage
-        $directorio = __DIR__ . '/../../storage/uploads/pagos/';
+        $directorio = __DIR__ . '/../../storage/uploads/pagos/'; //no tiene permiso de escritura
         $destino = $directorio . $nombreArchivo;
 
         // ruta para guardarlo en la BD (relativa)
@@ -63,7 +63,7 @@ class PaymentsController
     public function approvePayment()
     {
         header('Content-Type: application/json');
-        
+
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             http_response_code(405);
             echo json_encode(['success' => false, 'message' => 'Método no permitido']);
@@ -73,7 +73,7 @@ class PaymentsController
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
-        
+
         // Verificar que sea admin
         if (!isset($_SESSION['is_admin']) || !$_SESSION['is_admin']) {
             http_response_code(403);
@@ -102,7 +102,7 @@ class PaymentsController
     public function rejectPayment()
     {
         header('Content-Type: application/json');
-        
+
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             http_response_code(405);
             echo json_encode(['success' => false, 'message' => 'Método no permitido']);
@@ -112,7 +112,7 @@ class PaymentsController
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
-        
+
         // Verificar que sea admin
         if (!isset($_SESSION['is_admin']) || !$_SESSION['is_admin']) {
             http_response_code(403);

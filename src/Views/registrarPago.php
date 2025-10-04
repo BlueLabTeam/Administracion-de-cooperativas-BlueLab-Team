@@ -36,7 +36,9 @@
             window.location.href = data.redirect;
           } else {
             alert("Error:" + data.message);
-            window.location.href = data.redirect;
+            if (data.redirect) {
+              window.location.href = data.redirect;
+            }
           }
         } catch (error) {
           console.error(error);

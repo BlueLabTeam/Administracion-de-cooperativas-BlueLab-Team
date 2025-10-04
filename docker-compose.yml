@@ -8,11 +8,9 @@ services:
       - "80:80"
     volumes:
       - ./public:/var/www/public
-      
       - ./docker/apache/apache.conf:/usr/local/apache2/conf/extra/apache-custom.conf
       - ./docker/apache/gestcoop.conf:/usr/local/apache2/conf/extra/gestcoop.conf
       - ./docker/apache/httpd.conf:/usr/local/apache2/conf/httpd.conf
-
     depends_on:
       - gestcoop_php
     networks:
@@ -27,7 +25,7 @@ services:
     volumes:
       - ./public:/var/www/public
       - ./src:/var/www/src
-      - ./storage/uploads:/var/www/storage/uploads
+      - ./storage:/var/www/storage
       - ./vendor:/var/www/vendor
     depends_on:
       - gestcoop_db
