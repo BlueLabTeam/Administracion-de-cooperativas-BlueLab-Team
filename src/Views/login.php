@@ -167,6 +167,11 @@
       transform: translateY(-1px);
     }
 
+    .register-link {
+      color: var(--color-primary);
+      font-weight: 500;
+    }
+
     @keyframes slideInUp {
       to {
         transform: translateY(0);
@@ -256,9 +261,8 @@
           <label for="password" class="formulario__label">Contraseña</label>
           <input type="password" class="login__input input--contrasenia" name="password"
             placeholder="Ingrese su contraseña" />
-
           <input type="submit" class="login__submit" value="Ingresar" />
-          
+          <p> No tienes una cuenta?<a class="register-link" href="/register">Regístrate aquí</a></p>
         </form>
       </div>
     </div>

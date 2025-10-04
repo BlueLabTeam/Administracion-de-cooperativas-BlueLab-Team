@@ -154,6 +154,11 @@
       box-shadow: 0 10px 20px rgba(255, 255, 255, 0.2);
     }
 
+    .login-link {
+      color: var(--color-primary);
+      font-weight: 500;
+    }
+
     @keyframes slideInUp {
       to {
         transform: translateY(0);
@@ -205,6 +210,7 @@
     }
 
     @keyframes float {
+
       0%,
       100% {
         transform: translateY(0px) rotate(0deg);
@@ -287,6 +293,7 @@
           </div>
 
           <input type="submit" class="formulario__submit" value="Enviar Solicitud" />
+          <p>¿Ya tienes una cuenta?<a class="login-link" href="/login">Inicia sesión aquí</a></p>
         </form>
       </div>
     </div>
