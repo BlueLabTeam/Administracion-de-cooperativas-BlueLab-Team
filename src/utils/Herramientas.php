@@ -41,7 +41,6 @@ class Herramientas
         $currentURL = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
         $rutasExcluidas = [
-            '/api/pay/firstPay',
             '/dashboard-admin',
             '/api/notifications/users',
             '/api/notifications/create',
@@ -63,7 +62,10 @@ class Herramientas
         if (in_array($currentURL, $rutasExcluidas)) {
             return; // Permitir acceso sin validar estado
         }
-
+        //  Si es una ruta API, no hacer redirección
+        if (strpos($currentURL, '/api/') === 0) {
+            return; // Deja pasar las rutas JSON
+        }
         // Si es admin y está en dashboard-admin, no redirigir
         if ($currentURL === '/dashboard-admin' && isset($_SESSION['is_admin']) && $_SESSION['is_admin']) {
             return;
