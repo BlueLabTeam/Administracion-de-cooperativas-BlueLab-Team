@@ -10,6 +10,9 @@
     RewriteRule ^(.*)$ index.php [QSA,L]
 </IfModule>
 
+# Error 404
+ErrorDocument 404 /../src/Views/404error.php
+
 # Evitar listado de directorios
 Options -Indexes
 

@@ -22,12 +22,6 @@ $fullPath = __DIR__ . '/../storage/' . $path;
 $realPath = realpath($fullPath);
 $storageDir = realpath(__DIR__ . '/../storage');
 
-// Verificar que el archivo existe
-if (!$realPath || !file_exists($realPath) || !is_file($realPath)) {
-    http_response_code(404);
-    die('Archivo no encontrado');
-}
-
 // Verificar que está dentro de storage (seguridad)
 if (strpos($realPath, $storageDir) !== 0) {
     http_response_code(403);
