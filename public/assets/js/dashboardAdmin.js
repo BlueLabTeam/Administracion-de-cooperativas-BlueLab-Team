@@ -335,6 +335,7 @@ function toggleAllNucleos() {
 
 function createTask(event) {
     event.preventDefault();
+    console.log('>>> Creando tarea');
     
     const form = event.target;
     const formData = new FormData(form);
@@ -358,13 +359,33 @@ function createTask(event) {
         return;
     }
     
+    // CRÍTICO: Agregar materiales ANTES del fetch
+    if (materialesAsignados.length > 0) {
+        console.log('>>> Agregando materiales:', materialesAsignados);
+        formData.append('materiales_json', JSON.stringify(materialesAsignados));
+    } else {
+        console.log('>>> No hay materiales asignados');
+    }
+    
+    // Log para debug
+    console.log('>>> FormData contenido:');
+    for (let pair of formData.entries()) {
+        console.log(pair[0] + ': ' + pair[1]);
+    }
+    
     fetch('/api/tasks/create', { method: 'POST', body: formData })
     .then(response => response.json())
     .then(data => {
+        console.log('>>> Response del servidor:', data);
         if (data.success) {
             alert(data.message);
             form.reset();
             document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+            
+            // Limpiar materiales
+            materialesAsignados = [];
+            renderMaterialesAsignados();
+            
             loadAllTasks();
         } else {
             alert('Error: ' + data.message);
@@ -430,12 +451,140 @@ function renderTasksList(tareas) {
                 ${tarea.estado !== 'cancelada' ? `
                     <div class="task-actions">
                         <button class="btn btn-small btn-view" onclick="viewTaskDetails(${tarea.id_tarea})">Ver Detalles</button>
+                        <button class="btn btn-small btn-materiales" onclick="viewTaskMaterialsAdmin(${tarea.id_tarea})">
+                            <i class="fas fa-boxes"></i> Materiales
+                        </button>
                         <button class="btn btn-small btn-cancel" onclick="cancelTask(${tarea.id_tarea})">Cancelar Tarea</button>
                     </div>
                 ` : '<p style="color: #dc3545; margin-top: 10px;"><strong>Esta tarea ha sido cancelada</strong></p>'}
             </div>
         `;
     }).join('');
+}
+
+// Agregar función para ver materiales de tarea (Admin)
+function viewTaskMaterialsAdmin(tareaId) {
+    console.log('>>> viewTaskMaterialsAdmin llamada para tarea:', tareaId);
+    
+    fetch(`/api/materiales/task-materials?tarea_id=${tareaId}`)
+    .then(response => {
+        console.log('>>> Response status:', response.status);
+        return response.json();
+    })
+    .then(data => {
+        console.log('>>> Materiales recibidos COMPLETO:', JSON.stringify(data)); // ← CAMBIA ESTA LÍNEA
+        console.log('>>> data.success:', data.success);
+        console.log('>>> data.materiales:', data.materiales);
+        console.log('>>> Cantidad materiales:', data.materiales ? data.materiales.length : 'undefined');
+        
+        if (data.success) {
+            if (data.materiales && data.materiales.length > 0) {
+                showTaskMaterialsModalAdmin(data.materiales, tareaId);
+            } else {
+                alert('Esta tarea no tiene materiales asignados');
+            }
+        } else {
+            alert('Error: ' + (data.message || 'Error desconocido'));
+        }
+    })
+    .catch(error => {
+        console.error('>>> Error:', error);
+        alert('Error de conexión: ' + error.message);
+    });
+}
+
+function showTaskMaterialsModalAdmin(materiales, tareaId) {
+    console.log('Mostrando modal con', materiales.length, 'materiales');
+    
+    const materialesHTML = `
+        <div class="materials-grid">
+            ${materiales.map(material => {
+                const suficiente = parseInt(material.stock_disponible) >= parseInt(material.cantidad_requerida);
+                return `
+                    <div class="material-card ${suficiente ? 'disponible' : 'insuficiente'}">
+                        <div class="material-icon-box">
+                            <i class="fas fa-box"></i>
+                        </div>
+                        <div class="material-info-box">
+                            <h4>${material.nombre}</h4>
+                            ${material.caracteristicas ? `<p class="material-desc">${material.caracteristicas}</p>` : ''}
+                            <div class="material-quantities">
+                                <span class="quantity-item">
+                                    <i class="fas fa-clipboard-list"></i>
+                                    Requerido: <strong>${material.cantidad_requerida}</strong>
+                                </span>
+                                <span class="quantity-item ${suficiente ? 'available' : 'unavailable'}">
+                                    <i class="fas fa-warehouse"></i>
+                                    Stock: <strong>${material.stock_disponible}</strong>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="material-status-badge">
+                            ${suficiente ? 
+                                '<span class="badge-success"><i class="fas fa-check-circle"></i> Disponible</span>' :
+                                '<span class="badge-warning"><i class="fas fa-exclamation-triangle"></i> Stock Bajo</span>'
+                            }
+                        </div>
+                    </div>
+                `;
+            }).join('')}
+        </div>
+    `;
+    
+    const modal = `
+        <div id="materialesModalAdmin" class="modal-detail" onclick="if(event.target.id==='materialesModalAdmin') this.remove()">
+            <div class="modal-detail-content">
+                <button onclick="document.getElementById('materialesModalAdmin').remove()" class="modal-close-button">&times;</button>
+                
+                <h2 class="modal-detail-header">
+                    <i class="fas fa-boxes" style="color: #667eea; margin-right: 10px;"></i>
+                    Materiales de la Tarea
+                </h2>
+                
+                <p style="color: #666; margin-bottom: 20px;">
+                    Total de materiales asignados: <strong>${materiales.length}</strong>
+                </p>
+                
+                ${materialesHTML}
+                
+                <div class="modal-detail-footer" style="margin-top: 30px;">
+                    <button onclick="document.getElementById('materialesModalAdmin').remove()" class="btn btn-secondary">
+                        Cerrar
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modal);
+}
+
+function showTaskMaterialsModal(materiales, tareaId) {
+    const materialesHTML = materiales && materiales.length > 0 ? `
+        <div class="materials-grid">
+            ${materiales.map(m => `
+                <div class="material-card disponible">
+                    <h4>${m.nombre}</h4>
+                    <p>Cantidad requerida: <strong>${m.cantidad_requerida}</strong></p>
+                    <p>Stock actual: <strong>${m.stock_disponible}</strong></p>
+                </div>
+            `).join('')}
+        </div>
+    ` : '<p>No hay materiales asignados a esta tarea</p>';
+    
+    const modal = `
+        <div id="materialesModalAdmin" class="modal-detail" onclick="if(event.target.id==='materialesModalAdmin') this.remove()">
+            <div class="modal-detail-content">
+                <button onclick="document.getElementById('materialesModalAdmin').remove()" class="modal-close-button">&times;</button>
+                <h2 class="modal-detail-header">📦 Materiales de la Tarea</h2>
+                ${materialesHTML}
+                <div class="modal-detail-footer">
+                    <button onclick="document.getElementById('materialesModalAdmin').remove()" class="btn btn-secondary">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modal);
 }
 
 function formatEstado(estado) {
@@ -1482,3 +1631,626 @@ function deleteNucleo(nucleoId) {
 }
 
 console.log('✓ Módulo de Núcleos Familiares cargado completamente');
+
+
+// ==========================================
+// GESTIÓN DE MATERIALES - VERSIÓN FINAL
+// Agregar DESPUÉS del código de núcleos en dashboardAdmin.js
+// ==========================================
+
+console.log('🟢 Cargando módulo de Materiales');
+
+// ========== CARGAR MATERIALES ==========
+function loadMateriales() {
+    console.log('>>> loadMateriales() ejecutada');
+    const container = document.getElementById('materialesTableContainer');
+    
+    if (!container) {
+        console.error('✗ NO SE ENCONTRÓ materialesTableContainer');
+        return;
+    }
+    
+    container.innerHTML = '<p class="loading">Cargando materiales...</p>';
+    
+    fetch('/api/materiales/all', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin'
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('DEBUG: Materiales recibidos:', data);
+        if (data.success) {
+            renderMaterialesTable(data.materiales);
+        } else {
+            container.innerHTML = `<p class="error">Error: ${data.message}</p>`;
+        }
+    })
+    .catch(error => {
+        console.error('Error al cargar materiales:', error);
+        container.innerHTML = '<p class="error">Error de conexión</p>';
+    });
+}
+
+// ========== RENDERIZAR TABLA ==========
+function renderMaterialesTable(materiales) {
+    const container = document.getElementById('materialesTableContainer');
+
+    if (!materiales || materiales.length === 0) {
+        container.innerHTML = `
+            <div style="text-align: center; padding: 40px;">
+                <i class="fas fa-box-open" style="font-size: 48px; color: #ddd; display: block; margin-bottom: 15px;"></i>
+                <p style="color: #999; margin-bottom: 20px;">No hay materiales registrados</p>
+                <button class="btn btn-primary" onclick="showCreateMaterialModal()">
+                    <i class="fas fa-plus"></i> Crear Primer Material
+                </button>
+            </div>
+        `;
+        return;
+    }
+
+    let tableHTML = `
+        <div class="materiales-table-container">
+            <table class="materiales-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Material</th>
+                        <th>Características</th>
+                        <th>Stock</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+
+    materiales.forEach(material => {
+        const stock = parseInt(material.stock) || 0;
+        let stockClass = 'disponible';
+
+        if (stock === 0) {
+            stockClass = 'agotado';
+        } else if (stock < 10) {
+            stockClass = 'bajo';
+        }
+
+        tableHTML += `
+            <tr>
+                <td>${material.id_material}</td>
+                <td><strong>${material.nombre}</strong></td>
+                <td>${material.caracteristicas || '-'}</td>
+                <td>
+                    <span class="stock-badge ${stockClass}">${stock}</span>
+                </td>
+                <td>
+                    <div class="material-actions">
+                        <button class="btn-stock-material" onclick="showStockModal(${material.id_material}, '${material.nombre.replace(/'/g, "\\'")}', ${stock})" title="Actualizar Stock">
+                            <i class="fas fa-boxes"></i>
+                        </button>
+                        <button class="btn-edit-material" onclick="editMaterial(${material.id_material})" title="Editar">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn-delete-material" onclick="deleteMaterial(${material.id_material}, '${material.nombre.replace(/'/g, "\\'")}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    });
+
+    tableHTML += `
+                </tbody>
+            </table>
+        </div>
+    `;
+
+    container.innerHTML = tableHTML;
+}
+
+// ========== BUSCAR MATERIALES ==========
+let searchMaterialesTimeout;
+function searchMateriales() {
+    clearTimeout(searchMaterialesTimeout);
+    
+    searchMaterialesTimeout = setTimeout(() => {
+        const searchTerm = document.getElementById('search-materiales').value.trim();
+        
+        if (searchTerm === '') {
+            loadMateriales();
+            return;
+        }
+
+        fetch(`/api/materiales/search?q=${encodeURIComponent(searchTerm)}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                renderMaterialesTable(data.materiales);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }, 300);
+}
+
+// ========== MOSTRAR MODAL CREAR ==========
+function showCreateMaterialModal() {
+    console.log('>>> showCreateMaterialModal() EJECUTADA');
+    
+    const modal = document.getElementById('materialModal');
+    
+    if (!modal) {
+        console.error('✗ Modal no encontrado');
+        alert('ERROR: Modal no encontrado en el DOM');
+        return;
+    }
+    
+    // Resetear formulario
+    document.getElementById('materialModalTitle').textContent = 'Nuevo Material';
+    document.getElementById('material-id').value = '';
+    document.getElementById('material-nombre').value = '';
+    document.getElementById('material-caracteristicas').value = '';
+    
+    // Mostrar modal
+    modal.style.display = 'flex';
+    console.log('✓ Modal mostrado');
+}
+
+// ========== EDITAR MATERIAL ==========
+function editMaterial(id) {
+    console.log('>>> Editando material ID:', id);
+    
+    fetch(`/api/materiales/details?id=${id}`)
+    .then(response => response.json())
+    .then(data => {
+        if (data.success && data.material) {
+            document.getElementById('materialModalTitle').textContent = 'Editar Material';
+            document.getElementById('material-id').value = data.material.id_material;
+            document.getElementById('material-nombre').value = data.material.nombre;
+            document.getElementById('material-caracteristicas').value = data.material.caracteristicas || '';
+            document.getElementById('materialModal').style.display = 'flex';
+        } else {
+            alert('Error al cargar material');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error al cargar material');
+    });
+}
+
+// ========== GUARDAR MATERIAL ==========
+function saveMaterial(event) {
+    event.preventDefault();
+    console.log('>>> Guardando material');
+
+    const id = document.getElementById('material-id').value;
+    const nombre = document.getElementById('material-nombre').value.trim();
+    const caracteristicas = document.getElementById('material-caracteristicas').value.trim();
+
+    if (!nombre) {
+        alert('El nombre es requerido');
+        return;
+    }
+
+    const materialData = { nombre, caracteristicas };
+    const url = id ? '/api/materiales/update' : '/api/materiales/create';
+
+    if (id) {
+        materialData.id = id;
+    }
+
+    fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(materialData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            closeMaterialModal();
+            loadMateriales();
+        } else {
+            alert('Error: ' + (data.message || 'Error al guardar material'));
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error de conexión');
+    });
+}
+
+// ========== CERRAR MODAL MATERIAL ==========
+function closeMaterialModal() {
+    document.getElementById('materialModal').style.display = 'none';
+    document.getElementById('materialForm').reset();
+}
+
+// ========== ELIMINAR MATERIAL ==========
+function deleteMaterial(id, nombre) {
+    if (!confirm(`¿Estás seguro de eliminar el material "${nombre}"?\n\nNota: No se puede eliminar si está asignado a tareas.`)) {
+        return;
+    }
+
+    fetch('/api/materiales/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Material eliminado exitosamente');
+            loadMateriales();
+        } else {
+            alert('Error: ' + (data.message || 'Error al eliminar material'));
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error de conexión');
+    });
+}
+
+// ========== MOSTRAR MODAL STOCK ==========
+function showStockModal(id, nombre, stockActual) {
+    console.log('>>> Abriendo modal stock para:', nombre);
+    document.getElementById('stock-material-id').value = id;
+    document.getElementById('stock-material-name').textContent = 'Material: ' + nombre;
+    document.getElementById('stock-cantidad').value = stockActual;
+    document.getElementById('stockModal').style.display = 'flex';
+}
+
+// ========== CERRAR MODAL STOCK ==========
+function closeStockModal() {
+    document.getElementById('stockModal').style.display = 'none';
+    document.getElementById('stockForm').reset();
+}
+
+// ========== ACTUALIZAR STOCK ==========
+function updateStock(event) {
+    event.preventDefault();
+    console.log('>>> Actualizando stock');
+
+    const id = document.getElementById('stock-material-id').value;
+    const cantidad = parseInt(document.getElementById('stock-cantidad').value);
+
+    if (cantidad < 0) {
+        alert('La cantidad no puede ser negativa');
+        return;
+    }
+
+    fetch('/api/materiales/update-stock', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, cantidad })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Stock actualizado exitosamente');
+            closeStockModal();
+            loadMateriales();
+        } else {
+            alert('Error: ' + (data.message || 'Error al actualizar stock'));
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error de conexión');
+    });
+}
+
+// ========== EVENTOS - AGREGAR AL DOMContentLoaded EXISTENTE ==========
+// BUSCA EN TU CÓDIGO DONDE ESTÁ EL document.addEventListener('DOMContentLoaded'
+// Y AGREGA ESTE CÓDIGO DENTRO:
+
+/*
+    // Listener para materiales
+    const materialesMenuItem = document.querySelector('.menu li[data-section="materiales"]');
+    if (materialesMenuItem) {
+        console.log('✓ Listener de materiales agregado');
+        materialesMenuItem.addEventListener('click', function() {
+            console.log('>>> Click en sección materiales');
+            loadMateriales();
+        });
+    }
+    
+    // Cerrar modales al hacer click fuera
+    window.addEventListener('click', function(event) {
+        if (event.target.id === 'materialModal') {
+            closeMaterialModal();
+        }
+        if (event.target.id === 'stockModal') {
+            closeStockModal();
+        }
+    });
+*/
+
+console.log('✅ Módulo de Materiales cargado');
+console.log('TEST: showCreateMaterialModal disponible:', typeof showCreateMaterialModal === 'function');
+
+
+// ==========================================
+// INTEGRACIÓN DE MATERIALES EN TAREAS - VERSIÓN CORREGIDA
+// Reemplazar el código anterior con este
+// ==========================================
+
+console.log('🔵 Cargando integración de Materiales en Tareas');
+
+// Variable global para materiales asignados
+let materialesAsignados = [];
+
+// ========== CARGAR MATERIALES DISPONIBLES PARA ASIGNAR ==========
+function loadMaterialesParaTarea() {
+    console.log('>>> loadMaterialesParaTarea() ejecutada');
+    const container = document.getElementById('materiales-tarea-list');
+    
+    if (!container) {
+        console.error('✗ Container materiales-tarea-list NO encontrado');
+        return;
+    }
+    
+    console.log('✓ Container encontrado, haciendo fetch...');
+    container.innerHTML = '<p class="loading">Cargando materiales...</p>';
+    
+    fetch('/api/materiales/all', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin'
+    })
+    .then(response => {
+        console.log('Response status:', response.status);
+        return response.json();
+    })
+    .then(data => {
+        console.log('Materiales recibidos:', data);
+        if (data.success) {
+            renderMaterialesSelectorTarea(data.materiales);
+        } else {
+            container.innerHTML = `<p class="error">Error: ${data.message}</p>`;
+        }
+    })
+    .catch(error => {
+        console.error('Error al cargar materiales:', error);
+        container.innerHTML = '<p class="error">Error de conexión</p>';
+    });
+}
+
+// ========== RENDERIZAR SELECTOR DE MATERIALES ==========
+function renderMaterialesSelectorTarea(materiales) {
+    console.log('>>> renderMaterialesSelectorTarea con', materiales.length, 'materiales');
+    const container = document.getElementById('materiales-tarea-list');
+    
+    if (!materiales || materiales.length === 0) {
+        container.innerHTML = '<p style="color: #999; padding: 10px;">No hay materiales disponibles. <a href="#" onclick="event.preventDefault(); document.querySelector(\'[data-section=\\\'materiales\\\']\').click();">Crear materiales</a></p>';
+        return;
+    }
+    
+    container.innerHTML = materiales.map(material => {
+        const stock = parseInt(material.stock) || 0;
+        const stockClass = stock === 0 ? 'agotado' : (stock < 10 ? 'bajo' : 'disponible');
+        
+        return `
+            <div class="material-selector-item" data-material-id="${material.id_material}">
+                <div class="material-selector-info">
+                    <div class="material-selector-name">
+                        <strong>${material.nombre}</strong>
+                        <span class="stock-badge-small ${stockClass}">${stock} disponible</span>
+                    </div>
+                    ${material.caracteristicas ? `<small style="color: #666;">${material.caracteristicas}</small>` : ''}
+                </div>
+                <div class="material-selector-actions">
+                    <input type="number" 
+                           class="material-cantidad-input" 
+                           id="cantidad-${material.id_material}"
+                           min="1" 
+                           max="${stock > 0 ? stock : 999}"
+                           placeholder="Cant." 
+                           style="width: 70px;">
+                    <button type="button" 
+                            class="btn-small btn-add-material" 
+                            onclick="addMaterialToTask(${material.id_material}, '${material.nombre.replace(/'/g, "\\'")}', ${stock})"
+                            ${stock === 0 ? 'disabled title="Sin stock"' : ''}>
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    console.log('✓ Materiales renderizados');
+}
+
+// ========== AGREGAR MATERIAL A LA LISTA ==========
+function addMaterialToTask(materialId, materialNombre, stockDisponible) {
+    console.log('>>> Agregando material:', materialId, materialNombre);
+    const cantidadInput = document.getElementById(`cantidad-${materialId}`);
+    const cantidad = parseInt(cantidadInput.value);
+    
+    if (!cantidad || cantidad <= 0) {
+        alert('Ingresa una cantidad válida');
+        return;
+    }
+    
+    if (cantidad > stockDisponible) {
+        alert(`Solo hay ${stockDisponible} unidades disponibles`);
+        return;
+    }
+    
+    const existente = materialesAsignados.find(m => m.id === materialId);
+    if (existente) {
+        existente.cantidad = cantidad;
+        alert('Cantidad actualizada');
+    } else {
+        materialesAsignados.push({
+            id: materialId,
+            nombre: materialNombre,
+            cantidad: cantidad,
+            stock: stockDisponible
+        });
+    }
+    
+    cantidadInput.value = '';
+    renderMaterialesAsignados();
+}
+
+// ========== RENDERIZAR LISTA DE ASIGNADOS ==========
+function renderMaterialesAsignados() {
+    const container = document.getElementById('materiales-asignados-list');
+    
+    if (!container) return;
+    
+    if (materialesAsignados.length === 0) {
+        container.innerHTML = '<p style="color: #999; padding: 10px;">No hay materiales asignados</p>';
+        return;
+    }
+    
+    container.innerHTML = `
+        <div class="materiales-asignados-header">
+            <strong>Materiales asignados (${materialesAsignados.length}):</strong>
+        </div>
+        ${materialesAsignados.map(material => `
+            <div class="material-asignado-item">
+                <div class="material-asignado-info">
+                    <strong>${material.nombre}</strong>
+                    <span class="cantidad-badge">Cantidad: ${material.cantidad}</span>
+                </div>
+                <button type="button" 
+                        class="btn-small btn-remove" 
+                        onclick="removeMaterialFromTask(${material.id})"
+                        title="Quitar material">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        `).join('')}
+    `;
+}
+
+// ========== QUITAR MATERIAL ==========
+function removeMaterialFromTask(materialId) {
+    materialesAsignados = materialesAsignados.filter(m => m.id !== materialId);
+    renderMaterialesAsignados();
+}
+
+// ========== FILTRAR MATERIALES ==========
+function filterMaterialesTarea() {
+    const searchTerm = document.getElementById('search-materiales-tarea').value.toLowerCase();
+    const items = document.querySelectorAll('.material-selector-item');
+    
+    items.forEach(item => {
+        const text = item.textContent.toLowerCase();
+        item.style.display = text.includes(searchTerm) ? '' : 'none';
+    });
+}
+
+// ========== MODIFICAR createTask EXISTENTE ==========
+// IMPORTANTE: Busca la función createTask en tu código y reemplázala con esta
+
+function createTask(event) {
+    event.preventDefault();
+    
+    console.log('=== INICIO createTask ===');
+    console.log('materialesAsignados:', materialesAsignados);
+    
+    const form = event.target;
+    const formData = new FormData(form);
+    const tipoAsignacion = formData.get('tipo_asignacion');
+    
+    // Asignar usuarios o núcleos
+    let seleccionados;
+    if (tipoAsignacion === 'usuario') {
+        seleccionados = Array.from(document.querySelectorAll('input[name="usuarios[]"]:checked'))
+            .map(cb => cb.value);
+        formData.delete('usuarios[]');
+        seleccionados.forEach(id => formData.append('usuarios[]', id));
+    } else {
+        seleccionados = Array.from(document.querySelectorAll('input[name="nucleos[]"]:checked'))
+            .map(cb => cb.value);
+        formData.delete('nucleos[]');
+        seleccionados.forEach(id => formData.append('nucleos[]', id));
+    }
+    
+    if (seleccionados.length === 0) {
+        alert('Debes seleccionar al menos un ' + (tipoAsignacion === 'usuario' ? 'usuario' : 'núcleo familiar'));
+        return;
+    }
+    
+    // AGREGAR MATERIALES
+    if (materialesAsignados.length > 0) {
+        const materialesJSON = JSON.stringify(materialesAsignados);
+        console.log('materialesJSON generado:', materialesJSON);
+        formData.append('materiales_json', materialesJSON);
+    } else {
+        console.warn('No hay materiales asignados');
+    }
+    
+    // DEBUG: Mostrar todo el FormData
+    console.log('=== FormData contenido ===');
+    for (let [key, value] of formData.entries()) {
+        console.log(`${key}: ${value}`);
+    }
+    console.log('========================');
+    
+    // Enviar
+    fetch('/api/tasks/create', { 
+        method: 'POST', 
+        body: formData 
+    })
+    .then(response => {
+        console.log('Response status:', response.status);
+        return response.json();
+    })
+    .then(data => {
+        console.log('Response data:', data);
+        if (data.success) {
+            alert(data.message);
+            form.reset();
+            document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+            
+            // Limpiar materiales
+            materialesAsignados = [];
+            renderMaterialesAsignados();
+            
+            loadAllTasks();
+        } else {
+            alert('Error: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error en fetch:', error);
+        alert('Error al crear tarea');
+    });
+}
+
+// ========== CARGAR MATERIALES AL ABRIR SECCIÓN TAREAS ==========
+// Agregar al DOMContentLoaded existente o crear uno nuevo
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('>>> DOM Loaded - Configurando materiales en tareas');
+    
+    // Cargar materiales cuando se abre la sección de tareas
+    const tareasMenuItem = document.querySelector('.menu li[data-section="tareas"]');
+    if (tareasMenuItem) {
+        tareasMenuItem.addEventListener('click', function() {
+            console.log('>>> Sección tareas abierta');
+            loadTaskUsers();
+            loadNucleos();
+            loadAllTasks();
+            // IMPORTANTE: Cargar materiales inmediatamente
+            setTimeout(() => {
+                loadMaterialesParaTarea();
+            }, 300);
+        });
+    }
+    
+    // Cargar materiales al abrir sección materiales
+    const materialesMenuItem = document.querySelector('.menu li[data-section="materiales"]');
+    if (materialesMenuItem) {
+        materialesMenuItem.addEventListener('click', function() {
+            loadMateriales();
+        });
+    }
+});
+
+console.log('✅ Integración de Materiales en Tareas cargada');
+console.log('TEST loadMaterialesParaTarea:', typeof loadMaterialesParaTarea);

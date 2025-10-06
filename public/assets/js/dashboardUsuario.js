@@ -1,5 +1,5 @@
 // ==========================================
-// DASHBOARD USUARIO - JAVASCRIPT
+// DASHBOARD USUARIO 
 // ==========================================
 
 // Sistema SPA - Navegación entre secciones
@@ -10,29 +10,22 @@ document.addEventListener('DOMContentLoaded', function() {
         item.addEventListener('click', function(e) {
             e.preventDefault();
             
-            // Limpiar activo
             menuItems.forEach(mi => mi.classList.remove('activo'));
-            
-            // Activar seleccionado
             this.classList.add('activo');
             const sectionId = this.getAttribute('data-section') + '-section';
             
-            // Ocultar todas las secciones
             document.querySelectorAll('.section-content').forEach(s => {
                 s.classList.remove('active');
             });
             
-            // Mostrar la seleccionada
             const targetSection = document.getElementById(sectionId);
             if (targetSection) targetSection.classList.add('active');
         });
     });
 
-    // Cargar notificaciones al inicio
     loadNotifications();
-    setInterval(loadNotifications, 120000); // Actualizar cada 2 minutos
+    setInterval(loadNotifications, 120000);
     
-    // Cargar tareas cuando se abre esa sección
     const tareasMenuItem = document.querySelector('.menu li[data-section="tareas"]');
     if (tareasMenuItem) {
         tareasMenuItem.addEventListener('click', function() {
@@ -41,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// ========== GESTIÓN DE NOTIFICACIONES ==========
+// ========== NOTIFICACIONES ==========
 
 async function loadNotifications() {
     try {
@@ -62,11 +55,9 @@ function renderNotifications(notifications, unreadCount) {
     const badge = document.getElementById('notificationsBadge');
     const list = document.getElementById('notificationsList');
     
-    // Actualizar badge
     badge.textContent = unreadCount;
     badge.className = 'notifications-badge' + (unreadCount === 0 ? ' zero' : '');
     
-    // Renderizar lista
     if (notifications.length === 0) {
         list.innerHTML = '<div class="no-notifications">No tienes notificaciones</div>';
         return;
@@ -150,13 +141,19 @@ async function markAsRead(notifId, element) {
     }
 }
 
-// ========== GESTIÓN DE TAREAS ==========
+// ========== TAREAS ==========
 
 async function loadUserTasks() {
     const incluirFinalizadas = document.getElementById('mostrar-completadas')?.checked || false;
+    const userId = document.getElementById('dashboard').dataset.userId; // <-- Asegurate de tener esto
+    
+    if (!userId) {
+        console.error('No se encontró el id del usuario');
+        return;
+    }
     
     try {
-        const url = `/api/tasks/user?incluir_finalizadas=${incluirFinalizadas}`;
+        const url = `/api/tasks/user?id_usuario=${userId}&incluir_finalizadas=${incluirFinalizadas}`;
         const response = await fetch(url);
         const data = await response.json();
         
@@ -165,7 +162,7 @@ async function loadUserTasks() {
             renderUserTasks(data.tareas_nucleo, 'tareasNucleoList', true);
             updateTasksSummary(data.tareas_usuario, data.tareas_nucleo);
         } else {
-            console.error('Error al cargar tareas');
+            console.error('Error al cargar tareas:', data.message || data);
         }
     } catch (error) {
         console.error('Error:', error);
@@ -212,19 +209,22 @@ function renderUserTasks(tareas, containerId, esNucleo = false) {
                     </div>
                 </div>
                 
-                ${!esCompletada ? `
-                    <div class="user-task-actions">
-                        <button class="btn-small btn-update" onclick="updateTaskProgress(${tarea.id_asignacion}, '${esNucleo ? 'nucleo' : 'usuario'}', ${tarea.id_tarea})">
-                            Actualizar Progreso
-                        </button>
-                        <button class="btn-small btn-avance" onclick="addTaskAvance(${tarea.id_tarea})">
-                            Reportar Avance
-                        </button>
-                        <button class="btn-small btn-detalles" onclick="viewUserTaskDetails(${tarea.id_tarea})">
-                            Ver Detalles
-                        </button>
-                    </div>
-                ` : '<p style="color: #28a745; margin-top: 10px;"><strong>✓ Tarea completada</strong></p>'}
+           ${!esCompletada ? `
+    <div class="user-task-actions">
+        <button class="btn-small btn-update" onclick="updateTaskProgress(${tarea.id_asignacion}, '${esNucleo ? 'nucleo' : 'usuario'}', ${tarea.id_tarea})">
+            Actualizar Progreso
+        </button>
+        <button class="btn-small btn-avance" onclick="addTaskAvance(${tarea.id_tarea})">
+            Reportar Avance
+        </button>
+        <button class="btn-small btn-materiales" onclick="viewTaskMaterials(${tarea.id_tarea})" title="Ver materiales necesarios">
+            <i class="fas fa-boxes"></i> Materiales
+        </button>
+        <button class="btn-small btn-detalles" onclick="viewUserTaskDetails(${tarea.id_tarea})">
+            Ver Detalles Completos
+        </button>
+    </div>
+` : '<p style="color: #28a745; margin-top: 10px;"><strong>✓ Tarea completada</strong></p>'}
             </div>
         `;
     }).join('');
@@ -343,13 +343,26 @@ function addTaskAvance(tareaId) {
     });
 }
 
+// ========== VER DETALLES CON MATERIALES ==========
+
 async function viewUserTaskDetails(tareaId) {
+    alert('Función viewTaskMaterials llamada! Tarea: ' + tareaId); // ← AGREGA ESTO
+    console.log('>>> Cargando materiales de tarea:', tareaId);
+    
     try {
-        const response = await fetch(`/api/tasks/details?tarea_id=${tareaId}`);
-        const data = await response.json();
+        const responseTask = await fetch(`/api/tasks/details?tarea_id=${tareaId}`);
+        const dataTask = await responseTask.json();
         
-        if (data.success) {
-            mostrarDetallesTareaUsuario(data.tarea, data.avances);
+        console.log('Detalles tarea:', dataTask);
+        
+        const responseMaterials = await fetch(`/api/materiales/task-materials?tarea_id=${tareaId}`);
+        const dataMaterials = await responseMaterials.json();
+        
+        console.log('Materiales:', dataMaterials);
+        
+        if (dataTask.success) {
+            const materiales = dataMaterials.success ? dataMaterials.materiales : [];
+            mostrarDetallesTareaUsuario(dataTask.tarea, dataTask.avances, materiales);
         } else {
             alert('Error al cargar detalles');
         }
@@ -359,7 +372,143 @@ async function viewUserTaskDetails(tareaId) {
     }
 }
 
-function mostrarDetallesTareaUsuario(tarea, avances) {
+async function viewTaskMaterials(tareaId) {
+    console.log('>>> Cargando materiales de tarea:', tareaId);
+    
+    try {
+        const response = await fetch(`/api/materiales/task-materials?tarea_id=${tareaId}`);
+        const data = await response.json();
+        
+        console.log('Materiales recibidos:', data);
+        
+        if (data.success) {
+            showMaterialesModal(tareaId, data.materiales);
+        } else {
+            alert('Error al cargar materiales');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error de conexión');
+    }
+}
+
+function showMaterialesModal(tareaId, materiales) {
+    const materialesHTML = materiales && materiales.length > 0 ? `
+        <div class="materials-grid">
+            ${materiales.map(material => {
+                const suficiente = material.stock_disponible >= material.cantidad_requerida;
+                return `
+                    <div class="material-card ${suficiente ? 'disponible' : 'insuficiente'}">
+                        <div class="material-icon-box">
+                            <i class="fas fa-box"></i>
+                        </div>
+                        <div class="material-info-box">
+                            <h4>${material.nombre}</h4>
+                            ${material.caracteristicas ? `<p class="material-desc">${material.caracteristicas}</p>` : ''}
+                            <div class="material-quantities">
+                                <span class="quantity-item">
+                                    <i class="fas fa-clipboard-list"></i>
+                                    Necesario: <strong>${material.cantidad_requerida}</strong>
+                                </span>
+                                <span class="quantity-item ${suficiente ? 'available' : 'unavailable'}">
+                                    <i class="fas fa-warehouse"></i>
+                                    Disponible: <strong>${material.stock_disponible}</strong>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="material-status-badge">
+                            ${suficiente ? 
+                                '<span class="badge-success"><i class="fas fa-check-circle"></i> Disponible</span>' :
+                                '<span class="badge-warning"><i class="fas fa-exclamation-triangle"></i> Insuficiente</span>'
+                            }
+                        </div>
+                    </div>
+                `;
+            }).join('')}
+        </div>
+    ` : `
+        <div style="text-align: center; padding: 40px; background: #f8f9fa; border-radius: 8px;">
+            <i class="fas fa-info-circle" style="font-size: 48px; color: #999; margin-bottom: 15px;"></i>
+            <p style="color: #666; margin: 0; font-size: 16px;">Esta tarea no requiere materiales específicos</p>
+        </div>
+    `;
+    
+    const modal = `
+        <div id="materialesModal" class="modal-detail" onclick="if(event.target.id==='materialesModal') this.remove()">
+            <div class="modal-detail-content">
+                <button onclick="document.getElementById('materialesModal').remove()" class="modal-close-button">&times;</button>
+                
+                <h2 class="modal-detail-header">
+                    <i class="fas fa-boxes" style="color: #667eea; margin-right: 10px;"></i>
+                    Materiales Necesarios
+                </h2>
+                
+                ${materialesHTML}
+                
+                <div class="modal-detail-footer" style="margin-top: 30px;">
+                    <button onclick="document.getElementById('materialesModal').remove()" class="btn btn-secondary">
+                        Cerrar
+                    </button>
+                    <button onclick="document.getElementById('materialesModal').remove(); viewUserTaskDetails(${tareaId})" class="btn btn-primary">
+                        Ver Detalles Completos
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modal);
+}
+
+
+
+
+function mostrarDetallesTareaUsuario(tarea, avances, materiales = []) {
+    console.log('>>> Mostrando modal con', materiales.length, 'materiales');
+    
+    const materialesHTML = materiales && materiales.length > 0 ? `
+        <div class="task-materials-section">
+            <h3><i class="fas fa-boxes"></i> Materiales Necesarios</h3>
+            <div class="materials-grid">
+                ${materiales.map(material => {
+                    const suficiente = material.stock_disponible >= material.cantidad_requerida;
+                    return `
+                        <div class="material-card ${suficiente ? 'disponible' : 'insuficiente'}">
+                            <div class="material-icon-box">
+                                <i class="fas fa-box"></i>
+                            </div>
+                            <div class="material-info-box">
+                                <h4>${material.nombre}</h4>
+                                ${material.caracteristicas ? `<p class="material-desc">${material.caracteristicas}</p>` : ''}
+                                <div class="material-quantities">
+                                    <span class="quantity-item">
+                                        <i class="fas fa-clipboard-list"></i>
+                                        Necesario: <strong>${material.cantidad_requerida}</strong>
+                                    </span>
+                                    <span class="quantity-item ${suficiente ? 'available' : 'unavailable'}">
+                                        <i class="fas fa-warehouse"></i>
+                                        Disponible: <strong>${material.stock_disponible}</strong>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="material-status-badge">
+                                ${suficiente ? 
+                                    '<span class="badge-success"><i class="fas fa-check-circle"></i> Disponible</span>' :
+                                    '<span class="badge-warning"><i class="fas fa-exclamation-triangle"></i> Insuficiente</span>'
+                                }
+                            </div>
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+        </div>
+    ` : `
+        <div style="text-align: center; padding: 20px; background: #f8f9fa; border-radius: 8px; margin: 20px 0;">
+            <i class="fas fa-info-circle" style="font-size: 32px; color: #999; margin-bottom: 10px;"></i>
+            <p style="color: #666; margin: 0;">Esta tarea no requiere materiales específicos</p>
+        </div>
+    `;
+    
     const modal = `
         <div id="taskDetailModal" class="modal-detail" onclick="if(event.target.id==='taskDetailModal') this.remove()">
             <div class="modal-detail-content">
@@ -393,6 +542,8 @@ function mostrarDetallesTareaUsuario(tarea, avances) {
                 <div style="padding: 10px; background: #d1ecf1; border-radius: 5px; margin-bottom: 20px;">
                     <strong>Creado por:</strong> ${tarea.creador}
                 </div>
+                
+                ${materialesHTML}
                 
                 ${avances && avances.length > 0 ? `
                     <h3 style="margin-top: 30px; margin-bottom: 15px; color: #333;">Avances Reportados</h3>

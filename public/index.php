@@ -98,24 +98,31 @@ $privateRoutes = [
     '/api/nucleos/details',        
     '/api/nucleos/update',       
     '/api/nucleos/delete',       
-    '/api/nucleos/users-available' 
+    '/api/nucleos/users-available',
+    '/api/materiales/create',
+    '/api/materiales/all',
+    '/api/materiales/details',
+    '/api/materiales/update',
+    '/api/materiales/update-stock',
+    '/api/materiales/delete',
+    '/api/materiales/search',
+    '/api/materiales/assign-task',
+    '/api/materiales/task-materials',
+    '/api/materiales/remove-from-task',
+    '/api/materiales/request',
+    '/api/materiales/requests'
 ];
 
 // Aplicar middleware según el tipo de ruta
 if (in_array($uri, $loginOnlyRoutes)) {
-    // Solo validar login, NO estado
     Herramientas::validarLogin();
 } elseif (in_array($uri, $privateRoutes)) {
-    // Validar login Y estado
     Middleware::handle();
 }
 
 switch ($uri) {
     // VISTAS
     case '/':
-        $controller = new App\Controllers\ViewsController();
-        $controller->index();
-        break;
     case '/home':
         $controller = new App\Controllers\ViewsController();
         $controller->index();
@@ -137,137 +144,206 @@ switch ($uri) {
         $controller->showDashboardAdmin();
         break;
     case '/pagoPendiente':
-        $controller = new App\controllers\ViewsController();
+        $controller = new App\Controllers\ViewsController();
         $controller->showRegistrarPago();
         break;
     case '/pagoEnviado':
-        $controller = new App\controllers\ViewsController;
+        $controller = new App\Controllers\ViewsController();
         $controller->showSalaEspera();
         break;
 
     // API AUTH
     case '/api/login':
-        $login = new App\Controllers\AuthController();
-        $login->login();
+        (new App\Controllers\AuthController())->login();
         break;
     case '/api/register':
-        $register = new App\Controllers\AuthController();
-        $register->register();
+        (new App\Controllers\AuthController())->register();
         break;
     case '/api/logout':
-        $logout = new App\Controllers\AuthController();
-        $logout->logout();
+        (new App\Controllers\AuthController())->logout();
         break;
 
     // API PAGOS
     case '/api/pay/firstPay':
-        $pay = new App\controllers\PaymentsController();
-        $pay->addPay();
+        (new App\Controllers\PaymentsController())->addPay();
         break;
     case '/api/payment/approve':
-        $payments = new App\Controllers\PaymentsController();
-        $payments->approvePayment();
+        (new App\Controllers\PaymentsController())->approvePayment();
         break;
     case '/api/payment/reject':
-        $payments = new App\Controllers\PaymentsController();
-        $payments->rejectPayment();
+        (new App\Controllers\PaymentsController())->rejectPayment();
         break;
 
     // API NOTIFICACIONES
     case '/api/notifications/create':
-        $notification = new App\Controllers\NotificationController();
-        $notification->create();
+        (new App\Controllers\NotificationController())->create();
         break;
     case '/api/notifications/user':
-        $notification = new App\Controllers\NotificationController();
-        $notification->getUserNotifications();
+        (new App\Controllers\NotificationController())->getUserNotifications();
         break;
     case '/api/notifications/mark-read':
-        $notification = new App\Controllers\NotificationController();
-        $notification->markAsRead();
+        (new App\Controllers\NotificationController())->markAsRead();
         break;
     case '/api/notifications/users':
-        $notification = new App\Controllers\NotificationController();
-        $notification->getUsers();
+        (new App\Controllers\NotificationController())->getUsers();
         break;
 
     // API TAREAS
     case '/api/tasks/create':
-        $task = new App\Controllers\TaskController();
-        $task->create();
+        (new App\Controllers\TaskController())->create();
         break;
     case '/api/tasks/user':
-        $task = new App\Controllers\TaskController();
-        $task->getUserTasks();
+        $userId = $_GET['id_usuario'] ?? null;
+        if ($userId) {
+            (new App\Controllers\TaskController())->getUserTasks($userId);
+        } else {
+            http_response_code(400);
+            echo json_encode(['error' => 'Falta id_usuario']);
+        }
         break;
     case '/api/tasks/all':
-        $task = new App\Controllers\TaskController();
-        $task->getAllTasks();
+        (new App\Controllers\TaskController())->getAllTasks();
         break;
     case '/api/tasks/update-progress':
-        $task = new App\Controllers\TaskController();
-        $task->updateProgress();
+        $asignacionId = $_POST['id_asignacion'] ?? null;
+        $tipoAsignacion = $_POST['tipo_asignacion'] ?? null;
+        $progreso = $_POST['progreso'] ?? null;
+        $estado = $_POST['estado'] ?? null;
+        if ($asignacionId && $tipoAsignacion && $progreso !== null) {
+            (new App\Controllers\TaskController())->updateProgress($asignacionId, $tipoAsignacion, $progreso, $estado);
+        } else {
+            http_response_code(400);
+            echo json_encode(['error' => 'Faltan parámetros']);
+        }
         break;
     case '/api/tasks/add-avance':
-        $task = new App\Controllers\TaskController();
-        $task->addAvance();
+        $tareaId = $_POST['id_tarea'] ?? null;
+        $userId = $_POST['id_usuario'] ?? null;
+        $comentario = $_POST['comentario'] ?? null;
+        $progreso = $_POST['progreso_reportado'] ?? 0;
+        $archivo = $_FILES['archivo']['name'] ?? null;
+        if ($tareaId && $userId && $comentario) {
+            (new App\Controllers\TaskController())->addAvance($tareaId, $userId, $comentario, $progreso, $archivo);
+        } else {
+            http_response_code(400);
+            echo json_encode(['error' => 'Faltan parámetros']);
+        }
         break;
     case '/api/tasks/details':
-        $task = new App\Controllers\TaskController();
-        $task->getTaskDetails();
+        $tareaId = $_GET['id_tarea'] ?? null;
+        if ($tareaId) {
+            (new App\Controllers\TaskController())->getTaskDetails($tareaId);
+        } else {
+            http_response_code(400);
+            echo json_encode(['error' => 'Falta id_tarea']);
+        }
         break;
     case '/api/tasks/users':
-        $task = new App\Controllers\TaskController();
-        $task->getUsers();
+        (new App\Controllers\TaskController())->getUsers();
         break;
     case '/api/tasks/nucleos':
-        $task = new App\Controllers\TaskController();
-        $task->getNucleos();
+        (new App\Controllers\TaskController())->getNucleos();
         break;
     case '/api/tasks/cancel':
-        $task = new App\Controllers\TaskController();
-        $task->cancelTask();
+        $tareaId = $_POST['id_tarea'] ?? null;
+        if ($tareaId) {
+            (new App\Controllers\TaskController())->cancelTask($tareaId);
+        } else {
+            http_response_code(400);
+            echo json_encode(['error' => 'Falta id_tarea']);
+        }
         break;
 
     // API USUARIOS
     case '/api/users/all':
-        $users = new App\Controllers\UserController();
-        $users->getAllUsers();
+        (new App\Controllers\UserController())->getAllUsers();
         break;
     case '/api/users/details':
-        $users = new App\Controllers\UserController();
-        $users->getUserById();
+        $userId = $_GET['id_usuario'] ?? null;
+        if ($userId) {
+            (new App\Controllers\UserController())->getUserById($userId);
+        } else {
+            http_response_code(400);
+            echo json_encode(['error' => 'Falta id_usuario']);
+        }
+        break;
+
+    // API NUCLEOS
+    case '/api/nucleos/create':
+        (new App\Controllers\NucleoController())->create();
+        break;
+    case '/api/nucleos/all':
+        (new App\Controllers\NucleoController())->getAll();
+        break;
+    case '/api/nucleos/details':
+        $nucleoId = $_GET['id_nucleo'] ?? null;
+        if ($nucleoId) {
+            (new App\Controllers\NucleoController())->getDetails($nucleoId);
+        } else {
+            http_response_code(400);
+            echo json_encode(['error' => 'Falta id_nucleo']);
+        }
+        break;
+    case '/api/nucleos/update':
+        (new App\Controllers\NucleoController())->update();
+        break;
+    case '/api/nucleos/delete':
+        (new App\Controllers\NucleoController())->delete();
+        break;
+    case '/api/nucleos/users-available':
+        (new App\Controllers\NucleoController())->getAvailableUsers();
+        break;
+
+    // API MATERIALES
+    case '/api/materiales/create':
+        (new App\Controllers\MaterialController())->create();
+        break;
+    case '/api/materiales/all':
+        (new App\Controllers\MaterialController())->getAll();
+        break;
+    case '/api/materiales/details':
+        $materialId = $_GET['id_material'] ?? null;
+        if ($materialId) {
+            (new App\Controllers\MaterialController())->getById($materialId);
+        } else {
+            http_response_code(400);
+            echo json_encode(['error' => 'Falta id_material']);
+        }
+        break;
+    case '/api/materiales/update':
+        (new App\Controllers\MaterialController())->update();
+        break;
+    case '/api/materiales/update-stock':
+        (new App\Controllers\MaterialController())->updateStock();
+        break;
+    case '/api/materiales/delete':
+        (new App\Controllers\MaterialController())->delete();
+        break;
+    case '/api/materiales/search':
+        (new App\Controllers\MaterialController())->search();
+        break;
+    case '/api/materiales/assign-task':
+        (new App\Controllers\MaterialController())->assignToTask();
+        break;
+    case '/api/materiales/task-materials':
+        (new App\Controllers\MaterialController())->getTaskMaterials();
+        break;
+    case '/api/materiales/remove-from-task':
+        (new App\Controllers\MaterialController())->removeFromTask();
+        break;
+    case '/api/materiales/request':
+        (new App\Controllers\MaterialController())->createRequest();
+        break;
+    case '/api/materiales/requests':
+        (new App\Controllers\MaterialController())->getRequests();
         break;
 
     default:
         http_response_code(404);
         include __DIR__ . '/../src/views/404error.php';
         break;
-
-        // API NUCLEOS
-    case '/api/nucleos/create':
-        $nucleos = new App\Controllers\NucleoController();
-        $nucleos->create();
-        break;
-    case '/api/nucleos/all':
-        $nucleos = new App\Controllers\NucleoController();
-        $nucleos->getAll();
-        break;
-    case '/api/nucleos/details':
-        $nucleos = new App\Controllers\NucleoController();
-        $nucleos->getDetails();
-        break;
-    case '/api/nucleos/update':
-        $nucleos = new App\Controllers\NucleoController();
-        $nucleos->update();
-        break;
-    case '/api/nucleos/delete':
-        $nucleos = new App\Controllers\NucleoController();
-        $nucleos->delete();
-        break;
-    case '/api/nucleos/users-available':
-        $nucleos = new App\Controllers\NucleoController();
-        $nucleos->getAvailableUsers();
-        break;
 }
+
+
+
 

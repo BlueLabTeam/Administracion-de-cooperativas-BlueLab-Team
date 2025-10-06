@@ -14,6 +14,7 @@
 	<link rel="stylesheet" href="/assets/css/dashboardUtils.css" />
 	<link rel="stylesheet" href="/assets/css/dashboardUsuarios.css" />
 	<link rel="stylesheet" href="/assets/css/dashboardNucleos.css" /> 
+	<link rel="stylesheet" href="/assets/css/dashboardMateriales.css" /> 
 </head>
 
 <body>
@@ -163,12 +164,96 @@
 		</section>
 
 		<!-- SECCIÓN INVENTARIO -->
-		<section id="inventario-section" class="section-content">
-			<h2 class="section-title">Inventario</h2>
-			<div class="info-card">
-				<p>Control de inventario en desarrollo...</p>
+
+
+<!-- SECCIÓN MATERIALES -->
+<section id="materiales-section" class="section-content">
+	<h2 class="section-title">Gestión de Materiales</h2>
+	
+	<!-- Cabecera con búsqueda y botón crear -->
+	<div class="info-card">
+		<div class="materiales-header">
+			<div class="materiales-search">
+				<input type="text" id="search-materiales" placeholder="Buscar material..." onkeyup="searchMateriales()">
 			</div>
-		</section>
+			<button class="btn btn-primary" onclick="showCreateMaterialModal()">
+				<i class="fas fa-plus"></i> Nuevo Material
+			</button>
+		</div>
+		
+		<div id="materialesTableContainer">
+			<p class="loading">Cargando materiales...</p>
+		</div>
+	</div>
+	
+	<!-- Información adicional -->
+	<div class="info-card">
+		<h3>Información sobre Materiales</h3>
+		<ul style="line-height: 1.8;">
+			<li><strong>¿Qué son los materiales?</strong> Recursos necesarios para realizar las tareas de la cooperativa</li>
+			<li><strong>Stock:</strong> Control de cantidades disponibles de cada material</li>
+			<li><strong>Asignación a tareas:</strong> Los materiales se pueden asignar a tareas específicas</li>
+			<li><strong>Solicitudes:</strong> Los usuarios pueden solicitar materiales cuando los necesitan</li>
+		</ul>
+	</div>
+</section>
+
+<!-- Modal para crear/editar material -->
+<div id="materialModal" class="material-modal">
+	<div class="material-modal-content">
+		<div class="material-modal-header">
+			<h3 id="materialModalTitle">Nuevo Material</h3>
+			<button class="close-material-modal" onclick="closeMaterialModal()">&times;</button>
+		</div>
+		
+		<form id="materialForm" onsubmit="saveMaterial(event)">
+			<input type="hidden" id="material-id">
+			
+			<div class="material-form-group">
+				<label for="material-nombre">Nombre del Material *</label>
+				<input type="text" id="material-nombre" required placeholder="Ej: Cemento, Ladrillos, Arena">
+			</div>
+			
+			<div class="material-form-group">
+				<label for="material-caracteristicas">Características / Descripción</label>
+				<textarea id="material-caracteristicas" placeholder="Describe el material, sus especificaciones, etc."></textarea>
+			</div>
+			
+			<div class="material-form-actions">
+				<button type="button" class="btn btn-secondary" onclick="closeMaterialModal()">Cancelar</button>
+				<button type="submit" class="btn btn-primary">Guardar Material</button>
+			</div>
+		</form>
+	</div>
+</div>
+
+<!-- Modal para actualizar stock -->
+<div id="stockModal" class="material-modal">
+	<div class="material-modal-content">
+		<div class="material-modal-header">
+			<h3>Actualizar Stock</h3>
+			<button class="close-material-modal" onclick="closeStockModal()">&times;</button>
+		</div>
+		
+		<form id="stockForm" onsubmit="updateStock(event)">
+			<input type="hidden" id="stock-material-id">
+			
+			<div class="material-form-group">
+				<label id="stock-material-name">Material</label>
+			</div>
+			
+			<div class="material-form-group">
+				<label for="stock-cantidad">Cantidad Disponible *</label>
+				<input type="number" id="stock-cantidad" required min="0" placeholder="0">
+			</div>
+			
+			<div class="material-form-actions">
+				<button type="button" class="btn btn-secondary" onclick="closeStockModal()">Cancelar</button>
+				<button type="submit" class="btn btn-primary">Actualizar Stock</button>
+			</div>
+		</form>
+	</div>
+</div>
 
 		<!-- SECCIÓN TAREAS -->
 		<section id="tareas-section" class="section-content">
@@ -246,29 +331,53 @@
 						</div>
 					</div>
 
-					<button type="submit" class="btn btn-primary">Crear Tarea</button>
-				</form>
-			</div>
+				<!-- Selector de materiales -->
+<div class="form-group">
+    <label>📦 Materiales necesarios para esta tarea:</label>
+    <div class="materiales-tarea-selector">
+        <div class="materiales-search-box">
+            <input type="text" 
+                   id="search-materiales-tarea" 
+                   placeholder="Buscar material..."
+                   onkeyup="filterMaterialesTarea()">
+        </div>
+        
+        <div id="materiales-tarea-list" class="materiales-selector-list">
+            <p class="loading">Cargando materiales...</p>
+        </div>
+        
+        <!-- Lista de materiales ya asignados -->
+        <div id="materiales-asignados-list" class="materiales-asignados-container">
+            <p style="color: #999; padding: 10px;">No hay materiales asignados</p>
+        </div>
+    </div>
+</div>
 
-			<!-- Lista de tareas existentes -->
-			<div class="info-card">
-				<div class="task-list-header">
-					<h3>Tareas Creadas</h3>
-					<div>
-						<select id="filtro-estado" onchange="loadAllTasks()">
-							<option value="">Todas</option>
-							<option value="pendiente">Pendientes</option>
-							<option value="en_progreso">En Progreso</option>
-							<option value="completada">Completadas</option>
-							<option value="cancelada">Canceladas</option>
-						</select>
-					</div>
-				</div>
-				
-				<div id="tasksList">
-					<p class="loading">Cargando tareas...</p>
-				</div>
-			</div>
+<!-- BOTÓN CREAR TAREA - AQUÍ DEBE ESTAR -->
+<button type="submit" class="btn btn-primary">Crear Tarea</button>
+
+</form> <!-- Cierre del formulario -->
+</div> <!-- Cierre de info-card -->
+
+<!-- LISTA DE TAREAS EXISTENTES - FUERA DEL FORMULARIO -->
+<div class="info-card">
+    <div class="task-list-header">
+        <h3>Tareas Creadas</h3>
+        <div>
+            <select id="filtro-estado" onchange="loadAllTasks()">
+                <option value="">Todas</option>
+                <option value="pendiente">Pendientes</option>
+                <option value="en_progreso">En Progreso</option>
+                <option value="completada">Completadas</option>
+                <option value="cancelada">Canceladas</option>
+            </select>
+        </div>
+    </div>
+    
+    <div id="tasksList">
+        <p class="loading">Cargando tareas...</p>
+    </div>
+</div>
 		</section>
 	</main>
 

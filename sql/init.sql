@@ -263,3 +263,31 @@ CREATE TABLE IF NOT EXISTS Tarea_Avances (
     INDEX idx_tarea (id_tarea),
     INDEX idx_fecha (fecha_avance)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS Tarea_Material (
+    id_tarea INT NOT NULL,
+    id_material INT NOT NULL,
+    cantidad_requerida INT NOT NULL DEFAULT 1,
+    fecha_asignacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id_tarea, id_material),
+    FOREIGN KEY (id_tarea) REFERENCES Tareas(id_tarea) ON DELETE CASCADE,
+    FOREIGN KEY (id_material) REFERENCES Materiales(id_material) ON DELETE CASCADE,
+    INDEX idx_tarea (id_tarea),
+    INDEX idx_material (id_material)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- TABLA DE SOLICITUDES DE MATERIALES
+CREATE TABLE IF NOT EXISTS Solicitud_Material (
+    id_solicitud INT PRIMARY KEY AUTO_INCREMENT,
+    id_material INT NOT NULL,
+    cantidad_solicitada INT NOT NULL,
+    id_usuario INT NOT NULL,
+    descripcion TEXT,
+    estado ENUM('pendiente', 'aprobada', 'rechazada', 'entregada') DEFAULT 'pendiente',
+    fecha_solicitud DATETIME DEFAULT CURRENT_TIMESTAMP,
+    fecha_respuesta DATETIME NULL,
+    FOREIGN KEY (id_material) REFERENCES Materiales(id_material),
+    FOREIGN KEY (id_usuario) REFERENCES Usuario(id_usuario),
+    INDEX idx_estado (estado),
+    INDEX idx_fecha (fecha_solicitud)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

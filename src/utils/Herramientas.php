@@ -70,12 +70,24 @@ class Herramientas
             '/api/users/all',
             '/api/users/details',
             '/api/pay/firstPay',
-            '/api/nucleos/create',          // AGREGADO
-            '/api/nucleos/all',              // AGREGADO
-            '/api/nucleos/details',          // AGREGADO
-            '/api/nucleos/update',           // AGREGADO
-            '/api/nucleos/delete',           // AGREGADO
-            '/api/nucleos/users-available'   // AGREGADO
+            '/api/nucleos/create',          
+            '/api/nucleos/all',              
+            '/api/nucleos/details',          
+            '/api/nucleos/update',           
+            '/api/nucleos/delete',           
+            '/api/nucleos/users-available',
+              '/api/materiales/create',
+            '/api/materiales/all',
+           '/api/materiales/details',
+        '/api/materiales/update',
+    '/api/materiales/update-stock',
+    '/api/materiales/delete',
+    '/api/materiales/search',
+    '/api/materiales/assign-task',
+    '/api/materiales/task-materials',
+    '/api/materiales/remove-from-task',
+    '/api/materiales/request',
+    '/api/materiales/requests'   
         ];
         
         if (in_array($currentURL, $rutasExcluidas)) {

@@ -158,34 +158,35 @@ class Task
 
     // Actualizar progreso de tarea
     public function updateProgress($asignacionId, $tipoAsignacion, $progreso, $estado = null)
-    {
-        try {
-            $tabla = ($tipoAsignacion === 'usuario') ? 'Tarea_Usuario' : 'Tarea_Nucleo';
-            $campoEstado = ($tipoAsignacion === 'usuario') ? 'estado_usuario' : 'estado_nucleo';
-            
-            if ($estado) {
-                $query = "UPDATE $tabla 
-                          SET progreso = :progreso, 
-                              $campoEstado = :estado,
-                              fecha_completada = CASE WHEN :estado = 'completada' THEN NOW() ELSE fecha_completada END
-                          WHERE id_asignacion = :id_asignacion";
-                $stmt = $this->conn->prepare($query);
-                $stmt->bindParam(':estado', $estado);
-            } else {
-                $query = "UPDATE $tabla SET progreso = :progreso WHERE id_asignacion = :id_asignacion";
-                $stmt = $this->conn->prepare($query);
-            }
-            
-            $stmt->bindParam(':progreso', $progreso);
-            $stmt->bindParam(':id_asignacion', $asignacionId);
-            
-            return $stmt->execute();
-        } catch (\PDOException $e) {
-            error_log("Error al actualizar progreso: " . $e->getMessage());
-            throw $e;
+{
+    try {
+        $tabla = ($tipoAsignacion === 'usuario') ? 'Tarea_Usuario' : 'Tarea_Nucleo';
+        $campoEstado = ($tipoAsignacion === 'usuario') ? 'estado_usuario' : 'estado_nucleo';
+        
+        if ($estado) {
+            $query = "UPDATE $tabla 
+                      SET progreso = :progreso, 
+                          $campoEstado = :estado,
+                          fecha_completada = CASE WHEN :estado_check = 'completada' THEN NOW() ELSE fecha_completada END
+                      WHERE id_asignacion = :id_asignacion";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':progreso', $progreso, \PDO::PARAM_INT);
+            $stmt->bindParam(':estado', $estado, \PDO::PARAM_STR);
+            $stmt->bindParam(':estado_check', $estado, \PDO::PARAM_STR);
+            $stmt->bindParam(':id_asignacion', $asignacionId, \PDO::PARAM_INT);
+        } else {
+            $query = "UPDATE $tabla SET progreso = :progreso WHERE id_asignacion = :id_asignacion";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':progreso', $progreso, \PDO::PARAM_INT);
+            $stmt->bindParam(':id_asignacion', $asignacionId, \PDO::PARAM_INT);
         }
+        
+        return $stmt->execute();
+    } catch (\PDOException $e) {
+        error_log("Error al actualizar progreso: " . $e->getMessage());
+        throw $e;
     }
-
+}
     // Agregar avance/comentario
     public function addAvance($tareaId, $userId, $comentario, $progresoReportado, $archivo = null)
     {

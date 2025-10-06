@@ -20,72 +20,133 @@ class TaskController
     }
 
     public function create()
-    {
-        header('Content-Type: application/json');
-        error_log("TaskController::create called");
+{
+    header('Content-Type: application/json');
+    error_log("=== TaskController::create INICIO ===");
 
-        if (!isset($_SESSION['is_admin']) || !$_SESSION['is_admin']) {
-            error_log("Permission denied - is_admin: " . ($_SESSION['is_admin'] ?? 'NOT_SET'));
-            echo json_encode(['success' => false, 'message' => 'No tienes permisos']);
+    if (!isset($_SESSION['is_admin']) || !$_SESSION['is_admin']) {
+        echo json_encode(['success' => false, 'message' => 'No tienes permisos']);
+        return;
+    }
+
+    try {
+        // Log del POST completo
+        error_log("POST recibido: " . print_r($_POST, true));
+        
+        $titulo = $_POST['titulo'] ?? '';
+        $descripcion = $_POST['descripcion'] ?? '';
+        $fechaInicio = $_POST['fecha_inicio'] ?? '';
+        $fechaFin = $_POST['fecha_fin'] ?? '';
+        $prioridad = $_POST['prioridad'] ?? 'media';
+        $tipoAsignacion = $_POST['tipo_asignacion'] ?? 'usuario';
+
+        if (empty($titulo) || empty($descripcion) || empty($fechaInicio) || empty($fechaFin)) {
+            echo json_encode(['success' => false, 'message' => 'Todos los campos son obligatorios']);
             return;
         }
 
-        try {
-            $titulo = $_POST['titulo'] ?? '';
-            $descripcion = $_POST['descripcion'] ?? '';
-            $fechaInicio = $_POST['fecha_inicio'] ?? '';
-            $fechaFin = $_POST['fecha_fin'] ?? '';
-            $prioridad = $_POST['prioridad'] ?? 'media';
-            $tipoAsignacion = $_POST['tipo_asignacion'] ?? 'usuario';
-
-            if (empty($titulo) || empty($descripcion) || empty($fechaInicio) || empty($fechaFin)) {
-                echo json_encode(['success' => false, 'message' => 'Todos los campos son obligatorios']);
-                return;
-            }
-
-            if (strtotime($fechaFin) < strtotime($fechaInicio)) {
-                echo json_encode(['success' => false, 'message' => 'La fecha de fin debe ser posterior a la fecha de inicio']);
-                return;
-            }
-
-            $tareaId = $this->taskModel->create(
-                $titulo,
-                $descripcion,
-                $fechaInicio,
-                $fechaFin,
-                $prioridad,
-                $tipoAsignacion,
-                $_SESSION['user_id']
-            );
-
-            if ($tipoAsignacion === 'usuario') {
-                $usuarios = $_POST['usuarios'] ?? [];
-                if (empty($usuarios)) {
-                    echo json_encode(['success' => false, 'message' => 'Debes seleccionar al menos un usuario']);
-                    return;
-                }
-                $this->taskModel->assignToUsers($tareaId, $usuarios);
-            } else {
-                $nucleos = $_POST['nucleos'] ?? [];
-                if (empty($nucleos)) {
-                    echo json_encode(['success' => false, 'message' => 'Debes seleccionar al menos un núcleo familiar']);
-                    return;
-                }
-                $this->taskModel->assignToNucleos($tareaId, $nucleos);
-            }
-
-            echo json_encode([
-                'success' => true,
-                'message' => 'Tarea creada y asignada exitosamente',
-                'tarea_id' => $tareaId
-            ]);
-
-        } catch (\Exception $e) {
-            error_log("Error al crear tarea: " . $e->getMessage());
-            error_log("Stack trace: " . $e->getTraceAsString());
-            echo json_encode(['success' => false, 'message' => 'Error al crear la tarea: ' . $e->getMessage()]);
+        if (strtotime($fechaFin) < strtotime($fechaInicio)) {
+            echo json_encode(['success' => false, 'message' => 'La fecha de fin debe ser posterior a la fecha de inicio']);
+            return;
         }
+
+        // Crear la tarea
+        $tareaId = $this->taskModel->create(
+            $titulo,
+            $descripcion,
+            $fechaInicio,
+            $fechaFin,
+            $prioridad,
+            $tipoAsignacion,
+            $_SESSION['user_id']
+        );
+
+        error_log("Tarea creada con ID: $tareaId");
+
+        // Asignar a usuarios o núcleos
+        if ($tipoAsignacion === 'usuario') {
+            $usuarios = $_POST['usuarios'] ?? [];
+            if (empty($usuarios)) {
+                echo json_encode(['success' => false, 'message' => 'Debes seleccionar al menos un usuario']);
+                return;
+            }
+            $this->taskModel->assignToUsers($tareaId, $usuarios);
+        } else {
+            $nucleos = $_POST['nucleos'] ?? [];
+            if (empty($nucleos)) {
+                echo json_encode(['success' => false, 'message' => 'Debes seleccionar al menos un núcleo familiar']);
+                return;
+            }
+            $this->taskModel->assignToNucleos($tareaId, $nucleos);
+        }
+
+        // PROCESAR MATERIALES
+        if (isset($_POST['materiales_json']) && !empty($_POST['materiales_json'])) {
+            error_log("=== PROCESANDO MATERIALES ===");
+            error_log("materiales_json RAW: " . $_POST['materiales_json']);
+            
+            $materialesData = json_decode($_POST['materiales_json'], true);
+            $jsonError = json_last_error();
+            
+            if ($jsonError !== JSON_ERROR_NONE) {
+                error_log("ERROR JSON: " . json_last_error_msg());
+            } else {
+                error_log("JSON decodificado OK. Materiales: " . count($materialesData));
+                
+                if ($materialesData && is_array($materialesData) && count($materialesData) > 0) {
+                    $materialModel = new \App\Models\Material();
+                    
+                    foreach ($materialesData as $material) {
+                        error_log("Procesando material: " . print_r($material, true));
+                        
+                        if (isset($material['id']) && isset($material['cantidad'])) {
+                            $materialId = intval($material['id']);
+                            $cantidad = intval($material['cantidad']);
+                            
+                            if ($materialId > 0 && $cantidad > 0) {
+                                error_log("Guardando: Material ID=$materialId, Cantidad=$cantidad, Tarea=$tareaId");
+                                
+                                try {
+                                    // Asignar material a la tarea
+                                    $resultado = $materialModel->assignToTask($tareaId, $materialId, $cantidad);
+                                    error_log("assignToTask resultado: " . ($resultado ? 'OK' : 'FALLO'));
+                                    
+                                    // Reducir stock
+                                    $materialActual = $materialModel->getById($materialId);
+                                    if ($materialActual) {
+                                        $stockAnterior = intval($materialActual['stock']);
+                                        $nuevoStock = max(0, $stockAnterior - $cantidad);
+                                        $materialModel->updateStock($materialId, $nuevoStock);
+                                        error_log("Stock actualizado: $stockAnterior -> $nuevoStock");
+                                    }
+                                    
+                                } catch (\Exception $e) {
+                                    error_log("ERROR guardando material: " . $e->getMessage());
+                                    error_log("Stack: " . $e->getTraceAsString());
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    error_log("Array de materiales vacío o inválido");
+                }
+            }
+        } else {
+            error_log("No se recibió materiales_json en POST");
+        }
+
+        echo json_encode([
+            'success' => true,
+            'message' => 'Tarea creada y asignada exitosamente',
+            'tarea_id' => $tareaId
+        ]);
+
+    } catch (\Exception $e) {
+        error_log("ERROR CRÍTICO: " . $e->getMessage());
+        error_log("Stack: " . $e->getTraceAsString());
+        echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
     }
+}
 
     public function getUserTasks()
     {
@@ -329,40 +390,67 @@ class TaskController
         }
     }
 
-    public function getTaskDetails()
-    {
-        header('Content-Type: application/json');
+    // Obtener detalles completos de una tarea (incluyendo materiales asignados)
+public function getTaskDetails($tareaId)
+{
+    try {
+        $db = (new Database())->getConnection();
 
-        if (!isset($_SESSION['user_id'])) {
-            echo json_encode(['success' => false, 'message' => 'No autenticado']);
-            return;
+        // ✅ Nueva consulta que une Tareas con los Materiales asignados
+        $sql = "
+            SELECT 
+                t.id_tarea,
+                t.titulo,
+                t.descripcion,
+                t.fecha_inicio,
+                t.fecha_fin,
+                t.prioridad,
+                t.estado,
+                tm.id_material,
+                m.nombre AS nombre_material,
+                m.caracteristicas,
+                tm.cantidad_requerida
+            FROM Tareas t
+            LEFT JOIN Tarea_Material tm ON t.id_tarea = tm.id_tarea
+            LEFT JOIN Materiales m ON tm.id_material = m.id_material
+            WHERE t.id_tarea = :id_tarea
+        ";
+
+        $stmt = $db->prepare($sql);
+        $stmt->bindParam(':id_tarea', $tareaId, PDO::PARAM_INT);
+        $stmt->execute();
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        if (!$result) {
+            return null;
         }
 
-        try {
-            $tareaId = $_GET['tarea_id'] ?? '';
+        // ✅ Armamos respuesta con la tarea + materiales asignados
+        return [
+            'tarea' => [
+                'id_tarea' => $result[0]['id_tarea'],
+                'titulo' => $result[0]['titulo'],
+                'descripcion' => $result[0]['descripcion'],
+                'fecha_inicio' => $result[0]['fecha_inicio'],
+                'fecha_fin' => $result[0]['fecha_fin'],
+                'prioridad' => $result[0]['prioridad'],
+                'estado' => $result[0]['estado']
+            ],
+            'materiales' => array_map(function ($row) {
+                return [
+                    'id_material' => $row['id_material'],
+                    'nombre' => $row['nombre_material'],
+                    'caracteristicas' => $row['caracteristicas'],
+                    'cantidad_requerida' => $row['cantidad_requerida']
+                ];
+            }, array_filter($result, fn($r) => !empty($r['id_material'])))
+        ];
 
-            if (empty($tareaId)) {
-                echo json_encode(['success' => false, 'message' => 'ID de tarea requerido']);
-                return;
-            }
-
-            $detalles = $this->taskModel->getTaskDetails($tareaId);
-            $avances = $this->taskModel->getAvances($tareaId);
-
-            if (!$detalles) {
-                echo json_encode(['success' => false, 'message' => 'Tarea no encontrada']);
-                return;
-            }
-
-            echo json_encode([
-                'success' => true,
-                'tarea' => $detalles,
-                'avances' => $avances
-            ]);
-
-        } catch (\Exception $e) {
-            error_log("Error al obtener detalles: " . $e->getMessage());
-            echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
-        }
+    } catch (\PDOException $e) {
+        error_log("❌ Error SQL en getTaskDetails: " . $e->getMessage());
+        return ['error' => 'Error al obtener detalles de la tarea'];
     }
 }
+}
+
+
