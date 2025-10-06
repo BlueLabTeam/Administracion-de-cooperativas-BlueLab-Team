@@ -140,6 +140,45 @@ class User
         return $this->id_rol !== null && $this->id_rol == 1;
     }
 
+public function getAllUsersWithPayments()
+{
+    try {
+        $pdo = Database::getConnection();
+        
+        $sql = "SELECT 
+                    u.id_usuario,
+                    u.nombre_completo,
+                    u.cedula,
+                    u.email,
+                    u.estado,
+                    u.direccion,
+                    u.fecha_ingreso,
+                    u.fecha_nacimiento,
+                    r.nombre_rol,
+                    nf.nombre_nucleo,
+                    cp.id_comprobante,
+                    cp.archivo as comprobante_archivo,
+                    cp.fecha_pago
+                FROM Usuario u
+                LEFT JOIN Rol r ON u.id_rol = r.id_rol
+                LEFT JOIN Nucleo_Familiar nf ON u.id_nucleo = nf.id_nucleo
+                LEFT JOIN Comprobante_Pago cp ON u.id_usuario = cp.id_usuario 
+                    AND cp.id_comprobante = (
+                        SELECT MAX(id_comprobante) 
+                        FROM Comprobante_Pago cp2 
+                        WHERE cp2.id_usuario = u.id_usuario
+                    )
+                ORDER BY u.fecha_ingreso DESC";
+        
+        $stmt = $pdo->query($sql);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+    } catch (PDOException $e) {
+        error_log("Error en getAllUsersWithPayments: " . $e->getMessage());
+        return [];
+    }
+}
+
     public function getRoleName()
     {
         if ($this->id_rol === null) {

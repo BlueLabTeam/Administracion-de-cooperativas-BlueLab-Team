@@ -90,7 +90,15 @@ $privateRoutes = [
     '/api/tasks/details',
     '/api/tasks/users',
     '/api/tasks/nucleos',
-    '/api/tasks/cancel'
+    '/api/tasks/cancel',
+    '/api/users/all',
+    '/api/users/details',
+    '/api/nucleos/create',      
+    '/api/nucleos/all',            
+    '/api/nucleos/details',        
+    '/api/nucleos/update',       
+    '/api/nucleos/delete',       
+    '/api/nucleos/users-available' 
 ];
 
 // Aplicar middleware según el tipo de ruta
@@ -221,8 +229,45 @@ switch ($uri) {
         $task->cancelTask();
         break;
 
+    // API USUARIOS
+    case '/api/users/all':
+        $users = new App\Controllers\UserController();
+        $users->getAllUsers();
+        break;
+    case '/api/users/details':
+        $users = new App\Controllers\UserController();
+        $users->getUserById();
+        break;
+
     default:
         http_response_code(404);
         include __DIR__ . '/../src/views/404error.php';
         break;
+
+        // API NUCLEOS
+    case '/api/nucleos/create':
+        $nucleos = new App\Controllers\NucleoController();
+        $nucleos->create();
+        break;
+    case '/api/nucleos/all':
+        $nucleos = new App\Controllers\NucleoController();
+        $nucleos->getAll();
+        break;
+    case '/api/nucleos/details':
+        $nucleos = new App\Controllers\NucleoController();
+        $nucleos->getDetails();
+        break;
+    case '/api/nucleos/update':
+        $nucleos = new App\Controllers\NucleoController();
+        $nucleos->update();
+        break;
+    case '/api/nucleos/delete':
+        $nucleos = new App\Controllers\NucleoController();
+        $nucleos->delete();
+        break;
+    case '/api/nucleos/users-available':
+        $nucleos = new App\Controllers\NucleoController();
+        $nucleos->getAvailableUsers();
+        break;
 }
+

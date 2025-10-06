@@ -1,19 +1,3 @@
-<?php
-// Verificar que el usuario esté autenticado y sea admin
-if (!isset($_SESSION['user_id'])) {
-    header('Location: /login');
-    exit();
-}
-
-if (!isset($_SESSION['is_admin']) || !$_SESSION['is_admin']) {
-    header('Location: /dashboard');
-    exit();
-}
-
-// Obtener pagos pendientes
-$userModel = new \App\Models\User();
-$pagosPendientes = $userModel->getPendingPayments();
-?>
 <!DOCTYPE html>
 <html lang="es">
 
@@ -28,6 +12,8 @@ $pagosPendientes = $userModel->getPendingPayments();
 	<link rel="stylesheet" href="/assets/css/dashboardTareas.css" />
 	<link rel="stylesheet" href="/assets/css/dashboardPagos.css" />
 	<link rel="stylesheet" href="/assets/css/dashboardUtils.css" />
+	<link rel="stylesheet" href="/assets/css/dashboardUsuarios.css" />
+	<link rel="stylesheet" href="/assets/css/dashboardNucleos.css" /> 
 </head>
 
 <body>
@@ -45,68 +31,35 @@ $pagosPendientes = $userModel->getPendingPayments();
 				<ul>
 					<li><strong>Usuarios:</strong> Gestionar pagos pendientes y usuarios</li>
 					<li><strong>Notificaciones:</strong> Enviar mensajes a los socios</li>
+					<li><strong>Núcleos Familiares:</strong> Gestionar grupos familiares</li>
+					<li><strong>Tareas:</strong> Asignar y gestionar tareas</li>
 					<li><strong>Reportes:</strong> Visualizar estadísticas</li>
-					<li><strong>Y más...</strong></li>
 				</ul>
 			</div>
 		</section>
 
-		<!-- SECCIÓN USUARIOS (con pagos pendientes) -->
+		<!-- SECCIÓN USUARIOS -->
 		<section id="usuarios-section" class="section-content">
-			<div class="admin-banner">
-				<p>Gestión de Pagos Pendientes</p>
-			</div>
-
-			<div class="payments-container">
-				<h2 class="section-title">Pagos Pendientes de Aprobación</h2>
-				
-				<?php if (empty($pagosPendientes)): ?>
-					<div class="no-payments">
-						<p>No hay pagos pendientes de revisión</p>
+			<h2 class="section-title">Gestión de Usuarios</h2>
+			
+			<div class="info-card">
+				<div class="users-table-header">
+					<h3>Todos los Usuarios</h3>
+					<div class="filter-controls">
+						<select id="filtro-estado-usuarios" onchange="filterUsers()">
+							<option value="">Todos los estados</option>
+							<option value="pendiente">Pendiente</option>
+							<option value="enviado">Enviado (Pendiente Aprobación)</option>
+							<option value="aceptado">Aceptado</option>
+							<option value="rechazado">Rechazado</option>
+						</select>
+						<input type="text" id="search-users" placeholder="Buscar usuario..." onkeyup="filterUsers()">
 					</div>
-				<?php else: ?>
-					<?php foreach ($pagosPendientes as $pago): ?>
-						<div class="payment-card" id="payment-<?php echo $pago['id_usuario']; ?>">
-							<div class="payment-header">
-								<div class="payment-info">
-									<h3><?php echo htmlspecialchars($pago['nombre_completo']); ?></h3>
-									<p><strong>Email:</strong> <?php echo htmlspecialchars($pago['email']); ?></p>
-									<p><strong>Cédula:</strong> <?php echo htmlspecialchars($pago['cedula']); ?></p>
-									<p><strong>Fecha de envío:</strong> <?php echo date('d/m/Y H:i', strtotime($pago['fecha_pago'])); ?></p>
-								</div>
-							</div>
-							
-							<div class="payment-image">
-								<p>Comprobante de pago:</p>
-								<?php 
-								$rutaImagen = '/files/?path=' . urlencode($pago['archivo']); 
-								?>
-								<img 
-									src="<?php echo htmlspecialchars($rutaImagen); ?>" 
-									alt="Comprobante de pago" 
-									class="image-preview"
-									onclick="openModal(this.src)"
-									onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23ddd%22 width=%22200%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 fill=%22%23999%22%3EImagen no disponible%3C/text%3E%3C/svg%3E';"
-								>
-								<br>
-								<a href="<?php echo htmlspecialchars($rutaImagen); ?>" 
-								   target="_blank" 
-								   class="image-link">
-									Abrir imagen en nueva pestaña
-								</a>
-							</div>
-							
-							<div class="payment-actions">
-								<button class="btn btn-approve" onclick="approvePayment(<?php echo $pago['id_usuario']; ?>)">
-									Aprobar Pago
-								</button>
-								<button class="btn btn-reject" onclick="rejectPayment(<?php echo $pago['id_usuario']; ?>)">
-									Rechazar Pago
-								</button>
-							</div>
-						</div>
-					<?php endforeach; ?>
-				<?php endif; ?>
+				</div>
+				
+				<div id="usersTableContainer">
+					<p class="loading">Cargando usuarios...</p>
+				</div>
 			</div>
 		</section>
 
@@ -155,7 +108,37 @@ $pagosPendientes = $userModel->getPendingPayments();
 			</div>
 		</section>
 
-		<!-- OTRAS SECCIONES (Placeholder) -->
+		<!-- SECCIÓN NÚCLEO FAMILIAR - NUEVA Y COMPLETA -->
+		<section id="nucleo-section" class="section-content">
+			<h2 class="section-title">Gestión de Núcleos Familiares</h2>
+			
+			<!-- Botón para crear nuevo núcleo -->
+			<div class="info-card">
+				<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+					<h3>Núcleos Familiares Registrados</h3>
+					<button class="btn btn-primary" onclick="showCreateNucleoForm()">
+						Crear Nuevo Núcleo
+					</button>
+				</div>
+				
+				<div id="nucleosTableContainer">
+					<p class="loading">Cargando núcleos...</p>
+				</div>
+			</div>
+			
+			<!-- Información adicional -->
+			<div class="info-card">
+				<h3>Información sobre Núcleos Familiares</h3>
+				<ul style="line-height: 1.8;">
+					<li><strong>¿Qué es un núcleo familiar?</strong> Grupo de usuarios que comparten vivienda o están relacionados</li>
+					<li><strong>Asignación de tareas:</strong> Las tareas pueden asignarse a núcleos completos</li>
+					<li><strong>Gestión de usuarios:</strong> Un usuario puede pertenecer a un solo núcleo</li>
+					<li><strong>Eliminación:</strong> Al eliminar un núcleo, los usuarios NO se eliminan, solo se desvinculan</li>
+				</ul>
+			</div>
+		</section>
+
+		<!-- SECCIÓN REPORTES -->
 		<section id="reportes-section" class="section-content">
 			<h2 class="section-title">Reportes</h2>
 			<div class="info-card">
@@ -163,13 +146,7 @@ $pagosPendientes = $userModel->getPendingPayments();
 			</div>
 		</section>
 
-		<section id="nucleo-section" class="section-content">
-			<h2 class="section-title">Núcleo Familiar</h2>
-			<div class="info-card">
-				<p>Gestión de núcleos familiares en desarrollo...</p>
-			</div>
-		</section>
-
+		<!-- SECCIÓN VIVIENDAS -->
 		<section id="viviendas-section" class="section-content">
 			<h2 class="section-title">Viviendas</h2>
 			<div class="info-card">
@@ -177,6 +154,7 @@ $pagosPendientes = $userModel->getPendingPayments();
 			</div>
 		</section>
 
+		<!-- SECCIÓN FACTURACIÓN -->
 		<section id="facturacion-section" class="section-content">
 			<h2 class="section-title">Facturación</h2>
 			<div class="info-card">
@@ -184,6 +162,7 @@ $pagosPendientes = $userModel->getPendingPayments();
 			</div>
 		</section>
 
+		<!-- SECCIÓN INVENTARIO -->
 		<section id="inventario-section" class="section-content">
 			<h2 class="section-title">Inventario</h2>
 			<div class="info-card">
@@ -193,7 +172,7 @@ $pagosPendientes = $userModel->getPendingPayments();
 
 		<!-- SECCIÓN TAREAS -->
 		<section id="tareas-section" class="section-content">
-			<h2 class="section-title">📋 Gestión de Tareas</h2>
+			<h2 class="section-title">Gestión de Tareas</h2>
 
 			<!-- Formulario para crear nueva tarea -->
 			<div class="info-card">

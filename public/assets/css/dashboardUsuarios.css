@@ -1,0 +1,461 @@
+/* ==========================================
+   ESTILOS PARA TABLA DE USUARIOS - TEMA AZUL #005CB9
+   dashboardUsuarios.css
+   ========================================== */
+
+.users-table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+    gap: 15px;
+    padding: 20px;
+    background: #005CB9;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 92, 185, 0.3);
+}
+
+.users-table-header h3 {
+    margin: 0;
+    color: white;
+    font-size: 22px;
+    font-weight: 600;
+}
+
+.filter-controls {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.filter-controls select,
+.filter-controls input {
+    padding: 10px 15px;
+    border: 2px solid #e3f2fd;
+    border-radius: 8px;
+    font-size: 14px;
+    background: white;
+    transition: all 0.3s ease;
+}
+
+.filter-controls select:focus,
+.filter-controls input:focus {
+    outline: none;
+    border-color: #005CB9;
+    box-shadow: 0 0 0 4px rgba(0, 92, 185, 0.1);
+}
+
+.filter-controls input {
+    min-width: 280px;
+}
+
+.filter-controls select {
+    cursor: pointer;
+    color: #005CB9;
+    font-weight: 500;
+}
+
+/* Tabla de usuarios */
+.users-table-wrapper {
+    overflow-x: auto;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    background: white;
+}
+
+.users-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    font-size: 14px;
+    min-width: 1200px;
+}
+
+.users-table thead {
+    background: #005CB9;
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.users-table th {
+    padding: 18px 15px;
+    text-align: left;
+    font-weight: 600;
+    white-space: nowrap;
+    text-transform: uppercase;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    color: white;
+}
+
+.users-table td {
+    padding: 16px 15px;
+    border-bottom: 1px solid #e3f2fd;
+    vertical-align: middle;
+}
+
+.users-table tbody tr {
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.users-table tbody tr:hover {
+    background-color: #f0f7ff;
+    transform: translateX(5px);
+    box-shadow: 0 2px 8px rgba(0, 92, 185, 0.1);
+}
+
+/* DESTACAR USUARIOS CON PAGO PENDIENTE */
+.users-table tbody tr.estado-enviado {
+    background: linear-gradient(90deg, #fff9c4 0%, #fff59d 100%);
+    border-left: 5px solid #ffa726;
+    font-weight: 500;
+}
+
+.users-table tbody tr.estado-enviado:hover {
+    background: linear-gradient(90deg, #fff59d 0%, #ffee58 100%);
+    transform: translateX(8px);
+    box-shadow: 0 4px 15px rgba(255, 167, 38, 0.3);
+}
+
+.users-table tbody tr.estado-enviado td {
+    border-bottom-color: #ffe082;
+}
+
+/* Animación de pulso para pagos pendientes */
+@keyframes pulse-payment {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(255, 167, 38, 0.4);
+    }
+    50% {
+        box-shadow: 0 0 0 10px rgba(255, 167, 38, 0);
+    }
+}
+
+.users-table tbody tr.estado-enviado .estado-badge {
+    animation: pulse-payment 2s infinite;
+}
+
+/* Estados de usuario */
+.estado-badge {
+    display: inline-block;
+    padding: 7px 16px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+.estado-badge.estado-pendiente {
+    background: #e3f2fd;
+    color: #005CB9;
+    border: 2px solid #90caf9;
+}
+
+.estado-badge.estado-enviado {
+    background: #fff9c4;
+    color: #f57c00;
+    border: 2px solid #ffa726;
+    font-weight: 800;
+    animation: pulse-payment 2s infinite;
+}
+
+.estado-badge.estado-aceptado {
+    background: #e8f5e9;
+    color: #2e7d32;
+    border: 2px solid #66bb6a;
+}
+
+.estado-badge.estado-rechazado {
+    background: #ffebee;
+    color: #c62828;
+    border: 2px solid #ef5350;
+}
+
+/* Botones de acción */
+.btn-small {
+    padding: 9px 18px;
+    font-size: 13px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    white-space: nowrap;
+    color: white;
+}
+
+.btn-view {
+    background: #005CB9;
+    color: white;
+    box-shadow: 0 3px 8px rgba(0, 92, 185, 0.3);
+}
+
+.btn-view:hover {
+    background: #004a94;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 92, 185, 0.4);
+}
+
+.btn-approve-small {
+    background: #43a047;
+    color: white;
+    box-shadow: 0 3px 8px rgba(67, 160, 71, 0.3);
+}
+
+.btn-approve-small:hover {
+    background: #2e7d32;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(67, 160, 71, 0.4);
+}
+
+.btn-reject-small {
+    background: #d32f2f;
+    color: white;
+    box-shadow: 0 3px 8px rgba(211, 47, 47, 0.3);
+}
+
+.btn-reject-small:hover {
+    background: #c62828;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(211, 47, 47, 0.4);
+}
+
+.btn-small:active {
+    transform: translateY(0);
+}
+
+.btn-approve-small:disabled,
+.btn-reject-small:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Indicador visual para pago pendiente */
+.users-table tbody tr.estado-enviado td:first-child::before {
+    content: '⚠️';
+    display: inline-block;
+    margin-right: 8px;
+    font-size: 16px;
+    animation: bounce 1s infinite;
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-3px);
+    }
+}
+
+/* Mensajes de estado */
+.no-users {
+    text-align: center;
+    padding: 60px 20px;
+    color: #005CB9;
+    font-size: 16px;
+    background: #e3f2fd;
+    border-radius: 12px;
+    border: 2px dashed #90caf9;
+}
+
+/* Estilos para celdas específicas */
+.users-table td:first-child {
+    font-weight: 700;
+    color: #005CB9;
+    font-size: 15px;
+}
+
+.users-table td:nth-child(2) {
+    font-weight: 600;
+    color: #005CB9;
+}
+
+.users-table td:nth-child(3),
+.users-table td:nth-child(4) {
+    color: #455a64;
+}
+
+/* Loading y errores */
+.loading {
+    text-align: center;
+    padding: 50px;
+    color: #005CB9;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.error {
+    color: #c62828;
+    padding: 40px;
+    text-align: center;
+    background: #ffebee;
+    border-radius: 12px;
+    border: 2px solid #ef5350;
+}
+
+/* Modal de detalles de usuario */
+.user-detail-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 92, 185, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    backdrop-filter: blur(5px);
+}
+
+.user-detail-content {
+    background: white;
+    border-radius: 15px;
+    max-width: 700px;
+    width: 90%;
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: 40px;
+    position: relative;
+    box-shadow: 0 15px 50px rgba(0, 92, 185, 0.4);
+    border-top: 5px solid #005CB9;
+}
+
+.user-detail-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: #e3f2fd;
+    border: none;
+    font-size: 28px;
+    cursor: pointer;
+    color: #005CB9;
+    line-height: 1;
+    padding: 0;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    border-radius: 50%;
+}
+
+.user-detail-close:hover {
+    background: #005CB9;
+    color: white;
+    transform: rotate(90deg);
+}
+
+.users-table-header h3 {
+    margin: 0;
+    color: white !important;
+    font-size: 22px;
+    font-weight: 600;
+}
+
+/* Y también asegura que los h3 dentro de info-card sean oscuros */
+.info-card h3 {
+    color: #333 !important;
+}
+
+/* Pero el header de usuarios (que está dentro de info-card) debe ser blanco */
+.info-card .users-table-header h3 {
+    color: white !important;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .users-table {
+        font-size: 13px;
+    }
+    
+    .users-table th,
+    .users-table td {
+        padding: 14px 12px;
+    }
+}
+
+@media (max-width: 768px) {
+    .users-table-header {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 15px;
+    }
+    
+    .filter-controls {
+        flex-direction: column;
+    }
+    
+    .filter-controls input {
+        width: 100%;
+        min-width: auto;
+    }
+    
+    .users-table {
+        font-size: 12px;
+        min-width: 900px;
+    }
+    
+    .users-table th,
+    .users-table td {
+        padding: 12px 10px;
+    }
+}
+
+/* Scroll suave para la tabla */
+.users-table-wrapper {
+    scroll-behavior: smooth;
+}
+
+.users-table-wrapper::-webkit-scrollbar {
+    height: 10px;
+}
+
+.users-table-wrapper::-webkit-scrollbar-track {
+    background: #e3f2fd;
+    border-radius: 10px;
+}
+
+.users-table-wrapper::-webkit-scrollbar-thumb {
+    background: #005CB9;
+    border-radius: 10px;
+}
+
+.users-table-wrapper::-webkit-scrollbar-thumb:hover {
+    background: #004a94;
+}
+
+/* Animación de entrada de filas */
+@keyframes slideInRow {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.users-table tbody tr {
+    animation: slideInRow 0.4s ease forwards;
+}
+
+.users-table tbody tr:nth-child(1) { animation-delay: 0.05s; }
+.users-table tbody tr:nth-child(2) { animation-delay: 0.1s; }
+.users-table tbody tr:nth-child(3) { animation-delay: 0.15s; }
+.users-table tbody tr:nth-child(4) { animation-delay: 0.2s; }
+.users-table tbody tr:nth-child(5) { animation-delay: 0.25s; }
+.users-table tbody tr:nth-child(6) { animation-delay: 0.3s; }
+.users-table tbody tr:nth-child(7) { animation-delay: 0.35s; }
+.users-table tbody tr:nth-child(8) { animation-delay: 0.4s; }
+.users-table tbody tr:nth-child(9) { animation-delay: 0.45s; }
+.users-table tbody tr:nth-child(10) { animation-delay: 0.5s; }

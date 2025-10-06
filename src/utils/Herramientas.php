@@ -30,7 +30,6 @@ class Herramientas
     {
         self::startSession();
         if (!isset($_SESSION['user_id'])) {
-            // Detectar si es una petición AJAX/API
             if (self::isApiRequest()) {
                 http_response_code(401);
                 header('Content-Type: application/json');
@@ -68,23 +67,28 @@ class Herramientas
             '/api/tasks/users',
             '/api/tasks/nucleos',
             '/api/tasks/cancel',
-            '/api/pay/firstPay'  // AÑADIDO: Excluir la ruta de primer pago
+            '/api/users/all',
+            '/api/users/details',
+            '/api/pay/firstPay',
+            '/api/nucleos/create',          // AGREGADO
+            '/api/nucleos/all',              // AGREGADO
+            '/api/nucleos/details',          // AGREGADO
+            '/api/nucleos/update',           // AGREGADO
+            '/api/nucleos/delete',           // AGREGADO
+            '/api/nucleos/users-available'   // AGREGADO
         ];
         
         if (in_array($currentURL, $rutasExcluidas)) {
-            return; // Permitir acceso sin validar estado
+            return;
         }
 
-        // Si es admin y está en dashboard-admin, no redirigir
         if ($currentURL === '/dashboard-admin' && isset($_SESSION['is_admin']) && $_SESSION['is_admin']) {
             return;
         }
 
         $estado = $_SESSION['estado'] ?? 'pendiente';
 
-        // Si existe ruta para el estado
         if (isset(self::$estadoRutas[$estado])) {
-            // Detectar si es una petición AJAX/API
             if (self::isApiRequest()) {
                 http_response_code(403);
                 header('Content-Type: application/json');
@@ -99,7 +103,6 @@ class Herramientas
             }
             self::safeRedirect(self::$estadoRutas[$estado]);
         } else {
-            // Por seguridad, si el estado es inesperado
             if (self::isApiRequest()) {
                 http_response_code(403);
                 header('Content-Type: application/json');
@@ -114,25 +117,19 @@ class Herramientas
         }
     }
 
-    /**
-     * Detecta si la petición es una llamada a API
-     */
     private static function isApiRequest(): bool
     {
         $currentURL = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
         
-        // Si la URL comienza con /api/
         if (strpos($currentURL, '/api/') === 0) {
             return true;
         }
         
-        // Si hay un header que indica que es una petición AJAX
         if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
             strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
             return true;
         }
         
-        // Si el Accept header prefiere JSON
         if (isset($_SERVER['HTTP_ACCEPT']) && 
             strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false) {
             return true;
