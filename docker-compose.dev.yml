@@ -55,5 +55,25 @@ services:
       - db_data:/var/lib/mysql
       - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql
       - ./sql/seeds.sql:/docker-entrypoint-initdb.d/seeds.sql
+      - ./docker/db/master/config/:/etc/mysql/conf.d/master.cnf
+  gestcoop_db_slave:
+    image: mysql:8.0
+    container_name: gestcoop_db_slave
+    restart: unless-stopped
+    ports:
+      - "3307:3306"
+    env_file:
+      - .env
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}    
+    depends_on:
+      gestcoop_db:
+        condition: service_started
+    volumes:
+      - ./docker/db/slave/config/:/etc/mysql/conf.d
+      - ./docker/db/slave/init-slave.sh:/docker-entrypoint-initdb.d/init-slave.sh
+      - db_data_slave:/var/lib/mysql
+
 volumes:
   db_data:
+  db_data_slave:
