@@ -32,23 +32,23 @@ if (in_array($uri, $privateRoutes)) {
 switch ($uri) {
 
     case '/':
-        $controller = new App\Controllers\ViewsController();
+        $controller = new App\controllers\ViewsController();
         $controller->index();
         break;
     case '/home':
-        $controller = new App\Controllers\ViewsController();
+        $controller = new App\controllers\ViewsController();
         $controller->index();
         break;
     case '/login':
-        $controller = new App\Controllers\ViewsController();
+        $controller = new App\controllers\ViewsController();
         $controller->showLoginForm();
         break;
     case '/register':
-        $controller = new App\Controllers\ViewsController();
+        $controller = new App\controllers\ViewsController();
         $controller->showRegistrationForm();
         break;
     case '/dashboard':
-        $controller = new App\Controllers\ViewsController();
+        $controller = new App\controllers\ViewsController();
         $controller->showDashboard();
         break;
     case '/pagoPendiente':
@@ -64,15 +64,15 @@ switch ($uri) {
     // APIS
 
     case '/api/login':
-        $login = new App\Controllers\AuthController();
+        $login = new App\controllers\AuthController();
         $login->login($_POST);
         break;
     case '/api/register':
-        $register = new App\Controllers\AuthController();
+        $register = new App\controllers\AuthController();
         $register->register($_POST);
         break;
     case '/api/logout':
-        $logout = new App\Controllers\AuthController();
+        $logout = new App\controllers\AuthController();
         $logout->logout();
         break;
 
