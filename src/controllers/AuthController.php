@@ -23,7 +23,7 @@ class AuthController
         $password = $_POST['password'];
         // Aquí iría la lógica de autenticación
 
-        $userModel = new \App\Models\User();
+        $userModel = new User();
         $user = $userModel->findByEmail($email);
         if ($user && password_verify($password, $user->getPasswordHash())) {
             $_SESSION['user_id'] = $user->getId();
@@ -67,7 +67,7 @@ class AuthController
         $fecha_nacimiento = $_POST['fecha_nacimiento'];
         $password = $_POST['password'];
 
-        $userModel = new \App\Models\User();
+        $userModel = new User();
         $existingUser = $userModel->findByEmail($email);
         if ($existingUser) {
             http_response_code(409);

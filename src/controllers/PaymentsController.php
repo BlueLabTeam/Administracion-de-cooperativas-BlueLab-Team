@@ -3,6 +3,7 @@
 namespace App\controllers;
 
 use App\models\Pay;
+use App\models\User;
 
 class PaymentsController
 {
@@ -39,7 +40,7 @@ class PaymentsController
 
         if ($resultado) {
 
-            $userModel = new \App\models\User();
+            $userModel = new User();
             $userModel->updateEstado($usuario_id, 'enviado');
             $_SESSION['estado'] = 'enviado';
 
