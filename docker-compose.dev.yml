@@ -53,6 +53,7 @@ services:
     #   - "127.0.0.1:3306:3306" # Solo accesible desde localhost
     volumes:
       - db_data:/var/lib/mysql
+      - ./docker/db/master/init-master.sh:/docker-entrypoint-initdb.d/init-master.sh
       - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql
       - ./sql/seeds.sql:/docker-entrypoint-initdb.d/seeds.sql
       - ./docker/db/master/config/:/etc/mysql/conf.d/master.cnf
@@ -65,14 +66,14 @@ services:
     env_file:
       - .env
     environment:
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}    
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
     depends_on:
       gestcoop_db:
         condition: service_started
     volumes:
+      - db_data_slave:/var/lib/mysql
       - ./docker/db/slave/config/:/etc/mysql/conf.d
       - ./docker/db/slave/init-slave.sh:/docker-entrypoint-initdb.d/init-slave.sh
-      - db_data_slave:/var/lib/mysql
 
 volumes:
   db_data:
