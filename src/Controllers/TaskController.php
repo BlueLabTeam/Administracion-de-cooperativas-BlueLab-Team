@@ -149,77 +149,103 @@ class TaskController
 }
 
     public function getUserTasks()
-    {
-        header('Content-Type: application/json');
-        error_log("TaskController::getUserTasks called for user: " . ($_SESSION['user_id'] ?? 'NONE'));
-
-        if (!isset($_SESSION['user_id'])) {
-            echo json_encode(['success' => false, 'message' => 'No autenticado']);
-            return;
-        }
-
-        try {
-            $incluirFinalizadas = isset($_GET['incluir_finalizadas']) && $_GET['incluir_finalizadas'] === 'true';
-            
-            $tareasUsuario = $this->taskModel->getUserTasks($_SESSION['user_id'], $incluirFinalizadas);
-            $tareasNucleo = $this->taskModel->getNucleoTasks($_SESSION['user_id'], $incluirFinalizadas);
-            $pendientesCount = $this->taskModel->getPendingTasksCount($_SESSION['user_id']);
-
-            echo json_encode([
-                'success' => true,
-                'tareas_usuario' => $tareasUsuario,
-                'tareas_nucleo' => $tareasNucleo,
-                'pendientes_count' => $pendientesCount
-            ]);
-
-        } catch (\Exception $e) {
-            error_log("Error al obtener tareas: " . $e->getMessage());
-            echo json_encode(['success' => false, 'message' => 'Error al cargar tareas: ' . $e->getMessage()]);
-        }
+{
+    header('Content-Type: application/json');
+    
+    // ✅ Obtener userId de la sesión (ya autenticado por middleware)
+    if (!isset($_SESSION['user_id'])) {
+        echo json_encode(['success' => false, 'message' => 'No autenticado']);
+        return;
     }
+    
+    $userId = $_SESSION['user_id'];
+    error_log("TaskController::getUserTasks called for user: " . $userId);
+
+    try {
+        $incluirFinalizadas = isset($_GET['incluir_finalizadas']) && $_GET['incluir_finalizadas'] === 'true';
+        
+        $tareasUsuario = $this->taskModel->getUserTasks($userId, $incluirFinalizadas);
+        $tareasNucleo = $this->taskModel->getNucleoTasks($userId, $incluirFinalizadas);
+        $pendientesCount = $this->taskModel->getPendingTasksCount($userId);
+
+        echo json_encode([
+            'success' => true,
+            'tareas_usuario' => $tareasUsuario,
+            'tareas_nucleo' => $tareasNucleo,
+            'pendientes_count' => $pendientesCount
+        ]);
+
+    } catch (\Exception $e) {
+        error_log("Error al obtener tareas: " . $e->getMessage());
+        echo json_encode(['success' => false, 'message' => 'Error al cargar tareas: ' . $e->getMessage()]);
+    }
+}
 
     public function updateProgress()
-    {
-        header('Content-Type: application/json');
+{
+    header('Content-Type: application/json');
 
-        if (!isset($_SESSION['user_id'])) {
-            echo json_encode(['success' => false, 'message' => 'No autenticado']);
+    if (!isset($_SESSION['user_id'])) {
+        echo json_encode(['success' => false, 'message' => 'No autenticado']);
+        return;
+    }
+
+    try {
+        // ✅ Extraer datos de POST
+        $asignacionId = $_POST['asignacion_id'] ?? null;
+        $tipoAsignacion = $_POST['tipo_asignacion'] ?? 'usuario';
+        $progreso = isset($_POST['progreso']) ? intval($_POST['progreso']) : null;
+        $estado = $_POST['estado'] ?? null;
+
+        // ✅ LOG para debug
+        error_log("=== updateProgress DEBUG ===");
+        error_log("POST completo: " . print_r($_POST, true));
+        error_log("asignacion_id: " . $asignacionId);
+        error_log("tipo_asignacion: " . $tipoAsignacion);
+        error_log("progreso: " . $progreso);
+        error_log("estado: " . $estado);
+
+        // ✅ Validaciones
+        if (empty($asignacionId)) {
+            echo json_encode(['success' => false, 'message' => 'ID de asignación requerido', 'error' => 'Falta asignacion_id']);
             return;
         }
 
-        try {
-            $asignacionId = $_POST['asignacion_id'] ?? '';
-            $tipoAsignacion = $_POST['tipo_asignacion'] ?? 'usuario';
-            $progreso = intval($_POST['progreso'] ?? 0);
-            $estado = $_POST['estado'] ?? null;
+        if ($progreso === null) {
+            echo json_encode(['success' => false, 'message' => 'Progreso requerido', 'error' => 'Falta progreso']);
+            return;
+        }
 
-            if (empty($asignacionId)) {
-                echo json_encode(['success' => false, 'message' => 'ID de asignación requerido']);
-                return;
-            }
+        if ($progreso < 0 || $progreso > 100) {
+            echo json_encode(['success' => false, 'message' => 'El progreso debe estar entre 0 y 100']);
+            return;
+        }
 
-            if ($progreso < 0 || $progreso > 100) {
-                echo json_encode(['success' => false, 'message' => 'El progreso debe estar entre 0 y 100']);
-                return;
-            }
+        // ✅ Si progreso es 100 y no hay estado, forzar 'completada'
+        if ($progreso === 100 && !$estado) {
+            $estado = 'completada';
+        }
 
-            if ($progreso === 100 && !$estado) {
-                $estado = 'completada';
-            }
+        // ✅ Actualizar en BD
+        $result = $this->taskModel->updateProgress($asignacionId, $tipoAsignacion, $progreso, $estado);
 
-            $this->taskModel->updateProgress($asignacionId, $tipoAsignacion, $progreso, $estado);
-
+        if ($result) {
             echo json_encode([
                 'success' => true,
                 'message' => 'Progreso actualizado correctamente'
             ]);
-
-        } catch (\Exception $e) {
-            error_log("Error al actualizar progreso: " . $e->getMessage());
-            echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+        } else {
+            echo json_encode([
+                'success' => false,
+                'message' => 'No se pudo actualizar el progreso'
+            ]);
         }
-    }
 
+    } catch (\Exception $e) {
+        error_log("Error al actualizar progreso: " . $e->getMessage());
+        echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+    }
+}
     public function addAvance()
     {
         header('Content-Type: application/json');
@@ -361,94 +387,99 @@ class TaskController
     }
 
     public function cancelTask()
-    {
-        header('Content-Type: application/json');
+{
+    header('Content-Type: application/json');
 
-        if (!isset($_SESSION['is_admin']) || !$_SESSION['is_admin']) {
-            echo json_encode(['success' => false, 'message' => 'No tienes permisos']);
+    if (!isset($_SESSION['is_admin']) || !$_SESSION['is_admin']) {
+        echo json_encode(['success' => false, 'message' => 'No tienes permisos']);
+        return;
+    }
+
+    try {
+        // ✅ El parámetro viene como 'tarea_id' desde JavaScript
+        $tareaId = $_POST['tarea_id'] ?? null;
+
+        error_log("=== cancelTask DEBUG ===");
+        error_log("POST completo: " . print_r($_POST, true));
+        error_log("tarea_id recibido: " . $tareaId);
+
+        if (empty($tareaId)) {
+            echo json_encode([
+                'success' => false, 
+                'message' => 'ID de tarea requerido',
+                'debug' => 'POST recibido: ' . json_encode($_POST)
+            ]);
             return;
         }
 
-        try {
-            $tareaId = $_POST['tarea_id'] ?? '';
+        $result = $this->taskModel->cancelTask($tareaId);
 
-            if (empty($tareaId)) {
-                echo json_encode(['success' => false, 'message' => 'ID de tarea requerido']);
-                return;
-            }
-
-            $this->taskModel->cancelTask($tareaId);
-
+        if ($result) {
             echo json_encode([
                 'success' => true,
                 'message' => 'Tarea cancelada exitosamente'
             ]);
-
-        } catch (\Exception $e) {
-            error_log("Error al cancelar tarea: " . $e->getMessage());
-            echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+        } else {
+            echo json_encode([
+                'success' => false,
+                'message' => 'No se pudo cancelar la tarea'
+            ]);
         }
+
+    } catch (\Exception $e) {
+        error_log("Error al cancelar tarea: " . $e->getMessage());
+        echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+    }
+}
+
+   public function getTaskDetails()
+{
+    header('Content-Type: application/json');
+
+    // ✅ Usuarios también pueden ver detalles de sus propias tareas
+    if (!isset($_SESSION['user_id'])) {
+        echo json_encode(['success' => false, 'message' => 'No autenticado']);
+        return;
     }
 
-    // Obtener detalles completos de una tarea (incluyendo materiales asignados)
-public function getTaskDetails($tareaId)
-{
     try {
-        $db = (new Database())->getConnection();
+        // ✅ El parámetro viene como 'tarea_id' en GET
+        $tareaId = $_GET['tarea_id'] ?? null;
 
-        // ✅ Nueva consulta que une Tareas con los Materiales asignados
-        $sql = "
-            SELECT 
-                t.id_tarea,
-                t.titulo,
-                t.descripcion,
-                t.fecha_inicio,
-                t.fecha_fin,
-                t.prioridad,
-                t.estado,
-                tm.id_material,
-                m.nombre AS nombre_material,
-                m.caracteristicas,
-                tm.cantidad_requerida
-            FROM Tareas t
-            LEFT JOIN Tarea_Material tm ON t.id_tarea = tm.id_tarea
-            LEFT JOIN Materiales m ON tm.id_material = m.id_material
-            WHERE t.id_tarea = :id_tarea
-        ";
+        error_log("=== getTaskDetails DEBUG ===");
+        error_log("GET completo: " . print_r($_GET, true));
+        error_log("tarea_id recibido: " . $tareaId);
 
-        $stmt = $db->prepare($sql);
-        $stmt->bindParam(':id_tarea', $tareaId, PDO::PARAM_INT);
-        $stmt->execute();
-        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        if (!$result) {
-            return null;
+        if (empty($tareaId)) {
+            echo json_encode([
+                'success' => false, 
+                'message' => 'ID de tarea requerido',
+                'debug' => 'GET recibido: ' . json_encode($_GET)
+            ]);
+            return;
         }
 
-        // ✅ Armamos respuesta con la tarea + materiales asignados
-        return [
-            'tarea' => [
-                'id_tarea' => $result[0]['id_tarea'],
-                'titulo' => $result[0]['titulo'],
-                'descripcion' => $result[0]['descripcion'],
-                'fecha_inicio' => $result[0]['fecha_inicio'],
-                'fecha_fin' => $result[0]['fecha_fin'],
-                'prioridad' => $result[0]['prioridad'],
-                'estado' => $result[0]['estado']
-            ],
-            'materiales' => array_map(function ($row) {
-                return [
-                    'id_material' => $row['id_material'],
-                    'nombre' => $row['nombre_material'],
-                    'caracteristicas' => $row['caracteristicas'],
-                    'cantidad_requerida' => $row['cantidad_requerida']
-                ];
-            }, array_filter($result, fn($r) => !empty($r['id_material'])))
-        ];
+        $tarea = $this->taskModel->getTaskDetails($tareaId);
 
-    } catch (\PDOException $e) {
-        error_log("❌ Error SQL en getTaskDetails: " . $e->getMessage());
-        return ['error' => 'Error al obtener detalles de la tarea'];
+        if (!$tarea) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Tarea no encontrada'
+            ]);
+            return;
+        }
+
+        $avances = $this->taskModel->getAvances($tareaId);
+
+        echo json_encode([
+            'success' => true,
+            'tarea' => $tarea,
+            'avances' => $avances
+        ]);
+
+    } catch (\Exception $e) {
+        error_log("Error al obtener detalles: " . $e->getMessage());
+        echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
     }
 }
 }

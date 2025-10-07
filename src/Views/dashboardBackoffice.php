@@ -9,6 +9,7 @@
 	<link rel="stylesheet" href="/assets/css/dashboardBase.css" />
 	<link rel="stylesheet" href="/assets/css/dashboardHeader.css" />
 	<link rel="stylesheet" href="/assets/css/dashboardNotificaciones.css" />
+	<link rel="stylesheet" href="/assets/css/dashboarViviendas.css" />
 	<link rel="stylesheet" href="/assets/css/dashboardTareas.css" />
 	<link rel="stylesheet" href="/assets/css/dashboardPagos.css" />
 	<link rel="stylesheet" href="/assets/css/dashboardUtils.css" />
@@ -147,13 +148,165 @@
 			</div>
 		</section>
 
-		<!-- SECCIÓN VIVIENDAS -->
-		<section id="viviendas-section" class="section-content">
-			<h2 class="section-title">Viviendas</h2>
-			<div class="info-card">
-				<p>Gestión de viviendas en desarrollo...</p>
+		<!-- REEMPLAZAR LA SECCIÓN VIVIENDAS EN dashboardBackoffice.php CON ESTE CÓDIGO -->
+
+<!-- SECCIÓN VIVIENDAS -->
+<section id="viviendas-section" class="section-content">
+	<h2 class="section-title">Gestión de Viviendas</h2>
+	
+	<!-- Botón para crear nueva vivienda -->
+	<div class="info-card">
+		<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+			<h3>Viviendas Registradas</h3>
+			<button class="btn btn-primary" onclick="showCreateViviendaModal()">
+				<i class="fas fa-plus"></i> Nueva Vivienda
+			</button>
+		</div>
+		
+		<!-- Filtros -->
+		<div class="filter-controls" style="margin-bottom: 20px;">
+			<select id="filtro-estado-vivienda" onchange="filterViviendas()">
+				<option value="">Todos los estados</option>
+				<option value="disponible">Disponibles</option>
+				<option value="ocupada">Ocupadas</option>
+				<option value="mantenimiento">En Mantenimiento</option>
+			</select>
+			<select id="filtro-habitaciones" onchange="filterViviendas()">
+				<option value="">Todas las habitaciones</option>
+				<option value="1">1 Habitación</option>
+				<option value="2">2 Habitaciones</option>
+				<option value="3">3 Habitaciones</option>
+			</select>
+			<input type="text" id="search-viviendas" placeholder="Buscar vivienda..." onkeyup="filterViviendas()">
+		</div>
+		
+		<div id="viviendasTableContainer">
+			<p class="loading">Cargando viviendas...</p>
+		</div>
+	</div>
+	
+	<!-- Información adicional -->
+	<div class="info-card">
+		<h3>Información sobre Viviendas</h3>
+		<ul style="line-height: 1.8;">
+			<li><strong>Estados:</strong> Disponible, Ocupada, En Mantenimiento</li>
+			<li><strong>Asignación:</strong> Las viviendas se pueden asignar a usuarios individuales o núcleos familiares</li>
+			<li><strong>Tipos:</strong> 1, 2 o 3 habitaciones según las necesidades</li>
+			<li><strong>Gestión:</strong> Puedes crear, editar, asignar y desasignar viviendas</li>
+		</ul>
+	</div>
+</section>
+
+<!-- Modal para crear/editar vivienda -->
+<div id="viviendaModal" class="material-modal">
+	<div class="material-modal-content">
+		<div class="material-modal-header">
+			<h3 id="viviendaModalTitle">Nueva Vivienda</h3>
+			<button class="close-material-modal" onclick="closeViviendaModal()">&times;</button>
+		</div>
+		
+		<form id="viviendaForm" onsubmit="saveVivienda(event)">
+			<input type="hidden" id="vivienda-id">
+			
+			<div class="material-form-group">
+				<label for="vivienda-numero">Número de Vivienda *</label>
+				<input type="text" id="vivienda-numero" required placeholder="Ej: A-101">
 			</div>
-		</section>
+			
+			<div class="material-form-group">
+				<label for="vivienda-direccion">Dirección *</label>
+				<input type="text" id="vivienda-direccion" required placeholder="Ej: Bloque A, Planta Baja">
+			</div>
+			
+			<div class="material-form-group">
+				<label for="vivienda-tipo">Tipo de Vivienda *</label>
+				<select id="vivienda-tipo" required>
+					<option value="">Seleccione...</option>
+				</select>
+			</div>
+			
+			<div class="material-form-group">
+				<label for="vivienda-metros">Metros Cuadrados</label>
+				<input type="number" id="vivienda-metros" step="0.01" placeholder="Ej: 55.50">
+			</div>
+			
+			<div class="material-form-group">
+				<label for="vivienda-fecha">Fecha de Construcción</label>
+				<input type="date" id="vivienda-fecha">
+			</div>
+			
+			<div class="material-form-group">
+				<label for="vivienda-estado">Estado</label>
+				<select id="vivienda-estado">
+					<option value="disponible">Disponible</option>
+					<option value="ocupada">Ocupada</option>
+					<option value="mantenimiento">Mantenimiento</option>
+				</select>
+			</div>
+			
+			<div class="material-form-group">
+				<label for="vivienda-observaciones">Observaciones</label>
+				<textarea id="vivienda-observaciones" placeholder="Notas adicionales..."></textarea>
+			</div>
+			
+			<div class="material-form-actions">
+				<button type="button" class="btn btn-secondary" onclick="closeViviendaModal()">Cancelar</button>
+				<button type="submit" class="btn btn-primary">Guardar Vivienda</button>
+			</div>
+		</form>
+	</div>
+</div>
+
+<!-- Modal para asignar vivienda -->
+<div id="asignarViviendaModal" class="material-modal">
+	<div class="material-modal-content">
+		<div class="material-modal-header">
+			<h3>Asignar Vivienda</h3>
+			<button class="close-material-modal" onclick="closeAsignarModal()">&times;</button>
+		</div>
+		
+		<form id="asignarForm" onsubmit="submitAsignacion(event)">
+			<input type="hidden" id="asignar-vivienda-id">
+			
+			<div class="material-form-group">
+				<label id="asignar-vivienda-info" style="font-weight: bold; color: #667eea;"></label>
+			</div>
+			
+			<div class="material-form-group">
+				<label for="asignar-tipo">Asignar a:</label>
+				<select id="asignar-tipo" onchange="toggleAsignarTipo()" required>
+					<option value="">Seleccione...</option>
+					<option value="usuario">Usuario Individual</option>
+					<option value="nucleo">Núcleo Familiar</option>
+				</select>
+			</div>
+			
+			<div class="material-form-group" id="asignar-usuario-group" style="display: none;">
+				<label for="asignar-usuario">Seleccionar Usuario:</label>
+				<select id="asignar-usuario">
+					<option value="">Seleccione un usuario...</option>
+				</select>
+			</div>
+			
+			<div class="material-form-group" id="asignar-nucleo-group" style="display: none;">
+				<label for="asignar-nucleo">Seleccionar Núcleo:</label>
+				<select id="asignar-nucleo">
+					<option value="">Seleccione un núcleo...</option>
+				</select>
+			</div>
+			
+			<div class="material-form-group">
+				<label for="asignar-observaciones">Observaciones:</label>
+				<textarea id="asignar-observaciones" placeholder="Notas sobre la asignación..."></textarea>
+			</div>
+			
+			<div class="material-form-actions">
+				<button type="button" class="btn btn-secondary" onclick="closeAsignarModal()">Cancelar</button>
+				<button type="submit" class="btn btn-primary">Confirmar Asignación</button>
+			</div>
+		</form>
+	</div>
+</div>
 
 		<!-- SECCIÓN FACTURACIÓN -->
 		<section id="facturacion-section" class="section-content">

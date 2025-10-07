@@ -291,3 +291,61 @@ CREATE TABLE IF NOT EXISTS Solicitud_Material (
     INDEX idx_estado (estado),
     INDEX idx_fecha (fecha_solicitud)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+-- Tabla de tipos de vivienda
+CREATE TABLE IF NOT EXISTS Tipo_Vivienda (
+    id_tipo INT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(50) NOT NULL,
+    descripcion TEXT,
+    habitaciones INT NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Insertar tipos predeterminados
+INSERT INTO Tipo_Vivienda (nombre, descripcion, habitaciones) VALUES
+('Mono-ambiente', 'Vivienda de 1 habitación con cocina y baño integrado', 1),
+('2 Dormitorios', 'Vivienda de 2 dormitorios, sala, cocina y baño', 2),
+('3 Dormitorios', 'Vivienda de 3 dormitorios, sala, cocina y 2 baños', 3);
+
+-- Tabla de viviendas
+CREATE TABLE IF NOT EXISTS Viviendas (
+    id_vivienda INT PRIMARY KEY AUTO_INCREMENT,
+    numero_vivienda VARCHAR(20) UNIQUE NOT NULL,
+    direccion VARCHAR(200),
+    id_tipo INT NOT NULL,
+    estado ENUM('disponible', 'ocupada', 'mantenimiento') DEFAULT 'disponible',
+    fecha_construccion DATE,
+    metros_cuadrados DECIMAL(10,2),
+    observaciones TEXT,
+    FOREIGN KEY (id_tipo) REFERENCES Tipo_Vivienda(id_tipo)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Tabla de asignaciones de vivienda
+CREATE TABLE IF NOT EXISTS Asignacion_Vivienda (
+    id_asignacion INT PRIMARY KEY AUTO_INCREMENT,
+    id_vivienda INT NOT NULL,
+    id_usuario INT,
+    id_nucleo INT,
+    fecha_asignacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+    fecha_fin DATETIME NULL,
+    activa BOOLEAN DEFAULT TRUE,
+    observaciones TEXT,
+    FOREIGN KEY (id_vivienda) REFERENCES Viviendas(id_vivienda),
+    FOREIGN KEY (id_usuario) REFERENCES Usuario(id_usuario) ON DELETE SET NULL,
+    FOREIGN KEY (id_nucleo) REFERENCES Nucleo_Familiar(id_nucleo) ON DELETE SET NULL,
+    CONSTRAINT chk_asignacion CHECK (
+        (id_usuario IS NOT NULL AND id_nucleo IS NULL) OR 
+        (id_usuario IS NULL AND id_nucleo IS NOT NULL)
+    )
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Insertar algunas viviendas de ejemplo
+INSERT INTO Viviendas (numero_vivienda, direccion, id_tipo, estado, metros_cuadrados) VALUES
+('A-101', 'Bloque A, Planta Baja', 1, 'disponible', 35.50),
+('A-102', 'Bloque A, Planta Baja', 2, 'disponible', 55.00),
+('A-201', 'Bloque A, Primer Piso', 2, 'disponible', 55.00),
+('A-202', 'Bloque A, Primer Piso', 3, 'disponible', 75.00),
+('B-101', 'Bloque B, Planta Baja', 2, 'disponible', 58.00),
+('B-102', 'Bloque B, Planta Baja', 3, 'disponible', 78.00),
+('B-201', 'Bloque B, Primer Piso', 1, 'disponible', 38.00),
+('B-202', 'Bloque B, Primer Piso', 2, 'disponible', 56.00);

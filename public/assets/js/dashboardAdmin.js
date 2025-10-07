@@ -24,6 +24,14 @@ document.addEventListener('DOMContentLoaded', function() {
             document.querySelectorAll('.section-content').forEach(s => {
                 s.classList.remove('active');
             });
+
+            const viviendasMenuItem = document.querySelector('.menu li[data-section="viviendas"]');
+if (viviendasMenuItem) {
+    viviendasMenuItem.addEventListener('click', function() {
+        console.log('>>> Click en sección viviendas');
+        loadViviendas();
+    });
+}
             
             const targetSection = document.getElementById(section + '-section');
             if (targetSection) {
@@ -432,29 +440,65 @@ function renderTasksList(tareas) {
             `${tarea.total_usuarios} usuario(s)` : 
             `${tarea.total_nucleos} núcleo(s)`;
         
+        // ✅ Calcular progreso y completados
+        const progresoPromedio = Math.round(parseFloat(tarea.progreso_promedio || 0));
+        const totalAsignados = tarea.tipo_asignacion === 'usuario' ? 
+            parseInt(tarea.total_usuarios) : 
+            parseInt(tarea.total_nucleos);
+        const completados = parseInt(tarea.asignaciones_completadas || 0);
+        
+        // Determinar estado visual
+        const estadoFinal = tarea.estado;
+        const esCompletada = estadoFinal === 'completada';
+        const esCancelada = estadoFinal === 'cancelada';
+        
         return `
-            <div class="task-item prioridad-${tarea.prioridad}">
+            <div class="task-item prioridad-${tarea.prioridad} ${esCompletada ? 'tarea-completada' : ''}">
                 <div class="task-header">
                     <h4 class="task-title">${tarea.titulo}</h4>
                     <div class="task-badges">
-                        <span class="task-badge badge-estado">${formatEstado(tarea.estado)}</span>
+                        <span class="task-badge badge-estado ${esCompletada ? 'completada' : ''} ${esCancelada ? 'cancelada' : ''}">
+                            ${formatEstado(tarea.estado)}
+                        </span>
                         <span class="task-badge badge-prioridad ${tarea.prioridad}">${formatPrioridad(tarea.prioridad)}</span>
                     </div>
                 </div>
                 <p class="task-description">${tarea.descripcion}</p>
+                
                 <div class="task-meta">
                     <div class="task-meta-item"><strong>Inicio:</strong> ${fechaInicio}</div>
                     <div class="task-meta-item"><strong>Fin:</strong> ${fechaFin}</div>
                     <div class="task-meta-item"><strong>Creado por:</strong> ${tarea.creador}</div>
                     <div class="task-meta-item"><strong>Asignado a:</strong> ${asignados}</div>
                 </div>
-                ${tarea.estado !== 'cancelada' ? `
+                
+                ${!esCancelada ? `
+                    <div class="task-progress-section">
+                        <div class="progress-info">
+                            <span class="progress-label">Progreso general:</span>
+                            <span class="progress-percentage">${progresoPromedio}%</span>
+                            <span class="progress-completed">${completados}/${totalAsignados} completados</span>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" style="width: ${progresoPromedio}%; background: ${esCompletada ? '#28a745' : '#667eea'};">
+                            </div>
+                        </div>
+                    </div>
+                ` : ''}
+                
+                ${!esCancelada ? `
                     <div class="task-actions">
                         <button class="btn btn-small btn-view" onclick="viewTaskDetails(${tarea.id_tarea})">Ver Detalles</button>
                         <button class="btn btn-small btn-materiales" onclick="viewTaskMaterialsAdmin(${tarea.id_tarea})">
                             <i class="fas fa-boxes"></i> Materiales
                         </button>
-                        <button class="btn btn-small btn-cancel" onclick="cancelTask(${tarea.id_tarea})">Cancelar Tarea</button>
+                        ${!esCompletada ? `
+                            <button class="btn btn-small btn-cancel" onclick="cancelTask(${tarea.id_tarea})">Cancelar Tarea</button>
+                        ` : `
+                            <span style="color: #28a745; font-weight: bold; padding: 5px 10px;">
+                                ✓ Tarea Completada
+                            </span>
+                        `}
                     </div>
                 ` : '<p style="color: #dc3545; margin-top: 10px;"><strong>Esta tarea ha sido cancelada</strong></p>'}
             </div>
@@ -609,17 +653,35 @@ function formatPrioridad(prioridad) {
 function cancelTask(tareaId) {
     if (!confirm('¿Estás seguro de cancelar esta tarea?')) return;
     
-    const formData = new FormData();
-    formData.append('tarea_id', tareaId);
+    console.log('=== cancelTask DEBUG ===');
+    console.log('tareaId:', tareaId);
     
-    fetch('/api/tasks/cancel', { method: 'POST', body: formData })
-    .then(response => response.json())
+    const formData = new FormData();
+    formData.append('tarea_id', tareaId);  // ✅ Asegurar que sea 'tarea_id'
+    
+    // Log para verificar FormData
+    for (let [key, value] of formData.entries()) {
+        console.log(`${key}: ${value}`);
+    }
+    
+    fetch('/api/tasks/cancel', { 
+        method: 'POST', 
+        body: formData 
+    })
+    .then(response => {
+        console.log('Response status:', response.status);
+        return response.json();
+    })
     .then(data => {
+        console.log('Response data:', data);
         if (data.success) {
             alert(data.message);
             loadAllTasks();
         } else {
             alert('Error: ' + data.message);
+            if (data.debug) {
+                console.error('Debug info:', data.debug);
+            }
         }
     })
     .catch(error => {
@@ -628,19 +690,36 @@ function cancelTask(tareaId) {
     });
 }
 
+
 function viewTaskDetails(tareaId) {
-    fetch(`/api/tasks/details?tarea_id=${tareaId}`)
-    .then(response => response.json())
+    console.log('=== viewTaskDetails DEBUG ===');
+    console.log('tareaId:', tareaId);
+    
+    const url = `/api/tasks/details?tarea_id=${tareaId}`;  // ✅ Asegurar parámetro
+    console.log('URL completa:', url);
+    
+    fetch(url)
+    .then(response => {
+        console.log('Response status:', response.status);
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        return response.json();
+    })
     .then(data => {
+        console.log('Response data:', data);
         if (data.success) {
             mostrarDetallesTarea(data.tarea, data.avances);
         } else {
-            alert('Error al cargar detalles');
+            alert('Error al cargar detalles: ' + data.message);
+            if (data.debug) {
+                console.error('Debug info:', data.debug);
+            }
         }
     })
     .catch(error => {
-        console.error('Error:', error);
-        alert('Error de conexión');
+        console.error('Error completo:', error);
+        alert('Error de conexión: ' + error.message);
     });
 }
 
@@ -2254,3 +2333,489 @@ document.addEventListener('DOMContentLoaded', function() {
 
 console.log('✅ Integración de Materiales en Tareas cargada');
 console.log('TEST loadMaterialesParaTarea:', typeof loadMaterialesParaTarea);
+
+
+
+
+
+// ==========================================
+// GESTIÓN DE VIVIENDAS
+// Agregar DESPUÉS del código de materiales
+// ==========================================
+
+console.log('🟢 Cargando módulo de Viviendas');
+
+// ========== CARGAR VIVIENDAS ==========
+function loadViviendas() {
+    console.log('>>> loadViviendas() ejecutada');
+    const container = document.getElementById('viviendasTableContainer');
+    
+    if (!container) {
+        console.error('✗ Container viviendasTableContainer NO encontrado');
+        return;
+    }
+    
+    container.innerHTML = '<p class="loading">Cargando viviendas...</p>';
+    
+    fetch('/api/viviendas/all', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin'
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Viviendas recibidas:', data);
+        if (data.success) {
+            renderViviendasTable(data.viviendas);
+        } else {
+            container.innerHTML = `<p class="error">Error: ${data.message}</p>`;
+        }
+    })
+    .catch(error => {
+        console.error('Error al cargar viviendas:', error);
+        container.innerHTML = '<p class="error">Error de conexión</p>';
+    });
+}
+
+// ========== RENDERIZAR TABLA ==========
+function renderViviendasTable(viviendas) {
+    const container = document.getElementById('viviendasTableContainer');
+
+    if (!viviendas || viviendas.length === 0) {
+        container.innerHTML = `
+            <div style="text-align: center; padding: 40px;">
+                <i class="fas fa-home" style="font-size: 48px; color: #ddd; display: block; margin-bottom: 15px;"></i>
+                <p style="color: #999; margin-bottom: 20px;">No hay viviendas registradas</p>
+                <button class="btn btn-primary" onclick="showCreateViviendaModal()">
+                    <i class="fas fa-plus"></i> Crear Primera Vivienda
+                </button>
+            </div>
+        `;
+        return;
+    }
+
+    let tableHTML = `
+        <div class="viviendas-table-container">
+            <table class="viviendas-table">
+                <thead>
+                    <tr>
+                        <th>Número</th>
+                        <th>Dirección</th>
+                        <th>Tipo</th>
+                        <th>Estado</th>
+                        <th>Metros²</th>
+                        <th>Asignada a</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+
+    viviendas.forEach(vivienda => {
+        const estadoClass = vivienda.estado === 'disponible' ? 'disponible' : 
+                           vivienda.estado === 'ocupada' ? 'ocupada' : 'mantenimiento';
+        
+        const asignada = vivienda.usuario_asignado || vivienda.nucleo_asignado || '-';
+        const tieneAsignacion = vivienda.id_asignacion && vivienda.activa == 1;
+
+        tableHTML += `
+            <tr data-estado="${vivienda.estado}" data-habitaciones="${vivienda.habitaciones}">
+                <td><strong>${vivienda.numero_vivienda}</strong></td>
+                <td>${vivienda.direccion || '-'}</td>
+                <td>${vivienda.tipo_nombre} (${vivienda.habitaciones} hab.)</td>
+                <td>
+                    <span class="estado-badge-vivienda ${estadoClass}">
+                        ${formatEstadoVivienda(vivienda.estado)}
+                    </span>
+                </td>
+                <td>${vivienda.metros_cuadrados ? vivienda.metros_cuadrados + ' m²' : '-'}</td>
+                <td>${asignada}</td>
+                <td>
+                    <div class="vivienda-actions">
+                        <button class="btn-view-vivienda" onclick="viewViviendaDetails(${vivienda.id_vivienda})" title="Ver detalles">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="btn-edit-vivienda" onclick="editVivienda(${vivienda.id_vivienda})" title="Editar">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        ${!tieneAsignacion ? `
+                            <button class="btn-assign-vivienda" onclick="showAsignarModal(${vivienda.id_vivienda}, '${vivienda.numero_vivienda.replace(/'/g, "\\'")}')">
+                                <i class="fas fa-user-plus"></i>
+                            </button>
+                        ` : `
+                            <button class="btn-unassign-vivienda" onclick="desasignarVivienda(${vivienda.id_asignacion})">
+                                <i class="fas fa-user-minus"></i>
+                            </button>
+                        `}
+                        <button class="btn-delete-vivienda" onclick="deleteVivienda(${vivienda.id_vivienda}, '${vivienda.numero_vivienda.replace(/'/g, "\\'")}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    });
+
+    tableHTML += `
+                </tbody>
+            </table>
+        </div>
+    `;
+
+    container.innerHTML = tableHTML;
+}
+
+// ========== FORMATEAR ESTADO ==========
+function formatEstadoVivienda(estado) {
+    const estados = {
+        'disponible': 'Disponible',
+        'ocupada': 'Ocupada',
+        'mantenimiento': 'Mantenimiento'
+    };
+    return estados[estado] || estado;
+}
+
+// ========== FILTRAR VIVIENDAS ==========
+function filterViviendas() {
+    const estadoFilter = document.getElementById('filtro-estado-vivienda').value;
+    const habitacionesFilter = document.getElementById('filtro-habitaciones').value;
+    const searchText = document.getElementById('search-viviendas').value.toLowerCase();
+    const rows = document.querySelectorAll('.viviendas-table tbody tr');
+    
+    rows.forEach(row => {
+        const estado = row.dataset.estado || '';
+        const habitaciones = row.dataset.habitaciones || '';
+        const text = row.textContent.toLowerCase();
+        
+        const matchEstado = !estadoFilter || estado === estadoFilter;
+        const matchHabitaciones = !habitacionesFilter || habitaciones === habitacionesFilter;
+        const matchSearch = !searchText || text.includes(searchText);
+        
+        row.style.display = (matchEstado && matchHabitaciones && matchSearch) ? '' : 'none';
+    });
+}
+
+// ========== CARGAR TIPOS DE VIVIENDA ==========
+function loadTiposVivienda() {
+    return fetch('/api/viviendas/tipos')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const select = document.getElementById('vivienda-tipo');
+                select.innerHTML = '<option value="">Seleccione...</option>';
+                data.tipos.forEach(tipo => {
+                    select.innerHTML += `<option value="${tipo.id_tipo}">${tipo.nombre} (${tipo.habitaciones} hab.)</option>`;
+                });
+            }
+        })
+        .catch(error => console.error('Error al cargar tipos:', error));
+}
+
+// ========== MOSTRAR MODAL CREAR ==========
+function showCreateViviendaModal() {
+    console.log('>>> showCreateViviendaModal() EJECUTADA');
+    
+    loadTiposVivienda().then(() => {
+        document.getElementById('viviendaModalTitle').textContent = 'Nueva Vivienda';
+        document.getElementById('vivienda-id').value = '';
+        document.getElementById('vivienda-numero').value = '';
+        document.getElementById('vivienda-direccion').value = '';
+        document.getElementById('vivienda-tipo').value = '';
+        document.getElementById('vivienda-metros').value = '';
+        document.getElementById('vivienda-fecha').value = '';
+        document.getElementById('vivienda-estado').value = 'disponible';
+        document.getElementById('vivienda-observaciones').value = '';
+        
+        document.getElementById('viviendaModal').style.display = 'flex';
+    });
+}
+
+// ========== EDITAR VIVIENDA ==========
+function editVivienda(id) {
+    console.log('>>> Editando vivienda ID:', id);
+    
+    Promise.all([
+        fetch(`/api/viviendas/details?id=${id}`).then(r => r.json()),
+        loadTiposVivienda()
+    ]).then(([data]) => {
+        if (data.success && data.vivienda) {
+            const v = data.vivienda;
+            document.getElementById('viviendaModalTitle').textContent = 'Editar Vivienda';
+            document.getElementById('vivienda-id').value = v.id_vivienda;
+            document.getElementById('vivienda-numero').value = v.numero_vivienda;
+            document.getElementById('vivienda-direccion').value = v.direccion || '';
+            document.getElementById('vivienda-tipo').value = v.id_tipo;
+            document.getElementById('vivienda-metros').value = v.metros_cuadrados || '';
+            document.getElementById('vivienda-fecha').value = v.fecha_construccion || '';
+            document.getElementById('vivienda-estado').value = v.estado;
+            document.getElementById('vivienda-observaciones').value = v.observaciones || '';
+            
+            document.getElementById('viviendaModal').style.display = 'flex';
+        } else {
+            alert('Error al cargar vivienda');
+        }
+    }).catch(error => {
+        console.error('Error:', error);
+        alert('Error al cargar vivienda');
+    });
+}
+
+// ========== GUARDAR VIVIENDA ==========
+function saveVivienda(event) {
+    event.preventDefault();
+    console.log('>>> Guardando vivienda');
+
+    const id = document.getElementById('vivienda-id').value;
+    const formData = new FormData();
+    
+    if (id) formData.append('id', id);
+    formData.append('numero_vivienda', document.getElementById('vivienda-numero').value);
+    formData.append('direccion', document.getElementById('vivienda-direccion').value);
+    formData.append('id_tipo', document.getElementById('vivienda-tipo').value);
+    formData.append('metros_cuadrados', document.getElementById('vivienda-metros').value || 0);
+    formData.append('fecha_construccion', document.getElementById('vivienda-fecha').value || '');
+    formData.append('estado', document.getElementById('vivienda-estado').value);
+    formData.append('observaciones', document.getElementById('vivienda-observaciones').value);
+
+    const url = id ? '/api/viviendas/update' : '/api/viviendas/create';
+
+    fetch(url, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            closeViviendaModal();
+            loadViviendas();
+        } else {
+            alert('Error: ' + (data.message || 'Error al guardar vivienda'));
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error de conexión');
+    });
+}
+
+// ========== CERRAR MODAL VIVIENDA ==========
+function closeViviendaModal() {
+    document.getElementById('viviendaModal').style.display = 'none';
+    document.getElementById('viviendaForm').reset();
+}
+
+// ========== ELIMINAR VIVIENDA ==========
+function deleteVivienda(id, numero) {
+    if (!confirm(`¿Estás seguro de eliminar la vivienda "${numero}"?\n\nNota: No se puede eliminar si tiene asignaciones activas.`)) {
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('id', id);
+
+    fetch('/api/viviendas/delete', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Vivienda eliminada exitosamente');
+            loadViviendas();
+        } else {
+            alert('Error: ' + (data.message || 'Error al eliminar vivienda'));
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error de conexión');
+    });
+}
+
+// ========== VER DETALLES ==========
+function viewViviendaDetails(id) {
+    fetch(`/api/viviendas/details?id=${id}`)
+    .then(response => response.json())
+    .then(data => {
+        if (data.success && data.vivienda) {
+            showViviendaDetailsModal(data.vivienda);
+        } else {
+            alert('Error al cargar detalles');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error de conexión');
+    });
+}
+
+function showViviendaDetailsModal(vivienda) {
+    const modal = `
+        <div class="modal-overlay" onclick="if(event.target.classList.contains('modal-overlay')) this.remove()">
+            <div class="modal-content-large">
+                <button class="modal-close-btn" onclick="this.closest('.modal-overlay').remove()">×</button>
+                
+                <h2 class="modal-title">Vivienda ${vivienda.numero_vivienda}</h2>
+                
+                <div class="vivienda-details-grid">
+                    <div class="detail-item"><strong>Dirección:</strong> ${vivienda.direccion || 'No especificada'}</div>
+                    <div class="detail-item"><strong>Tipo:</strong> ${vivienda.tipo_nombre} (${vivienda.habitaciones} hab.)</div>
+                    <div class="detail-item"><strong>Estado:</strong> ${formatEstadoVivienda(vivienda.estado)}</div>
+                    <div class="detail-item"><strong>Metros²:</strong> ${vivienda.metros_cuadrados || '-'}</div>
+                    <div class="detail-item"><strong>Construcción:</strong> ${vivienda.fecha_construccion || '-'}</div>
+                </div>
+                
+                ${vivienda.observaciones ? `
+                    <div style="margin-top: 20px;">
+                        <strong>Observaciones:</strong>
+                        <p>${vivienda.observaciones}</p>
+                    </div>
+                ` : ''}
+                
+                <div class="form-actions" style="margin-top: 30px;">
+                    <button class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">Cerrar</button>
+                    <button class="btn btn-primary" onclick="this.closest('.modal-overlay').remove(); editVivienda(${vivienda.id_vivienda})">Editar</button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modal);
+}
+
+// ========== ASIGNAR VIVIENDA ==========
+function showAsignarModal(viviendaId, numeroVivienda) {
+    console.log('>>> Abriendo modal asignar:', viviendaId);
+    
+    // Cargar usuarios y núcleos
+    Promise.all([
+        fetch('/api/users/all').then(r => r.json()),
+        fetch('/api/nucleos/all').then(r => r.json())
+    ]).then(([usersData, nucleosData]) => {
+        if (usersData.success && nucleosData.success) {
+            // Llenar select de usuarios
+            const userSelect = document.getElementById('asignar-usuario');
+            userSelect.innerHTML = '<option value="">Seleccione un usuario...</option>';
+            usersData.users.forEach(user => {
+                userSelect.innerHTML += `<option value="${user.id_usuario}">${user.nombre_completo} (${user.email})</option>`;
+            });
+            
+            // Llenar select de núcleos
+            const nucleoSelect = document.getElementById('asignar-nucleo');
+            nucleoSelect.innerHTML = '<option value="">Seleccione un núcleo...</option>';
+            nucleosData.nucleos.forEach(nucleo => {
+                nucleoSelect.innerHTML += `<option value="${nucleo.id_nucleo}">${nucleo.nombre_nucleo || 'Sin nombre'} (${nucleo.total_miembros} miembros)</option>`;
+            });
+            
+            // Mostrar info de vivienda
+            document.getElementById('asignar-vivienda-info').textContent = `Vivienda: ${numeroVivienda}`;
+            document.getElementById('asignar-vivienda-id').value = viviendaId;
+            
+            // Mostrar modal
+            document.getElementById('asignarViviendaModal').style.display = 'flex';
+        }
+    }).catch(error => {
+        console.error('Error:', error);
+        alert('Error al cargar datos');
+    });
+}
+
+function toggleAsignarTipo() {
+    const tipo = document.getElementById('asignar-tipo').value;
+    const usuarioGroup = document.getElementById('asignar-usuario-group');
+    const nucleoGroup = document.getElementById('asignar-nucleo-group');
+    
+    if (tipo === 'usuario') {
+        usuarioGroup.style.display = 'block';
+        nucleoGroup.style.display = 'none';
+        document.getElementById('asignar-nucleo').value = '';
+    } else if (tipo === 'nucleo') {
+        usuarioGroup.style.display = 'none';
+        nucleoGroup.style.display = 'block';
+        document.getElementById('asignar-usuario').value = '';
+    } else {
+        usuarioGroup.style.display = 'none';
+        nucleoGroup.style.display = 'none';
+    }
+}
+
+function submitAsignacion(event) {
+    event.preventDefault();
+    
+    const viviendaId = document.getElementById('asignar-vivienda-id').value;
+    const tipo = document.getElementById('asignar-tipo').value;
+    const usuarioId = document.getElementById('asignar-usuario').value;
+    const nucleoId = document.getElementById('asignar-nucleo').value;
+    const observaciones = document.getElementById('asignar-observaciones').value;
+    
+    if (!tipo || (tipo === 'usuario' && !usuarioId) || (tipo === 'nucleo' && !nucleoId)) {
+        alert('Debe seleccionar un usuario o núcleo');
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append('vivienda_id', viviendaId);
+    if (tipo === 'usuario') {
+        formData.append('usuario_id', usuarioId);
+    } else {
+        formData.append('nucleo_id', nucleoId);
+    }
+    formData.append('observaciones', observaciones);
+    
+    fetch('/api/viviendas/asignar', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            closeAsignarModal();
+            loadViviendas();
+        } else {
+            alert('Error: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error de conexión');
+    });
+}
+
+function closeAsignarModal() {
+    document.getElementById('asignarViviendaModal').style.display = 'none';
+    document.getElementById('asignarForm').reset();
+    document.getElementById('asignar-usuario-group').style.display = 'none';
+    document.getElementById('asignar-nucleo-group').style.display = 'none';
+}
+
+// ========== DESASIGNAR VIVIENDA ==========
+function desasignarVivienda(asignacionId) {
+    if (!confirm('¿Estás seguro de desasignar esta vivienda?')) {
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append('asignacion_id', asignacionId);
+    
+    fetch('/api/viviendas/desasignar', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            loadViviendas();
+        } else {
+            alert('Error: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error de conexión');
+    });
+}
+
+console.log('✅ Módulo de Viviendas cargado completamente');

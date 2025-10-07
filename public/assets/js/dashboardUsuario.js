@@ -25,6 +25,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     loadNotifications();
     setInterval(loadNotifications, 120000);
+
+    const viviendaMenuItem = document.querySelector('.menu li[data-section="vivienda"]');
+if (viviendaMenuItem) {
+    viviendaMenuItem.addEventListener('click', function() {
+        loadMyVivienda();
+    });
+}
     
     const tareasMenuItem = document.querySelector('.menu li[data-section="tareas"]');
     if (tareasMenuItem) {
@@ -145,15 +152,10 @@ async function markAsRead(notifId, element) {
 
 async function loadUserTasks() {
     const incluirFinalizadas = document.getElementById('mostrar-completadas')?.checked || false;
-    const userId = document.getElementById('dashboard').dataset.userId; // <-- Asegurate de tener esto
-    
-    if (!userId) {
-        console.error('No se encontró el id del usuario');
-        return;
-    }
     
     try {
-        const url = `/api/tasks/user?id_usuario=${userId}&incluir_finalizadas=${incluirFinalizadas}`;
+        // No necesitamos el userId porque el backend lo obtiene de la sesión
+        const url = `/api/tasks/user?incluir_finalizadas=${incluirFinalizadas}`;
         const response = await fetch(url);
         const data = await response.json();
         
@@ -260,6 +262,8 @@ function formatPrioridad(prioridad) {
     return prioridades[prioridad] || prioridad;
 }
 
+// REEMPLAZAR la función updateTaskProgress en dashboardUsuario.js
+
 function updateTaskProgress(asignacionId, tipoAsignacion, tareaId) {
     const progreso = prompt('Ingrese el porcentaje de progreso (0-100):');
     
@@ -277,16 +281,28 @@ function updateTaskProgress(asignacionId, tipoAsignacion, tareaId) {
     formData.append('tipo_asignacion', tipoAsignacion);
     formData.append('progreso', progresoNum);
     
-    if (progresoNum < 100) {
+    if (progresoNum === 100) {
+        formData.append('estado', 'completada');
+    } else if (progresoNum > 0) {
         formData.append('estado', 'en_progreso');
     }
+    
+    // ✅ LOG PARA DEBUG
+    console.log('=== Enviando actualización de progreso ===');
+    console.log('asignacion_id:', asignacionId);
+    console.log('tipo_asignacion:', tipoAsignacion);
+    console.log('progreso:', progresoNum);
     
     fetch('/api/tasks/update-progress', {
         method: 'POST',
         body: formData
     })
-    .then(response => response.json())
+    .then(response => {
+        console.log('Response status:', response.status);
+        return response.json();
+    })
     .then(data => {
+        console.log('Response data:', data);
         if (data.success) {
             alert(data.message);
             loadUserTasks();
@@ -575,3 +591,75 @@ function mostrarDetallesTareaUsuario(tarea, avances, materiales = []) {
     
     document.body.insertAdjacentHTML('beforeend', modal);
 }
+
+// ==========================================
+// MI VIVIENDA (USUARIO)
+// Agregar AL FINAL de dashboardUsuario.js
+// ==========================================
+
+console.log('🟢 Cargando módulo Mi Vivienda');
+
+function loadMyVivienda() {
+    console.log('>>> Cargando mi vivienda');
+    const container = document.getElementById('myViviendaContainer');
+    
+    if (!container) {
+        console.error('✗ Container myViviendaContainer NO encontrado');
+        return;
+    }
+    
+    container.innerHTML = '<p class="loading">Cargando información de vivienda...</p>';
+    
+    fetch('/api/viviendas/my-vivienda', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin'
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Mi vivienda:', data);
+        if (data.success) {
+            if (data.vivienda) {
+                renderMyVivienda(data.vivienda);
+            } else {
+                container.innerHTML = '<p>Aún no tienes una vivienda asignada.</p>';
+            }
+        } else {
+            container.innerHTML = `<p class="error">Error: ${data.message}</p>`;
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        container.innerHTML = '<p class="error">Error de conexión</p>';
+    });
+}
+
+function renderMyVivienda(vivienda) {
+    const container = document.getElementById('myViviendaContainer');
+    
+    container.innerHTML = `
+        <div class="my-vivienda-card">
+            <h3>🏡 Vivienda ${vivienda.numero_vivienda}</h3>
+            <div class="vivienda-info-grid">
+                <div class="info-item">
+                    <strong>📍 Dirección:</strong>
+                    <p>${vivienda.direccion || 'No especificada'}</p>
+                </div>
+                <div class="info-item">
+                    <strong>🏠 Tipo:</strong>
+                    <p>${vivienda.tipo_nombre} (${vivienda.habitaciones} habitaciones)</p>
+                </div>
+                <div class="info-item">
+                    <strong>📐 Superficie:</strong>
+                    <p>${vivienda.metros_cuadrados ? vivienda.metros_cuadrados + ' m²' : 'No especificada'}</p>
+                </div>
+                <div class="info-item">
+                    <strong>📅 Fecha de asignación:</strong>
+                    <p>${new Date(vivienda.fecha_asignacion).toLocaleDateString('es-UY')}</p>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+console.log('✅ Módulo Mi Vivienda cargado');

@@ -110,7 +110,17 @@ $privateRoutes = [
     '/api/materiales/task-materials',
     '/api/materiales/remove-from-task',
     '/api/materiales/request',
-    '/api/materiales/requests'
+    '/api/materiales/requests',
+    '/api/viviendas/all',
+'/api/viviendas/details',
+'/api/viviendas/create',
+'/api/viviendas/update',
+'/api/viviendas/delete',
+'/api/viviendas/asignar',
+'/api/viviendas/desasignar',
+'/api/viviendas/tipos',
+'/api/viviendas/my-vivienda',
+    
 ];
 
 // Aplicar middleware según el tipo de ruta
@@ -192,30 +202,17 @@ switch ($uri) {
     case '/api/tasks/create':
         (new App\Controllers\TaskController())->create();
         break;
-    case '/api/tasks/user':
-        $userId = $_GET['id_usuario'] ?? null;
-        if ($userId) {
-            (new App\Controllers\TaskController())->getUserTasks($userId);
-        } else {
-            http_response_code(400);
-            echo json_encode(['error' => 'Falta id_usuario']);
-        }
-        break;
+   case '/api/tasks/user':
+    // Ya no necesitamos id_usuario en GET, lo tomamos de la sesión
+    (new App\Controllers\TaskController())->getUserTasks();
+    break;
     case '/api/tasks/all':
-        (new App\Controllers\TaskController())->getAllTasks();
-        break;
+    (new App\Controllers\TaskController())->getAllTasks();
+    break;
     case '/api/tasks/update-progress':
-        $asignacionId = $_POST['id_asignacion'] ?? null;
-        $tipoAsignacion = $_POST['tipo_asignacion'] ?? null;
-        $progreso = $_POST['progreso'] ?? null;
-        $estado = $_POST['estado'] ?? null;
-        if ($asignacionId && $tipoAsignacion && $progreso !== null) {
-            (new App\Controllers\TaskController())->updateProgress($asignacionId, $tipoAsignacion, $progreso, $estado);
-        } else {
-            http_response_code(400);
-            echo json_encode(['error' => 'Faltan parámetros']);
-        }
-        break;
+    // ✅ Ya no extraemos parámetros aquí, el controller lo hace
+    (new App\Controllers\TaskController())->updateProgress();
+    break;
     case '/api/tasks/add-avance':
         $tareaId = $_POST['id_tarea'] ?? null;
         $userId = $_POST['id_usuario'] ?? null;
@@ -229,15 +226,10 @@ switch ($uri) {
             echo json_encode(['error' => 'Faltan parámetros']);
         }
         break;
-    case '/api/tasks/details':
-        $tareaId = $_GET['id_tarea'] ?? null;
-        if ($tareaId) {
-            (new App\Controllers\TaskController())->getTaskDetails($tareaId);
-        } else {
-            http_response_code(400);
-            echo json_encode(['error' => 'Falta id_tarea']);
-        }
-        break;
+   case '/api/tasks/details':
+    // ✅ Ya no validamos aquí, lo hace el controller
+    (new App\Controllers\TaskController())->getTaskDetails();
+    break;
     case '/api/tasks/users':
         (new App\Controllers\TaskController())->getUsers();
         break;
@@ -245,14 +237,9 @@ switch ($uri) {
         (new App\Controllers\TaskController())->getNucleos();
         break;
     case '/api/tasks/cancel':
-        $tareaId = $_POST['id_tarea'] ?? null;
-        if ($tareaId) {
-            (new App\Controllers\TaskController())->cancelTask($tareaId);
-        } else {
-            http_response_code(400);
-            echo json_encode(['error' => 'Falta id_tarea']);
-        }
-        break;
+    // ✅ Ya no validamos aquí, lo hace el controller
+    (new App\Controllers\TaskController())->cancelTask();
+    break;
 
     // API USUARIOS
     case '/api/users/all':
@@ -338,11 +325,51 @@ switch ($uri) {
         (new App\Controllers\MaterialController())->getRequests();
         break;
 
+
+        case '/api/viviendas/all':
+    (new App\Controllers\ViviendaController())->getAll();
+    break;
+
+case '/api/viviendas/details':
+    (new App\Controllers\ViviendaController())->getById();
+    break;
+
+case '/api/viviendas/create':
+    (new App\Controllers\ViviendaController())->create();
+    break;
+
+case '/api/viviendas/update':
+    (new App\Controllers\ViviendaController())->update();
+    break;
+
+case '/api/viviendas/delete':
+    (new App\Controllers\ViviendaController())->delete();
+    break;
+
+case '/api/viviendas/asignar':
+    (new App\Controllers\ViviendaController())->asignar();
+    break;
+
+case '/api/viviendas/desasignar':
+    (new App\Controllers\ViviendaController())->desasignar();
+    break;
+
+case '/api/viviendas/tipos':
+    (new App\Controllers\ViviendaController())->getTipos();
+    break;
+
+// API VIVIENDA USUARIO (Usuario)
+case '/api/viviendas/my-vivienda':
+    (new App\Controllers\ViviendaController())->getMyVivienda();
+    break;
+
     default:
         http_response_code(404);
         include __DIR__ . '/../src/views/404error.php';
         break;
 }
+
+
 
 
 

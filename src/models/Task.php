@@ -14,7 +14,7 @@ class Task
     $this->conn = Database::getConnection();
 }
     // Crear nueva tarea
-    public function create($titulo, $descripcion, $fechaInicio, $fechaFin, $prioridad, $tipoAsignacion, $idCreador)
+      public function create($titulo, $descripcion, $fechaInicio, $fechaFin, $prioridad, $tipoAsignacion, $idCreador)
     {
         try {
             $query = "INSERT INTO Tareas (titulo, descripcion, fecha_inicio, fecha_fin, prioridad, tipo_asignacion, id_creador) 
@@ -156,37 +156,158 @@ class Task
         }
     }
 
+
     // Actualizar progreso de tarea
     public function updateProgress($asignacionId, $tipoAsignacion, $progreso, $estado = null)
-{
-    try {
-        $tabla = ($tipoAsignacion === 'usuario') ? 'Tarea_Usuario' : 'Tarea_Nucleo';
-        $campoEstado = ($tipoAsignacion === 'usuario') ? 'estado_usuario' : 'estado_nucleo';
-        
-        if ($estado) {
-            $query = "UPDATE $tabla 
-                      SET progreso = :progreso, 
-                          $campoEstado = :estado,
-                          fecha_completada = CASE WHEN :estado_check = 'completada' THEN NOW() ELSE fecha_completada END
-                      WHERE id_asignacion = :id_asignacion";
-            $stmt = $this->conn->prepare($query);
-            $stmt->bindParam(':progreso', $progreso, \PDO::PARAM_INT);
-            $stmt->bindParam(':estado', $estado, \PDO::PARAM_STR);
-            $stmt->bindParam(':estado_check', $estado, \PDO::PARAM_STR);
-            $stmt->bindParam(':id_asignacion', $asignacionId, \PDO::PARAM_INT);
-        } else {
-            $query = "UPDATE $tabla SET progreso = :progreso WHERE id_asignacion = :id_asignacion";
-            $stmt = $this->conn->prepare($query);
-            $stmt->bindParam(':progreso', $progreso, \PDO::PARAM_INT);
-            $stmt->bindParam(':id_asignacion', $asignacionId, \PDO::PARAM_INT);
+    {
+        try {
+            $tabla = ($tipoAsignacion === 'usuario') ? 'Tarea_Usuario' : 'Tarea_Nucleo';
+            $campoEstado = ($tipoAsignacion === 'usuario') ? 'estado_usuario' : 'estado_nucleo';
+            
+            // Primero, obtener el id_tarea de esta asignación
+            $queryGetTarea = "SELECT id_tarea FROM $tabla WHERE id_asignacion = :id_asignacion";
+            $stmtGetTarea = $this->conn->prepare($queryGetTarea);
+            $stmtGetTarea->bindParam(':id_asignacion', $asignacionId, \PDO::PARAM_INT);
+            $stmtGetTarea->execute();
+            $tareaRow = $stmtGetTarea->fetch(PDO::FETCH_ASSOC);
+            
+            if (!$tareaRow) {
+                throw new \Exception("Asignación no encontrada");
+            }
+            
+            $tareaId = $tareaRow['id_tarea'];
+            
+            // Actualizar el progreso de la asignación
+            if ($estado) {
+                $query = "UPDATE $tabla 
+                          SET progreso = :progreso, 
+                              $campoEstado = :estado,
+                              fecha_completada = CASE WHEN :estado_check = 'completada' THEN NOW() ELSE fecha_completada END
+                          WHERE id_asignacion = :id_asignacion";
+                $stmt = $this->conn->prepare($query);
+                $stmt->bindParam(':progreso', $progreso, \PDO::PARAM_INT);
+                $stmt->bindParam(':estado', $estado, \PDO::PARAM_STR);
+                $stmt->bindParam(':estado_check', $estado, \PDO::PARAM_STR);
+                $stmt->bindParam(':id_asignacion', $asignacionId, \PDO::PARAM_INT);
+            } else {
+                $query = "UPDATE $tabla SET progreso = :progreso WHERE id_asignacion = :id_asignacion";
+                $stmt = $this->conn->prepare($query);
+                $stmt->bindParam(':progreso', $progreso, \PDO::PARAM_INT);
+                $stmt->bindParam(':id_asignacion', $asignacionId, \PDO::PARAM_INT);
+            }
+            
+            $result = $stmt->execute();
+            
+            // ✅ NUEVA LÓGICA: Verificar si todos completaron la tarea
+            if ($result) {
+                $this->checkAndUpdateTaskCompletion($tareaId);
+            }
+            
+            return $result;
+        } catch (\PDOException $e) {
+            error_log("Error al actualizar progreso: " . $e->getMessage());
+            throw $e;
         }
-        
-        return $stmt->execute();
-    } catch (\PDOException $e) {
-        error_log("Error al actualizar progreso: " . $e->getMessage());
-        throw $e;
     }
-}
+
+     private function checkAndUpdateTaskCompletion($tareaId)
+    {
+        try {
+            // Obtener el tipo de asignación de la tarea
+            $queryTipo = "SELECT tipo_asignacion FROM Tareas WHERE id_tarea = :tarea_id";
+            $stmtTipo = $this->conn->prepare($queryTipo);
+            $stmtTipo->bindParam(':tarea_id', $tareaId, \PDO::PARAM_INT);
+            $stmtTipo->execute();
+            $tareaInfo = $stmtTipo->fetch(PDO::FETCH_ASSOC);
+            
+            if (!$tareaInfo) {
+                return;
+            }
+            
+            $tipoAsignacion = $tareaInfo['tipo_asignacion'];
+            
+            if ($tipoAsignacion === 'usuario') {
+                // Verificar si todos los usuarios completaron
+                $queryCheck = "SELECT 
+                                COUNT(*) as total,
+                                SUM(CASE WHEN estado_usuario = 'completada' THEN 1 ELSE 0 END) as completadas
+                               FROM Tarea_Usuario 
+                               WHERE id_tarea = :tarea_id";
+            } else {
+                // Verificar si todos los núcleos completaron
+                $queryCheck = "SELECT 
+                                COUNT(*) as total,
+                                SUM(CASE WHEN estado_nucleo = 'completada' THEN 1 ELSE 0 END) as completadas
+                               FROM Tarea_Nucleo 
+                               WHERE id_tarea = :tarea_id";
+            }
+            
+            $stmtCheck = $this->conn->prepare($queryCheck);
+            $stmtCheck->bindParam(':tarea_id', $tareaId, \PDO::PARAM_INT);
+            $stmtCheck->execute();
+            $result = $stmtCheck->fetch(PDO::FETCH_ASSOC);
+            
+            // Si todos completaron, actualizar el estado general de la tarea
+            if ($result['total'] > 0 && $result['total'] == $result['completadas']) {
+                $queryUpdate = "UPDATE Tareas 
+                                SET estado = 'completada' 
+                                WHERE id_tarea = :tarea_id";
+                $stmtUpdate = $this->conn->prepare($queryUpdate);
+                $stmtUpdate->bindParam(':tarea_id', $tareaId, \PDO::PARAM_INT);
+                $stmtUpdate->execute();
+                
+                error_log("✅ Tarea $tareaId marcada como completada (todos los asignados terminaron)");
+            }
+            
+        } catch (\PDOException $e) {
+            error_log("Error al verificar completado de tarea: " . $e->getMessage());
+            // No lanzamos excepción para no interrumpir el flujo principal
+        }
+    }
+
+
+     public function getTaskProgress($tareaId)
+    {
+        try {
+            // Obtener tipo de asignación
+            $queryTipo = "SELECT tipo_asignacion FROM Tareas WHERE id_tarea = :tarea_id";
+            $stmtTipo = $this->conn->prepare($queryTipo);
+            $stmtTipo->bindParam(':tarea_id', $tareaId);
+            $stmtTipo->execute();
+            $tareaInfo = $stmtTipo->fetch(PDO::FETCH_ASSOC);
+            
+            if (!$tareaInfo) {
+                return null;
+            }
+            
+            if ($tareaInfo['tipo_asignacion'] === 'usuario') {
+                $query = "SELECT 
+                            COUNT(*) as total_asignados,
+                            AVG(progreso) as progreso_promedio,
+                            SUM(CASE WHEN estado_usuario = 'completada' THEN 1 ELSE 0 END) as completadas
+                          FROM Tarea_Usuario 
+                          WHERE id_tarea = :tarea_id";
+            } else {
+                $query = "SELECT 
+                            COUNT(*) as total_asignados,
+                            AVG(progreso) as progreso_promedio,
+                            SUM(CASE WHEN estado_nucleo = 'completada' THEN 1 ELSE 0 END) as completadas
+                          FROM Tarea_Nucleo 
+                          WHERE id_tarea = :tarea_id";
+            }
+            
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':tarea_id', $tareaId);
+            $stmt->execute();
+            
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+            
+        } catch (\PDOException $e) {
+            error_log("Error al obtener progreso de tarea: " . $e->getMessage());
+            return null;
+        }
+    }
+
     // Agregar avance/comentario
     public function addAvance($tareaId, $userId, $comentario, $progresoReportado, $archivo = null)
     {

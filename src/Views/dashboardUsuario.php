@@ -86,14 +86,15 @@ if (!isset($_SESSION['user_id'])) {
 		</section>
 
 		<!-- MI VIVIENDA -->
-		<section id="vivienda-section" class="section-content">
-			<h2 class="section-title">🏡 Mi Vivienda</h2>
-			<div class="info-card">
-				<h3>Información de tu Vivienda</h3>
-				<p>Aquí encontrarás toda la información relacionada con tu vivienda asignada.</p>
-				<p><em>Aún no tienes una vivienda asignada.</em></p>
-			</div>
-		</section>
+<section id="vivienda-section" class="section-content">
+    <h2 class="section-title">🏡 Mi Vivienda</h2>
+    <div class="info-card">
+        <h3>Información de tu Vivienda</h3>
+        <div id="myViviendaContainer">
+            <p class="loading">Cargando...</p>
+        </div>
+    </div>
+</section>
 
 		<!-- APORTES -->
 		<section id="aportes-section" class="section-content">
