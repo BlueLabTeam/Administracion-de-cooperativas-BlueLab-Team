@@ -9,7 +9,7 @@
 	<link rel="stylesheet" href="/assets/css/dashboardBase.css" />
 	<link rel="stylesheet" href="/assets/css/dashboardHeader.css" />
 	<link rel="stylesheet" href="/assets/css/dashboardNotificaciones.css" />
-	<link rel="stylesheet" href="/assets/css/dashboarViviendas.css" />
+	<link rel="stylesheet" href="/assets/css/dashboardViviendas.css" />
 	<link rel="stylesheet" href="/assets/css/dashboardTareas.css" />
 	<link rel="stylesheet" href="/assets/css/dashboardPagos.css" />
 	<link rel="stylesheet" href="/assets/css/dashboardUtils.css" />

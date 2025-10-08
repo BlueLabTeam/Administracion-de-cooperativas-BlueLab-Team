@@ -1,8 +1,60 @@
-// ==========================================
-// DASHBOARD USUARIO 
-// ==========================================
 
-// Sistema SPA - Navegación entre secciones
+(function() {
+    const originalAddEventListener = document.addEventListener;
+    let hasReordered = false;
+    
+    document.addEventListener = function(event, callback, options) {
+        if (event === 'DOMContentLoaded' && !hasReordered) {
+            const wrappedCallback = function(e) {
+                // Reordenar ANTES de cualquier otra cosa
+                const menuUl = document.querySelector('.menu ul');
+                if (menuUl) {
+                    const inicioLi = menuUl.querySelector('li[data-section="inicio"]');
+                    if (inicioLi) {
+                        inicioLi.remove();
+                        menuUl.insertBefore(inicioLi, menuUl.firstChild);
+                        console.log('✅ Botón Inicio reposicionado a la izquierda');
+                    }
+                }
+                hasReordered = true;
+                
+                // Ejecutar el callback original
+                if (callback) callback(e);
+            };
+            
+            return originalAddEventListener.call(document, event, wrappedCallback, options);
+        }
+        return originalAddEventListener.call(document, event, callback, options);
+    };
+})();
+
+// También forzar al cargar
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() {
+            const menuUl = document.querySelector('.menu ul');
+            if (menuUl) {
+                const inicioLi = menuUl.querySelector('li[data-section="inicio"]');
+                if (inicioLi) {
+                    inicioLi.remove();
+                    menuUl.insertBefore(inicioLi, menuUl.firstChild);
+                }
+            }
+        }, 0);
+    });
+} else {
+    // Si el DOM ya está cargado
+    const menuUl = document.querySelector('.menu ul');
+    if (menuUl) {
+        const inicioLi = menuUl.querySelector('li[data-section="inicio"]');
+        if (inicioLi) {
+            inicioLi.remove();
+            menuUl.insertBefore(inicioLi, menuUl.firstChild);
+        }
+    }
+}
+
+
 document.addEventListener('DOMContentLoaded', function() {
     const menuItems = document.querySelectorAll('.menu li');
     
@@ -23,20 +75,27 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // Cargar notificaciones
     loadNotifications();
     setInterval(loadNotifications, 120000);
 
+    // Listener para Mi Vivienda
     const viviendaMenuItem = document.querySelector('.menu li[data-section="vivienda"]');
-if (viviendaMenuItem) {
-    viviendaMenuItem.addEventListener('click', function() {
-        loadMyVivienda();
-    });
-}
+    if (viviendaMenuItem) {
+        viviendaMenuItem.addEventListener('click', function() {
+            loadMyVivienda();
+        });
+    }
     
+    // Listener para Tareas - SOLO cuando se hace click
     const tareasMenuItem = document.querySelector('.menu li[data-section="tareas"]');
     if (tareasMenuItem) {
         tareasMenuItem.addEventListener('click', function() {
-            loadUserTasks();
+            // Solo cargar si aún no se han cargado
+            const tareasUsuarioList = document.getElementById('tareasUsuarioList');
+            if (tareasUsuarioList && tareasUsuarioList.innerHTML.includes('loading')) {
+                loadUserTasks();
+            }
         });
     }
 });
@@ -54,7 +113,7 @@ async function loadNotifications() {
     } catch (error) {
         console.error('Error al cargar notificaciones:', error);
         document.getElementById('notificationsList').innerHTML = 
-            '<div class="loading">Error al cargar notificaciones</div>';
+            '<div class="no-notifications">No se pudieron cargar las notificaciones</div>';
     }
 }
 
@@ -154,7 +213,6 @@ async function loadUserTasks() {
     const incluirFinalizadas = document.getElementById('mostrar-completadas')?.checked || false;
     
     try {
-        // No necesitamos el userId porque el backend lo obtiene de la sesión
         const url = `/api/tasks/user?incluir_finalizadas=${incluirFinalizadas}`;
         const response = await fetch(url);
         const data = await response.json();
@@ -165,10 +223,17 @@ async function loadUserTasks() {
             updateTasksSummary(data.tareas_usuario, data.tareas_nucleo);
         } else {
             console.error('Error al cargar tareas:', data.message || data);
+            document.getElementById('tareasUsuarioList').innerHTML = 
+                '<div class="no-tasks">Error al cargar tareas</div>';
+            document.getElementById('tareasNucleoList').innerHTML = 
+                '<div class="no-tasks">Error al cargar tareas</div>';
         }
     } catch (error) {
         console.error('Error:', error);
-        alert('Error de conexión');
+        document.getElementById('tareasUsuarioList').innerHTML = 
+            '<div class="no-tasks">Error de conexión al cargar tareas</div>';
+        document.getElementById('tareasNucleoList').innerHTML = 
+            '<div class="no-tasks">Error de conexión al cargar tareas</div>';
     }
 }
 
@@ -211,22 +276,22 @@ function renderUserTasks(tareas, containerId, esNucleo = false) {
                     </div>
                 </div>
                 
-           ${!esCompletada ? `
-    <div class="user-task-actions">
-        <button class="btn-small btn-update" onclick="updateTaskProgress(${tarea.id_asignacion}, '${esNucleo ? 'nucleo' : 'usuario'}', ${tarea.id_tarea})">
-            Actualizar Progreso
-        </button>
-        <button class="btn-small btn-avance" onclick="addTaskAvance(${tarea.id_tarea})">
-            Reportar Avance
-        </button>
-        <button class="btn-small btn-materiales" onclick="viewTaskMaterials(${tarea.id_tarea})" title="Ver materiales necesarios">
-            <i class="fas fa-boxes"></i> Materiales
-        </button>
-        <button class="btn-small btn-detalles" onclick="viewUserTaskDetails(${tarea.id_tarea})">
-            Ver Detalles Completos
-        </button>
-    </div>
-` : '<p style="color: #28a745; margin-top: 10px;"><strong>✓ Tarea completada</strong></p>'}
+                ${!esCompletada ? `
+                    <div class="user-task-actions">
+                        <button class="btn-small btn-update" onclick="updateTaskProgress(${tarea.id_asignacion}, '${esNucleo ? 'nucleo' : 'usuario'}', ${tarea.id_tarea})">
+                            Actualizar Progreso
+                        </button>
+                        <button class="btn-small btn-avance" onclick="addTaskAvance(${tarea.id_tarea})">
+                            Reportar Avance
+                        </button>
+                        <button class="btn-small btn-materiales" onclick="viewTaskMaterials(${tarea.id_tarea})" title="Ver materiales necesarios">
+                            <i class="fas fa-boxes"></i> Materiales
+                        </button>
+                        <button class="btn-small btn-detalles" onclick="viewUserTaskDetails(${tarea.id_tarea})">
+                            Ver Detalles Completos
+                        </button>
+                    </div>
+                ` : '<p style="color: #28a745; margin-top: 10px;"><strong>✓ Tarea completada</strong></p>'}
             </div>
         `;
     }).join('');
@@ -239,9 +304,14 @@ function updateTasksSummary(tareasUsuario, tareasNucleo) {
     const enProgreso = todasTareas.filter(t => t.estado_usuario === 'en_progreso').length;
     const completadas = todasTareas.filter(t => t.estado_usuario === 'completada').length;
     
-    document.getElementById('pending-count').textContent = pendientes;
-    document.getElementById('progress-count').textContent = enProgreso;
-    document.getElementById('completed-count').textContent = completadas;
+    // Verificar que los elementos existan antes de actualizarlos
+    const pendingEl = document.getElementById('pending-count');
+    const progressEl = document.getElementById('progress-count');
+    const completedEl = document.getElementById('completed-count');
+    
+    if (pendingEl) pendingEl.textContent = pendientes;
+    if (progressEl) progressEl.textContent = enProgreso;
+    if (completedEl) completedEl.textContent = completadas;
 }
 
 function formatEstadoUsuario(estado) {
@@ -261,8 +331,6 @@ function formatPrioridad(prioridad) {
     };
     return prioridades[prioridad] || prioridad;
 }
-
-// REEMPLAZAR la función updateTaskProgress en dashboardUsuario.js
 
 function updateTaskProgress(asignacionId, tipoAsignacion, tareaId) {
     const progreso = prompt('Ingrese el porcentaje de progreso (0-100):');
@@ -287,22 +355,12 @@ function updateTaskProgress(asignacionId, tipoAsignacion, tareaId) {
         formData.append('estado', 'en_progreso');
     }
     
-    // ✅ LOG PARA DEBUG
-    console.log('=== Enviando actualización de progreso ===');
-    console.log('asignacion_id:', asignacionId);
-    console.log('tipo_asignacion:', tipoAsignacion);
-    console.log('progreso:', progresoNum);
-    
     fetch('/api/tasks/update-progress', {
         method: 'POST',
         body: formData
     })
-    .then(response => {
-        console.log('Response status:', response.status);
-        return response.json();
-    })
+    .then(response => response.json())
     .then(data => {
-        console.log('Response data:', data);
         if (data.success) {
             alert(data.message);
             loadUserTasks();
@@ -362,19 +420,12 @@ function addTaskAvance(tareaId) {
 // ========== VER DETALLES CON MATERIALES ==========
 
 async function viewUserTaskDetails(tareaId) {
-    alert('Función viewTaskMaterials llamada! Tarea: ' + tareaId); // ← AGREGA ESTO
-    console.log('>>> Cargando materiales de tarea:', tareaId);
-    
     try {
         const responseTask = await fetch(`/api/tasks/details?tarea_id=${tareaId}`);
         const dataTask = await responseTask.json();
         
-        console.log('Detalles tarea:', dataTask);
-        
         const responseMaterials = await fetch(`/api/materiales/task-materials?tarea_id=${tareaId}`);
         const dataMaterials = await responseMaterials.json();
-        
-        console.log('Materiales:', dataMaterials);
         
         if (dataTask.success) {
             const materiales = dataMaterials.success ? dataMaterials.materiales : [];
@@ -389,13 +440,9 @@ async function viewUserTaskDetails(tareaId) {
 }
 
 async function viewTaskMaterials(tareaId) {
-    console.log('>>> Cargando materiales de tarea:', tareaId);
-    
     try {
         const response = await fetch(`/api/materiales/task-materials?tarea_id=${tareaId}`);
         const data = await response.json();
-        
-        console.log('Materiales recibidos:', data);
         
         if (data.success) {
             showMaterialesModal(tareaId, data.materiales);
@@ -476,12 +523,7 @@ function showMaterialesModal(tareaId, materiales) {
     document.body.insertAdjacentHTML('beforeend', modal);
 }
 
-
-
-
 function mostrarDetallesTareaUsuario(tarea, avances, materiales = []) {
-    console.log('>>> Mostrando modal con', materiales.length, 'materiales');
-    
     const materialesHTML = materiales && materiales.length > 0 ? `
         <div class="task-materials-section">
             <h3><i class="fas fa-boxes"></i> Materiales Necesarios</h3>
@@ -594,17 +636,13 @@ function mostrarDetallesTareaUsuario(tarea, avances, materiales = []) {
 
 // ==========================================
 // MI VIVIENDA (USUARIO)
-// Agregar AL FINAL de dashboardUsuario.js
 // ==========================================
 
-console.log('🟢 Cargando módulo Mi Vivienda');
-
 function loadMyVivienda() {
-    console.log('>>> Cargando mi vivienda');
     const container = document.getElementById('myViviendaContainer');
     
     if (!container) {
-        console.error('✗ Container myViviendaContainer NO encontrado');
+        console.error('Container myViviendaContainer NO encontrado');
         return;
     }
     
@@ -617,7 +655,6 @@ function loadMyVivienda() {
     })
     .then(response => response.json())
     .then(data => {
-        console.log('Mi vivienda:', data);
         if (data.success) {
             if (data.vivienda) {
                 renderMyVivienda(data.vivienda);
@@ -650,7 +687,7 @@ function renderMyVivienda(vivienda) {
                     <p>${vivienda.tipo_nombre} (${vivienda.habitaciones} habitaciones)</p>
                 </div>
                 <div class="info-item">
-                    <strong>📐 Superficie:</strong>
+                    <strong>📏 Superficie:</strong>
                     <p>${vivienda.metros_cuadrados ? vivienda.metros_cuadrados + ' m²' : 'No especificada'}</p>
                 </div>
                 <div class="info-item">
@@ -662,4 +699,78 @@ function renderMyVivienda(vivienda) {
     `;
 }
 
-console.log('✅ Módulo Mi Vivienda cargado');
+// ==========================================
+// TOGGLE DE NOMBRES DEL MENÚ - VERSIÓN MEJORADA
+// Agregar al FINAL de dashboardAdmin.js y dashboardUsuario.js
+// ==========================================
+
+// Función para toggle de nombres
+function toggleMenuNames() {
+    console.log('🔵 toggleMenuNames() llamada');
+    
+    const menu = document.querySelector('.menu');
+    const button = document.querySelector('.toggle-names-btn');
+    
+    console.log('Menu:', menu);
+    console.log('Button:', button);
+    
+    if (!menu || !button) {
+        console.error('❌ No se encontró menu o button');
+        return;
+    }
+    
+    // Toggle de la clase
+    const isShowing = menu.classList.contains('show-names');
+    console.log('Estado actual - show-names:', isShowing);
+    
+    if (isShowing) {
+        menu.classList.remove('show-names');
+        button.innerHTML = '<i class="fas fa-eye"></i> Mostrar';
+        console.log('✅ Nombres OCULTOS');
+    } else {
+        menu.classList.add('show-names');
+        button.innerHTML = '<i class="fas fa-eye-slash"></i> Ocultar';
+        console.log('✅ Nombres MOSTRADOS');
+    }
+    
+    // Verificar que se aplicó
+    console.log('Nuevo estado - show-names:', menu.classList.contains('show-names'));
+    console.log('Clases del menu:', menu.className);
+}
+
+// Configurar al cargar - SIN localStorage para simplificar debug
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🟢 DOMContentLoaded - Configurando toggle');
+    
+    // Esperar un momento para que el DOM esté completamente listo
+    setTimeout(function() {
+        const menu = document.querySelector('.menu');
+        const button = document.querySelector('.toggle-names-btn');
+        
+        console.log('Menu encontrado:', !!menu);
+        console.log('Button encontrado:', !!button);
+        
+        if (menu && button) {
+            // Asegurar que los nombres estén ocultos al inicio
+            menu.classList.remove('show-names');
+            button.innerHTML = '<i class="fas fa-eye"></i> Mostrar';
+            
+            // Remover listeners anteriores si existen
+            button.removeEventListener('click', toggleMenuNames);
+            
+            // Agregar listener
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('🖱️ Click en botón toggle');
+                toggleMenuNames();
+            });
+            
+            console.log('✅ Toggle configurado correctamente');
+        } else {
+            console.error('❌ No se pudo configurar el toggle');
+        }
+    }, 100);
+});
+
+console.log('📦 Script de toggle-names cargado');

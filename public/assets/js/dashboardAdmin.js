@@ -1,6 +1,60 @@
-// ==========================================
-// DASHBOARD ADMIN - JAVASCRIPT DEBUG VERSION
-// ==========================================
+
+(function() {
+    const originalAddEventListener = document.addEventListener;
+    let hasReordered = false;
+    
+    document.addEventListener = function(event, callback, options) {
+        if (event === 'DOMContentLoaded' && !hasReordered) {
+            const wrappedCallback = function(e) {
+                // Reordenar ANTES de cualquier otra cosa
+                const menuUl = document.querySelector('.menu ul');
+                if (menuUl) {
+                    const inicioLi = menuUl.querySelector('li[data-section="inicio"]');
+                    if (inicioLi) {
+                        inicioLi.remove();
+                        menuUl.insertBefore(inicioLi, menuUl.firstChild);
+                        console.log('✅ Botón Inicio reposicionado a la izquierda');
+                    }
+                }
+                hasReordered = true;
+                
+                // Ejecutar el callback original
+                if (callback) callback(e);
+            };
+            
+            return originalAddEventListener.call(document, event, wrappedCallback, options);
+        }
+        return originalAddEventListener.call(document, event, callback, options);
+    };
+})();
+
+// También forzar al cargar
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() {
+            const menuUl = document.querySelector('.menu ul');
+            if (menuUl) {
+                const inicioLi = menuUl.querySelector('li[data-section="inicio"]');
+                if (inicioLi) {
+                    inicioLi.remove();
+                    menuUl.insertBefore(inicioLi, menuUl.firstChild);
+                }
+            }
+        }, 0);
+    });
+} else {
+    // Si el DOM ya está cargado
+    const menuUl = document.querySelector('.menu ul');
+    if (menuUl) {
+        const inicioLi = menuUl.querySelector('li[data-section="inicio"]');
+        if (inicioLi) {
+            inicioLi.remove();
+            menuUl.insertBefore(inicioLi, menuUl.firstChild);
+        }
+    }
+}
+
+
 
 console.log('=== Iniciando carga de dashboardAdmin.js ===');
 
@@ -2819,3 +2873,80 @@ function desasignarVivienda(asignacionId) {
 }
 
 console.log('✅ Módulo de Viviendas cargado completamente');
+
+
+// ==========================================
+// TOGGLE DE NOMBRES DEL MENÚ - VERSIÓN MEJORADA
+// Agregar al FINAL de dashboardAdmin.js y dashboardUsuario.js
+// ==========================================
+
+// Función para toggle de nombres
+function toggleMenuNames() {
+    console.log('🔵 toggleMenuNames() llamada');
+    
+    const menu = document.querySelector('.menu');
+    const button = document.querySelector('.toggle-names-btn');
+    
+    console.log('Menu:', menu);
+    console.log('Button:', button);
+    
+    if (!menu || !button) {
+        console.error('❌ No se encontró menu o button');
+        return;
+    }
+    
+    // Toggle de la clase
+    const isShowing = menu.classList.contains('show-names');
+    console.log('Estado actual - show-names:', isShowing);
+    
+    if (isShowing) {
+        menu.classList.remove('show-names');
+        button.innerHTML = '<i class="fas fa-eye"></i> Mostrar';
+        console.log('✅ Nombres OCULTOS');
+    } else {
+        menu.classList.add('show-names');
+        button.innerHTML = '<i class="fas fa-eye-slash"></i> Ocultar';
+        console.log('✅ Nombres MOSTRADOS');
+    }
+    
+    // Verificar que se aplicó
+    console.log('Nuevo estado - show-names:', menu.classList.contains('show-names'));
+    console.log('Clases del menu:', menu.className);
+}
+
+// Configurar al cargar - SIN localStorage para simplificar debug
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🟢 DOMContentLoaded - Configurando toggle');
+    
+    // Esperar un momento para que el DOM esté completamente listo
+    setTimeout(function() {
+        const menu = document.querySelector('.menu');
+        const button = document.querySelector('.toggle-names-btn');
+        
+        console.log('Menu encontrado:', !!menu);
+        console.log('Button encontrado:', !!button);
+        
+        if (menu && button) {
+            // Asegurar que los nombres estén ocultos al inicio
+            menu.classList.remove('show-names');
+            button.innerHTML = '<i class="fas fa-eye"></i> Mostrar';
+            
+            // Remover listeners anteriores si existen
+            button.removeEventListener('click', toggleMenuNames);
+            
+            // Agregar listener
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('🖱️ Click en botón toggle');
+                toggleMenuNames();
+            });
+            
+            console.log('✅ Toggle configurado correctamente');
+        } else {
+            console.error('❌ No se pudo configurar el toggle');
+        }
+    }, 100);
+});
+
+console.log('📦 Script de toggle-names cargado');

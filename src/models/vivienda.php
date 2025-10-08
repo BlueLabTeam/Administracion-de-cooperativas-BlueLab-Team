@@ -46,9 +46,12 @@ class Vivienda
                     ORDER BY v.numero_vivienda";
             
             $stmt = $this->conn->query($sql);
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            return $result;
         } catch (PDOException $e) {
             error_log("Error en Vivienda::getAll: " . $e->getMessage());
+            error_log("SQL Query: " . $sql);
             throw $e;
         }
     }
@@ -257,7 +260,7 @@ class Vivienda
         }
     }
 
-    // ✅ CORREGIDO: Obtener vivienda asignada a un usuario
+    // Obtener vivienda asignada a un usuario
     public function getViviendaUsuario($usuarioId)
     {
         try {
@@ -293,7 +296,7 @@ class Vivienda
         }
     }
 
-    // ✅ CORREGIDO: Obtener vivienda asignada a un núcleo
+    // Obtener vivienda asignada a un núcleo
     public function getViviendaNucleo($nucleoId)
     {
         try {

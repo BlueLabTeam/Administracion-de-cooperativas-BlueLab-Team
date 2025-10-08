@@ -356,7 +356,7 @@ class Task
         }
     }
 
-    // Obtener todas las tareas (Admin)
+    // ✅ FUNCIÓN MODIFICADA: Obtener todas las tareas con progreso calculado
     public function getAllTasks($filtroEstado = null)
     {
         try {
@@ -374,7 +374,23 @@ class Task
                         t.fecha_creacion,
                         u.nombre_completo as creador,
                         COUNT(DISTINCT CASE WHEN t.tipo_asignacion = 'usuario' THEN tu.id_usuario END) as total_usuarios,
-                        COUNT(DISTINCT CASE WHEN t.tipo_asignacion = 'nucleo' THEN tn.id_nucleo END) as total_nucleos
+                        COUNT(DISTINCT CASE WHEN t.tipo_asignacion = 'nucleo' THEN tn.id_nucleo END) as total_nucleos,
+                        -- ✅ CALCULAR PROGRESO PROMEDIO
+                        CASE 
+                            WHEN t.tipo_asignacion = 'usuario' THEN 
+                                COALESCE(AVG(tu.progreso), 0)
+                            WHEN t.tipo_asignacion = 'nucleo' THEN 
+                                COALESCE(AVG(tn.progreso), 0)
+                            ELSE 0
+                        END as progreso_promedio,
+                        -- ✅ CONTAR ASIGNACIONES COMPLETADAS
+                        CASE 
+                            WHEN t.tipo_asignacion = 'usuario' THEN 
+                                SUM(CASE WHEN tu.estado_usuario = 'completada' THEN 1 ELSE 0 END)
+                            WHEN t.tipo_asignacion = 'nucleo' THEN 
+                                SUM(CASE WHEN tn.estado_nucleo = 'completada' THEN 1 ELSE 0 END)
+                            ELSE 0
+                        END as asignaciones_completadas
                       FROM Tareas t
                       INNER JOIN Usuario u ON t.id_creador = u.id_usuario
                       LEFT JOIN Tarea_Usuario tu ON t.id_tarea = tu.id_tarea

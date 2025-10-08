@@ -19,6 +19,7 @@ if (!isset($_SESSION['user_id'])) {
 	<link rel="stylesheet" href="/assets/css/dashboardNotificaciones.css" />
 	<link rel="stylesheet" href="/assets/css/dashboardTareas.css" />
 	<link rel="stylesheet" href="/assets/css/dashboardUtils.css" />
+	<link rel="stylesheet" href="/assets/css/dashboardViviendas.css" />
 </head>
 
 <body>
@@ -86,15 +87,15 @@ if (!isset($_SESSION['user_id'])) {
 		</section>
 
 		<!-- MI VIVIENDA -->
-<section id="vivienda-section" class="section-content">
-    <h2 class="section-title">🏡 Mi Vivienda</h2>
-    <div class="info-card">
-        <h3>Información de tu Vivienda</h3>
-        <div id="myViviendaContainer">
-            <p class="loading">Cargando...</p>
-        </div>
-    </div>
-</section>
+		<section id="vivienda-section" class="section-content">
+			<h2 class="section-title">🏡 Mi Vivienda</h2>
+			<div class="info-card">
+				<h3>Información de tu Vivienda</h3>
+				<div id="myViviendaContainer">
+					<p class="loading">Cargando...</p>
+				</div>
+			</div>
+		</section>
 
 		<!-- APORTES -->
 		<section id="aportes-section" class="section-content">
@@ -152,30 +153,25 @@ if (!isset($_SESSION['user_id'])) {
 		<section id="tareas-section" class="section-content">
 			<h2 class="section-title">✅ Mis Tareas</h2>
 			
-			<div class="tasks-summary">
-				<div class="summary-card">
-					<div class="summary-icon">📋</div>
-					<div class="summary-content">
-						<h4>Tareas Pendientes</h4>
-						<p id="pending-count">0</p>
-					</div>
+			<!-- Resumen de Tareas -->
+			<div class="stats-grid" style="margin-bottom: 20px;">
+				<div class="stat-card">
+					<i class="fas fa-clock"></i>
+					<h4>Pendientes</h4>
+					<p id="pending-count">0</p>
 				</div>
-				<div class="summary-card">
-					<div class="summary-icon">⏳</div>
-					<div class="summary-content">
-						<h4>En Progreso</h4>
-						<p id="progress-count">0</p>
-					</div>
+				<div class="stat-card">
+					<i class="fas fa-spinner"></i>
+					<h4>En Progreso</h4>
+					<p id="progress-count">0</p>
 				</div>
-				<div class="summary-card">
-					<div class="summary-icon">✔️</div>
-					<div class="summary-content">
-						<h4>Completadas</h4>
-						<p id="completed-count">0</p>
-					</div>
+				<div class="stat-card">
+					<i class="fas fa-check-circle"></i>
+					<h4>Completadas</h4>
+					<p id="completed-count">0</p>
 				</div>
 			</div>
-
+			
 			<!-- Filtros -->
 			<div class="info-card">
 				<div class="task-filter-header">
@@ -189,7 +185,7 @@ if (!isset($_SESSION['user_id'])) {
 
 			<!-- Tareas personales -->
 			<div class="info-card">
-				<h3>📌 Tareas Individuales</h3>
+				<h3>📋 Tareas Individuales</h3>
 				<div id="tareasUsuarioList">
 					<p class="loading">Cargando tareas...</p>
 				</div>

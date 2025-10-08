@@ -31,15 +31,24 @@ class ViviendaController
 
         try {
             $viviendas = $this->viviendaModel->getAll();
+            
+            // Log para debugging
+            error_log("Viviendas obtenidas: " . count($viviendas));
+            
             echo json_encode([
                 'success' => true,
                 'viviendas' => $viviendas,
                 'count' => count($viviendas)
             ]);
         } catch (\Exception $e) {
-            error_log("Error en getAll: " . $e->getMessage());
+            error_log("Error en ViviendaController::getAll: " . $e->getMessage());
+            error_log("Stack trace: " . $e->getTraceAsString());
             http_response_code(500);
-            echo json_encode(['success' => false, 'message' => 'Error al obtener viviendas']);
+            echo json_encode([
+                'success' => false, 
+                'message' => 'Error al obtener viviendas',
+                'error' => $e->getMessage() // Solo en desarrollo
+            ]);
         }
         exit();
     }

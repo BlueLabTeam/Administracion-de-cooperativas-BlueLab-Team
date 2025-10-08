@@ -1,298 +1,674 @@
 /* ==========================================
-   GESTIÓN DE VIVIENDAS
+   GESTIÓN DE VIVIENDAS - AZUL Y BLANCO
+   Mantiene las mismas clases del HTML
    ========================================== */
 
-/* Tabla de viviendas */
+/* Contenedor principal de tabla */
 .viviendas-table-wrapper {
     overflow-x: auto;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 102, 204, 0.12);
+    background: white;
+    margin-top: 20px;
 }
 
+/* Tabla de viviendas */
 .viviendas-table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0;
     background: white;
+    min-width: 1000px;
 }
 
+/* ===== HEADER DE TABLA ===== */
 .viviendas-table thead {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #0066cc 0%, #0052a3 100%);
     color: white;
 }
 
-.viviendas-table th {
-    padding: 15px;
-    text-align: left;
-    font-weight: 600;
-    font-size: 14px;
-    text-transform: uppercase;
+.viviendas-table thead tr {
+    box-shadow: 0 2px 8px rgba(0, 102, 204, 0.2);
 }
 
+.viviendas-table th {
+    padding: 18px 16px;
+    text-align: left;
+    font-weight: 700;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    white-space: nowrap;
+    border-bottom: 3px solid #004c99;
+    color: white;
+}
+
+.viviendas-table th:first-child {
+    border-radius: 16px 0 0 0;
+    padding-left: 24px;
+}
+
+.viviendas-table th:last-child {
+    border-radius: 0 16px 0 0;
+    padding-right: 24px;
+}
+
+/* ===== FILAS DE TABLA ===== */
 .viviendas-table tbody tr {
-    border-bottom: 1px solid #eee;
-    transition: background 0.2s;
+    border-bottom: 1px solid #e3f2fd;
+    transition: all 0.3s ease;
+    background: white;
 }
 
 .viviendas-table tbody tr:hover {
-    background: #f8f9ff;
+    background: linear-gradient(90deg, #f8fbff 0%, #f0f7ff 100%);
+    transform: translateX(4px);
+    box-shadow: 0 2px 12px rgba(0, 102, 204, 0.1);
+}
+
+.viviendas-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.viviendas-table tbody tr:last-child td:first-child {
+    border-radius: 0 0 0 16px;
+}
+
+.viviendas-table tbody tr:last-child td:last-child {
+    border-radius: 0 0 16px 0;
 }
 
 .viviendas-table td {
-    padding: 12px 15px;
+    padding: 16px;
     font-size: 14px;
+    color: #2c3e50;
+    vertical-align: middle;
 }
 
-/* Estados de vivienda */
-.estado-vivienda {
-    display: inline-block;
-    padding: 5px 12px;
-    border-radius: 20px;
-    font-size: 12px;
+.viviendas-table td:first-child {
+    padding-left: 24px;
     font-weight: 600;
-    text-transform: uppercase;
 }
 
-.estado-vivienda.disponible {
-    background: #d4edda;
-    color: #155724;
+.viviendas-table td:last-child {
+    padding-right: 24px;
 }
 
-.estado-vivienda.ocupada {
-    background: #fff3cd;
-    color: #856404;
-}
-
-.estado-vivienda.mantenimiento {
-    background: #f8d7da;
-    color: #721c24;
-}
-
-/* Badge de habitaciones */
-.habitaciones-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 5px 10px;
-    background: #e7f3ff;
+.viviendas-table td strong {
     color: #0066cc;
-    border-radius: 5px;
-    font-weight: 600;
-    font-size: 13px;
+    font-weight: 700;
+    font-size: 15px;
 }
 
-/* Información de asignación */
-.asignacion-info {
-    font-size: 13px;
-    color: #666;
+/* ===== ESTADOS DE VIVIENDA ===== */
+.estado-badge-vivienda {
+    display: inline-block;
+    padding: 8px 18px;
+    border-radius: 25px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    white-space: nowrap;
 }
 
-.asignacion-info strong {
-    color: #333;
-    display: block;
-    margin-bottom: 3px;
+.estado-badge-vivienda.disponible {
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    color: #0066cc;
+    border: 2px solid #0066cc;
+    box-shadow: 0 3px 8px rgba(0, 102, 204, 0.25);
 }
 
-.asignacion-info small {
-    color: #999;
-    font-size: 11px;
+.estado-badge-vivienda.ocupada {
+    background: linear-gradient(135deg, #e8eaf6 0%, #c5cae9 100%);
+    color: #5c6bc0;
+    border: 2px solid #5c6bc0;
+    box-shadow: 0 3px 8px rgba(92, 107, 192, 0.25);
 }
 
-/* Botones de acción en viviendas */
+.estado-badge-vivienda.mantenimiento {
+    background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+    color: #757575;
+    border: 2px solid #9e9e9e;
+    box-shadow: 0 3px 8px rgba(117, 117, 117, 0.25);
+}
+
+/* ===== BOTONES DE ACCIÓN ===== */
 .vivienda-actions {
     display: flex;
     gap: 8px;
     flex-wrap: wrap;
+    justify-content: flex-start;
 }
 
-.btn-asignar {
-    background: #28a745;
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 5px;
+.btn-view-vivienda,
+.btn-edit-vivienda,
+.btn-delete-vivienda,
+.btn-assign-vivienda,
+.btn-unassign-vivienda {
+    background: white;
+    border: 2px solid #0066cc;
+    color: #0066cc;
+    padding: 8px 12px;
+    border-radius: 10px;
     cursor: pointer;
-    font-size: 13px;
-    transition: all 0.3s;
+    font-size: 16px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 42px;
+    height: 42px;
+    box-shadow: 0 2px 6px rgba(0, 102, 204, 0.15);
+    position: relative;
+    overflow: hidden;
 }
 
-.btn-asignar:hover {
-    background: #218838;
-    transform: translateY(-2px);
+.btn-view-vivienda::before,
+.btn-edit-vivienda::before,
+.btn-delete-vivienda::before,
+.btn-assign-vivienda::before,
+.btn-unassign-vivienda::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(0, 102, 204, 0.2);
+    transform: translate(-50%, -50%);
+    transition: width 0.4s, height 0.4s;
 }
 
-.btn-desasignar {
-    background: #dc3545;
+.btn-view-vivienda:hover::before,
+.btn-edit-vivienda:hover::before {
+    width: 200px;
+    height: 200px;
+}
+
+.btn-view-vivienda:hover {
+    background: linear-gradient(135deg, #0066cc 0%, #0052a3 100%);
     color: white;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 13px;
-    transition: all 0.3s;
-}
-
-.btn-desasignar:hover {
-    background: #c82333;
-    transform: translateY(-2px);
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 6px 16px rgba(0, 102, 204, 0.35);
+    border-color: #0052a3;
 }
 
 .btn-edit-vivienda {
-    background: #007bff;
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 13px;
-    transition: all 0.3s;
+    border-color: #0066cc;
+    color: #0066cc;
 }
 
 .btn-edit-vivienda:hover {
-    background: #0056b3;
-    transform: translateY(-2px);
+    background: linear-gradient(135deg, #0066cc 0%, #0052a3 100%);
+    color: white;
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 6px 16px rgba(0, 102, 204, 0.35);
 }
 
 .btn-delete-vivienda {
-    background: #6c757d;
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 13px;
-    transition: all 0.3s;
+    border-color: #bdc3c7;
+    color: #95a5a6;
+}
+
+.btn-delete-vivienda:hover::before {
+    background: rgba(231, 76, 60, 0.2);
+    width: 200px;
+    height: 200px;
 }
 
 .btn-delete-vivienda:hover {
-    background: #545b62;
-    transform: translateY(-2px);
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+    color: white;
+    border-color: #c0392b;
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 6px 16px rgba(231, 76, 60, 0.35);
 }
 
-/* Card de vivienda (para usuario) */
-.vivienda-card {
+.btn-assign-vivienda {
+    border-color: #0066cc;
+    color: #0066cc;
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 50%);
+}
+
+.btn-assign-vivienda:hover {
+    background: linear-gradient(135deg, #0066cc 0%, #0052a3 100%);
+    color: white;
+    border-color: #0052a3;
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 6px 16px rgba(0, 102, 204, 0.35);
+}
+
+.btn-unassign-vivienda {
+    border-color: #90a4ae;
+    color: #607d8b;
+    background: linear-gradient(135deg, #eceff1 0%, #cfd8dc 50%);
+}
+
+.btn-unassign-vivienda:hover::before {
+    background: rgba(96, 125, 139, 0.2);
+    width: 200px;
+    height: 200px;
+}
+
+.btn-unassign-vivienda:hover {
+    background: linear-gradient(135deg, #607d8b 0%, #546e7a 100%);
+    color: white;
+    border-color: #546e7a;
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 6px 16px rgba(96, 125, 139, 0.35);
+}
+
+/* ===== CARD DE VIVIENDA USUARIO ===== */
+.my-vivienda-card {
     background: white;
-    border-radius: 12px;
-    padding: 25px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    border-left: 5px solid #667eea;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 6px 24px rgba(0, 102, 204, 0.15);
+    border-left: 8px solid #0066cc;
+    border-top: 1px solid #e3f2fd;
+    position: relative;
+    overflow: hidden;
 }
 
-.vivienda-card-header {
+.my-vivienda-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, rgba(0, 102, 204, 0.05) 0%, transparent 70%);
+    border-radius: 50%;
+    transform: translate(50%, -50%);
+}
+
+.my-vivienda-card h3 {
+    color: #0066cc;
+    font-size: 28px;
+    margin: 0 0 35px 0;
     display: flex;
     align-items: center;
-    gap: 15px;
-    margin-bottom: 20px;
-    padding-bottom: 15px;
-    border-bottom: 2px solid #f0f0f0;
-}
-
-.vivienda-icon {
-    font-size: 48px;
-    color: #667eea;
-}
-
-.vivienda-title {
-    flex: 1;
-}
-
-.vivienda-title h3 {
-    margin: 0 0 5px 0;
-    color: #333;
-    font-size: 24px;
-}
-
-.vivienda-title p {
-    margin: 0;
-    color: #666;
-    font-size: 14px;
+    gap: 14px;
+    font-weight: 800;
+    position: relative;
+    z-index: 1;
 }
 
 .vivienda-info-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 15px;
-    margin-top: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 24px;
+    position: relative;
+    z-index: 1;
 }
 
-.vivienda-info-item {
-    padding: 15px;
-    background: #f8f9fa;
-    border-radius: 8px;
+.info-item {
+    background: linear-gradient(135deg, #f8fbff 0%, #e3f2fd 100%);
+    padding: 24px;
+    border-radius: 16px;
+    border: 2px solid #bbdefb;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
 }
 
-.vivienda-info-item label {
+.info-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 5px;
+    height: 100%;
+    background: linear-gradient(180deg, #0066cc 0%, #0052a3 100%);
+    transform: scaleY(0);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.info-item::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: radial-gradient(circle, rgba(0, 102, 204, 0.1) 0%, transparent 70%);
+    transform: translate(-50%, -50%);
+    transition: width 0.5s, height 0.5s;
+    border-radius: 50%;
+}
+
+.info-item:hover::before {
+    transform: scaleY(1);
+}
+
+.info-item:hover::after {
+    width: 300px;
+    height: 300px;
+}
+
+.info-item:hover {
+    border-color: #0066cc;
+    box-shadow: 0 8px 20px rgba(0, 102, 204, 0.25);
+    transform: translateY(-6px) scale(1.02);
+    background: white;
+}
+
+.info-item strong {
     display: block;
+    color: #0066cc;
     font-size: 12px;
-    color: #666;
     text-transform: uppercase;
-    margin-bottom: 5px;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+    font-weight: 800;
+    position: relative;
+    z-index: 1;
+}
+
+.info-item p {
+    color: #2c3e50;
+    font-size: 17px;
+    margin: 0;
     font-weight: 600;
+    position: relative;
+    z-index: 1;
 }
 
-.vivienda-info-item .value {
-    font-size: 18px;
-    color: #333;
-    font-weight: 600;
-}
-
-/* Sin vivienda asignada */
-.no-vivienda {
-    text-align: center;
-    padding: 60px 20px;
-    background: #f8f9fa;
-    border-radius: 12px;
-}
-
-.no-vivienda i {
-    font-size: 64px;
-    color: #ddd;
-    margin-bottom: 20px;
-    display: block;
-}
-
-.no-vivienda h3 {
-    color: #666;
-    margin-bottom: 10px;
-}
-
-.no-vivienda p {
-    color: #999;
-    font-size: 14px;
-}
-
-/* Filtros de viviendas */
+/* ===== FILTROS ===== */
 .filter-controls {
     display: flex;
-    gap: 10px;
+    gap: 14px;
     flex-wrap: wrap;
+    margin-bottom: 24px;
+    align-items: center;
 }
 
 .filter-controls select,
 .filter-controls input {
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+    padding: 14px 18px;
+    border: 2px solid #bbdefb;
+    border-radius: 12px;
     font-size: 14px;
+    color: #2c3e50;
+    background: white;
+    transition: all 0.3s ease;
+    font-weight: 600;
+}
+
+.filter-controls select:focus,
+.filter-controls input:focus {
+    outline: none;
+    border-color: #0066cc;
+    box-shadow: 0 0 0 5px rgba(0, 102, 204, 0.12);
+    background: #f8fbff;
+    transform: scale(1.02);
 }
 
 .filter-controls input {
     flex: 1;
-    min-width: 200px;
+    min-width: 280px;
 }
 
-/* Responsive */
+.filter-controls input::placeholder {
+    color: #90a4ae;
+    font-weight: 500;
+}
+
+/* ===== MODALES ===== */
+.material-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 51, 102, 0.75);
+    backdrop-filter: blur(6px);
+    z-index: 10000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    animation: modalFadeIn 0.3s ease;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.material-modal-content {
+    background: white;
+    border-radius: 20px;
+    max-width: 680px;
+    width: 100%;
+    max-height: 92vh;
+    overflow-y: auto;
+    box-shadow: 0 25px 70px rgba(0, 102, 204, 0.4);
+    animation: modalSlideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes modalSlideUp {
+    from {
+        transform: translateY(60px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.material-modal-header {
+    background: linear-gradient(135deg, #0066cc 0%, #0052a3 100%);
+    color: white;
+    padding: 26px 32px;
+    border-radius: 20px 20px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 3px 12px rgba(0, 82, 163, 0.35);
+}
+
+.material-modal-header h3 {
+    margin: 0;
+    font-size: 23px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+}
+
+.close-material-modal {
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    color: white;
+    font-size: 26px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    font-weight: bold;
+}
+
+.close-material-modal:hover {
+    background: white;
+    color: #0066cc;
+    border-color: white;
+    transform: rotate(90deg) scale(1.1);
+}
+
+.material-form-group {
+    margin: 26px 32px;
+}
+
+.material-form-group label {
+    display: block;
+    color: #2c3e50;
+    font-weight: 800;
+    margin-bottom: 12px;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+}
+
+.material-form-group input,
+.material-form-group select,
+.material-form-group textarea {
+    width: 100%;
+    padding: 14px 18px;
+    border: 2px solid #bbdefb;
+    border-radius: 12px;
+    font-size: 15px;
+    color: #2c3e50;
+    transition: all 0.3s ease;
+    background: white;
+    font-weight: 600;
+}
+
+.material-form-group input:focus,
+.material-form-group select:focus,
+.material-form-group textarea:focus {
+    outline: none;
+    border-color: #0066cc;
+    box-shadow: 0 0 0 5px rgba(0, 102, 204, 0.12);
+    background: #f8fbff;
+    transform: scale(1.01);
+}
+
+.material-form-group textarea {
+    resize: vertical;
+    min-height: 110px;
+    font-family: inherit;
+}
+
+.material-form-actions {
+    display: flex;
+    gap: 14px;
+    justify-content: flex-end;
+    padding: 26px 32px;
+    background: linear-gradient(180deg, #f8fbff 0%, #e3f2fd 100%);
+    border-radius: 0 0 20px 20px;
+    border-top: 2px solid #bbdefb;
+}
+
+/* ===== SIN DATOS ===== */
+.no-data {
+    text-align: center;
+    padding: 90px 40px;
+    background: linear-gradient(135deg, #f8fbff 0%, #e3f2fd 100%);
+    border-radius: 20px;
+    border: 3px dashed #bbdefb;
+    margin: 24px 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.no-data::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(0, 102, 204, 0.05) 0%, transparent 70%);
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+}
+
+.no-data i {
+    font-size: 90px;
+    color: #bbdefb;
+    margin-bottom: 24px;
+    display: block;
+    position: relative;
+    z-index: 1;
+}
+
+.no-data h3 {
+    color: #0066cc;
+    margin: 0 0 14px 0;
+    font-size: 24px;
+    font-weight: 800;
+    position: relative;
+    z-index: 1;
+}
+
+.no-data p {
+    color: #5c6bc0;
+    font-size: 16px;
+    margin: 0;
+    font-weight: 600;
+    position: relative;
+    z-index: 1;
+}
+
+/* ===== DETALLES ===== */
+.vivienda-details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 18px;
+    margin: 24px 0;
+}
+
+.detail-item {
+    background: linear-gradient(135deg, #f8fbff 0%, #e3f2fd 100%);
+    padding: 18px;
+    border-radius: 12px;
+    border: 2px solid #bbdefb;
+    transition: all 0.3s ease;
+}
+
+.detail-item:hover {
+    border-color: #0066cc;
+    box-shadow: 0 4px 12px rgba(0, 102, 204, 0.2);
+    transform: translateY(-3px);
+}
+
+.detail-item strong {
+    display: block;
+    color: #0066cc;
+    font-size: 12px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1200px) {
+    .viviendas-table {
+        min-width: 900px;
+    }
+}
+
 @media (max-width: 768px) {
     .viviendas-table {
-        font-size: 12px;
+        font-size: 13px;
+        min-width: 800px;
     }
     
     .viviendas-table th,
     .viviendas-table td {
-        padding: 10px 8px;
+        padding: 12px 10px;
     }
     
     .vivienda-actions {
         flex-direction: column;
+        width: 100%;
+    }
+    
+    .vivienda-actions button {
+        width: 100%;
     }
     
     .vivienda-info-grid {
@@ -306,5 +682,50 @@
     .filter-controls select,
     .filter-controls input {
         width: 100%;
+        min-width: 100%;
+    }
+
+    .my-vivienda-card {
+        padding: 28px;
+    }
+
+    .my-vivienda-card h3 {
+        font-size: 24px;
+    }
+
+    .material-modal-content {
+        margin: 10px;
+        max-height: 95vh;
+    }
+
+    .material-form-group,
+    .material-form-actions {
+        margin-left: 24px;
+        margin-right: 24px;
+        padding-left: 24px;
+        padding-right: 24px;
+    }
+}
+
+@media (max-width: 480px) {
+    .viviendas-table-wrapper {
+        border-radius: 12px;
+    }
+
+    .my-vivienda-card {
+        padding: 24px;
+        border-radius: 16px;
+    }
+
+    .info-item {
+        padding: 18px;
+    }
+
+    .no-data {
+        padding: 70px 24px;
+    }
+
+    .no-data i {
+        font-size: 70px;
     }
 }

@@ -67,7 +67,7 @@
 }
 
 .materiales-table thead {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #1130be 0%, #0511b3 100%);
     color: white;
 }
 
@@ -147,7 +147,7 @@
 }
 
 .stock-badge.bajo {
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    background: linear-gradient(135deg, #1130be 0%, #0511b3 100%);
     color: white;
 }
 
@@ -157,7 +157,7 @@
 }
 
 .stock-badge.agotado {
-    background: linear-gradient(135deg, #757f9a 0%, #d7dde8 100%);
+    background: linear-gradient(135deg, #1130be 0%, #0511b3 100%);
     color: #333;
 }
 
@@ -239,7 +239,7 @@
 }
 
 .btn-stock-material {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #1130be 0%, #0511b3 100%);
     color: white;
 }
 
@@ -249,7 +249,7 @@
 }
 
 .btn-edit-material {
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    background: linear-gradient(135deg, #1130be 0%, #0511b3 100%);
     color: white;
 }
 
@@ -259,7 +259,7 @@
 }
 
 .btn-delete-material {
-    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    background: linear-gradient(135deg, #1130be 0%, #0511b3 100%);
     color: white;
 }
 

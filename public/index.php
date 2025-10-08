@@ -355,9 +355,10 @@ case '/api/viviendas/desasignar':
     break;
 
 case '/api/viviendas/tipos':
-    (new App\Controllers\ViviendaController())->getTipos();
-    break;
-
+        Herramientas::validarLogin(); // Solo requiere login, no validación de estado
+        (new App\Controllers\ViviendaController())->getTipos();
+        break;
+        
 // API VIVIENDA USUARIO (Usuario)
 case '/api/viviendas/my-vivienda':
     (new App\Controllers\ViviendaController())->getMyVivienda();
