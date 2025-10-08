@@ -99,52 +99,20 @@ body {
     position: relative;
 }
 
-/* Botón para mostrar/ocultar nombres */
-.toggle-names-btn {
-    position: absolute;
-    top: 10px;
-    right: 20px;
-    background: #0066cc;
-    color: white;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 13px;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    z-index: 10;
-}
-
-.toggle-names-btn:hover {
-    background: #0052a3;
-    transform: scale(1.05);
-}
-
-.toggle-names-btn i {
-    margin-right: 5px;
-}
-
 .menu ul {
     list-style: none;
     display: flex;
-    justify-content: flex-start;
+    justify-content: center;  /* ✅ Centrado horizontal */
     align-items: center;
-    gap: 20px;
+    gap: 25px;
     margin: 0;
-    padding: 0 40px;
+    padding: 0;
     flex-wrap: wrap;
 }
 
 .menu li {
     text-align: center;
     transition: all 0.3s ease;
-}
-
-/* ✅ FORZAR que Inicio sea el PRIMERO y esté a la IZQUIERDA */
-.menu li[data-section="inicio"] {
-    order: -999 !important;
-    margin-right: auto !important;
 }
 
 .menu li a {
@@ -155,12 +123,14 @@ body {
     text-decoration: none;
     color: #333;
     transition: all 0.3s ease;
-    position: relative;
 }
 
+/* ==========================================
+   CÍRCULOS DE ICONOS - TODOS IGUALES
+   ========================================== */
 .menu li a i {
-    width: 100px;
-    height: 100px;
+    width: 90px;
+    height: 90px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -174,18 +144,20 @@ body {
 }
 
 /* ==========================================
-   NOMBRES DEL MENÚ - CONTROL CON JS
+   NOMBRES DEL MENÚ - SIEMPRE VISIBLES
    ========================================== */
-
-/* Por defecto los nombres estarán controlados por JavaScript inline styles */
 .menu li a small {
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 600;
     color: #0066cc;
     display: block;
+    margin-top: 5px;
+    text-align: center;
 }
 
-/* Estados del menú */
+/* ==========================================
+   ESTADOS DEL MENÚ
+   ========================================== */
 .menu li:hover a i {
     transform: translateY(-5px);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
@@ -195,53 +167,12 @@ body {
     background: #0066cc;
     color: white;
     box-shadow: 0 6px 12px rgba(0, 102, 204, 0.4);
-    transform: scale(1.05);
+    transform: scale(1.08);
 }
 
 .menu li.activo a small {
     color: #0066cc;
     font-weight: 700;
-}
-
-/* Botón de inicio destacado (más grande) */
-.menu li[data-section="inicio"] a i {
-    width: 120px;
-    height: 120px;
-    font-size: 40px;
-    background: #0066cc;
-    color: white;
-}
-
-.menu li[data-section="inicio"] a small {
-    font-size: 15px;
-    font-weight: 700;
-}
-
-.menu li[data-section="inicio"]:hover a i {
-    transform: translateY(-5px) scale(1.05);
-}
-
-/* Tooltip al hacer hover */
-.menu li a::after {
-    content: attr(data-tooltip);
-    position: absolute;
-    bottom: -40px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.8);
-    color: white;
-    padding: 5px 10px;
-    border-radius: 4px;
-    font-size: 12px;
-    white-space: nowrap;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
-    z-index: 100;
-}
-
-.menu li a:hover::after {
-    opacity: 1;
 }
 
 /* ==========================================
@@ -544,34 +475,19 @@ body {
         padding: 20px 10px;
     }
 
-    .toggle-names-btn {
-        top: 5px;
-        right: 10px;
-        padding: 6px 12px;
-        font-size: 11px;
-    }
-
     .menu ul {
         gap: 15px;
-        padding: 0 20px;
-        justify-content: flex-start;
-    }
-
-    .menu li[data-section="inicio"] {
-        order: -999 !important;
-        margin-right: auto !important;
+        justify-content: center;
     }
 
     .menu li a i {
-        width: 80px;
-        height: 80px;
-        font-size: 28px;
+        width: 70px;
+        height: 70px;
+        font-size: 24px;
     }
 
-    .menu li[data-section="inicio"] a i {
-        width: 100px;
-        height: 100px;
-        font-size: 36px;
+    .menu li a small {
+        font-size: 12px;
     }
 
     .content-area {
@@ -580,5 +496,22 @@ body {
 
     .stats-grid {
         grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .menu ul {
+        gap: 10px;
+    }
+
+    .menu li a i {
+        width: 60px;
+        height: 60px;
+        font-size: 20px;
+        margin-bottom: 5px;
+    }
+
+    .menu li a small {
+        font-size: 11px;
     }
 }

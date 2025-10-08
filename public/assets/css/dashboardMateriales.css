@@ -1,6 +1,13 @@
 /* ==========================================
-   MATERIALES - CSS MEJORADO Y MODERNO
+   MATERIALES - ESTILO AZUL CON LETRA BLANCA
    ========================================== */
+
+/* ===== BASE GENERAL ===== */
+body {
+    color: white;
+    background: #0f1e33;
+    font-family: Arial, sans-serif;
+}
 
 /* ===== CONTENEDOR PRINCIPAL ===== */
 .materiales-container {
@@ -27,11 +34,12 @@
 .materiales-search input {
     width: 100%;
     padding: 12px 16px 12px 45px;
-    border: 2px solid #e0e0e0;
+    border: 2px solid #007bff;
     border-radius: 10px;
     font-size: 15px;
+    background: #001a33;
+    color: white;
     transition: all 0.3s ease;
-    background: white;
 }
 
 .materiales-search::before {
@@ -42,56 +50,38 @@
     left: 16px;
     top: 50%;
     transform: translateY(-50%);
-    color: #999;
+    color: #4da3ff;
     font-size: 16px;
 }
 
 .materiales-search input:focus {
     outline: none;
-    border-color: #4CAF50;
-    box-shadow: 0 0 0 4px rgba(76, 175, 80, 0.1);
+    border-color: #00c851;
+    box-shadow: 0 0 0 4px rgba(0, 200, 81, 0.2);
 }
 
-/* ===== TABLA DE MATERIALES ===== */
+/* ===== TABLA ===== */
 .materiales-table-container {
     overflow-x: auto;
-    background: white;
+    background: #002855;
     border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.4);
 }
 
 .materiales-table {
     width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
+    border-collapse: collapse;
 }
 
 .materiales-table thead {
-    background: linear-gradient(135deg, #1130be 0%, #0511b3 100%);
+    background: #0056b3;
     color: white;
 }
 
-.materiales-table th {
-    padding: 18px 20px;
-    text-align: left;
-    font-weight: 600;
-    font-size: 14px;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-}
-
-.materiales-table th:first-child {
-    border-top-left-radius: 12px;
-}
-
-.materiales-table th:last-child {
-    border-top-right-radius: 12px;
-}
-
+.materiales-table th,
 .materiales-table td {
-    padding: 18px 20px;
-    border-bottom: 1px solid #f0f0f0;
-    color: #444;
+    padding: 16px 20px;
+    text-align: left;
     font-size: 14px;
 }
 
@@ -100,23 +90,10 @@
 }
 
 .materiales-table tbody tr:hover {
-    background: #f8f9ff;
-    transform: scale(1.01);
+    background: #004080;
 }
 
-.materiales-table tbody tr:last-child td {
-    border-bottom: none;
-}
-
-.materiales-table tbody tr:last-child td:first-child {
-    border-bottom-left-radius: 12px;
-}
-
-.materiales-table tbody tr:last-child td:last-child {
-    border-bottom-right-radius: 12px;
-}
-
-/* ===== BADGES DE STOCK ===== */
+/* ===== BADGES ===== */
 .stock-badge {
     display: inline-flex;
     align-items: center;
@@ -125,78 +102,22 @@
     border-radius: 20px;
     font-size: 13px;
     font-weight: 700;
-    letter-spacing: 0.5px;
-}
-
-.stock-badge::before {
-    content: "";
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    display: inline-block;
+    color: white;
 }
 
 .stock-badge.disponible {
-    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-    color: white;
-}
-
-.stock-badge.disponible::before {
-    background: white;
-    box-shadow: 0 0 8px rgba(255,255,255,0.5);
+    background: #00c851; /* verde */
 }
 
 .stock-badge.bajo {
-    background: linear-gradient(135deg, #1130be 0%, #0511b3 100%);
-    color: white;
-}
-
-.stock-badge.bajo::before {
-    background: white;
-    animation: pulse 2s infinite;
+    background: #007bff; /* azul */
 }
 
 .stock-badge.agotado {
-    background: linear-gradient(135deg, #1130be 0%, #0511b3 100%);
-    color: #333;
+    background: #ff4444; /* rojo */
 }
 
-.stock-badge.agotado::before {
-    background: #ff4444;
-}
-
-@keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
-}
-
-/* ===== BADGE PEQUEÑO (Para selector de tareas) ===== */
-.stock-badge-small {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 3px 10px;
-    border-radius: 12px;
-    font-size: 11px;
-    font-weight: 600;
-}
-
-.stock-badge-small.disponible {
-    background: #e8f5e9;
-    color: #2e7d32;
-}
-
-.stock-badge-small.bajo {
-    background: #fff3e0;
-    color: #ef6c00;
-}
-
-.stock-badge-small.agotado {
-    background: #ffebee;
-    color: #c62828;
-}
-
-/* ===== ACCIONES DE TABLA ===== */
+/* ===== BOTONES DE ACCIÓN ===== */
 .material-actions {
     display: flex;
     gap: 8px;
@@ -214,61 +135,34 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    position: relative;
-}
-
-.material-actions button::after {
-    content: attr(title);
-    position: absolute;
-    bottom: -35px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(0,0,0,0.8);
     color: white;
-    padding: 5px 10px;
-    border-radius: 5px;
-    font-size: 12px;
-    white-space: nowrap;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s;
-}
-
-.material-actions button:hover::after {
-    opacity: 1;
 }
 
 .btn-stock-material {
-    background: linear-gradient(135deg, #1130be 0%, #0511b3 100%);
-    color: white;
+    background: #00c851; /* verde */
 }
 
 .btn-stock-material:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    background: #009e44;
 }
 
 .btn-edit-material {
-    background: linear-gradient(135deg, #1130be 0%, #0511b3 100%);
-    color: white;
+    background: #007bff; /* azul */
 }
 
 .btn-edit-material:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 5px 15px rgba(240, 147, 251, 0.4);
+    background: #0056b3;
 }
 
 .btn-delete-material {
-    background: linear-gradient(135deg, #1130be 0%, #0511b3 100%);
-    color: white;
+    background: #ff4444; /* rojo */
 }
 
 .btn-delete-material:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 5px 15px rgba(250, 112, 154, 0.4);
+    background: #cc0000;
 }
 
-/* ===== MODALES ===== */
+/* ===== MODAL ===== */
 .material-modal,
 #stockModal {
     display: none;
@@ -281,441 +175,129 @@
     background-color: rgba(0,0,0,0.6);
     justify-content: center;
     align-items: center;
-    animation: fadeIn 0.3s ease;
     backdrop-filter: blur(5px);
 }
 
 .material-modal-content {
-    background: white;
-    padding: 35px;
-    border-radius: 16px;
+    background: #002855;
+    color: white;
+    padding: 30px;
+    border-radius: 12px;
     max-width: 550px;
     width: 90%;
-    max-height: 90vh;
-    overflow-y: auto;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
     animation: slideUp 0.3s ease;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
 }
 
 .material-modal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 25px;
-    padding-bottom: 20px;
-    border-bottom: 3px solid #f0f0f0;
+    border-bottom: 2px solid #007bff;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
 }
 
 .material-modal-header h3 {
     margin: 0;
-    color: #333;
-    font-size: 24px;
-    font-weight: 700;
+    color: white;
+    font-size: 22px;
 }
 
 .close-material-modal {
-    background: #f5f5f5;
-    border: none;
+    background: transparent;
+    color: white;
     font-size: 28px;
-    color: #666;
+    border: none;
     cursor: pointer;
-    padding: 0;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    transition: all 0.3s ease;
 }
 
 .close-material-modal:hover {
-    background: #e0e0e0;
-    color: #333;
-    transform: rotate(90deg);
+    color: #ff4444;
 }
 
 /* ===== FORMULARIOS ===== */
 .material-form-group {
-    margin-bottom: 22px;
+    margin-bottom: 20px;
 }
 
 .material-form-group label {
-    display: block;
-    margin-bottom: 10px;
     font-weight: 600;
-    color: #333;
-    font-size: 15px;
+    color: white;
+    margin-bottom: 8px;
+    display: block;
 }
 
 .material-form-group input,
 .material-form-group textarea {
     width: 100%;
     padding: 14px 16px;
-    border: 2px solid #e0e0e0;
-    border-radius: 10px;
-    font-size: 15px;
-    font-family: inherit;
+    border: 2px solid #007bff;
+    border-radius: 8px;
+    background: #001a33;
+    color: white;
     transition: all 0.3s ease;
-    box-sizing: border-box;
 }
 
 .material-form-group textarea {
     resize: vertical;
-    min-height: 120px;
-    line-height: 1.6;
+    min-height: 100px;
 }
 
 .material-form-group input:focus,
 .material-form-group textarea:focus {
-    outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    border-color: #00c851;
+    box-shadow: 0 0 8px rgba(0, 200, 81, 0.3);
 }
 
+/* ===== BOTONES DE FORMULARIO ===== */
 .material-form-actions {
     display: flex;
     gap: 12px;
     justify-content: flex-end;
-    margin-top: 30px;
-    padding-top: 25px;
-    border-top: 2px solid #f0f0f0;
+    margin-top: 25px;
+}
+
+.material-form-actions button {
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.material-form-actions .btn-save {
+    background: #00c851; /* verde */
+}
+
+.material-form-actions .btn-save:hover {
+    background: #009e44;
+}
+
+.material-form-actions .btn-cancel {
+    background: #ff4444; /* rojo */
+}
+
+.material-form-actions .btn-cancel:hover {
+    background: #cc0000;
 }
 
 /* ===== ESTADO VACÍO ===== */
 .empty-materials {
     text-align: center;
     padding: 60px 20px;
-    color: #999;
+    color: #b3d9ff;
 }
 
 .empty-materials i {
     font-size: 64px;
     margin-bottom: 20px;
-    color: #ddd;
-    display: block;
-}
-
-/* ===== SELECTOR DE MATERIALES EN TAREAS ===== */
-.materiales-tarea-selector {
-    border: 2px solid #e0e0e0;
-    border-radius: 12px;
-    padding: 20px;
-    background: #fafafa;
-}
-
-.materiales-search-box {
-    margin-bottom: 15px;
-}
-
-.materiales-search-box input {
-    width: 100%;
-    padding: 12px 16px;
-    border: 2px solid #e0e0e0;
-    border-radius: 8px;
-    font-size: 14px;
-}
-
-.materiales-selector-list {
-    max-height: 300px;
-    overflow-y: auto;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    background: white;
-    padding: 10px;
-}
-
-.material-selector-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px;
-    margin-bottom: 8px;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    background: white;
-    transition: all 0.3s ease;
-}
-
-.material-selector-item:hover {
-    background: #f8f9ff;
-    border-color: #667eea;
-    transform: translateX(5px);
-}
-
-.material-selector-info {
-    flex: 1;
-}
-
-.material-selector-name {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 5px;
-}
-
-.material-selector-name strong {
-    color: #333;
-    font-size: 14px;
-}
-
-.material-selector-actions {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-}
-
-.material-cantidad-input {
-    width: 80px;
-    padding: 8px;
-    border: 2px solid #e0e0e0;
-    border-radius: 6px;
-    text-align: center;
-    font-weight: 600;
-}
-
-.btn-add-material {
-    width: 36px;
-    height: 36px;
-    border: none;
-    border-radius: 8px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.btn-add-material:hover:not(:disabled) {
-    transform: scale(1.1);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-}
-
-.btn-add-material:disabled {
-    background: #ccc;
-    cursor: not-allowed;
-}
-
-/* ===== MATERIALES ASIGNADOS ===== */
-.materiales-asignados-container {
-    margin-top: 20px;
-    border: 2px dashed #e0e0e0;
-    border-radius: 12px;
-    padding: 15px;
-    background: white;
-    min-height: 80px;
-}
-
-.materiales-asignados-header {
-    margin-bottom: 15px;
-    padding-bottom: 10px;
-    border-bottom: 2px solid #f0f0f0;
-}
-
-.materiales-asignados-header strong {
-    color: #667eea;
-    font-size: 15px;
-}
-
-.material-asignado-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px;
-    margin-bottom: 10px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border-radius: 8px;
-    animation: slideInRight 0.3s ease;
-}
-
-@keyframes slideInRight {
-    from {
-        opacity: 0;
-        transform: translateX(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-.material-asignado-info {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.material-asignado-info strong {
-    font-size: 15px;
-}
-
-.cantidad-badge {
-    background: rgba(255,255,255,0.2);
-    padding: 4px 12px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: 600;
-}
-
-.btn-remove {
-    width: 32px;
-    height: 32px;
-    border: none;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.2);
-    color: white;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.btn-remove:hover {
-    background: rgba(255,255,255,0.4);
-    transform: scale(1.1);
-}
-
-/* ===== VISTA DE MATERIALES EN MODAL DE TAREA (USUARIO) ===== */
-.task-materials-section {
-    margin: 30px 0;
-    padding: 25px;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-    border-radius: 12px;
-}
-
-.task-materials-section h3 {
-    margin: 0 0 20px 0;
-    color: #333;
-    font-size: 18px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.task-materials-section h3 i {
-    color: #667eea;
-}
-
-.materials-grid {
-    display: grid;
-    gap: 15px;
-}
-
-.material-card {
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    gap: 15px;
-    padding: 18px;
-    background: white;
-    border-radius: 10px;
-    border: 2px solid #e0e0e0;
-    transition: all 0.3s ease;
-}
-
-.material-card:hover {
-    border-color: #667eea;
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
-    transform: translateY(-2px);
-}
-
-.material-card.disponible {
-    border-left: 4px solid #4CAF50;
-}
-
-.material-card.insuficiente {
-    border-left: 4px solid #FF9800;
-}
-
-.material-icon-box {
-    width: 50px;
-    height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 10px;
-    color: white;
-    font-size: 24px;
-}
-
-.material-info-box h4 {
-    margin: 0 0 8px 0;
-    color: #333;
-    font-size: 16px;
-}
-
-.material-desc {
-    color: #666;
-    font-size: 13px;
-    margin: 0 0 12px 0;
-    line-height: 1.5;
-}
-
-.material-quantities {
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
-}
-
-.quantity-item {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 13px;
-    color: #666;
-}
-
-.quantity-item i {
-    color: #667eea;
-}
-
-.quantity-item strong {
-    color: #333;
-}
-
-.quantity-item.available {
-    color: #4CAF50;
-}
-
-.quantity-item.unavailable {
-    color: #FF9800;
-}
-
-.material-status-badge {
-    display: flex;
-    align-items: center;
-}
-
-.material-status-badge .badge-success {
-    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-    color: white;
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    white-space: nowrap;
-}
-
-.material-status-badge .badge-warning {
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    color: white;
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    white-space: nowrap;
+    color: #007bff;
 }
 
 /* ===== ANIMACIONES ===== */
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
 @keyframes slideUp {
     from {
         opacity: 0;
@@ -728,26 +310,21 @@
 }
 
 /* ===== SCROLLBAR PERSONALIZADO ===== */
-.materiales-selector-list::-webkit-scrollbar,
 .material-modal-content::-webkit-scrollbar {
     width: 8px;
 }
 
-.materiales-selector-list::-webkit-scrollbar-track,
 .material-modal-content::-webkit-scrollbar-track {
-    background: #f0f0f0;
-    border-radius: 4px;
+    background: #001a33;
 }
 
-.materiales-selector-list::-webkit-scrollbar-thumb,
 .material-modal-content::-webkit-scrollbar-thumb {
-    background: #667eea;
+    background: #007bff;
     border-radius: 4px;
 }
 
-.materiales-selector-list::-webkit-scrollbar-thumb:hover,
 .material-modal-content::-webkit-scrollbar-thumb:hover {
-    background: #764ba2;
+    background: #0056b3;
 }
 
 /* ===== RESPONSIVE ===== */
@@ -761,19 +338,11 @@
         max-width: 100%;
     }
 
-    .materiales-table-container {
-        overflow-x: scroll;
-    }
-
-    .materiales-table {
-        min-width: 600px;
-    }
-
     .material-modal-content {
         width: 95%;
         padding: 25px 20px;
     }
-    
+
     .material-actions {
         gap: 6px;
     }
@@ -782,32 +351,4 @@
         width: 36px;
         height: 36px;
     }
-
-    .material-card {
-        grid-template-columns: 1fr;
-        text-align: center;
-    }
-
-    .material-icon-box {
-        margin: 0 auto;
-    }
-
-    .material-quantities {
-        justify-content: center;
-    }
-
-    .material-status-badge {
-        justify-content: center;
-    }
-
-    .material-selector-item {
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .material-selector-actions {
-        width: 100%;
-        justify-content: center;
-    }
 }
-

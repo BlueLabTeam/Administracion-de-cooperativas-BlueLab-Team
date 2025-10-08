@@ -484,8 +484,7 @@
 						</div>
 					</div>
 
-				<!-- Selector de materiales -->
-<div class="form-group">
+			<div class="form-group">
     <label>📦 Materiales necesarios para esta tarea:</label>
     <div class="materiales-tarea-selector">
         <div class="materiales-search-box">
@@ -501,18 +500,18 @@
         
         <!-- Lista de materiales ya asignados -->
         <div id="materiales-asignados-list" class="materiales-asignados-container">
-            <p style="color: #999; padding: 10px;">No hay materiales asignados</p>
+            <p class="no-materials">No hay materiales asignados</p>
         </div>
     </div>
 </div>
 
-<!-- BOTÓN CREAR TAREA - AQUÍ DEBE ESTAR -->
+<!-- BOTÓN CREAR TAREA -->
 <button type="submit" class="btn btn-primary">Crear Tarea</button>
 
-</form> <!-- Cierre del formulario -->
-</div> <!-- Cierre de info-card -->
+</form>
+</div>
 
-<!-- LISTA DE TAREAS EXISTENTES - FUERA DEL FORMULARIO -->
+<!-- LISTA DE TAREAS EXISTENTES -->
 <div class="info-card">
     <div class="task-list-header">
         <h3>Tareas Creadas</h3>
@@ -531,8 +530,8 @@
         <p class="loading">Cargando tareas...</p>
     </div>
 </div>
-		</section>
-	</main>
+</section>
+</main>
 
 	<!-- Modal para ver imagen en grande -->
 	<div id="imageModal" class="modal" onclick="closeModal()">
