@@ -1166,7 +1166,7 @@ function rejectPaymentFromTable(userId) {
 function viewUserDetails(userId) {
     console.log('👁️ [DETAILS] Cargando detalles de usuario:', userId);
     
-    fetch(`/api/users/details?user_id=${userId}`)
+    fetch(`/api/users/details?id_usuario=${userId}`)
     .then(response => response.json())
     .then(data => {
         console.log('👁️ [DETAILS] Response:', data);

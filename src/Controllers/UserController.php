@@ -69,7 +69,7 @@ class UserController
             exit();
         }
 
-        $userId = $_GET['user_id'] ?? null;
+       $userId = $_GET['id_usuario'] ?? $_GET['user_id'] ?? null;
 
         if (!$userId) {
             echo json_encode(['success' => false, 'message' => 'ID de usuario requerido']);

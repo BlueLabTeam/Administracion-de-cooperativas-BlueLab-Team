@@ -178,7 +178,7 @@
 }
 
 /* Botones de acción */
-.btn-small {
+.usuarios-btn-small {
     padding: 9px 18px;
     font-size: 13px;
     border: none;
@@ -190,7 +190,7 @@
     color: white;
 }
 
-.btn-view {
+.usuarios-btn-view {
     background: #005CB9;
     color: white;
     box-shadow: 0 3px 8px rgba(0, 92, 185, 0.3);

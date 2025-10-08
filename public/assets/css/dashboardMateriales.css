@@ -4,7 +4,7 @@
 
 /* ===== BASE GENERAL ===== */
 body {
-    color: white;
+
     background: #0f1e33;
     font-family: Arial, sans-serif;
 }
@@ -34,10 +34,10 @@ body {
 .materiales-search input {
     width: 100%;
     padding: 12px 16px 12px 45px;
-    border: 2px solid #007bff;
+    border: 2px solid #0054AA;
     border-radius: 10px;
     font-size: 15px;
-    background: #001a33;
+    background: white;
     color: white;
     transition: all 0.3s ease;
 }
@@ -60,38 +60,42 @@ body {
     box-shadow: 0 0 0 4px rgba(0, 200, 81, 0.2);
 }
 
+
 /* ===== TABLA ===== */
 .materiales-table-container {
     overflow-x: auto;
-    background: #002855;
+    background: white; /* contenedor blanco */
     border-radius: 12px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
 .materiales-table {
     width: 100%;
     border-collapse: collapse;
+    background: white; /* fondo de la tabla */
 }
 
+/* Encabezado: azul con texto blanco */
 .materiales-table thead {
     background: #0056b3;
     color: white;
 }
 
+/* Celdas: fondo blanco con texto negro */
 .materiales-table th,
 .materiales-table td {
     padding: 16px 20px;
     text-align: left;
     font-size: 14px;
+    color: #000; /* texto negro */
 }
 
-.materiales-table tbody tr {
-    transition: all 0.3s ease;
-}
-
+/* Hover suave para filas */
 .materiales-table tbody tr:hover {
-    background: #004080;
+    background: #e6f0ff; /* azul muy claro al pasar el mouse */
 }
+
+
 
 /* ===== BADGES ===== */
 .stock-badge {
