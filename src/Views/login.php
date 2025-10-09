@@ -6,8 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Login</title>
   <link rel="stylesheet" href="/assets/css/login.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+    integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
 
-  
 </head>
 
 <body>
@@ -22,10 +24,13 @@
         <form class="login__formulario" id="form-login" method="post">
           <label for="email" class="formulario__label">Correo</label>
           <input type="text" class="login__input input--usuario" name="email" placeholder="Ingrese su correo" />
-
           <label for="password" class="formulario__label">Contraseña</label>
-          <input type="password" class="login__input input--contrasenia" name="password"
-            placeholder="Ingrese su contraseña" />
+          <div class="password-container">
+            <input type="password" class="login__input input--contrasenia" name="password"
+              placeholder="Ingrese su contraseña" id="password" />
+            <i class="fa-solid fa-eye"></i>
+            <i class="fa-solid fa-eye-slash"></i>
+          </div>
           <input type="submit" class="login__submit" value="Ingresar" />
           <p> No tienes una cuenta?<a class="register-link" href="/register">Regístrate aquí</a></p>
         </form>
@@ -33,37 +38,37 @@
     </div>
   </main>
 
-   <?php include __DIR__ . '/includes/footer.html'; ?>
+  <?php include __DIR__ . '/includes/footer.html'; ?>
 
   <script>
     // lógica fetch original
-   document.querySelector("#form-login").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const formData = new FormData(e.target);
-  try {
-    const response = await fetch("/api/login", {
-      method: "POST",
-      body: formData
-    });
-    
-    // DEBUG: Ver qué responde el servidor
-    console.log("Status:", response.status);
-    const text = await response.text();
-    console.log("Respuesta del servidor:", text);
-    
-    const data = JSON.parse(text);
+    document.querySelector("#form-login").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      try {
+        const response = await fetch("/api/login", {
+          method: "POST",
+          body: formData
+        });
 
-    if (!data.success) {
-      alert(data.message);
-      if (data.redirect) window.location.href = data.redirect;
-    } else {
-      alert(data.message);
-      window.location.href = data.redirect;
-    }
-  } catch (error) {
-    console.error("error en la petición", error);
-    alert("Hubo un problema con el servidor: " + error.message)
-  }
+        // DEBUG: Ver qué responde el servidor
+        console.log("Status:", response.status);
+        const text = await response.text();
+        console.log("Respuesta del servidor:", text);
+
+        const data = JSON.parse(text);
+
+        if (!data.success) {
+          alert(data.message);
+          if (data.redirect) window.location.href = data.redirect;
+        } else {
+          alert(data.message);
+          window.location.href = data.redirect;
+        }
+      } catch (error) {
+        console.error("error en la petición", error);
+        alert("Hubo un problema con el servidor: " + error.message)
+      }
     });
 
     // partículas
@@ -133,6 +138,20 @@
       const x = (e.clientX / window.innerWidth) * 2 - 1;
       const y = (e.clientY / window.innerHeight) * 2 - 1;
       container.style.transform = `translateY(0) rotateY(${x * 1}deg) rotateX(${y * -1}deg)`;
+    });
+    let inputElement = document.getElementById("password");
+    let showElement = document.querySelector(".fa-eye");
+    let hideElement = document.querySelector(".fa-eye-slash");
+
+    showElement.addEventListener("click", function () {
+      inputElement.type = "text";
+      showElement.style.display = "none";
+      hideElement.style.display = "block";
+    });
+    hideElement.addEventListener("click", function () {
+      inputElement.type = "password";
+      hideElement.style.display = "none";
+      showElement.style.display = "block";
     });
   </script>
 </body>
