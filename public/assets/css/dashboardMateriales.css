@@ -1,13 +1,6 @@
 /* ==========================================
-   MATERIALES - ESTILO AZUL CON LETRA BLANCA
+   MATERIALES - DISEÑO MODERNO AZUL Y BLANCO
    ========================================== */
-
-/* ===== BASE GENERAL ===== */
-body {
-
-    background: #0f1e33;
-    font-family: Arial, sans-serif;
-}
 
 /* ===== CONTENEDOR PRINCIPAL ===== */
 .materiales-container {
@@ -34,11 +27,11 @@ body {
 .materiales-search input {
     width: 100%;
     padding: 12px 16px 12px 45px;
-    border: 2px solid #0054AA;
+    border: 2px solid #e0e0e0;
     border-radius: 10px;
     font-size: 15px;
     background: white;
-    color: white;
+    color: #333;
     transition: all 0.3s ease;
 }
 
@@ -50,78 +43,146 @@ body {
     left: 16px;
     top: 50%;
     transform: translateY(-50%);
-    color: #4da3ff;
+    color: #0066CC;
     font-size: 16px;
 }
 
 .materiales-search input:focus {
     outline: none;
-    border-color: #00c851;
-    box-shadow: 0 0 0 4px rgba(0, 200, 81, 0.2);
+    border-color: #0066CC;
+    box-shadow: 0 0 0 4px rgba(0, 102, 204, 0.1);
 }
 
+.materiales-search input::placeholder {
+    color: #999;
+}
 
-/* ===== TABLA ===== */
+/* ===== TABLA MODERNA ===== */
 .materiales-table-container {
     overflow-x: auto;
-    background: white; /* contenedor blanco */
+    background: white;
     border-radius: 12px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 20px rgba(0, 102, 204, 0.08);
+    border: 1px solid #e8f0ff;
 }
 
 .materiales-table {
     width: 100%;
-    border-collapse: collapse;
-    background: white; /* fondo de la tabla */
+    border-collapse: separate;
+    border-spacing: 0;
+    background: white;
 }
 
-/* Encabezado: azul con texto blanco */
+/* ===== ENCABEZADO MODERNO ===== */
 .materiales-table thead {
-    background: #0056b3;
-    color: white;
+    background: linear-gradient(135deg, #0066CC 0%, #0052a3 100%);
 }
 
-/* Celdas: fondo blanco con texto negro */
-.materiales-table th,
+.materiales-table thead tr {
+    box-shadow: 0 2px 10px rgba(0, 102, 204, 0.15);
+}
+
+.materiales-table th {
+    padding: 18px 20px;
+    text-align: left;
+    font-size: 14px;
+    font-weight: 700;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: none;
+}
+
+.materiales-table th:first-child {
+    border-radius: 12px 0 0 0;
+}
+
+.materiales-table th:last-child {
+    border-radius: 0 12px 0 0;
+}
+
+/* ===== CUERPO DE LA TABLA ===== */
+.materiales-table tbody tr {
+    transition: all 0.3s ease;
+    border-bottom: 1px solid #f0f4ff;
+}
+
+.materiales-table tbody tr:hover {
+    background: linear-gradient(90deg, #f8fbff 0%, #e8f0ff 100%);
+    transform: translateX(2px);
+    box-shadow: 0 2px 8px rgba(0, 102, 204, 0.08);
+}
+
+.materiales-table tbody tr:last-child {
+    border-bottom: none;
+}
+
 .materiales-table td {
     padding: 16px 20px;
     text-align: left;
     font-size: 14px;
-    color: #000; /* texto negro */
+    color: #2c3e50;
+    border: none;
 }
 
-/* Hover suave para filas */
-.materiales-table tbody tr:hover {
-    background: #e6f0ff; /* azul muy claro al pasar el mouse */
+/* ===== COLUMNA DE NOMBRE (DESTACADA) ===== */
+.materiales-table td:nth-child(2) {
+    font-weight: 600;
+    color: #0066CC;
 }
 
+/* ===== CARACTERÍSTICAS ===== */
+.materiales-table td:nth-child(3) {
+    color: #555;
+    font-size: 13px;
+    max-width: 300px;
+}
 
-
-/* ===== BADGES ===== */
+/* ===== BADGES DE STOCK MODERNOS ===== */
 .stock-badge {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 6px 14px;
-    border-radius: 20px;
+    padding: 8px 16px;
+    border-radius: 25px;
     font-size: 13px;
     font-weight: 700;
     color: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+}
+
+.stock-badge i {
+    font-size: 12px;
 }
 
 .stock-badge.disponible {
-    background: #00c851; /* verde */
+    background: linear-gradient(135deg, #00c851 0%, #00a142 100%);
 }
 
 .stock-badge.bajo {
-    background: #007bff; /* azul */
+    background: linear-gradient(135deg, #ffbb33 0%, #ff8800 100%);
 }
 
 .stock-badge.agotado {
-    background: #ff4444; /* rojo */
+    background: linear-gradient(135deg, #ff4444 0%, #cc0000 100%);
 }
 
-/* ===== BOTONES DE ACCIÓN ===== */
+/* ===== CANTIDAD DE STOCK ===== */
+.stock-cantidad {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: #0066CC;
+    font-size: 15px;
+}
+
+.stock-cantidad i {
+    color: #0066CC;
+}
+
+/* ===== BOTONES DE ACCIÓN MODERNOS ===== */
 .material-actions {
     display: flex;
     gap: 8px;
@@ -132,7 +193,7 @@ body {
     width: 40px;
     height: 40px;
     border: none;
-    border-radius: 8px;
+    border-radius: 10px;
     cursor: pointer;
     font-size: 16px;
     transition: all 0.3s ease;
@@ -140,30 +201,56 @@ body {
     align-items: center;
     justify-content: center;
     color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.material-actions button::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.4s, height 0.4s;
+}
+
+.material-actions button:hover::before {
+    width: 100px;
+    height: 100px;
 }
 
 .btn-stock-material {
-    background: #00c851; /* verde */
+    background: linear-gradient(135deg, #00c851 0%, #00a142 100%);
+    box-shadow: 0 4px 12px rgba(0, 200, 81, 0.3);
 }
 
 .btn-stock-material:hover {
-    background: #009e44;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 200, 81, 0.4);
 }
 
 .btn-edit-material {
-    background: #007bff; /* azul */
+    background: linear-gradient(135deg, #0066CC 0%, #0052a3 100%);
+    box-shadow: 0 4px 12px rgba(0, 102, 204, 0.3);
 }
 
 .btn-edit-material:hover {
-    background: #0056b3;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 102, 204, 0.4);
 }
 
 .btn-delete-material {
-    background: #ff4444; /* rojo */
+    background: linear-gradient(135deg, #ff4444 0%, #cc0000 100%);
+    box-shadow: 0 4px 12px rgba(255, 68, 68, 0.3);
 }
 
 .btn-delete-material:hover {
-    background: #cc0000;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(255, 68, 68, 0.4);
 }
 
 /* ===== MODAL ===== */
@@ -176,48 +263,58 @@ body {
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0,0,0,0.6);
+    background-color: rgba(0, 102, 204, 0.1);
     justify-content: center;
     align-items: center;
-    backdrop-filter: blur(5px);
+    backdrop-filter: blur(8px);
 }
 
 .material-modal-content {
-    background: #002855;
-    color: white;
+    background: white;
+    color: #333;
     padding: 30px;
-    border-radius: 12px;
+    border-radius: 16px;
     max-width: 550px;
     width: 90%;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    box-shadow: 0 20px 60px rgba(0, 102, 204, 0.2);
     animation: slideUp 0.3s ease;
+    border: 2px solid #e8f0ff;
 }
 
 .material-modal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 2px solid #007bff;
+    border-bottom: 3px solid #0066CC;
     padding-bottom: 15px;
     margin-bottom: 20px;
 }
 
 .material-modal-header h3 {
     margin: 0;
-    color: white;
+    color: #0066CC;
     font-size: 22px;
+    font-weight: 700;
 }
 
 .close-material-modal {
     background: transparent;
-    color: white;
+    color: #999;
     font-size: 28px;
     border: none;
     cursor: pointer;
+    transition: all 0.3s ease;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
 }
 
 .close-material-modal:hover {
     color: #ff4444;
+    background: #fff0f0;
 }
 
 /* ===== FORMULARIOS ===== */
@@ -227,31 +324,41 @@ body {
 
 .material-form-group label {
     font-weight: 600;
-    color: white;
+    color: #0066CC;
     margin-bottom: 8px;
     display: block;
+    font-size: 14px;
 }
 
 .material-form-group input,
 .material-form-group textarea {
     width: 100%;
     padding: 14px 16px;
-    border: 2px solid #007bff;
-    border-radius: 8px;
-    background: #001a33;
-    color: white;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    background: #f8fbff;
+    color: #333;
     transition: all 0.3s ease;
+    font-size: 14px;
 }
 
 .material-form-group textarea {
     resize: vertical;
     min-height: 100px;
+    font-family: Arial, sans-serif;
 }
 
 .material-form-group input:focus,
 .material-form-group textarea:focus {
-    border-color: #00c851;
-    box-shadow: 0 0 8px rgba(0, 200, 81, 0.3);
+    outline: none;
+    border-color: #0066CC;
+    box-shadow: 0 0 0 4px rgba(0, 102, 204, 0.1);
+    background: white;
+}
+
+.material-form-group input::placeholder,
+.material-form-group textarea::placeholder {
+    color: #999;
 }
 
 /* ===== BOTONES DE FORMULARIO ===== */
@@ -263,72 +370,102 @@ body {
 }
 
 .material-form-actions button {
-    padding: 10px 20px;
-    border-radius: 8px;
+    padding: 12px 24px;
+    border-radius: 10px;
     border: none;
     cursor: pointer;
-    font-weight: 600;
+    font-weight: 700;
     color: white;
     transition: all 0.3s ease;
+    font-size: 14px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.material-form-actions .btn-save {
-    background: #00c851; /* verde */
+.material-form-actions .btn-primary {
+    background: linear-gradient(135deg, #0066CC 0%, #0052a3 100%);
 }
 
-.material-form-actions .btn-save:hover {
-    background: #009e44;
+.material-form-actions .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 102, 204, 0.3);
 }
 
-.material-form-actions .btn-cancel {
-    background: #ff4444; /* rojo */
+.material-form-actions .btn-secondary {
+    background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
 }
 
-.material-form-actions .btn-cancel:hover {
-    background: #cc0000;
+.material-form-actions .btn-secondary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(108, 117, 125, 0.3);
 }
 
 /* ===== ESTADO VACÍO ===== */
 .empty-materials {
     text-align: center;
     padding: 60px 20px;
-    color: #b3d9ff;
+    color: #999;
 }
 
 .empty-materials i {
     font-size: 64px;
     margin-bottom: 20px;
-    color: #007bff;
+    color: #0066CC;
+    opacity: 0.5;
+}
+
+.empty-materials p {
+    color: #666;
+    font-size: 16px;
+}
+
+/* ===== LOADING STATE ===== */
+.loading {
+    text-align: center;
+    padding: 40px 20px;
+    color: #0066CC;
+    font-size: 16px;
+}
+
+.loading::after {
+    content: '...';
+    animation: dots 1.5s steps(4, end) infinite;
+}
+
+@keyframes dots {
+    0%, 20% { content: '.'; }
+    40% { content: '..'; }
+    60%, 100% { content: '...'; }
 }
 
 /* ===== ANIMACIONES ===== */
 @keyframes slideUp {
     from {
         opacity: 0;
-        transform: translateY(40px);
+        transform: translateY(40px) scale(0.95);
     }
     to {
         opacity: 1;
-        transform: translateY(0);
+        transform: translateY(0) scale(1);
     }
 }
 
 /* ===== SCROLLBAR PERSONALIZADO ===== */
-.material-modal-content::-webkit-scrollbar {
-    width: 8px;
+.materiales-table-container::-webkit-scrollbar {
+    height: 8px;
 }
 
-.material-modal-content::-webkit-scrollbar-track {
-    background: #001a33;
-}
-
-.material-modal-content::-webkit-scrollbar-thumb {
-    background: #007bff;
+.materiales-table-container::-webkit-scrollbar-track {
+    background: #f0f4ff;
     border-radius: 4px;
 }
 
-.material-modal-content::-webkit-scrollbar-thumb:hover {
-    background: #0056b3;
+.materiales-table-container::-webkit-scrollbar-thumb {
+    background: #0066CC;
+    border-radius: 4px;
+}
+
+.materiales-table-container::-webkit-scrollbar-thumb:hover {
+    background: #0052a3;
 }
 
 /* ===== RESPONSIVE ===== */
@@ -345,6 +482,7 @@ body {
     .material-modal-content {
         width: 95%;
         padding: 25px 20px;
+        border-radius: 12px;
     }
 
     .material-actions {
@@ -354,5 +492,31 @@ body {
     .material-actions button {
         width: 36px;
         height: 36px;
+        font-size: 14px;
+    }
+
+    .materiales-table th,
+    .materiales-table td {
+        padding: 12px 10px;
+        font-size: 13px;
+    }
+
+    .stock-badge {
+        font-size: 11px;
+        padding: 6px 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .materiales-table-container {
+        border-radius: 8px;
+    }
+
+    .materiales-table th:first-child {
+        border-radius: 8px 0 0 0;
+    }
+
+    .materiales-table th:last-child {
+        border-radius: 0 8px 0 0;
     }
 }
