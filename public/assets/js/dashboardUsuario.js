@@ -642,3 +642,542 @@ function renderMyVivienda(vivienda) {
     `;
 }
 
+// ==========================================
+// REGISTRO DE HORAS - USUARIO
+// Agregar AL FINAL de dashboardUsuario.js
+// ==========================================
+
+console.log('🟢 Cargando módulo de Registro de Horas');
+
+// Variables globales
+let relojInterval;
+let registroAbiertoId = null;
+
+// ========== INICIALIZACIÓN ==========
+document.addEventListener('DOMContentLoaded', function() {
+    // Iniciar reloj
+    updateClock();
+    relojInterval = setInterval(updateClock, 1000);
+    
+    // Listener para sección horas
+    const horasMenuItem = document.querySelector('.menu li[data-section="horas"]');
+    if (horasMenuItem) {
+        horasMenuItem.addEventListener('click', function() {
+            console.log('>>> Sección horas abierta');
+            inicializarSeccionHoras();
+        });
+    }
+});
+
+// ========== RELOJ EN TIEMPO REAL ==========
+function updateClock() {
+    const now = new Date();
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    
+    const clockElement = document.getElementById('current-time-display');
+    if (clockElement) {
+        clockElement.textContent = `${hours}:${minutes}:${seconds}`;
+    }
+}
+
+// ========== INICIALIZAR SECCIÓN ==========
+function inicializarSeccionHoras() {
+    console.log('>>> Inicializando sección de horas');
+    verificarRegistroAbierto();
+    loadResumenSemanal();
+    loadMisRegistros();
+}
+
+// ========== VERIFICAR SI HAY REGISTRO ABIERTO HOY ==========
+async function verificarRegistroAbierto() {
+    try {
+        const response = await fetch('/api/horas/registro-abierto');
+        const data = await response.json();
+        
+        console.log('Registro abierto:', data);
+        
+        if (data.success && data.registro) {
+            // Hay registro abierto
+            registroAbiertoId = data.registro.id_registro;
+            mostrarBotonSalida(data.registro.hora_entrada);
+        } else {
+            // No hay registro abierto
+            registroAbiertoId = null;
+            mostrarBotonEntrada();
+        }
+        
+        // Actualizar estadísticas
+        cargarEstadisticas();
+        
+    } catch (error) {
+        console.error('Error al verificar registro:', error);
+        mostrarBotonEntrada();
+    }
+}
+
+// ========== MOSTRAR BOTONES ==========
+function mostrarBotonEntrada() {
+    document.getElementById('btn-entrada').style.display = 'inline-block';
+    document.getElementById('btn-salida').style.display = 'none';
+    document.getElementById('registro-activo-info').style.display = 'none';
+}
+
+function mostrarBotonSalida(horaEntrada) {
+    document.getElementById('btn-entrada').style.display = 'none';
+    document.getElementById('btn-salida').style.display = 'inline-block';
+    
+    const infoDiv = document.getElementById('registro-activo-info');
+    infoDiv.style.display = 'block';
+    
+    const horaEntradaSpan = document.getElementById('hora-entrada-activa');
+    horaEntradaSpan.textContent = horaEntrada.substring(0, 5); // HH:MM
+}
+
+// ========== MARCAR ENTRADA ==========
+async function marcarEntrada() {
+    const descripcion = prompt('Describe brevemente tu trabajo de hoy (opcional):');
+    if (descripcion === null) return; // Usuario canceló
+    
+    const btnEntrada = document.getElementById('btn-entrada');
+    btnEntrada.disabled = true;
+    btnEntrada.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Registrando...';
+    
+    try {
+        const formData = new FormData();
+        formData.append('fecha', new Date().toISOString().split('T')[0]);
+        formData.append('hora_entrada', new Date().toTimeString().split(' ')[0]);
+        formData.append('descripcion', descripcion || '');
+        
+        const response = await fetch('/api/horas/iniciar', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert('✅ ' + data.message);
+            registroAbiertoId = data.id_registro;
+            verificarRegistroAbierto();
+            loadMisRegistros();
+        } else {
+            alert('❌ ' + data.message);
+            btnEntrada.disabled = false;
+            btnEntrada.innerHTML = '<i class="fas fa-sign-in-alt"></i> Marcar Entrada';
+        }
+        
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error de conexión');
+        btnEntrada.disabled = false;
+        btnEntrada.innerHTML = '<i class="fas fa-sign-in-alt"></i> Marcar Entrada';
+    }
+}
+
+// ========== MARCAR SALIDA ==========
+async function marcarSalida() {
+    if (!registroAbiertoId) {
+        alert('No hay registro activo');
+        return;
+    }
+    
+    if (!confirm('¿Deseas registrar tu salida?')) return;
+    
+    const btnSalida = document.getElementById('btn-salida');
+    btnSalida.disabled = true;
+    btnSalida.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Registrando...';
+    
+    try {
+        const formData = new FormData();
+        formData.append('id_registro', registroAbiertoId);
+        formData.append('hora_salida', new Date().toTimeString().split(' ')[0]);
+        
+        const response = await fetch('/api/horas/cerrar', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert(`✅ ${data.message}\n\nTotal trabajado: ${data.total_horas} horas`);
+            registroAbiertoId = null;
+            verificarRegistroAbierto();
+            loadMisRegistros();
+            loadResumenSemanal();
+        } else {
+            alert('❌ ' + data.message);
+            btnSalida.disabled = false;
+            btnSalida.innerHTML = '<i class="fas fa-sign-out-alt"></i> Marcar Salida';
+        }
+        
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error de conexión');
+        btnSalida.disabled = false;
+        btnSalida.innerHTML = '<i class="fas fa-sign-out-alt"></i> Marcar Salida';
+    }
+}
+
+// ========== CARGAR ESTADÍSTICAS ==========
+async function cargarEstadisticas() {
+    try {
+        const responseResumen = await fetch('/api/horas/resumen-semanal');
+        const dataResumen = await responseResumen.json();
+        
+        const responseStats = await fetch('/api/horas/estadisticas');
+        const dataStats = await responseStats.json();
+        
+        if (dataResumen.success) {
+            document.getElementById('horas-semana').textContent = 
+                (dataResumen.resumen.total_horas || 0) + 'h';
+            document.getElementById('dias-semana').textContent = 
+                dataResumen.resumen.dias_trabajados || 0;
+        }
+        
+        if (dataStats.success) {
+            document.getElementById('horas-mes').textContent = 
+                (dataStats.estadisticas.total_horas || 0) + 'h';
+        }
+        
+    } catch (error) {
+        console.error('Error al cargar estadísticas:', error);
+    }
+}
+
+// ========== RESUMEN SEMANAL ==========
+async function loadResumenSemanal() {
+    const container = document.getElementById('resumen-semanal-container');
+    container.innerHTML = '<p class="loading">Cargando...</p>';
+    
+    try {
+        const response = await fetch('/api/horas/resumen-semanal');
+        const data = await response.json();
+        
+        if (data.success) {
+            renderResumenSemanal(data.resumen);
+        } else {
+            container.innerHTML = '<p class="error">Error al cargar resumen</p>';
+        }
+        
+    } catch (error) {
+        console.error('Error:', error);
+        container.innerHTML = '<p class="error">Error de conexión</p>';
+    }
+}
+
+function renderResumenSemanal(resumen) {
+    const container = document.getElementById('resumen-semanal-container');
+    
+    const diasSemana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
+    const registrosPorDia = {};
+    
+    // Organizar registros por día
+    resumen.registros.forEach(reg => {
+        registrosPorDia[reg.fecha] = reg;
+    });
+    
+    // Generar fechas de la semana
+    const fechaInicio = new Date(resumen.semana.inicio);
+    const fechas = [];
+    for (let i = 0; i < 5; i++) {
+        const fecha = new Date(fechaInicio);
+        fecha.setDate(fecha.getDate() + i);
+        fechas.push(fecha.toISOString().split('T')[0]);
+    }
+    
+    let html = `
+        <div class="resumen-semana-header">
+            <p><strong>Semana del ${formatearFecha(resumen.semana.inicio)} al ${formatearFecha(resumen.semana.fin)}</strong></p>
+            <p>Total: <strong>${resumen.total_horas}h</strong> | Días trabajados: <strong>${resumen.dias_trabajados}</strong></p>
+        </div>
+        <div class="resumen-dias-grid">
+    `;
+    
+    fechas.forEach((fecha, index) => {
+        const registro = registrosPorDia[fecha];
+        const dia = diasSemana[index];
+        const fechaFormateada = formatearFecha(fecha);
+        
+        html += `
+            <div class="dia-card ${registro ? 'con-registro' : 'sin-registro'}">
+                <div class="dia-header">
+                    <strong>${dia}</strong>
+                    <span class="dia-fecha">${fechaFormateada}</span>
+                </div>
+                <div class="dia-content">
+        `;
+        
+        if (registro) {
+            const entrada = registro.hora_entrada ? registro.hora_entrada.substring(0, 5) : '--:--';
+            const salida = registro.hora_salida ? registro.hora_salida.substring(0, 5) : '--:--';
+            const horas = registro.total_horas || 0;
+            const estadoBadge = getEstadoBadge(registro.estado);
+            
+            html += `
+                <p><i class="fas fa-sign-in-alt"></i> Entrada: <strong>${entrada}</strong></p>
+                <p><i class="fas fa-sign-out-alt"></i> Salida: <strong>${salida}</strong></p>
+                <p><i class="fas fa-clock"></i> Total: <strong>${horas}h</strong></p>
+                ${estadoBadge}
+            `;
+        } else {
+            html += '<p class="no-registro">Sin registro</p>';
+        }
+        
+        html += `
+                </div>
+            </div>
+        `;
+    });
+    
+    html += '</div>';
+    container.innerHTML = html;
+}
+
+function getEstadoBadge(estado) {
+    const badges = {
+        'pendiente': '<span class="badge-estado pendiente">Pendiente</span>',
+        'aprobado': '<span class="badge-estado aprobado">✓ Aprobado</span>',
+        'rechazado': '<span class="badge-estado rechazado">✗ Rechazado</span>'
+    };
+    return badges[estado] || '';
+}
+
+// ========== HISTORIAL DE REGISTROS ==========
+async function loadMisRegistros() {
+    const container = document.getElementById('historial-registros-container');
+    container.innerHTML = '<p class="loading">Cargando registros...</p>';
+    
+    try {
+        const response = await fetch('/api/horas/mis-registros');
+        const data = await response.json();
+        
+        if (data.success) {
+            renderHistorialRegistros(data.registros);
+        } else {
+            container.innerHTML = '<p class="error">Error al cargar registros</p>';
+        }
+        
+    } catch (error) {
+        console.error('Error:', error);
+        container.innerHTML = '<p class="error">Error de conexión</p>';
+    }
+}
+
+function renderHistorialRegistros(registros) {
+    const container = document.getElementById('historial-registros-container');
+    
+    if (!registros || registros.length === 0) {
+        container.innerHTML = '<p class="no-data">No hay registros</p>';
+        return;
+    }
+    
+    let html = `
+        <div class="registros-table-wrapper">
+            <table class="registros-table">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Entrada</th>
+                        <th>Salida</th>
+                        <th>Total</th>
+                        <th>Estado</th>
+                        <th>Descripción</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+    
+    registros.forEach(reg => {
+        const fecha = formatearFecha(reg.fecha);
+        const entrada = reg.hora_entrada ? reg.hora_entrada.substring(0, 5) : '--:--';
+        const salida = reg.hora_salida ? reg.hora_salida.substring(0, 5) : 'En curso';
+        const horas = reg.total_horas || '0';
+        const estado = reg.estado || 'pendiente';
+        const descripcion = reg.descripcion || '-';
+        
+        const puedeEditar = estado === 'pendiente' && reg.hora_salida !== null;
+        
+        html += `
+            <tr class="registro-row estado-${estado}">
+                <td>${fecha}</td>
+                <td>${entrada}</td>
+                <td>${salida}</td>
+                <td><strong>${horas}h</strong></td>
+                <td>
+                    <span class="badge-estado ${estado}">
+                        ${formatearEstado(estado)}
+                    </span>
+                </td>
+                <td class="descripcion-cell">${descripcion}</td>
+                <td>
+                    ${puedeEditar ? `
+                        <button class="btn-small btn-edit" onclick="editarRegistro(${reg.id_registro})" title="Editar">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                    ` : ''}
+                    ${reg.observaciones ? `
+                        <button class="btn-small btn-info" onclick="verObservaciones('${reg.observaciones.replace(/'/g, "\\'")}')">
+                            <i class="fas fa-info-circle"></i>
+                        </button>
+                    ` : ''}
+                </td>
+            </tr>
+        `;
+    });
+    
+    html += `
+                </tbody>
+            </table>
+        </div>
+    `;
+    
+    container.innerHTML = html;
+}
+
+function formatearEstado(estado) {
+    const estados = {
+        'pendiente': 'Pendiente',
+        'aprobado': 'Aprobado',
+        'rechazado': 'Rechazado'
+    };
+    return estados[estado] || estado;
+}
+
+function formatearFecha(fecha) {
+    const f = new Date(fecha + 'T00:00:00');
+    return f.toLocaleDateString('es-UY', { 
+        day: '2-digit', 
+        month: '2-digit', 
+        year: 'numeric' 
+    });
+}
+
+// ========== FILTRAR REGISTROS ==========
+async function filtrarRegistros() {
+    const fechaInicio = document.getElementById('filtro-fecha-inicio').value;
+    const fechaFin = document.getElementById('filtro-fecha-fin').value;
+    
+    if (!fechaInicio || !fechaFin) {
+        alert('Selecciona ambas fechas');
+        return;
+    }
+    
+    if (fechaInicio > fechaFin) {
+        alert('La fecha de inicio debe ser anterior a la fecha de fin');
+        return;
+    }
+    
+    const container = document.getElementById('historial-registros-container');
+    container.innerHTML = '<p class="loading">Filtrando...</p>';
+    
+    try {
+        const url = `/api/horas/mis-registros?fecha_inicio=${fechaInicio}&fecha_fin=${fechaFin}`;
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        if (data.success) {
+            renderHistorialRegistros(data.registros);
+        } else {
+            container.innerHTML = '<p class="error">Error al filtrar</p>';
+        }
+        
+    } catch (error) {
+        console.error('Error:', error);
+        container.innerHTML = '<p class="error">Error de conexión</p>';
+    }
+}
+
+// ========== EDITAR REGISTRO ==========
+async function editarRegistro(idRegistro) {
+    try {
+        // Obtener datos del registro
+        const response = await fetch(`/api/horas/mis-registros`);
+        const data = await response.json();
+        
+        if (!data.success) {
+            alert('Error al cargar datos');
+            return;
+        }
+        
+        const registro = data.registros.find(r => r.id_registro == idRegistro);
+        
+        if (!registro) {
+            alert('Registro no encontrado');
+            return;
+        }
+        
+        // Llenar formulario
+        document.getElementById('edit-id-registro').value = registro.id_registro;
+        document.getElementById('edit-hora-entrada').value = registro.hora_entrada.substring(0, 5);
+        document.getElementById('edit-hora-salida').value = registro.hora_salida ? registro.hora_salida.substring(0, 5) : '';
+        document.getElementById('edit-descripcion').value = registro.descripcion || '';
+        
+        // Mostrar modal
+        document.getElementById('editarRegistroModal').style.display = 'flex';
+        
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al cargar registro');
+    }
+}
+
+function closeEditarRegistroModal() {
+    document.getElementById('editarRegistroModal').style.display = 'none';
+    document.getElementById('editarRegistroForm').reset();
+}
+
+async function submitEditarRegistro(event) {
+    event.preventDefault();
+    
+    const formData = new FormData();
+    formData.append('id_registro', document.getElementById('edit-id-registro').value);
+    formData.append('hora_entrada', document.getElementById('edit-hora-entrada').value + ':00');
+    
+    const horaSalida = document.getElementById('edit-hora-salida').value;
+    if (horaSalida) {
+        formData.append('hora_salida', horaSalida + ':00');
+    }
+    
+    formData.append('descripcion', document.getElementById('edit-descripcion').value);
+    
+    try {
+        const response = await fetch('/api/horas/editar', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert('✅ ' + data.message);
+            closeEditarRegistroModal();
+            loadMisRegistros();
+            loadResumenSemanal();
+        } else {
+            alert('❌ ' + data.message);
+        }
+        
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error de conexión');
+    }
+}
+
+// ========== VER OBSERVACIONES ==========
+function verObservaciones(observaciones) {
+    alert('Observaciones del administrador:\n\n' + observaciones);
+}
+
+// ========== CERRAR MODAL AL HACER CLICK FUERA ==========
+window.addEventListener('click', function(event) {
+    const modal = document.getElementById('editarRegistroModal');
+    if (event.target === modal) {
+        closeEditarRegistroModal();
+    }
+});
+
+console.log('✅ Módulo de Registro de Horas cargado completamente');

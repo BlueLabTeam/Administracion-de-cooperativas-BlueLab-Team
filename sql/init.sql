@@ -339,6 +339,32 @@ CREATE TABLE IF NOT EXISTS Asignacion_Vivienda (
     )
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- TABLA DE REGISTRO DE HORAS
+CREATE TABLE IF NOT EXISTS Registro_Horas (
+    id_registro INT PRIMARY KEY AUTO_INCREMENT,
+    id_usuario INT NOT NULL,
+    fecha DATE NOT NULL,
+    hora_entrada TIME NOT NULL,
+    hora_salida TIME NULL,
+    total_horas DECIMAL(5,2) DEFAULT 0.00,
+    descripcion TEXT,
+    estado ENUM('pendiente', 'aprobado', 'rechazado') DEFAULT 'pendiente',
+    observaciones TEXT,
+    fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+    fecha_modificacion DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_usuario) REFERENCES Usuario(id_usuario) ON DELETE CASCADE,
+    INDEX idx_usuario_fecha (id_usuario, fecha),
+    INDEX idx_estado (estado),
+    INDEX idx_fecha (fecha),
+    CONSTRAINT chk_entrada_salida CHECK (
+        hora_salida IS NULL OR hora_salida > hora_entrada
+    ),
+    CONSTRAINT chk_no_fin_semana CHECK (
+        DAYOFWEEK(fecha) NOT IN (1, 7)  -- 1=Domingo, 7=Sábado
+    )
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
 -- Insertar algunas viviendas de ejemplo
 INSERT INTO Viviendas (numero_vivienda, direccion, id_tipo, estado, metros_cuadrados) VALUES
 ('A-101', 'Bloque A, Planta Baja', 1, 'disponible', 35.50),

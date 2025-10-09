@@ -120,6 +120,17 @@ $privateRoutes = [
     '/api/viviendas/asignar',
     '/api/viviendas/desasignar',
     '/api/viviendas/my-vivienda',
+    '/api/horas/iniciar',
+    '/api/horas/cerrar',
+    '/api/horas/mis-registros',
+    '/api/horas/registro-abierto',
+    '/api/horas/resumen-semanal',
+    '/api/horas/estadisticas',
+    '/api/horas/editar',
+    '/api/horas/all',
+    '/api/horas/aprobar',
+    '/api/horas/rechazar',
+    '/api/horas/resumen-usuario',
 ];
 
 // Aplicar middleware según el tipo de ruta
@@ -339,6 +350,54 @@ switch ($uri) {
     case '/api/viviendas/my-vivienda':
         (new App\Controllers\ViviendaController())->getMyVivienda();
         break;
+
+
+        // API REGISTRO DE HORAS - USUARIO
+case '/api/horas/iniciar':
+    (new App\Controllers\RegistroHorasController())->iniciarJornada();
+    break;
+
+case '/api/horas/cerrar':
+    (new App\Controllers\RegistroHorasController())->cerrarJornada();
+    break;
+
+case '/api/horas/mis-registros':
+    (new App\Controllers\RegistroHorasController())->getMisRegistros();
+    break;
+
+case '/api/horas/registro-abierto':
+    (new App\Controllers\RegistroHorasController())->getRegistroAbiertoHoy();
+    break;
+
+case '/api/horas/resumen-semanal':
+    (new App\Controllers\RegistroHorasController())->getResumenSemanal();
+    break;
+
+case '/api/horas/estadisticas':
+    (new App\Controllers\RegistroHorasController())->getEstadisticasMes();
+    break;
+
+case '/api/horas/editar':
+    (new App\Controllers\RegistroHorasController())->editarRegistro();
+    break;
+
+// API REGISTRO DE HORAS - ADMIN
+case '/api/horas/all':
+    (new App\Controllers\RegistroHorasController())->getAllRegistros();
+    break;
+
+case '/api/horas/aprobar':
+    (new App\Controllers\RegistroHorasController())->aprobarHoras();
+    break;
+
+case '/api/horas/rechazar':
+    (new App\Controllers\RegistroHorasController())->rechazarHoras();
+    break;
+
+case '/api/horas/resumen-usuario':
+    (new App\Controllers\RegistroHorasController())->getResumenPorUsuario();
+    break;
+
 
     default:
         http_response_code(404);
