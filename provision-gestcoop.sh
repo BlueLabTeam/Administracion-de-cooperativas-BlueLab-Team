@@ -156,14 +156,16 @@ setup_project(){
     fi
   fi
 
-  # Permisos en storage/uploads
-  if [ -d storage/uploads ]; then
-    log "Ajustando permisos en storage/uploads..."
-    $SUDO chmod -R 775 storage/uploads || true
-    if $SUDO $dc -f "$DC_FILE" exec -T "$APP_SERVICE" id www-data >/dev/null 2>&1; then
-      $SUDO $dc -f "$DC_FILE" exec -T "$APP_SERVICE" chown -R www-data:www-data /var/www/storage/uploads || true
-    fi
-  fi
+  # # Storage
+  mkdir -p storage/
+  # # Permisos en storage/uploads
+  # if [ -d storage/uploads ]; then
+  #   log "Ajustando permisos en storage/uploads..."
+  #   $SUDO chmod -R 775 storage/uploads || true
+  #   if $SUDO $dc -f "$DC_FILE" exec -T "$APP_SERVICE" id www-data >/dev/null 2>&1; then
+  #     $SUDO $dc -f "$DC_FILE" exec -T "$APP_SERVICE" chown -R www-data:www-data /var/www/storage/uploads || true
+  #   fi
+  # fi
 
   # Permisos en public
   if [ -d public ]; then
@@ -171,12 +173,18 @@ setup_project(){
     $SUDO chmod -R 755 public || true
   fi
 
-  if [ -d logs ]; then
-    log "Ajustando permisos en logs..."
-    chmod -R 775 logs || true
+  if [ -f scripts/backup-db.sh ]; then
+    log "Se detectó scripts/backup-db.sh. Ajustando permisos..."
+    $SUDO chmod +x scripts/backup-db.sh || true
   fi
 
-  log "Setup del proyecto finalizado."
+  #crontab
+
+  info "Configurando tarea cron para backup diario a las 2am..."
+  (crontab -l 2>/dev/null; echo "0 2 * * * bash $(pwd)/scripts/backup.sh >> $(pwd)/logs/backup.log 2>&1") | crontab -
+
+
+  log "Setup completado."
 }
 
 ### ===== MAIN =====
