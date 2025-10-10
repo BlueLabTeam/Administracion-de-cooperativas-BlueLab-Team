@@ -92,7 +92,7 @@
     // ripple efecto botón
     function addButtonEffects() {
       const submitBtn = document.querySelector('.login__submit');
-      submitBtn.addEventListener('click', function (e) {
+      submitBtn.addEventListener('click', function(e) {
         const ripple = document.createElement('span');
         const rect = this.getBoundingClientRect();
         const size = Math.max(rect.width, rect.height);
@@ -124,31 +124,35 @@
     document.head.appendChild(style);
 
     // inicializar animaciones
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
       createParticles();
       addButtonEffects();
       document.body.style.opacity = '0';
       document.body.style.transition = 'opacity 0.5s ease';
-      setTimeout(() => { document.body.style.opacity = '1'; }, 100);
+      setTimeout(() => {
+        document.body.style.opacity = '1';
+      }, 100);
     });
 
     // paralaje
-    document.addEventListener('mousemove', function (e) {
+    document.addEventListener('mousemove', function(e) {
       const container = document.getElementById('loginBox');
       const x = (e.clientX / window.innerWidth) * 2 - 1;
       const y = (e.clientY / window.innerHeight) * 2 - 1;
       container.style.transform = `translateY(0) rotateY(${x * 1}deg) rotateX(${y * -1}deg)`;
     });
+
+    // Ver password
     let inputElement = document.getElementById("password");
     let showElement = document.querySelector(".fa-eye");
     let hideElement = document.querySelector(".fa-eye-slash");
 
-    showElement.addEventListener("click", function () {
+    showElement.addEventListener("click", function() {
       inputElement.type = "text";
       showElement.style.display = "none";
       hideElement.style.display = "block";
     });
-    hideElement.addEventListener("click", function () {
+    hideElement.addEventListener("click", function() {
       inputElement.type = "password";
       hideElement.style.display = "none";
       showElement.style.display = "block";
