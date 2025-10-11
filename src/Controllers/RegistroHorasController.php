@@ -51,17 +51,7 @@ class RegistroHorasController
             error_log("Fecha: " . $fecha);
             error_log("Hora entrada: " . $hora_entrada);
 
-            // COMENTADO TEMPORALMENTE PARA TESTING (DESCOMENTAR EN PRODUCCIÓN)
-            /*
-            $dia_semana = date('N', strtotime($fecha));
-            if ($dia_semana > 5) {
-                echo json_encode([
-                    'success' => false,
-                    'message' => 'No se pueden registrar horas en fin de semana'
-                ]);
-                exit();
-            }
-            */
+         
 
             $resultado = $this->registroHorasModel->iniciarJornada(
                 $id_usuario,

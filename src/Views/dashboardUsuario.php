@@ -125,7 +125,6 @@ if (!isset($_SESSION['user_id'])) {
 		</section>
 
 		<!-- HORAS -->
-		<!-- SECCIÓN HORAS - REEMPLAZAR LA SECCIÓN EXISTENTE EN dashboardUsuario.php -->
 <section id="horas-section" class="section-content">
 	<h2 class="section-title">⏰ Registro de Horas</h2>
 	

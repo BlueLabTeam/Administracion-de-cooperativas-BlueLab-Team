@@ -23,7 +23,7 @@ class RegistroHoras
             error_log("=== MODEL: iniciarJornada ===");
             error_log("Usuario: $id_usuario, Fecha: $fecha, Hora: $hora_entrada");
 
-            // COMENTADO TEMPORALMENTE PARA TESTING (DESCOMENTAR EN PRODUCCIÓN)
+           
         /*
         $dia_semana = date('N', strtotime($fecha));
         if ($dia_semana > 5) {
