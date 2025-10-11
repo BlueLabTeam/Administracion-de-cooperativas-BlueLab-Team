@@ -261,7 +261,7 @@ switch ($uri) {
         }
         break;
 
-    // API NUCLEOS - ✅ CORREGIDO
+    // API NUCLEOS
     case '/api/nucleos/create':
         (new App\Controllers\NucleoController())->create();
         break;
@@ -269,7 +269,6 @@ switch ($uri) {
         (new App\Controllers\NucleoController())->getAll();
         break;
     case '/api/nucleos/details':
-        // ✅ CORRECCIÓN: Dejar que el controller maneje el parámetro
         (new App\Controllers\NucleoController())->getDetails();
         break;
     case '/api/nucleos/update':
@@ -290,7 +289,6 @@ switch ($uri) {
         (new App\Controllers\MaterialController())->getAll();
         break;
     case '/api/materiales/details':
-        // ✅ Dejar que el controller maneje el parámetro
         (new App\Controllers\MaterialController())->getById();
         break;
     case '/api/materiales/update':
@@ -351,53 +349,52 @@ switch ($uri) {
         (new App\Controllers\ViviendaController())->getMyVivienda();
         break;
 
+ 
+    // API REGISTRO DE HORAS - USUARIO
+    case '/api/horas/iniciar':
+        (new App\Controllers\RegistroHorasController())->iniciarJornada();
+        break;
 
-        // API REGISTRO DE HORAS - USUARIO
-case '/api/horas/iniciar':
-    (new App\Controllers\RegistroHorasController())->iniciarJornada();
-    break;
+    case '/api/horas/cerrar':
+        (new App\Controllers\RegistroHorasController())->cerrarJornada();
+        break;
 
-case '/api/horas/cerrar':
-    (new App\Controllers\RegistroHorasController())->cerrarJornada();
-    break;
+    case '/api/horas/mis-registros':
+        (new App\Controllers\RegistroHorasController())->getMisRegistros();
+        break;
 
-case '/api/horas/mis-registros':
-    (new App\Controllers\RegistroHorasController())->getMisRegistros();
-    break;
+    case '/api/horas/registro-abierto':
+        (new App\Controllers\RegistroHorasController())->getRegistroAbiertoHoy();
+        break;
 
-case '/api/horas/registro-abierto':
-    (new App\Controllers\RegistroHorasController())->getRegistroAbiertoHoy();
-    break;
+    case '/api/horas/resumen-semanal':
+        (new App\Controllers\RegistroHorasController())->getResumenSemanal();
+        break;
 
-case '/api/horas/resumen-semanal':
-    (new App\Controllers\RegistroHorasController())->getResumenSemanal();
-    break;
+    case '/api/horas/estadisticas':
+        (new App\Controllers\RegistroHorasController())->getEstadisticasMes();
+        break;
 
-case '/api/horas/estadisticas':
-    (new App\Controllers\RegistroHorasController())->getEstadisticasMes();
-    break;
+    case '/api/horas/editar':
+        (new App\Controllers\RegistroHorasController())->editarRegistro();
+        break;
 
-case '/api/horas/editar':
-    (new App\Controllers\RegistroHorasController())->editarRegistro();
-    break;
+    // API REGISTRO DE HORAS - ADMIN
+    case '/api/horas/all':
+        (new App\Controllers\RegistroHorasController())->getAllRegistros();
+        break;
 
-// API REGISTRO DE HORAS - ADMIN
-case '/api/horas/all':
-    (new App\Controllers\RegistroHorasController())->getAllRegistros();
-    break;
+    case '/api/horas/aprobar':
+        (new App\Controllers\RegistroHorasController())->aprobarHoras();
+        break;
 
-case '/api/horas/aprobar':
-    (new App\Controllers\RegistroHorasController())->aprobarHoras();
-    break;
+    case '/api/horas/rechazar':
+        (new App\Controllers\RegistroHorasController())->rechazarHoras();
+        break;
 
-case '/api/horas/rechazar':
-    (new App\Controllers\RegistroHorasController())->rechazarHoras();
-    break;
-
-case '/api/horas/resumen-usuario':
-    (new App\Controllers\RegistroHorasController())->getResumenPorUsuario();
-    break;
-
+    case '/api/horas/resumen-usuario':
+        (new App\Controllers\RegistroHorasController())->getResumenPorUsuario();
+        break;
 
     default:
         http_response_code(404);

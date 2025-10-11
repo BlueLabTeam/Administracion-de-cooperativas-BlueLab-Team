@@ -18,6 +18,7 @@ if (!isset($_SESSION['user_id'])) {
 	<link rel="stylesheet" href="/assets/css/dashboardHeader.css" />
 	<link rel="stylesheet" href="/assets/css/dashboardNotificaciones.css" />
 	<link rel="stylesheet" href="/assets/css/dashboardTareas.css" />
+	<link rel="stylesheet" href="/assets/css/dashboardHoras.css" />
 	<link rel="stylesheet" href="/assets/css/dashboardUtils.css" />
 	<link rel="stylesheet" href="/assets/css/dashboardViviendas.css" />
 </head>
@@ -144,6 +145,8 @@ if (!isset($_SESSION['user_id'])) {
 					<i class="fas fa-sign-out-alt"></i> Marcar Salida
 				</button>
 			</div>
+
+			
 			
 			<div id="registro-activo-info" style="display: none; margin-top: 15px; padding: 15px; background: #e3f2fd; border-radius: 8px; text-align: center;">
 				<p style="margin: 0; font-weight: bold; color: #1976d2;">

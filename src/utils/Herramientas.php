@@ -12,10 +12,15 @@ class Herramientas
 
     public static function startSession()
     {
-        if (session_status() === PHP_SESSION_NONE) {
+           if (session_status() === PHP_SESSION_NONE) {
+        
+        if (!headers_sent()) {
             session_start();
+        } else {
+            error_log("⚠️ Headers already sent, no se puede iniciar sesión");
         }
     }
+}
 
     public static function safeRedirect(string $ruta)
     {
@@ -96,7 +101,18 @@ class Herramientas
             '/api/viviendas/asignar',
             '/api/viviendas/desasignar',
             '/api/viviendas/tipos',
-            '/api/viviendas/my-vivienda'
+            '/api/viviendas/my-vivienda',
+            '/api/horas/iniciar',
+            '/api/horas/cerrar',
+            '/api/horas/mis-registros',
+            '/api/horas/registro-abierto',
+            '/api/horas/resumen-semanal',
+            '/api/horas/estadisticas',
+            '/api/horas/editar',
+            '/api/horas/all',
+            '/api/horas/aprobar',
+            '/api/horas/rechazar',
+            '/api/horas/resumen-usuario'
         ];
         
         if (in_array($currentURL, $rutasExcluidas)) {

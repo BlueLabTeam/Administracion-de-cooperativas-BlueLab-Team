@@ -10,9 +10,16 @@ class RegistroHorasController
 
     public function __construct()
     {
+        // Limpiar cualquier output previo
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
+        ob_start();
+        
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
+        
         $this->registroHorasModel = new RegistroHoras();
     }
 
@@ -21,29 +28,40 @@ class RegistroHorasController
      */
     public function iniciarJornada()
     {
-        header('Content-Type: application/json');
-
-        if (!isset($_SESSION['user_id'])) {
-            http_response_code(401);
-            echo json_encode(['success' => false, 'message' => 'No autenticado']);
-            exit();
-        }
-
         try {
-            $id_usuario = $_SESSION['user_id'];
+            ob_clean();
+            header('Content-Type: application/json; charset=utf-8');
+            
+            if (!isset($_SESSION['user_id'])) {
+                http_response_code(401);
+                echo json_encode([
+                    'success' => false, 
+                    'message' => 'No autenticado'
+                ]);
+                exit();
+            }
+
+            $id_usuario = intval($_SESSION['user_id']);
             $fecha = $_POST['fecha'] ?? date('Y-m-d');
             $hora_entrada = $_POST['hora_entrada'] ?? date('H:i:s');
-            $descripcion = $_POST['descripcion'] ?? '';
+            $descripcion = trim($_POST['descripcion'] ?? '');
 
-            // Validar que no sea fin de semana
+            error_log("=== INICIAR JORNADA ===");
+            error_log("Usuario ID: " . $id_usuario);
+            error_log("Fecha: " . $fecha);
+            error_log("Hora entrada: " . $hora_entrada);
+
+            // COMENTADO TEMPORALMENTE PARA TESTING (DESCOMENTAR EN PRODUCCIÓN)
+            /*
             $dia_semana = date('N', strtotime($fecha));
-            if ($dia_semana > 5) { // 6 = sábado, 7 = domingo
+            if ($dia_semana > 5) {
                 echo json_encode([
                     'success' => false,
                     'message' => 'No se pueden registrar horas en fin de semana'
                 ]);
                 exit();
             }
+            */
 
             $resultado = $this->registroHorasModel->iniciarJornada(
                 $id_usuario,
@@ -52,14 +70,17 @@ class RegistroHorasController
                 $descripcion
             );
 
+            error_log("Resultado: " . json_encode($resultado));
             echo json_encode($resultado);
 
         } catch (\Exception $e) {
-            error_log("Error en iniciarJornada: " . $e->getMessage());
+            error_log("❌ Error en iniciarJornada: " . $e->getMessage());
+            error_log("Stack trace: " . $e->getTraceAsString());
             http_response_code(500);
             echo json_encode([
                 'success' => false,
-                'message' => 'Error al iniciar jornada'
+                'message' => 'Error al iniciar jornada',
+                'error' => $e->getMessage()
             ]);
         }
         exit();
@@ -70,15 +91,16 @@ class RegistroHorasController
      */
     public function cerrarJornada()
     {
-        header('Content-Type: application/json');
-
-        if (!isset($_SESSION['user_id'])) {
-            http_response_code(401);
-            echo json_encode(['success' => false, 'message' => 'No autenticado']);
-            exit();
-        }
-
         try {
+            ob_clean();
+            header('Content-Type: application/json; charset=utf-8');
+
+            if (!isset($_SESSION['user_id'])) {
+                http_response_code(401);
+                echo json_encode(['success' => false, 'message' => 'No autenticado']);
+                exit();
+            }
+
             $id_registro = $_POST['id_registro'] ?? null;
             $hora_salida = $_POST['hora_salida'] ?? date('H:i:s');
 
@@ -98,7 +120,8 @@ class RegistroHorasController
             http_response_code(500);
             echo json_encode([
                 'success' => false,
-                'message' => 'Error al cerrar jornada'
+                'message' => 'Error al cerrar jornada',
+                'error' => $e->getMessage()
             ]);
         }
         exit();
@@ -109,15 +132,16 @@ class RegistroHorasController
      */
     public function getMisRegistros()
     {
-        header('Content-Type: application/json');
-
-        if (!isset($_SESSION['user_id'])) {
-            http_response_code(401);
-            echo json_encode(['success' => false, 'message' => 'No autenticado']);
-            exit();
-        }
-
         try {
+            ob_clean();
+            header('Content-Type: application/json; charset=utf-8');
+
+            if (!isset($_SESSION['user_id'])) {
+                http_response_code(401);
+                echo json_encode(['success' => false, 'message' => 'No autenticado']);
+                exit();
+            }
+
             $id_usuario = $_SESSION['user_id'];
             $fecha_inicio = $_GET['fecha_inicio'] ?? null;
             $fecha_fin = $_GET['fecha_fin'] ?? null;
@@ -139,7 +163,8 @@ class RegistroHorasController
             http_response_code(500);
             echo json_encode([
                 'success' => false,
-                'message' => 'Error al obtener registros'
+                'message' => 'Error al obtener registros',
+                'error' => $e->getMessage()
             ]);
         }
         exit();
@@ -150,15 +175,16 @@ class RegistroHorasController
      */
     public function getRegistroAbiertoHoy()
     {
-        header('Content-Type: application/json');
-
-        if (!isset($_SESSION['user_id'])) {
-            http_response_code(401);
-            echo json_encode(['success' => false, 'message' => 'No autenticado']);
-            exit();
-        }
-
         try {
+            ob_clean();
+            header('Content-Type: application/json; charset=utf-8');
+
+            if (!isset($_SESSION['user_id'])) {
+                http_response_code(401);
+                echo json_encode(['success' => false, 'message' => 'No autenticado']);
+                exit();
+            }
+
             $id_usuario = $_SESSION['user_id'];
             $registro = $this->registroHorasModel->getRegistroAbiertoHoy($id_usuario);
 
@@ -172,7 +198,8 @@ class RegistroHorasController
             http_response_code(500);
             echo json_encode([
                 'success' => false,
-                'message' => 'Error al obtener registro'
+                'message' => 'Error al obtener registro',
+                'error' => $e->getMessage()
             ]);
         }
         exit();
@@ -183,15 +210,16 @@ class RegistroHorasController
      */
     public function getResumenSemanal()
     {
-        header('Content-Type: application/json');
-
-        if (!isset($_SESSION['user_id'])) {
-            http_response_code(401);
-            echo json_encode(['success' => false, 'message' => 'No autenticado']);
-            exit();
-        }
-
         try {
+            ob_clean();
+            header('Content-Type: application/json; charset=utf-8');
+
+            if (!isset($_SESSION['user_id'])) {
+                http_response_code(401);
+                echo json_encode(['success' => false, 'message' => 'No autenticado']);
+                exit();
+            }
+
             $id_usuario = $_SESSION['user_id'];
             $fecha = $_GET['fecha'] ?? null;
 
@@ -204,10 +232,12 @@ class RegistroHorasController
 
         } catch (\Exception $e) {
             error_log("Error en getResumenSemanal: " . $e->getMessage());
+            error_log("Stack: " . $e->getTraceAsString());
             http_response_code(500);
             echo json_encode([
                 'success' => false,
-                'message' => 'Error al obtener resumen'
+                'message' => 'Error al obtener resumen',
+                'error' => $e->getMessage()
             ]);
         }
         exit();
@@ -218,15 +248,16 @@ class RegistroHorasController
      */
     public function getEstadisticasMes()
     {
-        header('Content-Type: application/json');
-
-        if (!isset($_SESSION['user_id'])) {
-            http_response_code(401);
-            echo json_encode(['success' => false, 'message' => 'No autenticado']);
-            exit();
-        }
-
         try {
+            ob_clean();
+            header('Content-Type: application/json; charset=utf-8');
+
+            if (!isset($_SESSION['user_id'])) {
+                http_response_code(401);
+                echo json_encode(['success' => false, 'message' => 'No autenticado']);
+                exit();
+            }
+
             $id_usuario = $_SESSION['user_id'];
             $mes = $_GET['mes'] ?? date('m');
             $anio = $_GET['anio'] ?? date('Y');
@@ -240,10 +271,12 @@ class RegistroHorasController
 
         } catch (\Exception $e) {
             error_log("Error en getEstadisticasMes: " . $e->getMessage());
+            error_log("Stack: " . $e->getTraceAsString());
             http_response_code(500);
             echo json_encode([
                 'success' => false,
-                'message' => 'Error al obtener estadísticas'
+                'message' => 'Error al obtener estadísticas',
+                'error' => $e->getMessage()
             ]);
         }
         exit();
@@ -254,15 +287,16 @@ class RegistroHorasController
      */
     public function editarRegistro()
     {
-        header('Content-Type: application/json');
-
-        if (!isset($_SESSION['user_id'])) {
-            http_response_code(401);
-            echo json_encode(['success' => false, 'message' => 'No autenticado']);
-            exit();
-        }
-
         try {
+            ob_clean();
+            header('Content-Type: application/json; charset=utf-8');
+
+            if (!isset($_SESSION['user_id'])) {
+                http_response_code(401);
+                echo json_encode(['success' => false, 'message' => 'No autenticado']);
+                exit();
+            }
+
             $id_registro = $_POST['id_registro'] ?? null;
             $hora_entrada = $_POST['hora_entrada'] ?? null;
             $hora_salida = $_POST['hora_salida'] ?? null;
@@ -290,7 +324,8 @@ class RegistroHorasController
             http_response_code(500);
             echo json_encode([
                 'success' => false,
-                'message' => 'Error al editar registro'
+                'message' => 'Error al editar registro',
+                'error' => $e->getMessage()
             ]);
         }
         exit();
@@ -305,21 +340,22 @@ class RegistroHorasController
      */
     public function getAllRegistros()
     {
-        header('Content-Type: application/json');
-
-        if (!isset($_SESSION['user_id'])) {
-            http_response_code(401);
-            echo json_encode(['success' => false, 'message' => 'No autenticado']);
-            exit();
-        }
-
-        if (!isset($_SESSION['is_admin']) || !$_SESSION['is_admin']) {
-            http_response_code(403);
-            echo json_encode(['success' => false, 'message' => 'No autorizado']);
-            exit();
-        }
-
         try {
+            ob_clean();
+            header('Content-Type: application/json; charset=utf-8');
+
+            if (!isset($_SESSION['user_id'])) {
+                http_response_code(401);
+                echo json_encode(['success' => false, 'message' => 'No autenticado']);
+                exit();
+            }
+
+            if (!isset($_SESSION['is_admin']) || !$_SESSION['is_admin']) {
+                http_response_code(403);
+                echo json_encode(['success' => false, 'message' => 'No autorizado']);
+                exit();
+            }
+
             $filtros = [
                 'usuario_id' => $_GET['usuario_id'] ?? null,
                 'estado' => $_GET['estado'] ?? null,
@@ -340,7 +376,8 @@ class RegistroHorasController
             http_response_code(500);
             echo json_encode([
                 'success' => false,
-                'message' => 'Error al obtener registros'
+                'message' => 'Error al obtener registros',
+                'error' => $e->getMessage()
             ]);
         }
         exit();
@@ -351,21 +388,22 @@ class RegistroHorasController
      */
     public function aprobarHoras()
     {
-        header('Content-Type: application/json');
-
-        if (!isset($_SESSION['user_id'])) {
-            http_response_code(401);
-            echo json_encode(['success' => false, 'message' => 'No autenticado']);
-            exit();
-        }
-
-        if (!isset($_SESSION['is_admin']) || !$_SESSION['is_admin']) {
-            http_response_code(403);
-            echo json_encode(['success' => false, 'message' => 'No autorizado']);
-            exit();
-        }
-
         try {
+            ob_clean();
+            header('Content-Type: application/json; charset=utf-8');
+
+            if (!isset($_SESSION['user_id'])) {
+                http_response_code(401);
+                echo json_encode(['success' => false, 'message' => 'No autenticado']);
+                exit();
+            }
+
+            if (!isset($_SESSION['is_admin']) || !$_SESSION['is_admin']) {
+                http_response_code(403);
+                echo json_encode(['success' => false, 'message' => 'No autorizado']);
+                exit();
+            }
+
             $id_registro = $_POST['id_registro'] ?? null;
             $observaciones = $_POST['observaciones'] ?? '';
 
@@ -390,7 +428,8 @@ class RegistroHorasController
             http_response_code(500);
             echo json_encode([
                 'success' => false,
-                'message' => 'Error al aprobar horas'
+                'message' => 'Error al aprobar horas',
+                'error' => $e->getMessage()
             ]);
         }
         exit();
@@ -401,21 +440,22 @@ class RegistroHorasController
      */
     public function rechazarHoras()
     {
-        header('Content-Type: application/json');
-
-        if (!isset($_SESSION['user_id'])) {
-            http_response_code(401);
-            echo json_encode(['success' => false, 'message' => 'No autenticado']);
-            exit();
-        }
-
-        if (!isset($_SESSION['is_admin']) || !$_SESSION['is_admin']) {
-            http_response_code(403);
-            echo json_encode(['success' => false, 'message' => 'No autorizado']);
-            exit();
-        }
-
         try {
+            ob_clean();
+            header('Content-Type: application/json; charset=utf-8');
+
+            if (!isset($_SESSION['user_id'])) {
+                http_response_code(401);
+                echo json_encode(['success' => false, 'message' => 'No autenticado']);
+                exit();
+            }
+
+            if (!isset($_SESSION['is_admin']) || !$_SESSION['is_admin']) {
+                http_response_code(403);
+                echo json_encode(['success' => false, 'message' => 'No autorizado']);
+                exit();
+            }
+
             $id_registro = $_POST['id_registro'] ?? null;
             $observaciones = $_POST['observaciones'] ?? '';
 
@@ -448,7 +488,8 @@ class RegistroHorasController
             http_response_code(500);
             echo json_encode([
                 'success' => false,
-                'message' => 'Error al rechazar horas'
+                'message' => 'Error al rechazar horas',
+                'error' => $e->getMessage()
             ]);
         }
         exit();
@@ -459,21 +500,22 @@ class RegistroHorasController
      */
     public function getResumenPorUsuario()
     {
-        header('Content-Type: application/json');
-
-        if (!isset($_SESSION['user_id'])) {
-            http_response_code(401);
-            echo json_encode(['success' => false, 'message' => 'No autenticado']);
-            exit();
-        }
-
-        if (!isset($_SESSION['is_admin']) || !$_SESSION['is_admin']) {
-            http_response_code(403);
-            echo json_encode(['success' => false, 'message' => 'No autorizado']);
-            exit();
-        }
-
         try {
+            ob_clean();
+            header('Content-Type: application/json; charset=utf-8');
+
+            if (!isset($_SESSION['user_id'])) {
+                http_response_code(401);
+                echo json_encode(['success' => false, 'message' => 'No autenticado']);
+                exit();
+            }
+
+            if (!isset($_SESSION['is_admin']) || !$_SESSION['is_admin']) {
+                http_response_code(403);
+                echo json_encode(['success' => false, 'message' => 'No autorizado']);
+                exit();
+            }
+
             $usuario_id = $_GET['usuario_id'] ?? null;
             $mes = $_GET['mes'] ?? date('m');
             $anio = $_GET['anio'] ?? date('Y');
@@ -500,7 +542,8 @@ class RegistroHorasController
             http_response_code(500);
             echo json_encode([
                 'success' => false,
-                'message' => 'Error al obtener resumen'
+                'message' => 'Error al obtener resumen',
+                'error' => $e->getMessage()
             ]);
         }
         exit();

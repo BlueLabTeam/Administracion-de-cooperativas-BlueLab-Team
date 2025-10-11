@@ -9,25 +9,31 @@ class RegistroHoras
 {
     private $conn;
 
-    public function __construct()
-    {
-        $this->conn = Database::getInstance()->getConnection();
-    }
+  public function __construct()
+{
+    $this->conn = Database::getConnection(); // ← Cambiar aquí
+}
 
     /**
      * Iniciar una nueva jornada
      */
-    public function iniciarJornada($id_usuario, $fecha, $hora_entrada, $descripcion = '')
+   public function iniciarJornada($id_usuario, $fecha, $hora_entrada, $descripcion = '')
     {
         try {
-            // Validar que no sea fin de semana
-            $dia_semana = date('N', strtotime($fecha));
-            if ($dia_semana > 5) {
-                return [
-                    'success' => false,
-                    'message' => 'No se pueden registrar horas en fin de semana'
-                ];
-            }
+            error_log("=== MODEL: iniciarJornada ===");
+            error_log("Usuario: $id_usuario, Fecha: $fecha, Hora: $hora_entrada");
+
+            // COMENTADO TEMPORALMENTE PARA TESTING (DESCOMENTAR EN PRODUCCIÓN)
+        /*
+        $dia_semana = date('N', strtotime($fecha));
+        if ($dia_semana > 5) {
+            error_log("❌ Intento de registro en fin de semana");
+            return [
+                'success' => false,
+                'message' => 'No se pueden registrar horas en fin de semana'
+            ];
+        }
+        */
 
             // Verificar si ya existe un registro para hoy
             $stmt = $this->conn->prepare("
@@ -36,13 +42,21 @@ class RegistroHoras
                 WHERE id_usuario = :id_usuario 
                 AND fecha = :fecha
             ");
+            
+            if (!$stmt) {
+                error_log("❌ Error al preparar statement: " . json_encode($this->conn->errorInfo()));
+                throw new \Exception("Error al preparar consulta");
+            }
+            
             $stmt->execute([
                 'id_usuario' => $id_usuario,
                 'fecha' => $fecha
             ]);
+            
             $registro_existente = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if ($registro_existente) {
+                error_log("⚠️ Registro existente encontrado: " . json_encode($registro_existente));
                 if ($registro_existente['hora_salida'] === null) {
                     return [
                         'success' => false,
@@ -57,28 +71,54 @@ class RegistroHoras
             }
 
             // Crear nuevo registro
+            error_log("✅ Creando nuevo registro...");
             $stmt = $this->conn->prepare("
                 INSERT INTO Registro_Horas 
                 (id_usuario, fecha, hora_entrada, descripcion, estado) 
                 VALUES (:id_usuario, :fecha, :hora_entrada, :descripcion, 'pendiente')
             ");
 
-            $stmt->execute([
+            if (!$stmt) {
+                error_log("❌ Error al preparar INSERT: " . json_encode($this->conn->errorInfo()));
+                throw new \Exception("Error al preparar INSERT");
+            }
+
+            $ejecutado = $stmt->execute([
                 'id_usuario' => $id_usuario,
                 'fecha' => $fecha,
                 'hora_entrada' => $hora_entrada,
                 'descripcion' => $descripcion
             ]);
 
+            if (!$ejecutado) {
+                error_log("❌ Error al ejecutar INSERT: " . json_encode($stmt->errorInfo()));
+                throw new \Exception("Error al ejecutar INSERT");
+            }
+
+            $id_registro = $this->conn->lastInsertId();
+            error_log("✅ Registro creado con ID: " . $id_registro);
+
             return [
                 'success' => true,
                 'message' => 'Entrada registrada correctamente',
-                'id_registro' => $this->conn->lastInsertId(),
+                'id_registro' => $id_registro,
                 'hora_entrada' => $hora_entrada
             ];
 
         } catch (\PDOException $e) {
-            error_log("Error en iniciarJornada: " . $e->getMessage());
+            error_log("❌ PDOException en iniciarJornada: " . $e->getMessage());
+            error_log("Stack: " . $e->getTraceAsString());
+            return [
+                'success' => false,
+                'message' => 'Error de base de datos: ' . $e->getMessage(),
+                'debug' => [
+                    'code' => $e->getCode(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine()
+                ]
+            ];
+        } catch (\Exception $e) {
+            error_log("❌ Exception en iniciarJornada: " . $e->getMessage());
             return [
                 'success' => false,
                 'message' => 'Error al registrar entrada: ' . $e->getMessage()
