@@ -1,10 +1,4 @@
 <?php
-/**
- * Archivo para servir imágenes desde storage
- * Colocar en la carpeta pública (donde está index.php)
- * 
- * Uso: /file.php?path=uploads/pagos/imagen.jpg
- */
 
 // Obtener la ruta del archivo
 $path = $_GET['path'] ?? '';

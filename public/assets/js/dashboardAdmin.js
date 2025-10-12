@@ -366,7 +366,7 @@ function createTask(event) {
         return;
     }
     
-    // CRÍTICO: Agregar materiales ANTES del fetch
+    //  Agregar materiales ANTES del fetch
     if (materialesAsignados.length > 0) {
         console.log('>>> Agregando materiales:', materialesAsignados);
         formData.append('materiales_json', JSON.stringify(materialesAsignados));
@@ -439,7 +439,7 @@ function renderTasksList(tareas) {
             `${tarea.total_usuarios} usuario(s)` : 
             `${tarea.total_nucleos} núcleo(s)`;
         
-        // ✅ Calcular progreso y completados
+        //  Calcular progreso y completados
         const progresoPromedio = Math.round(parseFloat(tarea.progreso_promedio || 0));
         const totalAsignados = tarea.tipo_asignacion === 'usuario' ? 
             parseInt(tarea.total_usuarios) : 
@@ -656,7 +656,7 @@ function cancelTask(tareaId) {
     console.log('tareaId:', tareaId);
     
     const formData = new FormData();
-    formData.append('tarea_id', tareaId);  // ✅ Asegurar que sea 'tarea_id'
+    formData.append('tarea_id', tareaId);  //  Asegurar que sea 'tarea_id'
     
     // Log para verificar FormData
     for (let [key, value] of formData.entries()) {
@@ -694,7 +694,7 @@ function viewTaskDetails(tareaId) {
     console.log('=== viewTaskDetails DEBUG ===');
     console.log('tareaId:', tareaId);
     
-    const url = `/api/tasks/details?tarea_id=${tareaId}`;  // ✅ Asegurar parámetro
+    const url = `/api/tasks/details?tarea_id=${tareaId}`;  //  Asegurar parámetro
     console.log('URL completa:', url);
     
     fetch(url)
@@ -1225,7 +1225,6 @@ console.log('🔵 [INIT] loadUsersForTable disponible:', typeof loadUsersForTabl
 
 // ==========================================
 // GESTIÓN DE NÚCLEOS FAMILIARES
-// Agregar este código al final de dashboardAdmin.js
 // ==========================================
 
 console.log('🟢 Cargando módulo de Núcleos Familiares');
@@ -1713,7 +1712,6 @@ console.log('✓ Módulo de Núcleos Familiares cargado completamente');
 
 // ==========================================
 // GESTIÓN DE MATERIALES - VERSIÓN FINAL
-// Agregar DESPUÉS del código de núcleos en dashboardAdmin.js
 // ==========================================
 
 console.log('🟢 Cargando módulo de Materiales');
@@ -2019,31 +2017,7 @@ function updateStock(event) {
     });
 }
 
-// ========== EVENTOS - AGREGAR AL DOMContentLoaded EXISTENTE ==========
-// BUSCA EN TU CÓDIGO DONDE ESTÁ EL document.addEventListener('DOMContentLoaded'
-// Y AGREGA ESTE CÓDIGO DENTRO:
 
-/*
-    // Listener para materiales
-    const materialesMenuItem = document.querySelector('.menu li[data-section="materiales"]');
-    if (materialesMenuItem) {
-        console.log('✓ Listener de materiales agregado');
-        materialesMenuItem.addEventListener('click', function() {
-            console.log('>>> Click en sección materiales');
-            loadMateriales();
-        });
-    }
-    
-    // Cerrar modales al hacer click fuera
-    window.addEventListener('click', function(event) {
-        if (event.target.id === 'materialModal') {
-            closeMaterialModal();
-        }
-        if (event.target.id === 'stockModal') {
-            closeStockModal();
-        }
-    });
-*/
 
 console.log('✅ Módulo de Materiales cargado');
 console.log('TEST: showCreateMaterialModal disponible:', typeof showCreateMaterialModal === 'function');
@@ -2051,7 +2025,6 @@ console.log('TEST: showCreateMaterialModal disponible:', typeof showCreateMateri
 
 // ==========================================
 // INTEGRACIÓN DE MATERIALES EN TAREAS - VERSIÓN CORREGIDA
-// Reemplazar el código anterior con este
 // ==========================================
 
 console.log('🔵 Cargando integración de Materiales en Tareas');
@@ -2223,7 +2196,7 @@ function filterMaterialesTarea() {
 }
 
 // ========== MODIFICAR createTask EXISTENTE ==========
-// IMPORTANTE: Busca la función createTask en tu código y reemplázala con esta
+
 
 function createTask(event) {
     event.preventDefault();
@@ -2302,7 +2275,6 @@ function createTask(event) {
 }
 
 // ========== CARGAR MATERIALES AL ABRIR SECCIÓN TAREAS ==========
-// Agregar al DOMContentLoaded existente o crear uno nuevo
 document.addEventListener('DOMContentLoaded', function() {
     console.log('>>> DOM Loaded - Configurando materiales en tareas');
     
@@ -2314,7 +2286,7 @@ document.addEventListener('DOMContentLoaded', function() {
             loadTaskUsers();
             loadNucleos();
             loadAllTasks();
-            // IMPORTANTE: Cargar materiales inmediatamente
+            // Cargar materiales inmediatamente
             setTimeout(() => {
                 loadMaterialesParaTarea();
             }, 300);
@@ -2339,7 +2311,6 @@ console.log('TEST loadMaterialesParaTarea:', typeof loadMaterialesParaTarea);
 
 // ==========================================
 // GESTIÓN DE VIVIENDAS
-// Agregar DESPUÉS del código de materiales
 // ==========================================
 
 console.log('🟢 Cargando módulo de Viviendas');
