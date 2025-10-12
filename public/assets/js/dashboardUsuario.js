@@ -803,15 +803,6 @@ function mostrarBotonSalida(horaEntrada) {
 async function marcarEntrada() {
     console.log('🚀 Iniciando marcación de entrada');
     
-    // Verificar que sea día laboral (lunes a viernes)
-    const hoy = new Date();
-    const diaSemana = hoy.getDay(); // 0=domingo, 6=sábado
-    
-    if (diaSemana === 0 || diaSemana === 6) {
-        alert('❌ No se pueden registrar horas los fines de semana');
-        return;
-    }
-    
     const descripcion = prompt('Describe brevemente tu trabajo de hoy (opcional):');
     if (descripcion === null) {
         console.log('ℹ️ Usuario canceló la entrada');
@@ -823,6 +814,7 @@ async function marcarEntrada() {
     btnEntrada.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Registrando...';
     
     try {
+        const hoy = new Date();
         const formData = new FormData();
         formData.append('fecha', hoy.toISOString().split('T')[0]);
         formData.append('hora_entrada', hoy.toTimeString().split(' ')[0]);
@@ -872,6 +864,7 @@ async function marcarSalida() {
     }
     
     const btnSalida = document.getElementById('btn-salida');
+    const btnHTML = btnSalida.innerHTML;
     btnSalida.disabled = true;
     btnSalida.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Registrando...';
     
@@ -900,14 +893,14 @@ async function marcarSalida() {
         } else {
             alert(`❌ ${data.message}`);
             btnSalida.disabled = false;
-            btnSalida.innerHTML = '<i class="fas fa-sign-out-alt"></i> Marcar Salida';
+            btnSalida.innerHTML = btnHTML;
         }
         
     } catch (error) {
         console.error('❌ Error al marcar salida:', error);
         alert('❌ Error de conexión. Por favor, intenta nuevamente.');
         btnSalida.disabled = false;
-        btnSalida.innerHTML = '<i class="fas fa-sign-out-alt"></i> Marcar Salida';
+        btnSalida.innerHTML = btnHTML;
     }
 }
 
@@ -977,7 +970,7 @@ async function loadResumenSemanal() {
 function renderResumenSemanal(resumen) {
     const container = document.getElementById('resumen-semanal-container');
     
-    const diasSemana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
+    const diasSemana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
     const registrosPorDia = {};
     
     // Organizar registros por día
@@ -987,10 +980,10 @@ function renderResumenSemanal(resumen) {
         });
     }
     
-    // Generar fechas de la semana
+    // Generar fechas de la semana (Lunes a Domingo - 7 días)
     const fechaInicio = new Date(resumen.semana.inicio + 'T00:00:00');
     const fechas = [];
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 7; i++) {
         const fecha = new Date(fechaInicio);
         fecha.setDate(fecha.getDate() + i);
         fechas.push(fecha.toISOString().split('T')[0]);
@@ -1012,13 +1005,15 @@ function renderResumenSemanal(resumen) {
         const dia = diasSemana[index];
         const fechaFormateada = formatearFechaSimple(fecha);
         const esHoy = fecha === new Date().toISOString().split('T')[0];
+        const esFinDeSemana = index === 5 || index === 6; // Sábado o Domingo
         
         html += `
-            <div class="dia-card ${registro ? 'con-registro' : 'sin-registro'} ${esHoy ? 'dia-hoy' : ''}">
+            <div class="dia-card ${registro ? 'con-registro' : 'sin-registro'} ${esHoy ? 'dia-hoy' : ''} ${esFinDeSemana ? 'fin-de-semana' : ''}">
                 <div class="dia-header">
                     <strong>${dia}</strong>
                     <span class="dia-fecha">${fechaFormateada}</span>
                     ${esHoy ? '<span class="badge-hoy">HOY</span>' : ''}
+                    ${esFinDeSemana ? '<span class="badge-finde">🏖️</span>' : ''}
                 </div>
                 <div class="dia-content">
         `;
@@ -1332,7 +1327,6 @@ async function submitEditarRegistro(event) {
         alert('❌ Error de conexión al guardar');
     }
 }
-
 
 // ========== VER OBSERVACIONES ==========
 function verObservaciones(observaciones) {
