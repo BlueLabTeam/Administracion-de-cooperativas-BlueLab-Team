@@ -148,7 +148,7 @@
 			</div>
 		</section>
 
-		<!-- REEMPLAZAR LA SECCIÓN VIVIENDAS EN dashboardBackoffice.php CON ESTE CÓDIGO -->
+
 
 <!-- SECCIÓN VIVIENDAS -->
 <section id="viviendas-section" class="section-content">

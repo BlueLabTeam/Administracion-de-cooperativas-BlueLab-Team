@@ -101,66 +101,7 @@
         <section id="tareas" class="seccion"></section>
         <section id="documentos" class="seccion"></section>
     </main>
-
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const menuItems = document.querySelectorAll('.menu li');
-        const sections = document.querySelectorAll('.section-content');
-
-        // Por defecto, mostrar "Inicio"
-        let defaultSection = 'inicio';
-
-        menuItems.forEach(li => {
-            // Agregar click
-            li.addEventListener('click', function(e) {
-                e.preventDefault();
-
-                // Limpiar activo
-                menuItems.forEach(mi => mi.classList.remove('activo'));
-                sections.forEach(sec => sec.classList.remove('active'));
-
-                // Activar seleccionado
-                this.classList.add('activo');
-                const sectionId = this.getAttribute('data-section') + '-section';
-                const targetSection = document.getElementById(sectionId);
-                if (targetSection) targetSection.classList.add('active');
-            });
-
-            // Inicializar clase activo en el menú según defaultSection
-            if (li.getAttribute('data-section') === defaultSection) {
-                li.classList.add('activo');
-            }
-        });
-
-        // Inicializar sección activa según defaultSection
-        const initSection = document.getElementById(defaultSection + '-section');
-        if (initSection) initSection.classList.add('active');
-    });
-    </script>
-
-    <script>
-        // Script de navegación entre secciones
-        const links = document.querySelectorAll(".menu li");
-        const secciones = document.querySelectorAll(".seccion");
-
-        links.forEach(li => {
-            li.addEventListener("click", e => {
-                e.preventDefault();
-                const sectionId = li.getAttribute("data-section");
-
-                // Ocultar todas
-                secciones.forEach(sec => sec.classList.remove("activa"));
-                links.forEach(l => l.classList.remove("activo"));
-
-                // Mostrar la seleccionada
-                const targetSection = document.getElementById(sectionId);
-                if (targetSection) {
-                    targetSection.classList.add("activa");
-                    li.classList.add("activo");
-                }
-            });
-        });
-    </script>
+    <script src="/assets/js/dashboardHeaderUsuario.js?v=2"></script>
 
 </body>
 </html>

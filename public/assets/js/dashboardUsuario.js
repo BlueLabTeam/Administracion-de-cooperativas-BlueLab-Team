@@ -654,7 +654,6 @@ function renderMyVivienda(vivienda) {
 
 // ==========================================
 // SISTEMA DE REGISTRO DE HORAS - USUARIO
-// Versión mejorada con interfaz intuitiva
 // ==========================================
 
 console.log('🟢 Iniciando sistema de registro de horas');
