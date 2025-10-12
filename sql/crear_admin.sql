@@ -25,7 +25,7 @@ INSERT INTO Usuario (
 ) VALUES (
     'Administrador del Sistema',
     '12345678',
-    '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 
+    '$2y$10$doii4xqhiuZfUQ2RBxByBOZYOtZiuR/qtE9u/pyHNMv3A.Snsv9Qy', 
     'Oficina Principal',
     'aceptado',
     '1990-01-01',

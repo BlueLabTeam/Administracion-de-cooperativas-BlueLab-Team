@@ -331,8 +331,8 @@ CREATE TABLE IF NOT EXISTS Asignacion_Vivienda (
     activa BOOLEAN DEFAULT TRUE,
     observaciones TEXT,
     FOREIGN KEY (id_vivienda) REFERENCES Viviendas(id_vivienda),
-    FOREIGN KEY (id_usuario) REFERENCES Usuario(id_usuario) ON DELETE SET NULL,
-    FOREIGN KEY (id_nucleo) REFERENCES Nucleo_Familiar(id_nucleo) ON DELETE SET NULL,
+    FOREIGN KEY (id_usuario) REFERENCES Usuario(id_usuario) ON DELETE CASCADE,
+    FOREIGN KEY (id_nucleo) REFERENCES Nucleo_Familiar(id_nucleo) ON DELETE CASCADE,
     CONSTRAINT chk_asignacion CHECK (
         (id_usuario IS NOT NULL AND id_nucleo IS NULL) OR 
         (id_usuario IS NULL AND id_nucleo IS NOT NULL)
@@ -363,15 +363,3 @@ CREATE TABLE IF NOT EXISTS Registro_Horas (
         DAYOFWEEK(fecha) NOT IN (1, 7)  -- 1=Domingo, 7=Sábado
     )
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-
--- Insertar algunas viviendas de ejemplo
-INSERT INTO Viviendas (numero_vivienda, direccion, id_tipo, estado, metros_cuadrados) VALUES
-('A-101', 'Bloque A, Planta Baja', 1, 'disponible', 35.50),
-('A-102', 'Bloque A, Planta Baja', 2, 'disponible', 55.00),
-('A-201', 'Bloque A, Primer Piso', 2, 'disponible', 55.00),
-('A-202', 'Bloque A, Primer Piso', 3, 'disponible', 75.00),
-('B-101', 'Bloque B, Planta Baja', 2, 'disponible', 58.00),
-('B-102', 'Bloque B, Planta Baja', 3, 'disponible', 78.00),
-('B-201', 'Bloque B, Primer Piso', 1, 'disponible', 38.00),
-('B-202', 'Bloque B, Primer Piso', 2, 'disponible', 56.00);

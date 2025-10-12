@@ -8,10 +8,6 @@ class AuthController
 {
     public function login()
     {
-        // ✅ Iniciar sesión ANTES de cualquier output
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
         
         header('Content-Type: application/json');
         
@@ -38,7 +34,7 @@ class AuthController
             exit();
         }
 
-        $userModel = new \App\Models\User();
+        $userModel = new User();
         $user = $userModel->findByEmail($email);
 
         if ($user && password_verify($password, $user->getPasswordHash())) {
