@@ -135,49 +135,127 @@ class User
 
     public function isAdmin()
     {
-        // Asumiendo que el rol de admin tiene id_rol = 1
-        // Ajusta según tu base de datos
         return $this->id_rol !== null && $this->id_rol == 1;
     }
 
-public function getAllUsersWithPayments()
-{
-    try {
-        $pdo = Database::getConnection();
-        
-        $sql = "SELECT 
-                    u.id_usuario,
-                    u.nombre_completo,
-                    u.cedula,
-                    u.email,
-                    u.estado,
-                    u.direccion,
-                    u.fecha_ingreso,
-                    u.fecha_nacimiento,
-                    r.nombre_rol,
-                    nf.nombre_nucleo,
-                    cp.id_comprobante,
-                    cp.archivo as comprobante_archivo,
-                    cp.fecha_pago
-                FROM Usuario u
-                LEFT JOIN Rol r ON u.id_rol = r.id_rol
-                LEFT JOIN Nucleo_Familiar nf ON u.id_nucleo = nf.id_nucleo
-                LEFT JOIN Comprobante_Pago cp ON u.id_usuario = cp.id_usuario 
-                    AND cp.id_comprobante = (
-                        SELECT MAX(id_comprobante) 
-                        FROM Comprobante_Pago cp2 
-                        WHERE cp2.id_usuario = u.id_usuario
-                    )
-                ORDER BY u.fecha_ingreso DESC";
-        
-        $stmt = $pdo->query($sql);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
-    } catch (PDOException $e) {
-        error_log("Error en getAllUsersWithPayments: " . $e->getMessage());
-        return [];
+    /**
+     * Actualizar datos del usuario
+     */
+    public function updateUser($userId, $data)
+    {
+        try {
+            $pdo = Database::getConnection();
+            $sets = [];
+            $params = [];
+            
+            foreach ($data as $field => $value) {
+                $sets[] = "$field = ?";
+                $params[] = $value;
+            }
+            
+            $params[] = $userId;
+            
+            $sql = "UPDATE Usuario SET " . implode(', ', $sets) . " WHERE id_usuario = ?";
+            $stmt = $pdo->prepare($sql);
+            
+            return $stmt->execute($params);
+            
+        } catch (PDOException $e) {
+            error_log("Error en updateUser: " . $e->getMessage());
+            return false;
+        }
     }
-}
+
+    /**
+     * Obtener teléfono del usuario
+     */
+    public function getTelefonoByUserId($userId)
+    {
+        try {
+            $pdo = Database::getConnection();
+            $sql = "SELECT telefono FROM Usuario_Telefono WHERE id_usuario = ? LIMIT 1";
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([$userId]);
+            
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $result ? $result['telefono'] : null;
+            
+        } catch (PDOException $e) {
+            error_log("Error en getTelefonoByUserId: " . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Actualizar o insertar teléfono del usuario
+     */
+    public function updateTelefono($userId, $telefono)
+    {
+        try {
+            $pdo = Database::getConnection();
+            
+            // Verificar si ya existe un teléfono
+            $sql = "SELECT COUNT(*) as count FROM Usuario_Telefono WHERE id_usuario = ?";
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([$userId]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if ($result['count'] > 0) {
+                // Actualizar
+                $sql = "UPDATE Usuario_Telefono SET telefono = ? WHERE id_usuario = ?";
+                $stmt = $pdo->prepare($sql);
+                return $stmt->execute([$telefono, $userId]);
+            } else {
+                // Insertar
+                $sql = "INSERT INTO Usuario_Telefono (id_usuario, telefono) VALUES (?, ?)";
+                $stmt = $pdo->prepare($sql);
+                return $stmt->execute([$userId, $telefono]);
+            }
+            
+        } catch (PDOException $e) {
+            error_log("Error en updateTelefono: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function getAllUsersWithPayments()
+    {
+        try {
+            $pdo = Database::getConnection();
+            
+            $sql = "SELECT 
+                        u.id_usuario,
+                        u.nombre_completo,
+                        u.cedula,
+                        u.email,
+                        u.estado,
+                        u.direccion,
+                        u.fecha_ingreso,
+                        u.fecha_nacimiento,
+                        r.nombre_rol,
+                        nf.nombre_nucleo,
+                        cp.id_comprobante,
+                        cp.archivo as comprobante_archivo,
+                        cp.fecha_pago
+                    FROM Usuario u
+                    LEFT JOIN Rol r ON u.id_rol = r.id_rol
+                    LEFT JOIN Nucleo_Familiar nf ON u.id_nucleo = nf.id_nucleo
+                    LEFT JOIN Comprobante_Pago cp ON u.id_usuario = cp.id_usuario 
+                        AND cp.id_comprobante = (
+                            SELECT MAX(id_comprobante) 
+                            FROM Comprobante_Pago cp2 
+                            WHERE cp2.id_usuario = u.id_usuario
+                        )
+                    ORDER BY u.fecha_ingreso DESC";
+            
+            $stmt = $pdo->query($sql);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+        } catch (PDOException $e) {
+            error_log("Error en getAllUsersWithPayments: " . $e->getMessage());
+            return [];
+        }
+    }
 
     public function getRoleName()
     {

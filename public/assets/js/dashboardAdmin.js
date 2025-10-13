@@ -24,14 +24,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 s.classList.remove('active');
             });
 
-            const viviendasMenuItem = document.querySelector('.menu li[data-section="viviendas"]');
-            if (viviendasMenuItem) {
-                viviendasMenuItem.addEventListener('click', function () {
-                    console.log('>>> Click en sección viviendas');
-                    loadViviendas();
-                });
-            }
-
             const targetSection = document.getElementById(section + '-section');
             if (targetSection) {
                 targetSection.classList.add('active');
@@ -46,21 +38,31 @@ document.addEventListener('DOMContentLoaded', function () {
                     loadTaskUsers();
                     loadNucleos();
                     loadAllTasks();
+                    setTimeout(() => loadMaterialesParaTarea(), 300);
+                } else if (section === 'nucleo') {
+                    console.log('>>> Cargando núcleos familiares');
+                    loadNucleosFamiliares();
+                } else if (section === 'materiales') {
+                    console.log('>>> Cargando materiales');
+                    loadMateriales();
+                } else if (section === 'viviendas') {
+                    console.log('>>> Cargando viviendas');
+                    loadViviendas();
+                    loadTiposVivienda();
                 } else if (section === 'usuarios') {
                     console.log('>>> Cargando tabla de usuarios');
                     loadUsersForTable();
-                } else if (section === 'nucleo') {  // NUEVO
-                    console.log('>>> Cargando núcleos familiares');
-                    loadNucleosFamiliares();
                 }
             } else {
                 console.error('✗ Sección no encontrada:', section);
             }
         });
     });
-});
+
+}); // ← CIERRE CORRECTO DEL DOMContentLoaded
 
 console.log('=== Definiendo funciones globales ===');
+
 
 // ========== NOTIFICACIONES ==========
 

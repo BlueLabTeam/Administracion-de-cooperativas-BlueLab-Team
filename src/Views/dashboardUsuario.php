@@ -67,15 +67,120 @@ if (!isset($_SESSION['user_id'])) {
 		</section>
 
 		<!-- MI PERFIL -->
-		<section id="perfil-section" class="section-content">
-			<h2 class="section-title">👤 Mi Perfil</h2>
-			<div class="info-card">
-				<h3>Información Personal</h3>
-				<p><strong>Nombre:</strong> <?php echo htmlspecialchars($_SESSION['nombre_completo'] ?? 'Usuario'); ?></p>
-				<p><strong>Email:</strong> <?php echo htmlspecialchars($_SESSION['email'] ?? 'No disponible'); ?></p>
-				<p><strong>Estado:</strong> <?php echo htmlspecialchars($_SESSION['estado'] ?? 'pendiente'); ?></p>
+<section id="perfil-section" class="section-content">
+	<h2 class="section-title">👤 Mi Perfil</h2>
+	
+	<div class="info-card">
+		<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+			<h3>Información Personal</h3>
+			<button class="btn btn-primary" onclick="toggleEditProfile()">
+				<i class="fas fa-edit"></i> <span id="btn-edit-text">Editar Perfil</span>
+			</button>
+		</div>
+
+		<!-- Vista de solo lectura -->
+		<div id="profile-view">
+			<div class="profile-info-grid">
+				<div class="profile-info-item">
+					<strong><i class="fas fa-user"></i> Nombre Completo:</strong>
+					<p id="display-nombre"><?php echo htmlspecialchars($_SESSION['nombre_completo'] ?? 'Usuario'); ?></p>
+				</div>
+				<div class="profile-info-item">
+					<strong><i class="fas fa-id-card"></i> Cédula:</strong>
+					<p id="display-cedula"><?php echo htmlspecialchars($_SESSION['cedula'] ?? 'No disponible'); ?></p>
+				</div>
+				<div class="profile-info-item">
+					<strong><i class="fas fa-envelope"></i> Email:</strong>
+					<p id="display-email"><?php echo htmlspecialchars($_SESSION['email'] ?? 'No disponible'); ?></p>
+				</div>
+				<div class="profile-info-item">
+					<strong><i class="fas fa-map-marker-alt"></i> Dirección:</strong>
+					<p id="display-direccion"><?php echo htmlspecialchars($_SESSION['direccion'] ?? 'No especificada'); ?></p>
+				</div>
+				<div class="profile-info-item">
+					<strong><i class="fas fa-birthday-cake"></i> Fecha de Nacimiento:</strong>
+					<p id="display-fecha-nacimiento"><?php echo htmlspecialchars($_SESSION['fecha_nacimiento'] ?? 'No disponible'); ?></p>
+				</div>
+				<div class="profile-info-item">
+					<strong><i class="fas fa-calendar-alt"></i> Fecha de Ingreso:</strong>
+					<p><?php echo htmlspecialchars($_SESSION['fecha_ingreso'] ?? 'No disponible'); ?></p>
+				</div>
+				<div class="profile-info-item">
+					<strong><i class="fas fa-info-circle"></i> Estado:</strong>
+					<p><span class="badge badge-<?php echo htmlspecialchars($_SESSION['estado'] ?? 'pendiente'); ?>">
+						<?php echo ucfirst(htmlspecialchars($_SESSION['estado'] ?? 'pendiente')); ?>
+					</span></p>
+				</div>
 			</div>
-		</section>
+		</div>
+
+		<!-- Formulario de edición -->
+		<div id="profile-edit" style="display: none;">
+			<form id="editProfileForm" onsubmit="submitProfileEdit(event)">
+				<div class="form-row">
+					<div class="form-group">
+						<label for="edit-nombre">Nombre Completo *</label>
+						<input type="text" id="edit-nombre" required>
+					</div>
+					<div class="form-group">
+						<label for="edit-cedula">Cédula *</label>
+						<input type="text" id="edit-cedula" required readonly title="La cédula no se puede modificar">
+					</div>
+				</div>
+
+				<div class="form-row">
+					<div class="form-group">
+						<label for="edit-email">Email *</label>
+						<input type="email" id="edit-email" required>
+					</div>
+					<div class="form-group">
+						<label for="edit-fecha-nacimiento">Fecha de Nacimiento</label>
+						<input type="date" id="edit-fecha-nacimiento">
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label for="edit-direccion">Dirección</label>
+					<input type="text" id="edit-direccion">
+				</div>
+
+				<div class="form-group">
+					<label for="edit-telefono">Teléfono</label>
+					<input type="tel" id="edit-telefono" placeholder="Ej: 099123456">
+					<small style="color: #666;">Opcional - Puedes agregar un número de contacto</small>
+				</div>
+
+				<hr style="margin: 20px 0;">
+
+				<h4 style="margin-bottom: 15px;">Cambiar Contraseña (Opcional)</h4>
+				<div class="form-group">
+					<label for="edit-password-actual">Contraseña Actual</label>
+					<input type="password" id="edit-password-actual" placeholder="Dejar en blanco si no deseas cambiarla">
+				</div>
+
+				<div class="form-row">
+					<div class="form-group">
+						<label for="edit-password-nueva">Nueva Contraseña</label>
+						<input type="password" id="edit-password-nueva" minlength="6">
+					</div>
+					<div class="form-group">
+						<label for="edit-password-confirmar">Confirmar Nueva Contraseña</label>
+						<input type="password" id="edit-password-confirmar" minlength="6">
+					</div>
+				</div>
+
+				<div class="form-actions">
+					<button type="button" class="btn btn-secondary" onclick="toggleEditProfile()">
+						<i class="fas fa-times"></i> Cancelar
+					</button>
+					<button type="submit" class="btn btn-primary">
+						<i class="fas fa-save"></i> Guardar Cambios
+					</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</section>
 
 		<!-- SOLICITUDES -->
 		<section id="solicitudes-section" class="section-content">

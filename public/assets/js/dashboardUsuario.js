@@ -1345,3 +1345,197 @@ window.editarRegistro = editarRegistro;
 window.closeEditarRegistroModal = closeEditarRegistroModal;
 window.submitEditarRegistro = submitEditarRegistro;
 window.verObservaciones = verObservaciones;
+
+
+
+// ==========================================
+// EDICIÓN DE PERFIL
+// ==========================================
+
+let profileData = {};
+
+// Alternar entre vista y edición
+function toggleEditProfile() {
+    const viewDiv = document.getElementById('profile-view');
+    const editDiv = document.getElementById('profile-edit');
+    const btnText = document.getElementById('btn-edit-text');
+    
+    if (editDiv.style.display === 'none') {
+        // Mostrar formulario de edición
+        loadProfileData();
+        viewDiv.style.display = 'none';
+        editDiv.style.display = 'block';
+        btnText.textContent = 'Cancelar';
+    } else {
+        // Mostrar vista de solo lectura
+        viewDiv.style.display = 'block';
+        editDiv.style.display = 'none';
+        btnText.textContent = 'Editar Perfil';
+        
+        // Limpiar campos de contraseña
+        document.getElementById('edit-password-actual').value = '';
+        document.getElementById('edit-password-nueva').value = '';
+        document.getElementById('edit-password-confirmar').value = '';
+    }
+}
+
+// Cargar datos del perfil
+async function loadProfileData() {
+    try {
+        const response = await fetch('/api/users/my-profile');
+        const data = await response.json();
+        
+        if (data.success) {
+            profileData = data.user;
+            
+            // Llenar formulario
+            document.getElementById('edit-nombre').value = profileData.nombre_completo || '';
+            document.getElementById('edit-cedula').value = profileData.cedula || '';
+            document.getElementById('edit-email').value = profileData.email || '';
+            document.getElementById('edit-direccion').value = profileData.direccion || '';
+            document.getElementById('edit-fecha-nacimiento').value = profileData.fecha_nacimiento || '';
+            document.getElementById('edit-telefono').value = profileData.telefono || '';
+        } else {
+            alert('Error al cargar datos del perfil');
+        }
+    } catch (error) {
+        console.error('Error al cargar perfil:', error);
+        alert('Error de conexión al cargar perfil');
+    }
+}
+
+async function cargarDatosUsuario() {
+    try {
+        const response = await fetch('/api/users/my-profile');
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.success && data.user) {
+            const nombreElement = document.getElementById('user-name-header');
+            if (nombreElement) {
+                nombreElement.textContent = data.user.nombre_completo || 'Usuario';
+            }
+            
+            const emailElement = document.getElementById('user-email-header');
+            if (emailElement) {
+                emailElement.textContent = data.user.email || '';
+            }
+        } else {
+            console.error('Error en respuesta:', data);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+           }
+}
+
+// Enviar formulario de edición
+async function submitProfileEdit(event) {
+    event.preventDefault();
+    
+    const nombre = document.getElementById('edit-nombre').value.trim();
+    const email = document.getElementById('edit-email').value.trim();
+    const direccion = document.getElementById('edit-direccion').value.trim();
+    const fechaNacimiento = document.getElementById('edit-fecha-nacimiento').value;
+    const telefono = document.getElementById('edit-telefono').value.trim();
+    
+    const passwordActual = document.getElementById('edit-password-actual').value;
+    const passwordNueva = document.getElementById('edit-password-nueva').value;
+    const passwordConfirmar = document.getElementById('edit-password-confirmar').value;
+    
+    // Validaciones
+    if (!nombre || !email) {
+        alert('⚠️ El nombre y email son obligatorios');
+        return;
+    }
+    
+    // Validar email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        alert('⚠️ Por favor ingresa un email válido');
+        return;
+    }
+    
+    // Validar cambio de contraseña
+    if (passwordNueva || passwordConfirmar) {
+        if (!passwordActual) {
+            alert('⚠️ Debes ingresar tu contraseña actual para cambiarla');
+            return;
+        }
+        
+        if (passwordNueva.length < 6) {
+            alert('⚠️ La nueva contraseña debe tener al menos 6 caracteres');
+            return;
+        }
+        
+        if (passwordNueva !== passwordConfirmar) {
+            alert('⚠️ Las contraseñas nuevas no coinciden');
+            return;
+        }
+    }
+    
+    // Confirmar cambios
+    if (!confirm('¿Estás seguro de guardar los cambios?')) {
+        return;
+    }
+    
+    // Preparar datos
+    const formData = new FormData();
+    formData.append('nombre_completo', nombre);
+    formData.append('email', email);
+    formData.append('direccion', direccion);
+    formData.append('fecha_nacimiento', fechaNacimiento);
+    formData.append('telefono', telefono);
+    
+    if (passwordActual && passwordNueva) {
+        formData.append('password_actual', passwordActual);
+        formData.append('password_nueva', passwordNueva);
+    }
+    
+    try {
+        const response = await fetch('/api/users/update-profile', {
+            method: 'POST',
+            body: formData,
+            credentials: 'same-origin'
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert('✅ ' + data.message);
+            
+            // Actualizar vista de solo lectura
+            document.getElementById('display-nombre').textContent = nombre;
+            document.getElementById('display-email').textContent = email;
+            document.getElementById('display-direccion').textContent = direccion || 'No especificada';
+            
+            if (fechaNacimiento) {
+                const fecha = new Date(fechaNacimiento);
+                document.getElementById('display-fecha-nacimiento').textContent = 
+                    fecha.toLocaleDateString('es-UY');
+            }
+            
+            // Volver a vista de solo lectura
+            toggleEditProfile();
+            
+            // Actualizar sesión si es necesario
+            if (data.reload) {
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            }
+        } else {
+            alert('❌ ' + data.message);
+        }
+    } catch (error) {
+        console.error('Error al actualizar perfil:', error);
+        alert('❌ Error de conexión al guardar cambios');
+    }
+}
+
+// Exportar funciones
+window.toggleEditProfile = toggleEditProfile;
+window.submitProfileEdit = submitProfileEdit;

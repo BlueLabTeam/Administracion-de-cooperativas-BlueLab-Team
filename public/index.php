@@ -69,9 +69,10 @@ Herramientas::startSession();
 $loginOnlyRoutes = [
     '/api/pay/firstPay',
     '/api/viviendas/tipos',
+    '/api/users/my-profile',       
+    '/api/users/update-profile',    
 ];
 
-// Rutas que requieren login Y validación de estado
 $privateRoutes = [
     '/dashboard', 
     '/dashboard-admin', 
@@ -248,7 +249,7 @@ switch ($uri) {
         break;
 
     // API USUARIOS
-    case '/api/users/all':
+   case '/api/users/all':
         (new App\Controllers\UserController())->getAllUsers();
         break;
     case '/api/users/details':
@@ -259,6 +260,15 @@ switch ($uri) {
             http_response_code(400);
             echo json_encode(['error' => 'Falta id_usuario']);
         }
+        break;
+    
+    // ← AGREGAR ESTOS DOS CASOS
+    case '/api/users/my-profile':
+        (new App\Controllers\UserController())->getMyProfile();
+        break;
+    
+    case '/api/users/update-profile':
+        (new App\Controllers\UserController())->updateProfile();
         break;
 
     // API NUCLEOS
