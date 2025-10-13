@@ -17,53 +17,6 @@
       preguntas[index].classList.toggle('active');
     }
 
-    // Función para alternar pasos de incorporación
-    function togglePaso(index) {
-      const pasos = document.querySelectorAll('.incorporacion ol li');
-
-      // Marcar el paso como completado
-      pasos[index].classList.toggle('completed');
-
-      // Efecto de celebración si se completa un paso
-      if (pasos[index].classList.contains('completed')) {
-        confetti(pasos[index]);
-      }
-    }
-
-    // Función para crear efecto confetti simple
-    function confetti(element) {
-      for (let i = 0; i < 10; i++) {
-        const confettiPiece = document.createElement('div');
-        confettiPiece.style.cssText = `
-          position: absolute;
-          width: 6px;
-          height: 6px;
-          background: ${['#007bff', '#28a745', '#ffc107', '#dc3545'][Math.floor(Math.random() * 4)]};
-          top: ${element.offsetTop + 20}px;
-          left: ${element.offsetLeft + Math.random() * element.offsetWidth}px;
-          pointer-events: none;
-          animation: confettiFall 1s ease-out forwards;
-          z-index: 1000;
-        `;
-
-        element.parentElement.appendChild(confettiPiece);
-
-        setTimeout(() => {
-          confettiPiece.remove();
-        }, 1000);
-      }
-    }
-
-    // Agregar animación CSS para el confetti
-    const style = document.createElement('style');
-    style.textContent = `
-      @keyframes confettiFall {
-        0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-        100% { transform: translateY(100px) rotate(720deg); opacity: 0; }
-      }
-    `;
-    document.head.appendChild(style);
-
     // Animaciones de scroll
     const observerOptions = {
       threshold: 0.1,

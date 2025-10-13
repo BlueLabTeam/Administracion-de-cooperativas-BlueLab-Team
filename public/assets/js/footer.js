@@ -1,7 +1,7 @@
 
-(function() {
+(function () {
   'use strict';
-  
+
   // Variables locales
   let footer = null;
   let footerToggle = null;
@@ -13,18 +13,18 @@
   function initFooter() {
     footer = document.getElementById('footer');
     footerToggle = document.getElementById('footerToggle');
-    
+
     if (!footer || !footerToggle) return;
-    
+
     // Animación de entrada inicial
-    setTimeout(function() {
+    setTimeout(function () {
       footer.classList.add('footer-loaded');
     }, 100);
-    
+
     // Event listeners
     setupMobileEvents();
     setupSocialEvents();
-    
+
     // Detectar cambio de orientación y resize
     window.addEventListener('orientationchange', handleOrientationChange);
     window.addEventListener('resize', handleResize);
@@ -34,23 +34,23 @@
   function setupMobileEvents() {
     // Toggle con botón
     footerToggle.addEventListener('click', toggleFooter);
-    
+
     // Gestos táctiles
     footer.addEventListener('touchstart', handleTouchStart, { passive: false });
     footer.addEventListener('touchend', handleTouchEnd, { passive: false });
-    
+
     // Tap largo para expandir
     let tapTimer = null;
-    footer.addEventListener('touchstart', function(e) {
-      tapTimer = setTimeout(function() {
+    footer.addEventListener('touchstart', function (e) {
+      tapTimer = setTimeout(function () {
         if (!isExpanded && window.innerWidth <= 768) {
           expandFooter();
           if (navigator.vibrate) navigator.vibrate(50);
         }
       }, 500);
     });
-    
-    footer.addEventListener('touchend', function() {
+
+    footer.addEventListener('touchend', function () {
       if (tapTimer) clearTimeout(tapTimer);
     });
   }
@@ -73,7 +73,7 @@
   function handleSwipe() {
     const swipeThreshold = 30;
     const swipeDistance = touchStartY - touchEndY;
-    
+
     if (swipeDistance > swipeThreshold && !isExpanded) {
       expandFooter();
     } else if (swipeDistance < -swipeThreshold && isExpanded) {
@@ -107,15 +107,15 @@
   // Configurar eventos de redes sociales
   function setupSocialEvents() {
     const socialLinks = document.querySelectorAll('.footer-social');
-    
-    socialLinks.forEach(function(link) {
-      link.addEventListener('click', function(e) {
+
+    socialLinks.forEach(function (link) {
+      link.addEventListener('click', function (e) {
         e.stopPropagation();
-        
+
         const social = this.getAttribute('data-social');
         animateClick(this);
-        
-        setTimeout(function() {
+
+        setTimeout(function () {
           console.log('Abriendo ' + social + '...');
           // Aquí van los enlaces reales
         }, 200);
@@ -128,8 +128,8 @@
     element.style.transform = 'scale(0.95)';
     element.style.backgroundColor = '#3498db';
     element.style.color = 'white';
-    
-    setTimeout(function() {
+
+    setTimeout(function () {
       element.style.transform = 'scale(1)';
       element.style.backgroundColor = '';
       element.style.color = '';
@@ -138,7 +138,7 @@
 
   // Manejar cambios de orientación y resize
   function handleOrientationChange() {
-    setTimeout(function() {
+    setTimeout(function () {
       if (window.innerWidth > 768 && isExpanded) {
         collapseFooter();
       }
@@ -164,7 +164,7 @@
   } else {
     initFooter();
   }
-  
+
   // Event listener para tocar fuera
   document.addEventListener('touchstart', handleOutsideTouch);
 

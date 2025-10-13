@@ -1,18 +1,18 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const menuItems = document.querySelectorAll('.menu li');
-    
+
     menuItems.forEach(item => {
-        item.addEventListener('click', function(e) {
+        item.addEventListener('click', function (e) {
             e.preventDefault();
-            
+
             menuItems.forEach(mi => mi.classList.remove('activo'));
             this.classList.add('activo');
             const sectionId = this.getAttribute('data-section') + '-section';
-            
+
             document.querySelectorAll('.section-content').forEach(s => {
                 s.classList.remove('active');
             });
-            
+
             const targetSection = document.getElementById(sectionId);
             if (targetSection) targetSection.classList.add('active');
         });
@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Listener para Mi Vivienda
     const viviendaMenuItem = document.querySelector('.menu li[data-section="vivienda"]');
     if (viviendaMenuItem) {
-        viviendaMenuItem.addEventListener('click', function() {
+        viviendaMenuItem.addEventListener('click', function () {
             loadMyVivienda();
         });
     }
@@ -34,16 +34,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const horasMenuItem = document.querySelector('.menu li[data-section="horas"]');
     if (horasMenuItem) {
         console.log('✅ Listener de horas agregado');
-        horasMenuItem.addEventListener('click', function() {
+        horasMenuItem.addEventListener('click', function () {
             console.log('>>> Click en sección horas');
             inicializarSeccionHoras();
         });
     }
-    
+
     // Listener para Tareas - SOLO cuando se hace click
     const tareasMenuItem = document.querySelector('.menu li[data-section="tareas"]');
     if (tareasMenuItem) {
-        tareasMenuItem.addEventListener('click', function() {
+        tareasMenuItem.addEventListener('click', function () {
             // Solo cargar si aún no se han cargado
             const tareasUsuarioList = document.getElementById('tareasUsuarioList');
             if (tareasUsuarioList && tareasUsuarioList.innerHTML.includes('loading')) {
@@ -59,13 +59,13 @@ async function loadNotifications() {
     try {
         const response = await fetch('/api/notifications/user');
         const data = await response.json();
-        
+
         if (data.success) {
             renderNotifications(data.notifications, data.unread_count);
         }
     } catch (error) {
         console.error('Error al cargar notificaciones:', error);
-        document.getElementById('notificationsList').innerHTML = 
+        document.getElementById('notificationsList').innerHTML =
             '<div class="no-notifications">No se pudieron cargar las notificaciones</div>';
     }
 }
@@ -73,20 +73,20 @@ async function loadNotifications() {
 function renderNotifications(notifications, unreadCount) {
     const badge = document.getElementById('notificationsBadge');
     const list = document.getElementById('notificationsList');
-    
+
     badge.textContent = unreadCount;
     badge.className = 'notifications-badge' + (unreadCount === 0 ? ' zero' : '');
-    
+
     if (notifications.length === 0) {
         list.innerHTML = '<div class="no-notifications">No tienes notificaciones</div>';
         return;
     }
-    
+
     list.innerHTML = notifications.map(notif => {
         const fecha = new Date(notif.fecha_creacion);
         const fechaFormateada = formatearFecha(fecha);
         const isUnread = notif.leida == 0;
-        
+
         return `
             <div class="notification-item ${isUnread ? 'unread' : ''} tipo-${notif.tipo}" 
                  onclick="markAsRead(${notif.id}, this)">
@@ -120,33 +120,33 @@ function formatearFecha(fecha) {
     const minutos = Math.floor(diff / 60000);
     const horas = Math.floor(diff / 3600000);
     const dias = Math.floor(diff / 86400000);
-    
+
     if (minutos < 1) return 'Ahora';
     if (minutos < 60) return `Hace ${minutos} min`;
     if (horas < 24) return `Hace ${horas}h`;
     if (dias < 7) return `Hace ${dias}d`;
-    
-    return fecha.toLocaleDateString('es-UY', { 
-        day: '2-digit', 
-        month: '2-digit', 
-        year: 'numeric' 
+
+    return fecha.toLocaleDateString('es-UY', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
     });
 }
 
 async function markAsRead(notifId, element) {
     if (!element.classList.contains('unread')) return;
-    
+
     try {
         const formData = new FormData();
         formData.append('notificacion_id', notifId);
-        
+
         const response = await fetch('/api/notifications/mark-read', {
             method: 'POST',
             body: formData
         });
-        
+
         const data = await response.json();
-        
+
         if (data.success) {
             element.classList.remove('unread');
             const badge = document.getElementById('notificationsBadge');
@@ -164,46 +164,46 @@ async function markAsRead(notifId, element) {
 
 async function loadUserTasks() {
     const incluirFinalizadas = document.getElementById('mostrar-completadas')?.checked || false;
-    
+
     try {
         const url = `/api/tasks/user?incluir_finalizadas=${incluirFinalizadas}`;
         const response = await fetch(url);
         const data = await response.json();
-        
+
         if (data.success) {
             renderUserTasks(data.tareas_usuario, 'tareasUsuarioList');
             renderUserTasks(data.tareas_nucleo, 'tareasNucleoList', true);
             updateTasksSummary(data.tareas_usuario, data.tareas_nucleo);
         } else {
             console.error('Error al cargar tareas:', data.message || data);
-            document.getElementById('tareasUsuarioList').innerHTML = 
+            document.getElementById('tareasUsuarioList').innerHTML =
                 '<div class="no-tasks">Error al cargar tareas</div>';
-            document.getElementById('tareasNucleoList').innerHTML = 
+            document.getElementById('tareasNucleoList').innerHTML =
                 '<div class="no-tasks">Error al cargar tareas</div>';
         }
     } catch (error) {
         console.error('Error:', error);
-        document.getElementById('tareasUsuarioList').innerHTML = 
+        document.getElementById('tareasUsuarioList').innerHTML =
             '<div class="no-tasks">Error de conexión al cargar tareas</div>';
-        document.getElementById('tareasNucleoList').innerHTML = 
+        document.getElementById('tareasNucleoList').innerHTML =
             '<div class="no-tasks">Error de conexión al cargar tareas</div>';
     }
 }
 
 function renderUserTasks(tareas, containerId, esNucleo = false) {
     const container = document.getElementById(containerId);
-    
+
     if (!tareas || tareas.length === 0) {
         container.innerHTML = '<div class="no-tasks">No tienes tareas asignadas</div>';
         return;
     }
-    
+
     container.innerHTML = tareas.map(tarea => {
         const fechaInicio = new Date(tarea.fecha_inicio).toLocaleDateString('es-UY');
         const fechaFin = new Date(tarea.fecha_fin).toLocaleDateString('es-UY');
         const progreso = tarea.progreso || 0;
         const esCompletada = tarea.estado_usuario === 'completada';
-        
+
         return `
             <div class="user-task-item prioridad-${tarea.prioridad} ${esCompletada ? 'completada' : ''}">
                 <div class="user-task-header">
@@ -252,16 +252,16 @@ function renderUserTasks(tareas, containerId, esNucleo = false) {
 
 function updateTasksSummary(tareasUsuario, tareasNucleo) {
     const todasTareas = [...tareasUsuario, ...tareasNucleo];
-    
+
     const pendientes = todasTareas.filter(t => t.estado_usuario === 'pendiente').length;
     const enProgreso = todasTareas.filter(t => t.estado_usuario === 'en_progreso').length;
     const completadas = todasTareas.filter(t => t.estado_usuario === 'completada').length;
-    
+
     // Verificar que los elementos existan antes de actualizarlos
     const pendingEl = document.getElementById('pending-count');
     const progressEl = document.getElementById('progress-count');
     const completedEl = document.getElementById('completed-count');
-    
+
     if (pendingEl) pendingEl.textContent = pendientes;
     if (progressEl) progressEl.textContent = enProgreso;
     if (completedEl) completedEl.textContent = completadas;
@@ -287,87 +287,87 @@ function formatPrioridad(prioridad) {
 
 function updateTaskProgress(asignacionId, tipoAsignacion, tareaId) {
     const progreso = prompt('Ingrese el porcentaje de progreso (0-100):');
-    
+
     if (progreso === null) return;
-    
+
     const progresoNum = parseInt(progreso);
-    
+
     if (isNaN(progresoNum) || progresoNum < 0 || progresoNum > 100) {
         alert('Por favor ingrese un número válido entre 0 y 100');
         return;
     }
-    
+
     const formData = new FormData();
     formData.append('asignacion_id', asignacionId);
     formData.append('tipo_asignacion', tipoAsignacion);
     formData.append('progreso', progresoNum);
-    
+
     if (progresoNum === 100) {
         formData.append('estado', 'completada');
     } else if (progresoNum > 0) {
         formData.append('estado', 'en_progreso');
     }
-    
+
     fetch('/api/tasks/update-progress', {
         method: 'POST',
         body: formData
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert(data.message);
-            loadUserTasks();
-        } else {
-            alert('Error: ' + data.message);
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Error al actualizar progreso');
-    });
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                loadUserTasks();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error al actualizar progreso');
+        });
 }
 
 function addTaskAvance(tareaId) {
     const comentario = prompt('Describa el avance realizado:');
-    
+
     if (!comentario || comentario.trim() === '') {
         alert('Debe ingresar un comentario');
         return;
     }
-    
+
     const progresoReportado = prompt('¿Qué porcentaje de progreso representa este avance? (0-100):');
-    
+
     if (progresoReportado === null) return;
-    
+
     const progresoNum = parseInt(progresoReportado);
-    
+
     if (isNaN(progresoNum) || progresoNum < 0 || progresoNum > 100) {
         alert('Por favor ingrese un número válido entre 0 y 100');
         return;
     }
-    
+
     const formData = new FormData();
     formData.append('tarea_id', tareaId);
     formData.append('comentario', comentario);
     formData.append('progreso_reportado', progresoNum);
-    
+
     fetch('/api/tasks/add-avance', {
         method: 'POST',
         body: formData
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert(data.message);
-            loadUserTasks();
-        } else {
-            alert('Error: ' + data.message);
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Error al reportar avance');
-    });
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                loadUserTasks();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error al reportar avance');
+        });
 }
 
 // ========== VER DETALLES CON MATERIALES ==========
@@ -376,10 +376,10 @@ async function viewUserTaskDetails(tareaId) {
     try {
         const responseTask = await fetch(`/api/tasks/details?tarea_id=${tareaId}`);
         const dataTask = await responseTask.json();
-        
+
         const responseMaterials = await fetch(`/api/materiales/task-materials?tarea_id=${tareaId}`);
         const dataMaterials = await responseMaterials.json();
-        
+
         if (dataTask.success) {
             const materiales = dataMaterials.success ? dataMaterials.materiales : [];
             mostrarDetallesTareaUsuario(dataTask.tarea, dataTask.avances, materiales);
@@ -396,7 +396,7 @@ async function viewTaskMaterials(tareaId) {
     try {
         const response = await fetch(`/api/materiales/task-materials?tarea_id=${tareaId}`);
         const data = await response.json();
-        
+
         if (data.success) {
             showMaterialesModal(tareaId, data.materiales);
         } else {
@@ -412,8 +412,8 @@ function showMaterialesModal(tareaId, materiales) {
     const materialesHTML = materiales && materiales.length > 0 ? `
         <div class="materials-grid">
             ${materiales.map(material => {
-                const suficiente = material.stock_disponible >= material.cantidad_requerida;
-                return `
+        const suficiente = material.stock_disponible >= material.cantidad_requerida;
+        return `
                     <div class="material-card ${suficiente ? 'disponible' : 'insuficiente'}">
                         <div class="material-icon-box">
                             <i class="fas fa-box"></i>
@@ -433,14 +433,14 @@ function showMaterialesModal(tareaId, materiales) {
                             </div>
                         </div>
                         <div class="material-status-badge">
-                            ${suficiente ? 
-                                '<span class="badge-success"><i class="fas fa-check-circle"></i> Disponible</span>' :
-                                '<span class="badge-warning"><i class="fas fa-exclamation-triangle"></i> Insuficiente</span>'
-                            }
+                            ${suficiente ?
+                '<span class="badge-success"><i class="fas fa-check-circle"></i> Disponible</span>' :
+                '<span class="badge-warning"><i class="fas fa-exclamation-triangle"></i> Insuficiente</span>'
+            }
                         </div>
                     </div>
                 `;
-            }).join('')}
+    }).join('')}
         </div>
     ` : `
         <div style="text-align: center; padding: 40px; background: #f8f9fa; border-radius: 8px;">
@@ -448,7 +448,7 @@ function showMaterialesModal(tareaId, materiales) {
             <p style="color: #666; margin: 0; font-size: 16px;">Esta tarea no requiere materiales específicos</p>
         </div>
     `;
-    
+
     const modal = `
         <div id="materialesModal" class="modal-detail" onclick="if(event.target.id==='materialesModal') this.remove()">
             <div class="modal-detail-content">
@@ -472,7 +472,7 @@ function showMaterialesModal(tareaId, materiales) {
             </div>
         </div>
     `;
-    
+
     document.body.insertAdjacentHTML('beforeend', modal);
 }
 
@@ -482,8 +482,8 @@ function mostrarDetallesTareaUsuario(tarea, avances, materiales = []) {
             <h3><i class="fas fa-boxes"></i> Materiales Necesarios</h3>
             <div class="materials-grid">
                 ${materiales.map(material => {
-                    const suficiente = material.stock_disponible >= material.cantidad_requerida;
-                    return `
+        const suficiente = material.stock_disponible >= material.cantidad_requerida;
+        return `
                         <div class="material-card ${suficiente ? 'disponible' : 'insuficiente'}">
                             <div class="material-icon-box">
                                 <i class="fas fa-box"></i>
@@ -503,14 +503,14 @@ function mostrarDetallesTareaUsuario(tarea, avances, materiales = []) {
                                 </div>
                             </div>
                             <div class="material-status-badge">
-                                ${suficiente ? 
-                                    '<span class="badge-success"><i class="fas fa-check-circle"></i> Disponible</span>' :
-                                    '<span class="badge-warning"><i class="fas fa-exclamation-triangle"></i> Insuficiente</span>'
-                                }
+                                ${suficiente ?
+                '<span class="badge-success"><i class="fas fa-check-circle"></i> Disponible</span>' :
+                '<span class="badge-warning"><i class="fas fa-exclamation-triangle"></i> Insuficiente</span>'
+            }
                             </div>
                         </div>
                     `;
-                }).join('')}
+    }).join('')}
             </div>
         </div>
     ` : `
@@ -519,7 +519,7 @@ function mostrarDetallesTareaUsuario(tarea, avances, materiales = []) {
             <p style="color: #666; margin: 0;">Esta tarea no requiere materiales específicos</p>
         </div>
     `;
-    
+
     const modal = `
         <div id="taskDetailModal" class="modal-detail" onclick="if(event.target.id==='taskDetailModal') this.remove()">
             <div class="modal-detail-content">
@@ -583,7 +583,7 @@ function mostrarDetallesTareaUsuario(tarea, avances, materiales = []) {
             </div>
         </div>
     `;
-    
+
     document.body.insertAdjacentHTML('beforeend', modal);
 }
 
@@ -593,40 +593,40 @@ function mostrarDetallesTareaUsuario(tarea, avances, materiales = []) {
 
 function loadMyVivienda() {
     const container = document.getElementById('myViviendaContainer');
-    
+
     if (!container) {
         console.error('Container myViviendaContainer NO encontrado');
         return;
     }
-    
+
     container.innerHTML = '<p class="loading">Cargando información de vivienda...</p>';
-    
+
     fetch('/api/viviendas/my-vivienda', {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'same-origin'
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            if (data.vivienda) {
-                renderMyVivienda(data.vivienda);
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                if (data.vivienda) {
+                    renderMyVivienda(data.vivienda);
+                } else {
+                    container.innerHTML = '<p>Aún no tienes una vivienda asignada.</p>';
+                }
             } else {
-                container.innerHTML = '<p>Aún no tienes una vivienda asignada.</p>';
+                container.innerHTML = `<p class="error">Error: ${data.message}</p>`;
             }
-        } else {
-            container.innerHTML = `<p class="error">Error: ${data.message}</p>`;
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        container.innerHTML = '<p class="error">Error de conexión</p>';
-    });
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            container.innerHTML = '<p class="error">Error de conexión</p>';
+        });
 }
 
 function renderMyVivienda(vivienda) {
     const container = document.getElementById('myViviendaContainer');
-    
+
     container.innerHTML = `
         <div class="my-vivienda-card">
             <h3>🏡 Vivienda ${vivienda.numero_vivienda}</h3>
@@ -664,24 +664,24 @@ let registroAbiertoId = null;
 let registroAbiertoData = null;
 
 // ========== INICIALIZACIÓN ==========
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     console.log('📋 Inicializando módulo de horas');
-    
+
     // Iniciar reloj en tiempo real
     updateClock();
     relojInterval = setInterval(updateClock, 1000);
-    
+
     // Listener para la sección de horas
     const horasMenuItem = document.querySelector('.menu li[data-section="horas"]');
     if (horasMenuItem) {
-        horasMenuItem.addEventListener('click', function() {
+        horasMenuItem.addEventListener('click', function () {
             console.log('>>> Sección horas abierta');
             inicializarSeccionHoras();
         });
     }
-    
+
     // Cerrar modal al hacer clic fuera
-    window.addEventListener('click', function(event) {
+    window.addEventListener('click', function (event) {
         const modal = document.getElementById('editarRegistroModal');
         if (event.target === modal) {
             closeEditarRegistroModal();
@@ -695,7 +695,7 @@ function updateClock() {
     const hours = String(now.getHours()).padStart(2, '0');
     const minutes = String(now.getMinutes()).padStart(2, '0');
     const seconds = String(now.getSeconds()).padStart(2, '0');
-    
+
     const clockElement = document.getElementById('current-time-display');
     if (clockElement) {
         clockElement.textContent = `${hours}:${minutes}:${seconds}`;
@@ -705,20 +705,20 @@ function updateClock() {
 // ========== INICIALIZAR SECCIÓN ==========
 async function inicializarSeccionHoras() {
     console.log('🔄 Inicializando sección de horas');
-    
+
     try {
         // Verificar si hay registro abierto
         await verificarRegistroAbierto();
-        
+
         // Cargar datos
         await Promise.all([
             loadResumenSemanal(),
             loadMisRegistros(),
             cargarEstadisticas()
         ]);
-        
+
         console.log('✅ Sección inicializada correctamente');
-        
+
     } catch (error) {
         console.error('❌ Error al inicializar:', error);
         alert('Error al cargar la información. Por favor, recarga la página.');
@@ -733,12 +733,12 @@ async function verificarRegistroAbierto() {
             headers: { 'Content-Type': 'application/json' },
             credentials: 'same-origin'
         });
-        
+
         // DEBUG: Ver respuesta cruda
         const responseText = await response.text();
         console.log('🔍 Response status:', response.status);
         console.log('🔍 Response text:', responseText.substring(0, 500));
-        
+
         // Intentar parsear JSON
         let data;
         try {
@@ -748,9 +748,9 @@ async function verificarRegistroAbierto() {
             console.error('❌ Response completo:', responseText);
             throw new Error('El servidor devolvió HTML en lugar de JSON. Revisa los logs de PHP.');
         }
-        
+
         console.log('📊 Verificación de registro:', data);
-        
+
         if (data.success && data.registro) {
             // Hay un registro abierto
             registroAbiertoId = data.registro.id_registro;
@@ -764,7 +764,7 @@ async function verificarRegistroAbierto() {
             mostrarBotonEntrada();
             console.log('ℹ️ No hay registro abierto');
         }
-        
+
     } catch (error) {
         console.error('❌ Error en verificarRegistroAbierto:', error);
         // En caso de error, mostrar botón de entrada por defecto
@@ -777,7 +777,7 @@ function mostrarBotonEntrada() {
     const btnEntrada = document.getElementById('btn-entrada');
     const btnSalida = document.getElementById('btn-salida');
     const infoDiv = document.getElementById('registro-activo-info');
-    
+
     if (btnEntrada) btnEntrada.style.display = 'inline-block';
     if (btnSalida) btnSalida.style.display = 'none';
     if (infoDiv) infoDiv.style.display = 'none';
@@ -788,11 +788,11 @@ function mostrarBotonSalida(horaEntrada) {
     const btnSalida = document.getElementById('btn-salida');
     const infoDiv = document.getElementById('registro-activo-info');
     const horaEntradaSpan = document.getElementById('hora-entrada-activa');
-    
+
     if (btnEntrada) btnEntrada.style.display = 'none';
     if (btnSalida) btnSalida.style.display = 'inline-block';
     if (infoDiv) infoDiv.style.display = 'block';
-    
+
     if (horaEntradaSpan && horaEntrada) {
         const horaFormateada = horaEntrada.substring(0, 5); // HH:MM
         horaEntradaSpan.textContent = horaFormateada;
@@ -802,35 +802,35 @@ function mostrarBotonSalida(horaEntrada) {
 // ========== MARCAR ENTRADA ==========
 async function marcarEntrada() {
     console.log('🚀 Iniciando marcación de entrada');
-    
+
     const descripcion = prompt('Describe brevemente tu trabajo de hoy (opcional):');
     if (descripcion === null) {
         console.log('ℹ️ Usuario canceló la entrada');
         return;
     }
-    
+
     const btnEntrada = document.getElementById('btn-entrada');
     btnEntrada.disabled = true;
     btnEntrada.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Registrando...';
-    
+
     try {
         const hoy = new Date();
         const formData = new FormData();
         formData.append('fecha', hoy.toISOString().split('T')[0]);
         formData.append('hora_entrada', hoy.toTimeString().split(' ')[0]);
         formData.append('descripcion', descripcion || '');
-        
+
         console.log('📤 Enviando datos de entrada');
-        
+
         const response = await fetch('/api/horas/iniciar', {
             method: 'POST',
             body: formData,
             credentials: 'same-origin'
         });
-        
+
         const data = await response.json();
         console.log('📥 Respuesta del servidor:', data);
-        
+
         if (data.success) {
             alert(`✅ ${data.message}\nHora registrada: ${data.hora_entrada}`);
             registroAbiertoId = data.id_registro;
@@ -840,7 +840,7 @@ async function marcarEntrada() {
             btnEntrada.disabled = false;
             btnEntrada.innerHTML = '<i class="fas fa-sign-in-alt"></i> Marcar Entrada';
         }
-        
+
     } catch (error) {
         console.error('❌ Error al marcar entrada:', error);
         alert('❌ Error de conexión. Por favor, intenta nuevamente.');
@@ -852,39 +852,39 @@ async function marcarEntrada() {
 // ========== MARCAR SALIDA ==========
 async function marcarSalida() {
     console.log('🚀 Iniciando marcación de salida');
-    
+
     if (!registroAbiertoId) {
         alert('❌ No hay registro activo para cerrar');
         return;
     }
-    
+
     if (!confirm('¿Deseas registrar tu salida ahora?')) {
         console.log('ℹ️ Usuario canceló la salida');
         return;
     }
-    
+
     const btnSalida = document.getElementById('btn-salida');
     const btnHTML = btnSalida.innerHTML;
     btnSalida.disabled = true;
     btnSalida.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Registrando...';
-    
+
     try {
         const ahora = new Date();
         const formData = new FormData();
         formData.append('id_registro', registroAbiertoId);
         formData.append('hora_salida', ahora.toTimeString().split(' ')[0]);
-        
+
         console.log('📤 Enviando datos de salida');
-        
+
         const response = await fetch('/api/horas/cerrar', {
             method: 'POST',
             body: formData,
             credentials: 'same-origin'
         });
-        
+
         const data = await response.json();
         console.log('📥 Respuesta del servidor:', data);
-        
+
         if (data.success) {
             alert(`✅ ${data.message}\n\n⏱️ Total trabajado: ${data.total_horas} horas`);
             registroAbiertoId = null;
@@ -895,7 +895,7 @@ async function marcarSalida() {
             btnSalida.disabled = false;
             btnSalida.innerHTML = btnHTML;
         }
-        
+
     } catch (error) {
         console.error('❌ Error al marcar salida:', error);
         alert('❌ Error de conexión. Por favor, intenta nuevamente.');
@@ -911,15 +911,15 @@ async function cargarEstadisticas() {
             fetch('/api/horas/resumen-semanal'),
             fetch('/api/horas/estadisticas')
         ]);
-        
+
         const resumenData = await resumenResponse.json();
         const statsData = await statsResponse.json();
-        
+
         // Actualizar horas de la semana
         if (resumenData.success && resumenData.resumen) {
             const horasSemana = document.getElementById('horas-semana');
             const diasSemana = document.getElementById('dias-semana');
-            
+
             if (horasSemana) {
                 horasSemana.textContent = (resumenData.resumen.total_horas || 0) + 'h';
             }
@@ -927,7 +927,7 @@ async function cargarEstadisticas() {
                 diasSemana.textContent = resumenData.resumen.dias_trabajados || 0;
             }
         }
-        
+
         // Actualizar horas del mes
         if (statsData.success && statsData.estadisticas) {
             const horasMes = document.getElementById('horas-mes');
@@ -935,9 +935,9 @@ async function cargarEstadisticas() {
                 horasMes.textContent = (statsData.estadisticas.total_horas || 0) + 'h';
             }
         }
-        
+
         console.log('✅ Estadísticas actualizadas');
-        
+
     } catch (error) {
         console.error('❌ Error al cargar estadísticas:', error);
     }
@@ -947,20 +947,20 @@ async function cargarEstadisticas() {
 async function loadResumenSemanal() {
     const container = document.getElementById('resumen-semanal-container');
     if (!container) return;
-    
+
     container.innerHTML = '<p class="loading">Cargando resumen semanal...</p>';
-    
+
     try {
         const response = await fetch('/api/horas/resumen-semanal');
         const data = await response.json();
-        
+
         if (data.success && data.resumen) {
             renderResumenSemanal(data.resumen);
             console.log('✅ Resumen semanal cargado');
         } else {
             container.innerHTML = '<p class="error">Error al cargar resumen semanal</p>';
         }
-        
+
     } catch (error) {
         console.error('❌ Error al cargar resumen semanal:', error);
         container.innerHTML = '<p class="error">Error de conexión</p>';
@@ -969,17 +969,17 @@ async function loadResumenSemanal() {
 
 function renderResumenSemanal(resumen) {
     const container = document.getElementById('resumen-semanal-container');
-    
+
     const diasSemana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
     const registrosPorDia = {};
-    
+
     // Organizar registros por día
     if (resumen.registros) {
         resumen.registros.forEach(reg => {
             registrosPorDia[reg.fecha] = reg;
         });
     }
-    
+
     // Generar fechas de la semana (Lunes a Domingo - 7 días)
     const fechaInicio = new Date(resumen.semana.inicio + 'T00:00:00');
     const fechas = [];
@@ -988,7 +988,7 @@ function renderResumenSemanal(resumen) {
         fecha.setDate(fecha.getDate() + i);
         fechas.push(fecha.toISOString().split('T')[0]);
     }
-    
+
     let html = `
         <div class="resumen-semana-header">
             <p><strong>Semana del ${formatearFechaSimple(resumen.semana.inicio)} al ${formatearFechaSimple(resumen.semana.fin)}</strong></p>
@@ -999,14 +999,14 @@ function renderResumenSemanal(resumen) {
         </div>
         <div class="resumen-dias-grid">
     `;
-    
+
     fechas.forEach((fecha, index) => {
         const registro = registrosPorDia[fecha];
         const dia = diasSemana[index];
         const fechaFormateada = formatearFechaSimple(fecha);
         const esHoy = fecha === new Date().toISOString().split('T')[0];
         const esFinDeSemana = index === 5 || index === 6; // Sábado o Domingo
-        
+
         html += `
             <div class="dia-card ${registro ? 'con-registro' : 'sin-registro'} ${esHoy ? 'dia-hoy' : ''} ${esFinDeSemana ? 'fin-de-semana' : ''}">
                 <div class="dia-header">
@@ -1017,13 +1017,13 @@ function renderResumenSemanal(resumen) {
                 </div>
                 <div class="dia-content">
         `;
-        
+
         if (registro) {
             const entrada = registro.hora_entrada ? registro.hora_entrada.substring(0, 5) : '--:--';
             const salida = registro.hora_salida ? registro.hora_salida.substring(0, 5) : 'En curso';
             const horas = registro.total_horas || 0;
             const estadoBadge = getEstadoBadge(registro.estado);
-            
+
             html += `
                 <div class="registro-info">
                     <p><i class="fas fa-sign-in-alt"></i> Entrada: <strong>${entrada}</strong></p>
@@ -1035,13 +1035,13 @@ function renderResumenSemanal(resumen) {
         } else {
             html += '<p class="no-registro"><i class="fas fa-calendar-times"></i> Sin registro</p>';
         }
-        
+
         html += `
                 </div>
             </div>
         `;
     });
-    
+
     html += '</div>';
     container.innerHTML = html;
 }
@@ -1059,28 +1059,28 @@ function getEstadoBadge(estado) {
 async function loadMisRegistros() {
     const container = document.getElementById('historial-registros-container');
     if (!container) return;
-    
+
     container.innerHTML = '<p class="loading">Cargando historial...</p>';
-    
+
     try {
         const fechaInicio = document.getElementById('filtro-fecha-inicio')?.value || '';
         const fechaFin = document.getElementById('filtro-fecha-fin')?.value || '';
-        
+
         let url = '/api/horas/mis-registros';
         if (fechaInicio && fechaFin) {
             url += `?fecha_inicio=${fechaInicio}&fecha_fin=${fechaFin}`;
         }
-        
+
         const response = await fetch(url);
         const data = await response.json();
-        
+
         if (data.success && data.registros) {
             renderHistorialRegistros(data.registros);
             console.log(`✅ ${data.registros.length} registros cargados`);
         } else {
             container.innerHTML = '<p class="error">Error al cargar registros</p>';
         }
-        
+
     } catch (error) {
         console.error('❌ Error al cargar registros:', error);
         container.innerHTML = '<p class="error">Error de conexión</p>';
@@ -1089,7 +1089,7 @@ async function loadMisRegistros() {
 
 function renderHistorialRegistros(registros) {
     const container = document.getElementById('historial-registros-container');
-    
+
     if (!registros || registros.length === 0) {
         container.innerHTML = `
             <div class="no-data">
@@ -1099,7 +1099,7 @@ function renderHistorialRegistros(registros) {
         `;
         return;
     }
-    
+
     let html = `
         <div class="registros-table-wrapper">
             <table class="registros-table">
@@ -1117,7 +1117,7 @@ function renderHistorialRegistros(registros) {
                 </thead>
                 <tbody>
     `;
-    
+
     registros.forEach(reg => {
         const fecha = new Date(reg.fecha + 'T00:00:00');
         const fechaFormateada = formatearFechaSimple(reg.fecha);
@@ -1127,10 +1127,10 @@ function renderHistorialRegistros(registros) {
         const horas = reg.total_horas || '0.00';
         const estado = reg.estado || 'pendiente';
         const descripcion = reg.descripcion || '-';
-        
+
         const puedeEditar = estado === 'pendiente' && reg.hora_salida !== null;
         const estaRechazado = estado === 'rechazado';
-        
+
         html += `
             <tr class="registro-row estado-${estado}">
                 <td><strong>${fechaFormateada}</strong></td>
@@ -1172,13 +1172,13 @@ function renderHistorialRegistros(registros) {
             </tr>
         `;
     });
-    
+
     html += `
                 </tbody>
             </table>
         </div>
     `;
-    
+
     container.innerHTML = html;
 }
 
@@ -1194,10 +1194,10 @@ function formatearEstadoHoras(estado) {
 
 function formatearFechaSimple(fecha) {
     const f = new Date(fecha + 'T00:00:00');
-    return f.toLocaleDateString('es-UY', { 
-        day: '2-digit', 
-        month: '2-digit', 
-        year: 'numeric' 
+    return f.toLocaleDateString('es-UY', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
     });
 }
 
@@ -1219,17 +1219,17 @@ function escaparComillas(texto) {
 async function filtrarRegistros() {
     const fechaInicio = document.getElementById('filtro-fecha-inicio')?.value;
     const fechaFin = document.getElementById('filtro-fecha-fin')?.value;
-    
+
     if (!fechaInicio || !fechaFin) {
         alert('⚠️ Selecciona ambas fechas para filtrar');
         return;
     }
-    
+
     if (fechaInicio > fechaFin) {
         alert('⚠️ La fecha de inicio debe ser anterior a la fecha de fin');
         return;
     }
-    
+
     console.log(`🔍 Filtrando registros: ${fechaInicio} a ${fechaFin}`);
     await loadMisRegistros();
 }
@@ -1237,33 +1237,33 @@ async function filtrarRegistros() {
 // ========== EDITAR REGISTRO ==========
 async function editarRegistro(idRegistro) {
     console.log(`✏️ Editando registro ID: ${idRegistro}`);
-    
+
     try {
         // Cargar datos del registro
         const response = await fetch('/api/horas/mis-registros');
         const data = await response.json();
-        
+
         if (!data.success) {
             alert('❌ Error al cargar datos del registro');
             return;
         }
-        
+
         const registro = data.registros.find(r => r.id_registro == idRegistro);
-        
+
         if (!registro) {
             alert('❌ Registro no encontrado');
             return;
         }
-        
+
         // Llenar formulario
         document.getElementById('edit-id-registro').value = registro.id_registro;
         document.getElementById('edit-hora-entrada').value = registro.hora_entrada.substring(0, 5);
         document.getElementById('edit-hora-salida').value = registro.hora_salida ? registro.hora_salida.substring(0, 5) : '';
         document.getElementById('edit-descripcion').value = registro.descripcion || '';
-        
+
         // Mostrar modal
         document.getElementById('editarRegistroModal').style.display = 'flex';
-        
+
     } catch (error) {
         console.error('❌ Error al cargar registro:', error);
         alert('❌ Error al cargar el registro para editar');
@@ -1275,7 +1275,7 @@ function closeEditarRegistroModal() {
     if (modal) {
         modal.style.display = 'none';
     }
-    
+
     const form = document.getElementById('editarRegistroForm');
     if (form) {
         form.reset();
@@ -1285,35 +1285,35 @@ function closeEditarRegistroModal() {
 async function submitEditarRegistro(event) {
     event.preventDefault();
     console.log('💾 Guardando cambios en registro');
-    
+
     const horaEntrada = document.getElementById('edit-hora-entrada').value;
     const horaSalida = document.getElementById('edit-hora-salida').value;
-    
+
     // Validar que la salida sea posterior a la entrada
     if (horaSalida && horaSalida <= horaEntrada) {
         alert('⚠️ La hora de salida debe ser posterior a la hora de entrada');
         return;
     }
-    
+
     const formData = new FormData();
     formData.append('id_registro', document.getElementById('edit-id-registro').value);
     formData.append('hora_entrada', horaEntrada + ':00');
-    
+
     if (horaSalida) {
         formData.append('hora_salida', horaSalida + ':00');
     }
-    
+
     formData.append('descripcion', document.getElementById('edit-descripcion').value);
-    
+
     try {
         const response = await fetch('/api/horas/editar', {
             method: 'POST',
             body: formData,
             credentials: 'same-origin'
         });
-        
+
         const data = await response.json();
-        
+
         if (data.success) {
             alert('✅ ' + data.message);
             closeEditarRegistroModal();
@@ -1321,7 +1321,7 @@ async function submitEditarRegistro(event) {
         } else {
             alert('❌ ' + data.message);
         }
-        
+
     } catch (error) {
         console.error('❌ Error al guardar cambios:', error);
         alert('❌ Error de conexión al guardar');

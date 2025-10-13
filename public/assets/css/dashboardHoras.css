@@ -320,13 +320,8 @@
     border-bottom: 1px solid #e0e0e0;
 }
 
-.registros-table tbody tr {
-    transition: all 0.2s ease;
-}
-
 .registros-table tbody tr:hover {
     background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    transform: scale(1.01);
 }
 
 .registro-row.estado-pendiente {
