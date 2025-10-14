@@ -86,9 +86,6 @@ if (!isset($_SESSION['user_id'])) {
 					<p id="display-nombre"><?php echo htmlspecialchars($_SESSION['nombre_completo'] ?? 'Usuario'); ?></p>
 				</div>
 				<div class="profile-info-item">
-					<strong><i class="fas fa-id-card"></i> Cédula:</strong>
-					<p id="display-cedula"><?php echo htmlspecialchars($_SESSION['cedula'] ?? 'No disponible'); ?></p>
-				</div>
 				<div class="profile-info-item">
 					<strong><i class="fas fa-envelope"></i> Email:</strong>
 					<p id="display-email"><?php echo htmlspecialchars($_SESSION['email'] ?? 'No disponible'); ?></p>
@@ -100,10 +97,6 @@ if (!isset($_SESSION['user_id'])) {
 				<div class="profile-info-item">
 					<strong><i class="fas fa-birthday-cake"></i> Fecha de Nacimiento:</strong>
 					<p id="display-fecha-nacimiento"><?php echo htmlspecialchars($_SESSION['fecha_nacimiento'] ?? 'No disponible'); ?></p>
-				</div>
-				<div class="profile-info-item">
-					<strong><i class="fas fa-calendar-alt"></i> Fecha de Ingreso:</strong>
-					<p><?php echo htmlspecialchars($_SESSION['fecha_ingreso'] ?? 'No disponible'); ?></p>
 				</div>
 				<div class="profile-info-item">
 					<strong><i class="fas fa-info-circle"></i> Estado:</strong>

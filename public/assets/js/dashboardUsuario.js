@@ -834,6 +834,11 @@ async function marcarEntrada() {
         if (data.success) {
             alert(`✅ ${data.message}\nHora registrada: ${data.hora_entrada}`);
             registroAbiertoId = data.id_registro;
+            
+            // Restablecer botón antes de recargar
+            btnEntrada.disabled = false;
+            btnEntrada.innerHTML = '<i class="fas fa-sign-in-alt"></i> Marcar Entrada';
+            
             await inicializarSeccionHoras();
         } else {
             alert(`❌ ${data.message}`);
@@ -889,6 +894,11 @@ async function marcarSalida() {
             alert(`✅ ${data.message}\n\n⏱️ Total trabajado: ${data.total_horas} horas`);
             registroAbiertoId = null;
             registroAbiertoData = null;
+            
+            // Restablecer botón antes de recargar
+            btnSalida.disabled = false;
+            btnSalida.innerHTML = btnHTML;
+            
             await inicializarSeccionHoras();
         } else {
             alert(`❌ ${data.message}`);
@@ -1388,13 +1398,16 @@ async function loadProfileData() {
         if (data.success) {
             profileData = data.user;
             
-            // Llenar formulario
+            // Llenar formulario de edición
             document.getElementById('edit-nombre').value = profileData.nombre_completo || '';
             document.getElementById('edit-cedula').value = profileData.cedula || '';
             document.getElementById('edit-email').value = profileData.email || '';
             document.getElementById('edit-direccion').value = profileData.direccion || '';
             document.getElementById('edit-fecha-nacimiento').value = profileData.fecha_nacimiento || '';
             document.getElementById('edit-telefono').value = profileData.telefono || '';
+            
+            // Actualizar vista de solo lectura también
+            updateProfileView(profileData);
         } else {
             alert('Error al cargar datos del perfil');
         }
@@ -1404,6 +1417,50 @@ async function loadProfileData() {
     }
 }
 
+// Nueva función para actualizar la vista de solo lectura
+function updateProfileView(user) {
+    // Actualizar nombre
+    const nombreEl = document.getElementById('display-nombre');
+    if (nombreEl) {
+        nombreEl.textContent = user.nombre_completo || 'No disponible';
+    }
+    
+   
+    // Actualizar email
+    const emailEl = document.getElementById('display-email');
+    if (emailEl) {
+        emailEl.textContent = user.email || 'No disponible';
+    }
+    
+    // Actualizar dirección
+    const direccionEl = document.getElementById('display-direccion');
+    if (direccionEl) {
+        direccionEl.textContent = user.direccion || 'No especificada';
+    }
+    
+    // Actualizar fecha de nacimiento
+    const fechaNacEl = document.getElementById('display-fecha-nacimiento');
+    if (fechaNacEl && user.fecha_nacimiento) {
+        const fecha = new Date(user.fecha_nacimiento + 'T00:00:00');
+        fechaNacEl.textContent = fecha.toLocaleDateString('es-UY', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        });
+    } else if (fechaNacEl) {
+        fechaNacEl.textContent = 'No especificada';
+    }
+    
+    // Actualizar teléfono
+    const telefonoEl = document.getElementById('display-telefono');
+    if (telefonoEl) {
+        telefonoEl.textContent = user.telefono || 'No especificado';
+    }
+    
+   
+}
+
+// Cargar datos del usuario al iniciar
 async function cargarDatosUsuario() {
     try {
         const response = await fetch('/api/users/my-profile');
@@ -1415,6 +1472,7 @@ async function cargarDatosUsuario() {
         const data = await response.json();
         
         if (data.success && data.user) {
+            // Actualizar header
             const nombreElement = document.getElementById('user-name-header');
             if (nombreElement) {
                 nombreElement.textContent = data.user.nombre_completo || 'Usuario';
@@ -1424,12 +1482,20 @@ async function cargarDatosUsuario() {
             if (emailElement) {
                 emailElement.textContent = data.user.email || '';
             }
+            
+            // Actualizar vista del perfil
+            updateProfileView(data.user);
+            
+            // Guardar datos globalmente
+            profileData = data.user;
+            
+            console.log('✅ Datos de usuario cargados correctamente');
         } else {
             console.error('Error en respuesta:', data);
         }
     } catch (error) {
-        console.error('Error:', error);
-           }
+        console.error('Error al cargar datos de usuario:', error);
+    }
 }
 
 // Enviar formulario de edición
@@ -1507,16 +1573,8 @@ async function submitProfileEdit(event) {
         if (data.success) {
             alert('✅ ' + data.message);
             
-            // Actualizar vista de solo lectura
-            document.getElementById('display-nombre').textContent = nombre;
-            document.getElementById('display-email').textContent = email;
-            document.getElementById('display-direccion').textContent = direccion || 'No especificada';
-            
-            if (fechaNacimiento) {
-                const fecha = new Date(fechaNacimiento);
-                document.getElementById('display-fecha-nacimiento').textContent = 
-                    fecha.toLocaleDateString('es-UY');
-            }
+            // Recargar los datos del usuario para actualizar la vista
+            await cargarDatosUsuario();
             
             // Volver a vista de solo lectura
             toggleEditProfile();
@@ -1536,6 +1594,13 @@ async function submitProfileEdit(event) {
     }
 }
 
-// Exportar funciones
+// Inicializar al cargar la página
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🔄 Cargando datos del usuario...');
+    cargarDatosUsuario();
+});
+
+// Exportar funciones globales
 window.toggleEditProfile = toggleEditProfile;
 window.submitProfileEdit = submitProfileEdit;
+window.cargarDatosUsuario = cargarDatosUsuario;
