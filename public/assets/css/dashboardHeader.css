@@ -127,14 +127,14 @@ body {
 }
 
 /* ==========================================
-   MINIMIZAR MENÚ / EXPANDIR MENÚ
+   MINIMIZAR / EXPANDIR MENÚ
    ========================================== */
 
 .menu-container {
     position: relative;
 }
 
-.toggle-menu-btn  {
+.toggle-menu-btn {
     position: absolute;
     top: 100%;
     left: 50%;
@@ -171,14 +171,14 @@ body {
 }
 
 nav.menu.menu-minimized {
-    height: 60px; 
+    height: 60px;
     transition: height 0.3s ease;
     overflow: hidden;
     display: none;
 }
 
 .section-content.menu-minimized {
-    margin-top: -1em; 
+    margin-top: -1em;
     transition: margin-top 0.3s ease;
 }
 

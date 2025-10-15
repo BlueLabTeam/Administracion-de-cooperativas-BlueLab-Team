@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
 
-    // ========== BOTÓN MINIMIZAR/EXPANDIR MENU ==========
+    // ========== BOTÓN MINIMIZAR/EXPANDIR MENÚ ==========
     const toggleMenuBtn = document.querySelector('.toggle-menu-btn');
     const menu = document.querySelector('nav.menu');
     const allSections = document.querySelectorAll('.section-content');
