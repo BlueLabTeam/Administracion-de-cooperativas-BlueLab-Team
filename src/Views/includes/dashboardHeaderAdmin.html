@@ -15,7 +15,6 @@
         <div class="logo">
             <h1>🔧 Panel de Administración</h1>
         </div>
-
         <div class="user-controls">
             <a href="/api/logout" class="logout-link">
                 <button class="btn-logout">Logout</button>
@@ -23,16 +22,17 @@
             <a href="/dashboard" style="text-decoration: none;">
                 <button class="btn-usuario">Vista Usuario</button>
             </a>
-            <span class="nombre"><?php echo htmlspecialchars($_SESSION['nombre_completo'] ?? 'Administrador'); ?></span>
+            <span class="nombre">
+                <?php echo htmlspecialchars($_SESSION['nombre_completo'] ?? 'Administrador'); ?>
+            </span>
             <div class="icono-usuario">
                 <img src="https://cdn-icons-png.flaticon.com/512/847/847969.png" alt="Admin">
             </div>
         </div>
     </header>
 
-    
-        
-       <nav class="menu">
+
+    <nav class="menu">
         <ul>
             <li class="activo" data-section="inicio">
                 <a href="#inicio" title="Inicio">
@@ -80,7 +80,12 @@
                 </a>
             </li>
         </ul>
+        <button class="toggle-menu-btn" title="Minimizar menú">
+            <i class="fas fa-chevron-up"></i>
+        </button>
     </nav>
 
+
 </body>
+
 </html>

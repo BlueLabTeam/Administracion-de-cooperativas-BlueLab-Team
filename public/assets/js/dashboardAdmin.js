@@ -59,7 +59,34 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+
+    // ========== BOTÓN MINIMIZAR/EXPANDIR MENU ==========
+    const toggleMenuBtn = document.querySelector('.toggle-menu-btn');
+    const menu = document.querySelector('nav.menu');
+    const allSections = document.querySelectorAll('.section-content');
+    const headerMenu = document.querySelector('.header-menu');
+
+    toggleMenuBtn.addEventListener('click', () => {
+        console.log('>>> Botón minimizar/expandir clickeado');
+
+        // Alternamos la clase para minimizar/expandir
+        menu.classList.toggle('menu-minimized');
+
+        // Alternamos visualmente el main (sube cuando el menú se minimiza)
+        allSections.forEach(sec => sec.classList.toggle('menu-minimized'));
+
+        // Cambiamos la flecha como feedback visual
+        const icon = toggleMenuBtn.querySelector('i');
+        if (icon.classList.contains('fa-chevron-up')) {
+            icon.classList.remove('fa-chevron-up');
+            icon.classList.add('fa-chevron-down');
+        } else {
+            icon.classList.remove('fa-chevron-down');
+            icon.classList.add('fa-chevron-up');
+        }
+    });
 }); // ← CIERRE CORRECTO DEL DOMContentLoaded
+
 
 console.log('=== Definiendo funciones globales ===');
 
