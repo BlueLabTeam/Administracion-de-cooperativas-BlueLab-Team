@@ -1,0 +1,400 @@
+/* ==========================================
+   ESTILOS WIDGET DEUDA DE HORAS
+   dashboardDeudaHoras.css
+   ========================================== */
+
+/* ========== TARJETA PRINCIPAL DE DEUDA ========== */
+.deuda-principal-card {
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    margin-bottom: 25px;
+    border: 2px solid #e0e0e0;
+    transition: all 0.3s ease;
+}
+
+.deuda-principal-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(50, 156, 239, 0.2);
+}
+
+/* Estados de la tarjeta */
+.deuda-principal-card.inicial {
+    border-left: 5px solid #ff9800;
+}
+
+.deuda-principal-card.progreso {
+    border-left: 5px solid #329cef;
+}
+
+.deuda-principal-card.completado {
+    border-left: 5px solid #4caf50;
+    background: linear-gradient(135deg, #f0f9f4 0%, #e8f5e9 100%);
+}
+
+/* ========== ENCABEZADO ========== */
+.deuda-principal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid rgba(50, 10, 149, 0.1);
+}
+
+.deuda-principal-header h4 {
+    font-size: 1.4em;
+    color: #320a95;
+    margin: 0 0 5px 0;
+    font-weight: 700;
+}
+
+.deuda-principal-badge {
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.deuda-principal-badge.activo {
+    background: linear-gradient(135deg, #329cef 0%, #320a95 100%);
+    color: white;
+}
+
+.deuda-principal-badge.cerca {
+    background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+    color: white;
+    animation: pulse-badge 2s infinite;
+}
+
+.deuda-principal-badge.completado {
+    background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+    color: white;
+}
+
+@keyframes pulse-badge {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+/* ========== GRID DE INFORMACIÓN ========== */
+.deuda-principal-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.deuda-principal-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 20px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border-radius: 10px;
+    border: 1px solid #e0e0e0;
+    transition: all 0.3s ease;
+}
+
+.deuda-principal-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(50, 156, 239, 0.15);
+    border-color: #329cef;
+}
+
+.deuda-principal-item i {
+    font-size: 2em;
+    opacity: 0.9;
+}
+
+/* Iconos específicos para cada métrica */
+.deuda-principal-item i.fa-hourglass-start {
+    color: #ff9800; /* Naranja para deuda inicial */
+}
+
+.deuda-principal-item i.fa-check-circle {
+    color: #4caf50; /* Verde para horas aprobadas */
+}
+
+.deuda-principal-item i.fa-tasks {
+    color: #f44336; /* Rojo para deuda restante */
+}
+
+.deuda-principal-item i.fa-chart-pie {
+    color: #667eea; /* Morado para progreso */
+}
+
+.deuda-principal-item > div {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.deuda-label {
+    font-size: 0.85em;
+    color: #666;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.deuda-valor-grande {
+    font-size: 1.8em;
+    font-weight: bold;
+    color: #320a95;
+}
+
+.deuda-valor-grande.success {
+    color: #4caf50;
+}
+
+.deuda-valor-grande.error {
+    color: #f44336;
+}
+
+/* ========== BARRA DE PROGRESO PRINCIPAL ========== */
+.deuda-progress-container {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border-radius: 10px;
+    padding: 20px;
+    border: 1px solid #e0e0e0;
+}
+
+.deuda-progress-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    color: #320a95;
+    font-weight: 600;
+}
+
+.deuda-progress-bar-main {
+    height: 30px;
+    background: #e0e0e0;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 10px;
+}
+
+.deuda-progress-fill-main {
+    height: 100%;
+    background: linear-gradient(135deg, #329cef 0%, #320a95 100%);
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 15px;
+    color: white;
+    font-weight: bold;
+    transition: width 0.6s ease;
+    box-shadow: 0 2px 8px rgba(50, 156, 239, 0.4);
+}
+
+.deuda-progress-numbers {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9em;
+    color: #666;
+    font-weight: 500;
+}
+
+/* ========== ALERTAS ========== */
+.alert-success,
+.alert-info,
+.alert-warning {
+    padding: 15px 20px;
+    border-radius: 8px;
+    border-left: 4px solid;
+}
+
+.alert-success {
+    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+    border-color: #4caf50;
+    color: #1b5e20;
+}
+
+.alert-success strong {
+    color: #2e7d32;
+}
+
+.alert-info {
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    border-color: #329cef;
+    color: #0d47a1;
+}
+
+.alert-info strong {
+    color: #1565c0;
+}
+
+.alert-warning {
+    background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+    border-color: #ff9800;
+    color: #e65100;
+}
+
+.alert-warning strong {
+    color: #f57c00;
+}
+
+/* ========== HISTORIAL DE HORAS ========== */
+.historial-deuda-list {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+.historial-deuda-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.historial-deuda-table thead {
+    background: linear-gradient(135deg, #329cef 0%, #320a95 100%);
+    color: white;
+}
+
+.historial-deuda-table th {
+    padding: 12px;
+    text-align: left;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85em;
+    letter-spacing: 0.5px;
+}
+
+.historial-deuda-table th:first-child {
+    border-top-left-radius: 8px;
+}
+
+.historial-deuda-table th:last-child {
+    border-top-right-radius: 8px;
+}
+
+.historial-deuda-table td {
+    padding: 12px;
+    border-bottom: 1px solid #e0e0e0;
+    color: #333;
+}
+
+.historial-row {
+    transition: all 0.2s ease;
+}
+
+.historial-row:hover {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.historial-row.estado-aprobado {
+    background: linear-gradient(135deg, #f0f9f4 0%, #e8f5e9 100%);
+}
+
+.historial-row i {
+    color: #329cef;
+    margin-right: 5px;
+}
+
+/* ========== NO DATA ========== */
+.no-data {
+    text-align: center;
+    padding: 40px 20px;
+    color: #999;
+    background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+    border-radius: 8px;
+}
+
+.no-data i {
+    display: block;
+    margin-bottom: 10px;
+}
+
+/* ========== BADGE ESTADOS ========== */
+.badge-estado {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 12px;
+    border-radius: 12px;
+    font-size: 0.8em;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.badge-estado.aprobado {
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    color: #155724;
+}
+
+.badge-estado.rechazado {
+    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+    color: #721c24;
+}
+
+.badge-estado.pendiente {
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+    color: #856404;
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 768px) {
+    .deuda-principal-card {
+        padding: 20px;
+    }
+
+    .deuda-principal-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .deuda-principal-header {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .deuda-principal-badge {
+        align-self: flex-start;
+    }
+
+    .deuda-valor-grande {
+        font-size: 1.5em;
+    }
+
+    .deuda-progress-bar-main {
+        height: 25px;
+    }
+
+    .historial-deuda-table {
+        font-size: 0.85em;
+    }
+
+    .historial-deuda-table th,
+    .historial-deuda-table td {
+        padding: 8px;
+    }
+}
+
+@media (max-width: 576px) {
+    .deuda-principal-item {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+    }
+
+    .deuda-principal-item i {
+        font-size: 1.5em;
+    }
+
+    .deuda-progress-numbers {
+        flex-direction: column;
+        gap: 5px;
+        text-align: center;
+    }
+}

@@ -363,3 +363,278 @@ CREATE TABLE IF NOT EXISTS Registro_Horas (
         DAYOFWEEK(fecha) NOT IN (1, 7)  -- 1=Domingo, 7=Sábado
     )
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ==========================================
+-- TABLA DE CUOTAS MENSUALES
+-- ==========================================
+
+ALTER TABLE Cuotas_Mensuales 
+ADD COLUMN IF NOT EXISTS monto_pendiente_anterior DECIMAL(10,2) DEFAULT 0.00 COMMENT 'Deuda acumulada de meses anteriores',
+ADD COLUMN IF NOT EXISTS monto_total DECIMAL(10,2) GENERATED ALWAYS AS (monto + monto_pendiente_anterior) STORED COMMENT 'Monto total a pagar';
+
+CREATE INDEX IF NOT EXISTS idx_usuario_estado ON Cuotas_Mensuales(id_usuario, estado);
+CREATE INDEX IF NOT EXISTS idx_fecha_vencimiento ON Cuotas_Mensuales(fecha_vencimiento);
+
+-- ==========================================
+-- 2. PROCEDIMIENTO PARA GENERAR CUOTAS
+-- ==========================================
+
+DROP PROCEDURE IF EXISTS GenerarCuotasMensuales;
+
+DELIMITER //
+
+CREATE PROCEDURE GenerarCuotasMensuales(IN p_mes INT, IN p_anio INT)
+BEGIN
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE v_id_usuario INT;
+    DECLARE v_id_vivienda INT;
+    DECLARE v_id_tipo INT;
+    DECLARE v_monto_base DECIMAL(10,2);
+    DECLARE v_deuda_anterior DECIMAL(10,2);
+    DECLARE v_fecha_vencimiento DATE;
+    DECLARE v_count INT;
+    
+    -- Cursor para obtener todos los usuarios con vivienda asignada
+    DECLARE cur CURSOR FOR 
+        SELECT DISTINCT 
+            COALESCE(av.id_usuario, u.id_usuario) as id_usuario,
+            av.id_vivienda,
+            v.id_tipo
+        FROM Asignacion_Vivienda av
+        INNER JOIN Viviendas v ON av.id_vivienda = v.id_vivienda
+        INNER JOIN Usuario u ON (av.id_usuario = u.id_usuario OR av.id_nucleo = u.id_nucleo)
+        WHERE av.activa = TRUE
+        AND u.estado = 'aceptado';  -- Solo usuarios aceptados
+    
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+    
+    -- Calcular fecha de vencimiento (último día del mes)
+    SET v_fecha_vencimiento = LAST_DAY(CONCAT(p_anio, '-', LPAD(p_mes, 2, '0'), '-01'));
+    
+    OPEN cur;
+    
+    read_loop: LOOP
+        FETCH cur INTO v_id_usuario, v_id_vivienda, v_id_tipo;
+        
+        IF done THEN
+            LEAVE read_loop;
+        END IF;
+        
+        -- Verificar si ya existe la cuota
+        SET v_count = 0;
+        SELECT COUNT(*) INTO v_count
+        FROM Cuotas_Mensuales
+        WHERE id_usuario = v_id_usuario
+        AND mes = p_mes
+        AND anio = p_anio;
+        
+        -- Si ya existe, saltar
+        IF v_count > 0 THEN
+            ITERATE read_loop;
+        END IF;
+        
+        -- Obtener monto base según tipo de vivienda
+        SET v_monto_base = 0;
+        SELECT monto_mensual INTO v_monto_base
+        FROM Config_Cuotas
+        WHERE id_tipo = v_id_tipo
+        AND activo = TRUE
+        AND fecha_vigencia_desde <= CURDATE()
+        AND (fecha_vigencia_hasta IS NULL OR fecha_vigencia_hasta >= CURDATE())
+        LIMIT 1;
+        
+        -- Si no hay precio configurado, saltar
+        IF v_monto_base IS NULL OR v_monto_base = 0 THEN
+            ITERATE read_loop;
+        END IF;
+        
+        -- Calcular deuda acumulada de meses anteriores (solo cuotas NO pagadas)
+        SET v_deuda_anterior = 0;
+        SELECT COALESCE(SUM(monto + monto_pendiente_anterior), 0) INTO v_deuda_anterior
+        FROM Cuotas_Mensuales
+        WHERE id_usuario = v_id_usuario
+        AND estado != 'pagada'
+        AND (
+            anio < p_anio
+            OR (anio = p_anio AND mes < p_mes)
+        );
+        
+        -- Insertar cuota nueva
+        INSERT INTO Cuotas_Mensuales 
+            (id_usuario, id_vivienda, mes, anio, monto, monto_pendiente_anterior, 
+             fecha_vencimiento, horas_requeridas, estado)
+        VALUES 
+            (v_id_usuario, v_id_vivienda, p_mes, p_anio, v_monto_base, v_deuda_anterior,
+             v_fecha_vencimiento, 40.00, 'pendiente');
+        
+    END LOOP;
+    
+    CLOSE cur;
+END//
+
+DELIMITER ;
+
+-- ==========================================
+-- 3. HABILITAR EVENTOS AUTOMÁTICOS
+-- ==========================================
+
+SET GLOBAL event_scheduler = ON;
+
+-- ==========================================
+-- 4. CREAR EVENTO AUTOMÁTICO
+-- ==========================================
+
+DROP EVENT IF EXISTS GenerarCuotasAutomatico;
+
+DELIMITER //
+
+CREATE EVENT GenerarCuotasAutomatico
+ON SCHEDULE EVERY 1 MONTH
+STARTS CONCAT(DATE_FORMAT(DATE_ADD(CURDATE(), INTERVAL 1 MONTH), '%Y-%m-'), '01 00:01:00')
+DO
+BEGIN
+    DECLARE v_mes INT;
+    DECLARE v_anio INT;
+    
+    -- Obtener mes y año actual
+    SET v_mes = MONTH(CURDATE());
+    SET v_anio = YEAR(CURDATE());
+    
+    -- Llamar al procedimiento para generar cuotas
+    CALL GenerarCuotasMensuales(v_mes, v_anio);
+END//
+
+DELIMITER ;
+
+-- ==========================================
+-- 5. VISTA MEJORADA
+-- ==========================================
+
+DROP VIEW IF EXISTS Vista_Cuotas_Completa;
+
+CREATE VIEW Vista_Cuotas_Completa AS
+SELECT 
+    cm.id_cuota,
+    cm.id_usuario,
+    u.nombre_completo,
+    u.email,
+    cm.id_vivienda,
+    v.numero_vivienda,
+    tv.nombre as tipo_vivienda,
+    tv.habitaciones,
+    cm.mes,
+    cm.anio,
+    cm.monto as monto_base,
+    cm.monto_pendiente_anterior,
+    cm.monto_total,
+    cm.estado,
+    cm.fecha_vencimiento,
+    cm.horas_requeridas,
+    cm.horas_cumplidas,
+    cm.horas_validadas,
+    cm.observaciones,
+    pc.id_pago,
+    pc.monto_pagado,
+    pc.fecha_pago,
+    pc.comprobante_archivo,
+    pc.estado_validacion as estado_pago,
+    pc.observaciones_validacion,
+    CASE 
+        WHEN cm.fecha_vencimiento < CURDATE() AND cm.estado = 'pendiente' THEN 'vencida'
+        ELSE cm.estado
+    END as estado_actual,
+    CASE
+        WHEN cm.horas_cumplidas >= cm.horas_requeridas THEN TRUE
+        ELSE FALSE
+    END as cumple_horas
+FROM Cuotas_Mensuales cm
+INNER JOIN Usuario u ON cm.id_usuario = u.id_usuario
+INNER JOIN Viviendas v ON cm.id_vivienda = v.id_vivienda
+INNER JOIN Tipo_Vivienda tv ON v.id_tipo = tv.id_tipo
+LEFT JOIN Pagos_Cuotas pc ON cm.id_cuota = pc.id_cuota AND pc.estado_validacion != 'rechazado';
+
+-- ==========================================
+-- 6. FUNCIÓN PARA CALCULAR DEUDA
+-- ==========================================
+
+DROP FUNCTION IF EXISTS CalcularDeudaUsuario;
+
+DELIMITER //
+
+CREATE FUNCTION CalcularDeudaUsuario(p_id_usuario INT)
+RETURNS DECIMAL(10,2)
+DETERMINISTIC
+READS SQL DATA
+BEGIN
+    DECLARE v_deuda DECIMAL(10,2);
+    
+    SELECT COALESCE(SUM(monto_total), 0) INTO v_deuda
+    FROM Cuotas_Mensuales
+    WHERE id_usuario = p_id_usuario
+    AND estado != 'pagada';
+    
+    RETURN v_deuda;
+END//
+
+DELIMITER ;
+
+-- ==========================================
+-- 7. TRIGGER PARA ACTUALIZAR HORAS
+-- ==========================================
+
+DROP TRIGGER IF EXISTS actualizar_horas_cuota;
+
+DELIMITER //
+
+CREATE TRIGGER actualizar_horas_cuota
+AFTER UPDATE ON Registro_Horas
+FOR EACH ROW
+BEGIN
+    IF NEW.estado = 'aprobado' AND OLD.estado != 'aprobado' THEN
+        UPDATE Cuotas_Mensuales
+        SET horas_cumplidas = (
+            SELECT COALESCE(SUM(total_horas), 0)
+            FROM Registro_Horas
+            WHERE id_usuario = NEW.id_usuario
+            AND MONTH(fecha) = MONTH(NEW.fecha)
+            AND YEAR(fecha) = YEAR(NEW.fecha)
+            AND estado = 'aprobado'
+        )
+        WHERE id_usuario = NEW.id_usuario
+        AND mes = MONTH(NEW.fecha)
+        AND anio = YEAR(NEW.fecha);
+    END IF;
+END//
+
+DELIMITER ;
+
+-- ==========================================
+-- 8. INSERTAR PRECIOS INICIALES
+-- ==========================================
+
+INSERT INTO Config_Cuotas (id_tipo, monto_mensual, fecha_vigencia_desde, activo) VALUES
+(1, 5000.00, '2025-01-01', TRUE),  -- Mono-ambiente
+(2, 7500.00, '2025-01-01', TRUE),  -- 2 Dormitorios  
+(3, 10000.00, '2025-01-01', TRUE)  -- 3 Dormitorios
+ON DUPLICATE KEY UPDATE 
+    monto_mensual = VALUES(monto_mensual),
+    activo = VALUES(activo);
+
+-- ==========================================
+-- 9. GENERAR CUOTAS DEL MES ACTUAL (PRIMERA VEZ)
+-- ==========================================
+
+CALL GenerarCuotasMensuales(MONTH(CURDATE()), YEAR(CURDATE()));
+
+-- ==========================================
+-- 10. VERIFICACIÓN
+-- ==========================================
+
+-- Ver si el scheduler está activo
+SHOW VARIABLES LIKE 'event_scheduler';
+
+-- Ver eventos creados
+SHOW EVENTS;
+
+-- Ver cuotas generadas
+SELECT * FROM Cuotas_Mensuales ORDER BY anio DESC, mes DESC LIMIT 10;

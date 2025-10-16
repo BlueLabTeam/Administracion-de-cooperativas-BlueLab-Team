@@ -132,6 +132,19 @@ $privateRoutes = [
     '/api/horas/aprobar',
     '/api/horas/rechazar',
     '/api/horas/resumen-usuario',
+       '/api/horas/deuda-actual',       
+    '/api/horas/historial-deuda',      
+    '/api/cuotas/mis-cuotas',
+    '/api/cuotas/detalle',
+    '/api/cuotas/generar',
+    '/api/cuotas/verificar-pago',
+    '/api/cuotas/pagar',
+    '/api/cuotas/all',
+    '/api/cuotas/validar-pago',
+    '/api/cuotas/generar-masivas',
+    '/api/cuotas/estadisticas',
+    '/api/cuotas/precios',
+    '/api/cuotas/actualizar-precio',
 ];
 
 // Aplicar middleware según el tipo de ruta
@@ -406,6 +419,69 @@ switch ($uri) {
         (new App\Controllers\RegistroHorasController())->getResumenPorUsuario();
         break;
 
+
+          // API CUOTAS - USUARIO
+    case '/api/cuotas/mis-cuotas':
+        (new App\Controllers\CuotaController())->getMisCuotas();
+        break;
+    
+    case '/api/cuotas/detalle':
+        (new App\Controllers\CuotaController())->getDetalleCuota();
+        break;
+    
+    case '/api/cuotas/generar':
+        (new App\Controllers\CuotaController())->generarMiCuota();
+        break;
+    
+    case '/api/cuotas/verificar-pago':
+        (new App\Controllers\CuotaController())->verificarPagoCuota();
+        break;
+    
+    case '/api/cuotas/pagar':
+        (new App\Controllers\CuotaController())->pagarCuota();
+        break;
+
+    // API CUOTAS - ADMIN
+    case '/api/cuotas/all':
+        (new App\Controllers\CuotaController())->getAllCuotas();
+        break;
+    
+    case '/api/cuotas/validar-pago':
+        (new App\Controllers\CuotaController())->validarPago();
+        break;
+    
+    case '/api/cuotas/generar-masivas':
+        (new App\Controllers\CuotaController())->generarCuotasMasivas();
+        break;
+    
+    case '/api/cuotas/estadisticas':
+        (new App\Controllers\CuotaController())->getEstadisticas();
+        break;
+    
+    case '/api/cuotas/precios':
+        (new App\Controllers\CuotaController())->getPreciosActuales();
+        break;
+    
+    case '/api/cuotas/actualizar-precio':
+        (new App\Controllers\CuotaController())->actualizarPrecio();
+        break;
+
+       
+
+    // 🆕 AGREGAR ESTAS 2 RUTAS NUEVAS:
+    case '/api/horas/deuda-actual':
+        (new App\Controllers\DeudaHorasController())->getDeudaActual();
+        break;
+
+    case '/api/horas/historial-deuda':
+        (new App\Controllers\DeudaHorasController())->getHistorialDeuda();
+        break;
+
+    // API REGISTRO DE HORAS - ADMIN
+    case '/api/horas/all':
+        (new App\Controllers\RegistroHorasController())->getAllRegistros();
+        break;
+        
     default:
         http_response_code(404);
         include __DIR__ . '/../src/views/404error.php';

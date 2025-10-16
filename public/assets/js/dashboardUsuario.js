@@ -1417,7 +1417,7 @@ async function loadProfileData() {
     }
 }
 
-// Nueva función para actualizar la vista de solo lectura
+// actualizar la vista de solo lectura
 function updateProfileView(user) {
     // Actualizar nombre
     const nombreEl = document.getElementById('display-nombre');
@@ -1604,3 +1604,796 @@ document.addEventListener('DOMContentLoaded', function() {
 window.toggleEditProfile = toggleEditProfile;
 window.submitProfileEdit = submitProfileEdit;
 window.cargarDatosUsuario = cargarDatosUsuario;
+
+
+// ==========================================
+// SISTEMA DE CUOTAS MENSUALES - USUARIO
+// ==========================================
+
+console.log('🟢 Cargando módulo de cuotas');
+
+// ========== INICIALIZACIÓN ==========
+document.addEventListener('DOMContentLoaded', function() {
+    const cuotasMenuItem = document.querySelector('.menu li[data-section="cuotas"]');
+    if (cuotasMenuItem) {
+        cuotasMenuItem.addEventListener('click', function() {
+            console.log('>>> Sección cuotas abierta');
+            inicializarSeccionCuotas();
+        });
+    }
+
+    // Poblar selector de años
+    const selectAnio = document.getElementById('filtro-anio-cuotas');
+    if (selectAnio) {
+        const anioActual = new Date().getFullYear();
+        for (let i = 0; i < 3; i++) {
+            const anio = anioActual - i;
+            const option = document.createElement('option');
+            option.value = anio;
+            option.textContent = anio;
+            selectAnio.appendChild(option);
+        }
+    }
+});
+
+// ========== INICIALIZAR SECCIÓN ==========
+async function inicializarSeccionCuotas() {
+    console.log('📋 Inicializando sección de cuotas');
+    
+    try {
+        await Promise.all([
+            loadInfoViviendaCuota(),
+            loadMisCuotas()
+        ]);
+        
+        console.log('✅ Sección de cuotas inicializada');
+    } catch (error) {
+        console.error('❌ Error al inicializar cuotas:', error);
+        alert('Error al cargar la información de cuotas');
+    }
+}
+
+// ========== CARGAR INFO DE VIVIENDA ==========
+async function loadInfoViviendaCuota() {
+    const container = document.getElementById('info-vivienda-cuota');
+    if (!container) return;
+    
+    container.innerHTML = '<p class="loading">Cargando información de vivienda...</p>';
+    
+    try {
+        const response = await fetch('/api/viviendas/my-vivienda');
+        const data = await response.json();
+        
+        if (data.success && data.vivienda) {
+            const v = data.vivienda;
+            container.innerHTML = `
+                <h3>🏠 Tu Vivienda Asignada</h3>
+                <div class="vivienda-cuota-grid">
+                    <div class="info-item">
+                        <strong>Número:</strong> ${v.numero_vivienda}
+                    </div>
+                    <div class="info-item">
+                        <strong>Tipo:</strong> ${v.tipo_nombre} (${v.habitaciones} hab.)
+                    </div>
+                    <div class="info-item">
+                        <strong>Dirección:</strong> ${v.direccion || 'No especificada'}
+                    </div>
+                </div>
+                <div class="alert-info" style="margin-top: 15px;">
+                    <strong>ℹ️ Cuota Mensual:</strong> El monto se calcula automáticamente según el tipo de vivienda asignada.
+                </div>
+            `;
+        } else {
+            container.innerHTML = `
+                <div class="alert-warning">
+                    <strong>⚠️ Sin Vivienda Asignada</strong>
+                    <p>No tienes una vivienda asignada actualmente. Contacta con el administrador para más información.</p>
+                </div>
+            `;
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        container.innerHTML = '<p class="error">Error al cargar información</p>';
+    }
+}
+
+// ========== CARGAR CUOTAS DEL USUARIO ==========
+async function loadMisCuotas() {
+    const container = document.getElementById('misCuotasContainer');
+    if (!container) return;
+    
+    container.innerHTML = '<p class="loading">Cargando cuotas...</p>';
+    
+    try {
+        const mes = document.getElementById('filtro-mes-cuotas')?.value || '';
+        const anio = document.getElementById('filtro-anio-cuotas')?.value || '';
+        const estado = document.getElementById('filtro-estado-cuotas')?.value || '';
+        
+        let url = '/api/cuotas/mis-cuotas?';
+        if (mes) url += `mes=${mes}&`;
+        if (anio) url += `anio=${anio}&`;
+        if (estado) url += `estado=${estado}&`;
+        
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        if (data.success) {
+            renderMisCuotasOrganizadas(data.cuotas);
+            updateCuotasStats(data.cuotas);
+        } else {
+            container.innerHTML = '<p class="error">Error al cargar cuotas</p>';
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        container.innerHTML = '<p class="error">Error de conexión</p>';
+    }
+}
+
+// ========== RENDERIZAR CUOTAS ORGANIZADAS (PAGABLES ARRIBA, HISTORIAL ABAJO) ==========
+function renderMisCuotasOrganizadas(cuotas) {
+    const container = document.getElementById('misCuotasContainer');
+    
+    if (!cuotas || cuotas.length === 0) {
+        container.innerHTML = `
+            <div class="no-data">
+                <i class="fas fa-inbox" style="font-size: 48px; color: #ddd; margin-bottom: 10px;"></i>
+                <p>No se encontraron cuotas con los filtros seleccionados</p>
+            </div>
+        `;
+        return;
+    }
+    
+    // Separar cuotas pagables de historial
+    const cuotasPagables = cuotas.filter(c => {
+        const estadoFinal = c.estado_actual || c.estado;
+        const tienePagoPendiente = c.id_pago && c.estado_pago === 'pendiente';
+        return estadoFinal !== 'pagada' && !tienePagoPendiente;
+    });
+    
+    const cuotasHistorial = cuotas.filter(c => {
+        const estadoFinal = c.estado_actual || c.estado;
+        const tienePagoPendiente = c.id_pago && c.estado_pago === 'pendiente';
+        return estadoFinal === 'pagada' || tienePagoPendiente;
+    });
+    
+    let html = '';
+    
+    // SECCIÓN: CUOTAS PENDIENTES DE PAGO
+    if (cuotasPagables.length > 0) {
+        html += `
+            <div class="cuotas-section">
+                <h3 style="color: #f44336; margin-bottom: 20px;">
+                    <i class="fas fa-exclamation-circle"></i> Cuotas Pendientes de Pago (${cuotasPagables.length})
+                </h3>
+                <div class="cuotas-grid">
+        `;
+        
+        cuotasPagables.forEach(cuota => {
+            html += renderCuotaCard(cuota);
+        });
+        
+        html += `
+                </div>
+            </div>
+            <hr style="margin: 40px 0; border: none; border-top: 2px solid #e0e0e0;">
+        `;
+    }
+    
+    // SECCIÓN: HISTORIAL (PAGADAS Y PENDIENTES DE VALIDACIÓN)
+    html += `
+        <div class="cuotas-section">
+            <h3 style="color: #666; margin-bottom: 20px;">
+                <i class="fas fa-history"></i> Historial de Cuotas
+            </h3>
+    `;
+    
+    if (cuotasHistorial.length > 0) {
+        html += '<div class="cuotas-grid">';
+        cuotasHistorial.forEach(cuota => {
+            html += renderCuotaCard(cuota);
+        });
+        html += '</div>';
+    } else {
+        html += '<p style="color: #999; text-align: center;">No hay cuotas en el historial</p>';
+    }
+    
+    html += '</div>';
+    
+    container.innerHTML = html;
+}
+
+// ========== RENDERIZAR TARJETA DE CUOTA ==========
+function renderCuotaCard(cuota) {
+    const estadoFinal = cuota.estado_actual || cuota.estado;
+    const mes = obtenerNombreMes(cuota.mes);
+    const fechaVenc = new Date(cuota.fecha_vencimiento + 'T00:00:00');
+    const fechaVencFormatted = fechaVenc.toLocaleDateString('es-UY');
+    
+    const esVencida = estadoFinal === 'vencida';
+    const esPagada = cuota.estado === 'pagada';
+    const tienePagoPendiente = cuota.id_pago && cuota.estado_pago === 'pendiente';
+    
+    return `
+        <div class="cuota-card estado-${estadoFinal}">
+            <div class="cuota-card-header">
+                <div>
+                    <h4>${mes} ${cuota.anio}</h4>
+                    <span class="cuota-vivienda">${cuota.numero_vivienda} - ${cuota.tipo_vivienda}</span>
+                </div>
+                <span class="cuota-badge badge-${estadoFinal}">
+                    ${formatEstadoCuota(estadoFinal)}
+                </span>
+            </div>
+            
+            <div class="cuota-card-body">
+                <div class="cuota-monto">
+                    <span class="cuota-monto-label">Monto:</span>
+                    <span class="cuota-monto-valor">$${parseFloat(cuota.monto).toLocaleString('es-UY', {minimumFractionDigits: 2})}</span>
+                </div>
+                
+                <div class="cuota-info-grid">
+                    <div class="cuota-info-item">
+                        <i class="fas fa-calendar"></i>
+                        <span>Vencimiento: ${fechaVencFormatted}</span>
+                    </div>
+                    <div class="cuota-info-item">
+                        <i class="fas fa-clock"></i>
+                        <span>Horas: ${cuota.horas_cumplidas || 0}h / ${cuota.horas_requeridas}h</span>
+                    </div>
+                </div>
+                
+                ${tienePagoPendiente ? `
+                    <div class="alert-info" style="margin-top: 10px;">
+                        <i class="fas fa-hourglass-half"></i>
+                        <strong>Pago pendiente de validación</strong>
+                        <p style="margin: 5px 0 0 0; font-size: 12px;">
+                            Enviado el ${new Date(cuota.fecha_pago).toLocaleDateString('es-UY')}
+                        </p>
+                    </div>
+                ` : ''}
+                
+                ${cuota.estado_pago === 'rechazado' ? `
+                    <div class="alert-warning" style="margin-top: 10px;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>Pago rechazado</strong>
+                        <p style="margin: 5px 0 0 0; font-size: 12px;">Debes volver a realizar el pago</p>
+                    </div>
+                ` : ''}
+            </div>
+            
+            <div class="cuota-card-footer">
+                ${!esPagada && !tienePagoPendiente ? `
+                    <button class="btn btn-primary btn-small" onclick="abrirPagarCuotaModal(${cuota.id_cuota})">
+                        <i class="fas fa-credit-card"></i> Pagar Cuota
+                    </button>
+                ` : ''}
+                
+                ${cuota.comprobante_archivo ? `
+                    <button class="btn btn-secondary btn-small" onclick="verComprobante('${cuota.comprobante_archivo}')">
+                        <i class="fas fa-image"></i> Ver Comprobante
+                    </button>
+                ` : ''}
+                
+                <button class="btn btn-secondary btn-small" onclick="verDetalleCuota(${cuota.id_cuota})">
+                    <i class="fas fa-info-circle"></i> Detalles
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+// ========== ACTUALIZAR ESTADÍSTICAS ==========
+function updateCuotasStats(cuotas) {
+    const pendientes = cuotas.filter(c => c.estado === 'pendiente' && c.estado_actual !== 'vencida').length;
+    const pagadas = cuotas.filter(c => c.estado === 'pagada').length;
+    const vencidas = cuotas.filter(c => c.estado_actual === 'vencida').length;
+    
+    const pendientesEl = document.getElementById('cuotas-pendientes-count');
+    const pagadasEl = document.getElementById('cuotas-pagadas-count');
+    const vencidasEl = document.getElementById('cuotas-vencidas-count');
+    
+    if (pendientesEl) pendientesEl.textContent = pendientes;
+    if (pagadasEl) pagadasEl.textContent = pagadas;
+    if (vencidasEl) vencidasEl.textContent = vencidas;
+}
+
+// ========== VER COMPROBANTE (ABRE IMAGEN) ==========
+function verComprobante(archivo) {
+    // Abrir imagen en nueva ventana
+    window.open(`/files/?path=${archivo}`, '_blank');
+}
+
+// ========== RESTO DE FUNCIONES (sin cambios) ==========
+async function abrirPagarCuotaModal(cuotaId) {
+    console.log('💳 Abriendo modal para pagar cuota:', cuotaId);
+    
+    try {
+        const response = await fetch(`/api/cuotas/detalle?cuota_id=${cuotaId}`);
+        const data = await response.json();
+        
+        if (!data.success) {
+            alert('❌ Error al cargar información de la cuota');
+            return;
+        }
+        
+        const cuota = data.cuota;
+        const validacion = data.validacion;
+        
+        if (!validacion.puede_pagar) {
+            mostrarAlertaHorasInsuficientes(validacion);
+            return;
+        }
+        
+        const infoContainer = document.getElementById('cuota-info-modal');
+        const mes = obtenerNombreMes(cuota.mes);
+        
+        infoContainer.innerHTML = `
+            <div class="cuota-detalle-modal">
+                <h4>📋 Información de la Cuota</h4>
+                <div class="detalle-grid">
+                    <div><strong>Período:</strong> ${mes} ${cuota.anio}</div>
+                    <div><strong>Vivienda:</strong> ${cuota.numero_vivienda}</div>
+                    <div><strong>Tipo:</strong> ${cuota.tipo_vivienda}</div>
+                    <div><strong>Monto:</strong> $${parseFloat(cuota.monto).toLocaleString('es-UY', {minimumFractionDigits: 2})}</div>
+                </div>
+                <div class="alert-success" style="margin-top: 15px;">
+                    <i class="fas fa-check-circle"></i>
+                    <strong>✅ Horas de trabajo cumplidas:</strong> ${cuota.horas_cumplidas}h / ${cuota.horas_requeridas}h
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('pagar-cuota-id').value = cuotaId;
+        document.getElementById('pagar-monto').value = cuota.monto;
+        document.getElementById('pagarCuotaForm').reset();
+        document.getElementById('pagar-cuota-id').value = cuotaId;
+        document.getElementById('pagar-monto').value = cuota.monto;
+        
+        document.getElementById('pagarCuotaModal').style.display = 'flex';
+        
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Error al cargar información de la cuota');
+    }
+}
+
+function closePagarCuotaModal() {
+    document.getElementById('pagarCuotaModal').style.display = 'none';
+    document.getElementById('pagarCuotaForm').reset();
+}
+
+async function submitPagarCuota(event) {
+    event.preventDefault();
+    console.log('💾 Enviando pago de cuota');
+    
+    const cuotaId = document.getElementById('pagar-cuota-id').value;
+    const monto = document.getElementById('pagar-monto').value;
+    const metodo = document.getElementById('pagar-metodo').value;
+    const numeroComprobante = document.getElementById('pagar-numero-comprobante').value;
+    const archivo = document.getElementById('pagar-comprobante').files[0];
+    
+    if (!archivo) {
+        alert('⚠️ Debes adjuntar el comprobante de pago');
+        return;
+    }
+    
+    if (!confirm('¿Estás seguro de enviar este pago?')) {
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append('cuota_id', cuotaId);
+    formData.append('monto_pagado', monto);
+    formData.append('metodo_pago', metodo);
+    formData.append('numero_comprobante', numeroComprobante);
+    formData.append('comprobante', archivo);
+    
+    try {
+        const response = await fetch('/api/cuotas/pagar', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert('✅ ' + data.mensaje);
+            closePagarCuotaModal();
+            await loadMisCuotas();
+        } else {
+            alert('❌ ' + data.message);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Error al enviar el pago');
+    }
+}
+
+async function verDetalleCuota(cuotaId) {
+    try {
+        const response = await fetch(`/api/cuotas/detalle?cuota_id=${cuotaId}`);
+        const data = await response.json();
+        
+        if (!data.success) {
+            alert('Error al cargar detalles');
+            return;
+        }
+        
+        const cuota = data.cuota;
+        const validacion = data.validacion;
+        const mes = obtenerNombreMes(cuota.mes);
+        
+        const modal = `
+            <div class="modal-detail" onclick="if(event.target.classList.contains('modal-detail')) this.remove()">
+                <div class="modal-detail-content">
+                    <button onclick="this.closest('.modal-detail').remove()" class="modal-close-button">×</button>
+                    
+                    <h2 class="modal-detail-header">📋 Detalle de Cuota</h2>
+                    
+                    <div class="cuota-detalle-completo">
+                        <div class="detalle-section">
+                            <h3>Información General</h3>
+                            <div class="detalle-grid">
+                                <div><strong>Período:</strong> ${mes} ${cuota.anio}</div>
+                                <div><strong>Estado:</strong> <span class="badge-${cuota.estado}">${formatEstadoCuota(cuota.estado)}</span></div>
+                                <div><strong>Monto:</strong> $${parseFloat(cuota.monto).toLocaleString('es-UY', {minimumFractionDigits: 2})}</div>
+                                <div><strong>Vencimiento:</strong> ${new Date(cuota.fecha_vencimiento + 'T00:00:00').toLocaleDateString('es-UY')}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="detalle-section">
+                            <h3>Vivienda</h3>
+                            <div class="detalle-grid">
+                                <div><strong>Número:</strong> ${cuota.numero_vivienda}</div>
+                                <div><strong>Tipo:</strong> ${cuota.tipo_vivienda}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="detalle-section">
+                            <h3>Horas de Trabajo</h3>
+                            <div class="detalle-grid">
+                                <div><strong>Requeridas:</strong> ${cuota.horas_requeridas}h</div>
+                                <div><strong>Cumplidas:</strong> ${cuota.horas_cumplidas || 0}h</div>
+                                <div><strong>Estado:</strong> ${validacion.puede_pagar ? '✅ Cumplidas' : '❌ Insuficientes'}</div>
+                            </div>
+                            ${!validacion.puede_pagar && validacion.horas_faltantes ? `
+                                <div class="alert-warning" style="margin-top: 10px;">
+                                    <strong>⚠️ Faltan ${validacion.horas_faltantes}h de trabajo</strong>
+                                    <p>Debes completar las horas requeridas antes de poder pagar</p>
+                                </div>
+                            ` : ''}
+                        </div>
+                        
+                        ${cuota.observaciones ? `
+                            <div class="detalle-section">
+                                <h3>Observaciones</h3>
+                                <p>${cuota.observaciones}</p>
+                            </div>
+                        ` : ''}
+                    </div>
+                    
+                    <div class="modal-detail-footer">
+                        <button onclick="this.closest('.modal-detail').remove()" class="btn btn-secondary">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.insertAdjacentHTML('beforeend', modal);
+        
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al cargar detalles');
+    }
+}
+
+function mostrarAlertaHorasInsuficientes(validacion) {
+    const modal = `
+        <div class="modal-detail" onclick="if(event.target.classList.contains('modal-detail')) this.remove()">
+            <div class="modal-detail-content">
+                <button onclick="this.closest('.modal-detail').remove()" class="modal-close-button">×</button>
+                
+                <h2 class="modal-detail-header" style="color: #f44336;">⚠️ No Puedes Pagar Aún</h2>
+                
+                <div class="alert-warning" style="padding: 20px; margin: 20px 0;">
+                    <h3 style="margin-top: 0;">${validacion.mensaje}</h3>
+                    
+                    <div style="margin: 20px 0;">
+                        <div style="margin: 10px 0;">
+                            <strong>Horas cumplidas:</strong> ${validacion.horas_cumplidas || 0}h
+                        </div>
+                        <div style="margin: 10px 0;">
+                            <strong>Horas requeridas:</strong> ${validacion.horas_requeridas}h
+                        </div>
+                        <div style="margin: 10px 0; color: #f44336;">
+                            <strong>Horas faltantes:</strong> ${validacion.horas_faltantes}h
+                        </div>
+                    </div>
+                    
+                    <p style="margin-top: 15px;">
+                        Debes completar las horas de trabajo del mes antes de poder realizar el pago de la cuota.
+                    </p>
+                </div>
+                
+                <div class="modal-detail-footer">
+                    <button onclick="this.closest('.modal-detail').remove()" class="btn btn-primary">Entendido</button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modal);
+}
+
+function formatEstadoCuota(estado) {
+    const estados = {
+        'pendiente': 'Pendiente',
+        'pagada': 'Pagada',
+        'vencida': 'Vencida',
+        'exonerada': 'Exonerada'
+    };
+    return estados[estado] || estado;
+}
+
+function obtenerNombreMes(mes) {
+    const meses = [
+        'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+        'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+    ];
+    return meses[parseInt(mes) - 1] || mes;
+}
+
+// Exportar funciones globales
+window.loadMisCuotas = loadMisCuotas;
+window.abrirPagarCuotaModal = abrirPagarCuotaModal;
+window.closePagarCuotaModal = closePagarCuotaModal;
+window.submitPagarCuota = submitPagarCuota;
+window.verDetalleCuota = verDetalleCuota;
+window.verComprobante = verComprobante;
+
+console.log('✅ Módulo de cuotas de usuario cargado completamente');
+
+
+// ==========================================
+// WIDGET DEUDA DE HORAS (3360h sistema)
+// ==========================================
+
+// Cargar deuda cuando se abre sección de horas
+async function cargarDeudaHoras() {
+    console.log('📊 Cargando deuda de horas');
+    
+    const containerActual = document.getElementById('deuda-actual-container');
+    const containerHistorial = document.getElementById('historial-deuda-container');
+
+    if (!containerActual) {
+        console.error('⚠️ Container deuda-actual-container NO encontrado');
+        return;
+    }
+
+    try {
+        // Cargar deuda actual
+        containerActual.innerHTML = '<p class="loading">Calculando deuda...</p>';
+        
+        const response = await fetch('/api/horas/deuda-actual');
+        const data = await response.json();
+        
+        console.log('📦 Deuda recibida:', data);
+        
+        if (data.success) {
+            renderDeudaActual(data.deuda);
+        } else {
+            containerActual.innerHTML = '<p class="error">Error al calcular deuda</p>';
+        }
+
+        // Cargar historial de horas aprobadas
+        if (containerHistorial) {
+            containerHistorial.innerHTML = '<p class="loading">Cargando historial...</p>';
+            
+            const responseHist = await fetch('/api/horas/historial-deuda?limite=10');
+            const dataHist = await responseHist.json();
+            
+            if (dataHist.success) {
+                renderHistorialDeuda(dataHist.historial);
+            } else {
+                containerHistorial.innerHTML = '<p class="error">Error al cargar historial</p>';
+            }
+        }
+
+    } catch (error) {
+        console.error('❌ Error al cargar deuda:', error);
+        if (containerActual) {
+            containerActual.innerHTML = '<p class="error">Error de conexión al calcular deuda</p>';
+        }
+    }
+}
+
+// Renderizar deuda actual (3360h sistema)
+function renderDeudaActual(deuda) {
+    const container = document.getElementById('deuda-actual-container');
+    
+    const porcentajePagado = parseFloat(deuda.porcentaje_pagado) || 0;
+    const deudaRestante = parseFloat(deuda.deuda_restante) || 0;
+    const horasAprobadas = parseFloat(deuda.horas_aprobadas) || 0;
+    const deudaInicial = parseFloat(deuda.deuda_inicial) || 3360;
+    
+    const estaPagando = porcentajePagado > 0;
+    const estaCercaDeCompletar = porcentajePagado >= 80;
+    const estaCompleto = deudaRestante === 0;
+
+    let html = `
+        <div class="deuda-principal-card ${estaCompleto ? 'completado' : estaPagando ? 'progreso' : 'inicial'}">
+            
+            <!-- Encabezado -->
+            <div class="deuda-principal-header">
+                <div>
+                    <h4>💼 Deuda Total de Horas</h4>
+                    <p style="color: #666; font-size: 13px; margin: 5px 0 0 0;">
+                        Sistema de 3360 horas de trabajo cooperativo
+                    </p>
+                </div>
+                <span class="deuda-principal-badge ${estaCompleto ? 'completado' : estaCercaDeCompletar ? 'cerca' : 'activo'}">
+                    ${estaCompleto ? '✅ COMPLETO' : estaCercaDeCompletar ? '⚡ CERCA' : '🔄 EN CURSO'}
+                </span>
+            </div>
+
+            <!-- Grid de información -->
+            <div class="deuda-principal-grid">
+                <div class="deuda-principal-item">
+                    <i class="fas fa-hourglass-start" style="color: #ff9800;"></i>
+                    <div>
+                        <span class="deuda-label">Deuda Inicial</span>
+                        <span class="deuda-valor-grande">${deudaInicial}h</span>
+                    </div>
+                </div>
+                
+                <div class="deuda-principal-item">
+                    <i class="fas fa-check-circle" style="color: #4caf50;"></i>
+                    <div>
+                        <span class="deuda-label">Horas Aprobadas</span>
+                        <span class="deuda-valor-grande success">${horasAprobadas}h</span>
+                    </div>
+                </div>
+                
+                <div class="deuda-principal-item">
+                    <i class="fas fa-tasks" style="color: ${deudaRestante > 0 ? '#f44336' : '#4caf50'};"></i>
+                    <div>
+                        <span class="deuda-label">Deuda Restante</span>
+                        <span class="deuda-valor-grande ${deudaRestante > 0 ? 'error' : 'success'}">
+                            ${deudaRestante}h
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="deuda-principal-item">
+                    <i class="fas fa-chart-pie" style="color: #667eea;"></i>
+                    <div>
+                        <span class="deuda-label">Progreso</span>
+                        <span class="deuda-valor-grande">${porcentajePagado}%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Barra de progreso -->
+            <div class="deuda-progress-container">
+                <div class="deuda-progress-info">
+                    <span>Progreso Total</span>
+                    <span><strong>${porcentajePagado}%</strong> completado</span>
+                </div>
+                <div class="deuda-progress-bar-main">
+                    <div class="deuda-progress-fill-main" style="width: ${porcentajePagado}%; background: ${estaCompleto ? '#4caf50' : estaCercaDeCompletar ? '#ff9800' : '#667eea'}">
+                    </div>
+                </div>
+                <div class="deuda-progress-numbers">
+                    <span>${horasAprobadas}h trabajadas</span>
+                    <span>${deudaInicial}h totales</span>
+                </div>
+            </div>
+
+            <!-- Mensaje motivacional -->
+            ${estaCompleto ? `
+                <div class="alert-success" style="margin-top: 20px;">
+                    <strong>🎉 ¡Felicitaciones!</strong>
+                    <p>Has completado las <strong>3360 horas</strong> de trabajo cooperativo. ¡Excelente trabajo!</p>
+                </div>
+            ` : estaCercaDeCompletar ? `
+                <div class="alert-info" style="margin-top: 20px;">
+                    <strong>⚡ ¡Ya casi!</strong>
+                    <p>Solo te faltan <strong>${deudaRestante}h</strong> para completar tu deuda total. ¡Sigue así!</p>
+                </div>
+            ` : estaPagando ? `
+                <div class="alert-info" style="margin-top: 20px;">
+                    <strong>💪 Buen progreso</strong>
+                    <p>Llevas <strong>${horasAprobadas}h</strong> trabajadas. Te faltan <strong>${deudaRestante}h</strong> para completar.</p>
+                </div>
+            ` : `
+                <div class="alert-warning" style="margin-top: 20px;">
+                    <strong>📢 Comenzá a trabajar</strong>
+                    <p>Tenés que completar <strong>3360 horas</strong> de trabajo cooperativo en total.</p>
+                    <p>Cada mes debés cumplir con las horas asignadas en tus tareas.</p>
+                </div>
+            `}
+
+        </div>
+    `;
+
+    container.innerHTML = html;
+}
+
+// Renderizar historial de horas aprobadas
+function renderHistorialDeuda(historial) {
+    const container = document.getElementById('historial-deuda-container');
+    
+    if (!historial || historial.length === 0) {
+        container.innerHTML = `
+            <div class="no-data">
+                <i class="fas fa-clipboard-list" style="font-size: 32px; color: #ddd; margin-bottom: 10px;"></i>
+                <p>No hay registros de horas aprobadas aún</p>
+            </div>
+        `;
+        return;
+    }
+
+    let html = `
+        <div class="historial-deuda-list">
+            <table class="historial-deuda-table">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Entrada</th>
+                        <th>Salida</th>
+                        <th>Total</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+
+    historial.forEach(reg => {
+        const fecha = new Date(reg.fecha + 'T00:00:00');
+        const fechaFormateada = fecha.toLocaleDateString('es-UY', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        });
+        
+        const entrada = reg.hora_entrada ? reg.hora_entrada.substring(0, 5) : '--:--';
+        const salida = reg.hora_salida ? reg.hora_salida.substring(0, 5) : 'En curso';
+        const horas = reg.total_horas || '0.00';
+        const estado = reg.estado || 'pendiente';
+
+        html += `
+            <tr class="historial-row estado-${estado}">
+                <td>${fechaFormateada}</td>
+                <td><i class="fas fa-sign-in-alt"></i> ${entrada}</td>
+                <td><i class="fas fa-sign-out-alt"></i> ${salida}</td>
+                <td><strong>${horas}h</strong></td>
+                <td>
+                    <span class="badge-estado ${estado}">
+                        ${estado === 'aprobado' ? '✅' : estado === 'rechazado' ? '❌' : '⏳'}
+                        ${estado}
+                    </span>
+                </td>
+            </tr>
+        `;
+    });
+
+    html += `
+                </tbody>
+            </table>
+        </div>
+    `;
+
+    container.innerHTML = html;
+}
+
+// Agregar al listener de sección de horas existente
+const horasMenuItemDeuda = document.querySelector('.menu li[data-section="horas"]');
+if (horasMenuItemDeuda) {
+    horasMenuItemDeuda.addEventListener('click', function() {
+        setTimeout(() => {
+            cargarDeudaHoras();
+        }, 500);
+    });
+}
+
+console.log('✅ Widget de deuda de horas cargado');

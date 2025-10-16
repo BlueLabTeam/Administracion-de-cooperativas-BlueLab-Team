@@ -1,0 +1,730 @@
+/* ==========================================
+   GESTIÓN DE CUOTAS MENSUALES - AZUL Y BLANCO
+   Mantiene coherencia con viviendas y materiales
+   ========================================== */
+
+/* ===== GRILLA DE PRECIOS (3 FIJOS) ===== */
+.precios-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin: 24px 0;
+}
+
+.precio-card {
+    background: white;
+    border-radius: 16px;
+    padding: 28px;
+    box-shadow: 0 2px 8px rgba(0, 102, 204, 0.15);
+    border: 2px solid #bbdefb;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.precio-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 150px;
+    height: 150px;
+    background: radial-gradient(circle, rgba(0, 102, 204, 0.08) 0%, transparent 70%);
+    border-radius: 50%;
+    transform: translate(50%, -50%);
+}
+
+.precio-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 12px 32px rgba(0, 102, 204, 0.25);
+    border-color: #0066cc;
+    background: linear-gradient(135deg, white 0%, #f8fbff 100%);
+}
+
+.precio-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 1;
+}
+
+.precio-header h4 {
+    color: #0066cc;
+    font-size: 20px;
+    margin: 0;
+    font-weight: 800;
+}
+
+.precio-badge {
+    background: linear-gradient(135deg, #0066cc 0%, #0052a3 100%);
+    color: white;
+    padding: 6px 14px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    box-shadow: 0 3px 8px rgba(0, 102, 204, 0.3);
+}
+
+.precio-monto {
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    padding: 20px;
+    border-radius: 12px;
+    margin: 16px 0;
+    border-left: 5px solid #0066cc;
+    position: relative;
+    z-index: 1;
+}
+
+.precio-label {
+    display: block;
+    color: #2c3e50;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 8px;
+}
+
+.precio-valor {
+    display: block;
+    color: #0066cc;
+    font-size: 32px;
+    font-weight: 800;
+}
+
+.precio-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 2px solid #e3f2fd;
+    position: relative;
+    z-index: 1;
+}
+
+.precio-footer small {
+    color: #90a4ae;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* ===== TABLA DE CUOTAS ===== */
+.cuotas-admin-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: white;
+}
+
+.cuotas-admin-table thead {
+    background: linear-gradient(135deg, #0066cc 0%, #0052a3 100%);
+    color: white;
+}
+
+.cuotas-admin-table th {
+    padding: 18px 16px;
+    text-align: left;
+    font-weight: 700;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    white-space: nowrap;
+    color: white;
+}
+
+.cuotas-admin-table th:first-child {
+    border-radius: 8px 0 0 0;
+    padding-left: 24px;
+}
+
+.cuotas-admin-table th:last-child {
+    border-radius: 0 8px 0 0;
+    padding-right: 24px;
+}
+
+.cuotas-admin-table tbody tr {
+    border-bottom: 1px solid #e3f2fd;
+    transition: all 0.3s ease;
+}
+
+.cuotas-admin-table tbody tr:hover {
+    background: linear-gradient(90deg, #f8fbff 0%, #e3f2fd 100%);
+    box-shadow: 0 2px 8px rgba(0, 102, 204, 0.1);
+}
+
+.cuotas-admin-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.cuotas-admin-table tbody tr:last-child td:first-child {
+    border-radius: 0 0 0 8px;
+}
+
+.cuotas-admin-table tbody tr:last-child td:last-child {
+    border-radius: 0 0 8px 0;
+}
+
+.cuotas-admin-table td {
+    padding: 14px 16px;
+    font-size: 14px;
+    color: #2c3e50;
+}
+
+.cuotas-admin-table td:first-child {
+    padding-left: 24px;
+}
+
+.cuotas-admin-table td:last-child {
+    padding-right: 24px;
+}
+
+.cuotas-admin-table strong {
+    color: #0066cc;
+    font-weight: 700;
+}
+
+/* ===== BADGES DE ESTADO ===== */
+.cuota-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+}
+
+.badge-pendiente {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+.badge-pagada {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.badge-vencida {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.badge-exonerada {
+    background: #e2e3e5;
+    color: #383d41;
+    border: 1px solid #d6d8db;
+}
+
+/* ===== TARJETAS DE CUOTA (USUARIO) ===== */
+.cuotas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 24px;
+    margin: 24px 0;
+}
+
+.cuota-card {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 102, 204, 0.1);
+    border: 2px solid #bbdefb;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.cuota-card.estado-pagada {
+    opacity: 0.9;
+    background: linear-gradient(135deg, #d4edda 0%, #e8f5e9 100%);
+}
+
+.cuota-card.estado-vencida {
+    border-color: #ffcdd2;
+    background: linear-gradient(135deg, #ffebee 0%, #fff5f5 100%);
+}
+
+.cuota-card.estado-vencida .cuota-card-header {
+    background: linear-gradient(135deg, #f44336 0%, #e53935 100%);
+}
+
+.cuota-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 32px rgba(0, 102, 204, 0.25);
+}
+
+.cuota-card-header {
+    background: linear-gradient(135deg, #0066cc 0%, #0052a3 100%);
+    color: white;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.cuota-card-header h4 {
+    margin: 0 0 6px 0;
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.cuota-vivienda {
+    display: block;
+    font-size: 12px;
+    opacity: 0.9;
+    font-weight: 600;
+}
+
+.cuota-card-body {
+    padding: 20px;
+    flex-grow: 1;
+}
+
+.cuota-monto {
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    padding: 16px;
+    border-radius: 12px;
+    margin-bottom: 16px;
+    border-left: 4px solid #0066cc;
+    text-align: center;
+}
+
+.cuota-monto-label {
+    display: block;
+    color: #2c3e50;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+}
+
+.cuota-monto-valor {
+    display: block;
+    color: #0066cc;
+    font-size: 28px;
+    font-weight: 800;
+}
+
+.cuota-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.cuota-info-item {
+    background: #f8fbff;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #bbdefb;
+    font-size: 13px;
+    color: #2c3e50;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cuota-info-item i {
+    color: #0066cc;
+    font-weight: bold;
+}
+
+.cuota-card-footer {
+    display: flex;
+    gap: 8px;
+    padding: 16px 20px;
+    border-top: 1px solid #e3f2fd;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+/* ===== FILTROS CUOTAS ===== */
+.cuotas-admin-filters,
+.cuotas-filters {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    align-items: center;
+    padding: 16px;
+    background: linear-gradient(135deg, #f8fbff 0%, #e3f2fd 100%);
+    border-radius: 12px;
+    border: 2px solid #bbdefb;
+}
+
+.cuotas-admin-filters select,
+.cuotas-filters select,
+.cuotas-admin-filters input,
+.cuotas-filters input {
+    padding: 12px 16px;
+    border: 2px solid #bbdefb;
+    border-radius: 10px;
+    font-size: 14px;
+    color: #2c3e50;
+    background: white;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.cuotas-admin-filters select:focus,
+.cuotas-filters select:focus,
+.cuotas-admin-filters input:focus,
+.cuotas-filters input:focus {
+    outline: none;
+    border-color: #0066cc;
+    box-shadow: 0 0 0 4px rgba(0, 102, 204, 0.12);
+    background: white;
+}
+
+.cuotas-admin-filters button,
+.cuotas-filters button {
+    padding: 12px 20px;
+    background: linear-gradient(135deg, #0066cc 0%, #0052a3 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cuotas-admin-filters button:hover,
+.cuotas-filters button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 102, 204, 0.35);
+}
+
+/* ===== MODAL DE CUOTAS ===== */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 51, 102, 0.75);
+    backdrop-filter: blur(6px);
+    z-index: 10000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal-content,
+.modal-content-large {
+    background: white;
+    border-radius: 20px;
+    max-width: 680px;
+    width: 100%;
+    max-height: 92vh;
+    overflow-y: auto;
+    box-shadow: 0 25px 70px rgba(0, 102, 204, 0.4);
+    animation: modalSlideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.modal-content-large {
+    max-width: 900px;
+}
+
+@keyframes modalSlideUp {
+    from {
+        transform: translateY(60px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-close-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(0, 102, 204, 0.1);
+    border: 2px solid #0066cc;
+    color: #0066cc;
+    font-size: 28px;
+    cursor: pointer;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.modal-close-btn:hover {
+    background: #0066cc;
+    color: white;
+    transform: rotate(90deg) scale(1.1);
+}
+
+.modal-title {
+    color: #0066cc;
+    font-size: 26px;
+    font-weight: 800;
+    margin: 24px 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.modal-title i {
+    font-size: 32px;
+}
+
+.form-group {
+    margin: 20px 0;
+}
+
+.form-group label {
+    display: block;
+    color: #2c3e50;
+    font-weight: 800;
+    margin-bottom: 8px;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #bbdefb;
+    border-radius: 10px;
+    font-size: 14px;
+    color: #2c3e50;
+    background: white;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #0066cc;
+    box-shadow: 0 0 0 4px rgba(0, 102, 204, 0.12);
+}
+
+.form-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 2px solid #e3f2fd;
+}
+
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #0066cc 0%, #0052a3 100%);
+    color: white;
+    box-shadow: 0 3px 8px rgba(0, 102, 204, 0.3);
+}
+
+.btn-primary:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 102, 204, 0.35);
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover:not(:disabled) {
+    background: #5a6268;
+}
+
+.btn-danger {
+    background: #dc3545;
+    color: white;
+}
+
+.btn-danger:hover:not(:disabled) {
+    background: #c82333;
+}
+
+/* ===== ALERTAS ===== */
+.alert-info,
+.alert-warning,
+.alert-success {
+    padding: 16px 20px;
+    border-radius: 12px;
+    margin: 16px 0;
+    border-left: 5px solid;
+}
+
+.alert-info {
+    background: #e3f2fd;
+    border-color: #0066cc;
+    color: #7c050f;
+}
+
+.alert-warning {
+    background: #fff3cd;
+    border-color: #ffc107;
+    color: #856404;
+}
+
+.alert-success {
+    background: #d4edda;
+    border-color: #28a745;
+    color: #155724;
+}
+
+.alert-info strong,
+.alert-warning strong,
+.alert-success strong {
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cuota-detalle-modal,
+.pago-info-box {
+    background: linear-gradient(135deg, #f8fbff 0%, #e3f2fd 100%);
+    padding: 20px;
+    border-radius: 12px;
+    border: 2px solid #bbdefb;
+    margin: 16px 0;
+}
+
+.detalle-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-top: 12px;
+}
+
+.detalle-grid div {
+    background: white;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #bbdefb;
+}
+
+.detalle-grid strong {
+    display: block;
+    color: #0066cc;
+    font-size: 12px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    font-weight: 800;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1024px) {
+    .cuotas-grid {
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    }
+
+    .precios-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .cuotas-admin-filters,
+    .cuotas-filters {
+        flex-direction: column;
+    }
+
+    .cuotas-admin-filters select,
+    .cuotas-filters select,
+    .cuotas-admin-filters input,
+    .cuotas-filters input,
+    .cuotas-admin-filters button,
+    .cuotas-filters button {
+        width: 100%;
+    }
+
+    .cuotas-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .precios-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .modal-content,
+    .modal-content-large {
+        max-width: 95%;
+        margin: 20px;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .form-actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .cuota-info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .detalle-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .modal-title {
+        font-size: 20px;
+    }
+
+    .cuota-monto-valor {
+        font-size: 24px;
+    }
+
+    .cuota-card-footer {
+        flex-direction: column;
+    }
+
+    .cuota-card-footer .btn {
+        width: 100%;
+    }
+}

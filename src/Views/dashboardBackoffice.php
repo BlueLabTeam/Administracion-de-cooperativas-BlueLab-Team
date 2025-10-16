@@ -16,6 +16,7 @@
 	<link rel="stylesheet" href="/assets/css/dashboardUsuarios.css" />
 	<link rel="stylesheet" href="/assets/css/dashboardNucleos.css" /> 
 	<link rel="stylesheet" href="/assets/css/dashboardMateriales.css" /> 
+	<link rel="stylesheet" href="/assets/css/dashboardCuotas.css" />
 </head>
 
 <body>
@@ -309,14 +310,240 @@
 </div>
 
 		<!-- SECCIÓN FACTURACIÓN -->
-		<section id="facturacion-section" class="section-content">
-			<h2 class="section-title">Facturación</h2>
-			<div class="info-card">
-				<p>Sistema de facturación en desarrollo...</p>
-			</div>
-		</section>
+		<section id="cuotas-section" class="section-content">
+    <h2 class="section-title">💰 Gestión de Cuotas Mensuales</h2>
+    
+    <!-- Estadísticas generales -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <i class="fas fa-file-invoice-dollar"></i>
+            <h4>Total Cuotas</h4>
+            <p id="admin-total-cuotas">0</p>
+        </div>
+        <div class="stat-card">
+            <i class="fas fa-check-circle"></i>
+            <h4>Pagadas</h4>
+            <p id="admin-cuotas-pagadas">0</p>
+        </div>
+        <div class="stat-card">
+            <i class="fas fa-clock"></i>
+            <h4>Pendientes</h4>
+            <p id="admin-cuotas-pendientes">0</p>
+        </div>
+        <div class="stat-card">
+            <i class="fas fa-dollar-sign"></i>
+            <h4>Monto Cobrado</h4>
+            <p id="admin-monto-cobrado">$0</p>
+        </div>
+    </div>
+    
+    <!-- Configuración de precios -->
+    <div class="info-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3>⚙️ Configuración de Precios</h3>
+            <button class="btn btn-secondary" onclick="loadPreciosCuotas()">
+                <i class="fas fa-sync-alt"></i> Actualizar
+            </button>
+        </div>
+        
+        <div id="preciosCuotasContainer">
+            <p class="loading">Cargando precios...</p>
+        </div>
+    </div>
+    
+    <!-- Acciones rápidas -->
+    <div class="info-card">
+        <h3>🚀 Acciones Rápidas</h3>
+        <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-top: 15px;">
+            <button class="btn btn-primary" onclick="generarCuotasMesActual()">
+                <i class="fas fa-calendar-plus"></i> Generar Cuotas del Mes Actual
+            </button>
+            <button class="btn btn-secondary" onclick="mostrarGenerarCuotasPersonalizado()">
+                <i class="fas fa-calendar-alt"></i> Generar Cuotas (Mes Específico)
+            </button>
+        </div>
+    </div>
+    
+    <!-- Filtros -->
+    <div class="info-card">
+        <div class="cuotas-admin-filters">
+            <select id="admin-filtro-anio" onchange="loadAllCuotasAdmin()">
+                <option value="">Todos los años</option>
+            </select>
+            <select id="admin-filtro-mes" onchange="loadAllCuotasAdmin()">
+                <option value="">Todos los meses</option>
+                <option value="1">Enero</option>
+                <option value="2">Febrero</option>
+                <option value="3">Marzo</option>
+                <option value="4">Abril</option>
+                <option value="5">Mayo</option>
+                <option value="6">Junio</option>
+                <option value="7">Julio</option>
+                <option value="8">Agosto</option>
+                <option value="9">Septiembre</option>
+                <option value="10">Octubre</option>
+                <option value="11">Noviembre</option>
+                <option value="12">Diciembre</option>
+            </select>
+            <select id="admin-filtro-estado" onchange="loadAllCuotasAdmin()">
+                <option value="">Todos los estados</option>
+                <option value="pendiente">Pendientes</option>
+                <option value="pagada">Pagadas</option>
+            </select>
+            <button class="btn btn-secondary" onclick="loadAllCuotasAdmin()">
+                <i class="fas fa-filter"></i> Filtrar
+            </button>
+        </div>
+    </div>
+    
+    <!-- Lista de cuotas -->
+    <div class="info-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3>📋 Todas las Cuotas</h3>
+            <button class="btn btn-secondary" onclick="loadAllCuotasAdmin()">
+                <i class="fas fa-sync-alt"></i> Actualizar
+            </button>
+        </div>
+        
+        <div id="allCuotasAdminContainer">
+            <p class="loading">Cargando cuotas...</p>
+        </div>
+    </div>
+</section>
 
-		<!-- SECCIÓN INVENTARIO -->
+<!-- Modal para editar precio -->
+<div id="editarPrecioModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+        <button class="modal-close-btn" onclick="closeEditarPrecioModal()">×</button>
+        
+        <h2 class="modal-title">💵 Actualizar Precio de Cuota</h2>
+        
+        <form id="editarPrecioForm" onsubmit="submitEditarPrecio(event)">
+            <input type="hidden" id="precio-id-tipo">
+            
+            <div class="form-group">
+                <label id="precio-tipo-nombre">Tipo de Vivienda</label>
+            </div>
+            
+            <div class="form-group">
+                <label for="precio-monto">Nuevo Monto Mensual *</label>
+                <input type="number" 
+                       id="precio-monto" 
+                       step="0.01" 
+                       min="0" 
+                       required 
+                       placeholder="Ej: 7500.00">
+            </div>
+            
+            <div class="alert-warning" style="margin: 15px 0;">
+                <strong>⚠️ Importante:</strong>
+                <p>Este cambio aplicará para las nuevas cuotas que se generen. Las cuotas ya existentes mantendrán su monto original.</p>
+            </div>
+            
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeEditarPrecioModal()">
+                    Cancelar
+                </button>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Guardar Cambios
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal para validar pago -->
+<div id="validarPagoModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content-large">
+        <button class="modal-close-btn" onclick="closeValidarPagoModal()">×</button>
+        
+        <h2 class="modal-title">✅ Validar Pago de Cuota</h2>
+        
+        <div id="pago-info-validar">
+            <!-- Info se carga dinámicamente -->
+        </div>
+        
+        <form id="validarPagoForm" onsubmit="submitValidarPago(event)">
+            <input type="hidden" id="validar-pago-id">
+            <input type="hidden" id="validar-accion">
+            
+            <div class="form-group">
+                <label for="validar-observaciones">Observaciones (opcional)</label>
+                <textarea id="validar-observaciones" 
+                          rows="3" 
+                          placeholder="Comentarios sobre la validación..."></textarea>
+            </div>
+            
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeValidarPagoModal()">
+                    Cancelar
+                </button>
+                <button type="button" class="btn btn-danger" onclick="rechazarPagoAdmin()">
+                    <i class="fas fa-times"></i> Rechazar
+                </button>
+                <button type="button" class="btn btn-primary" onclick="aprobarPagoAdmin()">
+                    <i class="fas fa-check"></i> Aprobar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal para generar cuotas personalizadas -->
+<div id="generarCuotasModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+        <button class="modal-close-btn" onclick="closeGenerarCuotasModal()">×</button>
+        
+        <h2 class="modal-title">📅 Generar Cuotas Mensuales</h2>
+        
+        <form id="generarCuotasForm" onsubmit="submitGenerarCuotas(event)">
+            <div class="form-group">
+                <label for="generar-mes">Mes *</label>
+                <select id="generar-mes" required>
+                    <option value="">Seleccione un mes...</option>
+                    <option value="1">Enero</option>
+                    <option value="2">Febrero</option>
+                    <option value="3">Marzo</option>
+                    <option value="4">Abril</option>
+                    <option value="5">Mayo</option>
+                    <option value="6">Junio</option>
+                    <option value="7">Julio</option>
+                    <option value="8">Agosto</option>
+                    <option value="9">Septiembre</option>
+                    <option value="10">Octubre</option>
+                    <option value="11">Noviembre</option>
+                    <option value="12">Diciembre</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="generar-anio">Año *</label>
+                <input type="number" 
+                       id="generar-anio" 
+                       min="2024" 
+                       max="2030" 
+                       required 
+                       placeholder="Ej: 2025">
+            </div>
+            
+            <div class="alert-info">
+                <strong>ℹ️ Información:</strong>
+                <p>Se generarán cuotas automáticamente para todos los usuarios con vivienda asignada.</p>
+            </div>
+            
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeGenerarCuotasModal()">
+                    Cancelar
+                </button>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-calendar-check"></i> Generar Cuotas
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
 
 
 <!-- SECCIÓN MATERIALES -->

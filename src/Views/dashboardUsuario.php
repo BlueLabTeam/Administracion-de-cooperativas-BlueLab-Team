@@ -19,8 +19,10 @@ if (!isset($_SESSION['user_id'])) {
 	<link rel="stylesheet" href="/assets/css/dashboardNotificaciones.css" />
 	<link rel="stylesheet" href="/assets/css/dashboardTareas.css" />
 	<link rel="stylesheet" href="/assets/css/dashboardHoras.css" />
+	<link rel="stylesheet" href="/assets/css/dashboardDeudaHoras.css" />
 	<link rel="stylesheet" href="/assets/css/dashboardUtils.css" />
 	<link rel="stylesheet" href="/assets/css/dashboardViviendas.css" />
+	<link rel="stylesheet" href="/assets/css/dashboardCuotas.css" />
 </head>
 
 <body>
@@ -197,30 +199,146 @@ if (!isset($_SESSION['user_id'])) {
 		</section>
 
 		<!-- APORTES -->
-		<section id="aportes-section" class="section-content">
-			<h2 class="section-title">💰 Mis Aportes</h2>
-			<div class="info-card">
-				<h3>Historial de Aportes</h3>
-				<p>Registro de todos tus aportes económicos a la cooperativa.</p>
-			</div>
-			<div class="stats-grid">
-				<div class="stat-card">
-					<i class="fas fa-calendar-check"></i>
-					<h4>Aportes Realizados</h4>
-					<p>0</p>
-				</div>
-				<div class="stat-card">
-					<i class="fas fa-dollar-sign"></i>
-					<h4>Total Aportado</h4>
-					<p>$0</p>
-				</div>
-				<div class="stat-card">
-					<i class="fas fa-calendar-times"></i>
-					<h4>Aportes Pendientes</h4>
-					<p>0</p>
-				</div>
-			</div>
-		</section>
+		<section id="cuotas-section" class="section-content">
+    <h2 class="section-title">💰 Mis Cuotas Mensuales</h2>
+    
+    <!-- Resumen de cuotas -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <i class="fas fa-file-invoice-dollar"></i>
+            <h4>Cuotas Pendientes</h4>
+            <p id="cuotas-pendientes-count">0</p>
+        </div>
+        <div class="stat-card">
+            <i class="fas fa-check-circle"></i>
+            <h4>Cuotas Pagadas</h4>
+            <p id="cuotas-pagadas-count">0</p>
+        </div>
+        <div class="stat-card">
+            <i class="fas fa-exclamation-triangle"></i>
+            <h4>Cuotas Vencidas</h4>
+            <p id="cuotas-vencidas-count">0</p>
+        </div>
+    </div>
+
+    <!-- Información de vivienda y precio -->
+    <div class="info-card" id="info-vivienda-cuota">
+        <h3>📍 Tu Vivienda</h3>
+        <p class="loading">Cargando información...</p>
+    </div>
+
+    <!-- Filtros -->
+    <div class="info-card">
+        <div class="cuotas-filters">
+            <select id="filtro-anio-cuotas" onchange="loadMisCuotas()">
+                <option value="">Todos los años</option>
+            </select>
+            <select id="filtro-mes-cuotas" onchange="loadMisCuotas()">
+                <option value="">Todos los meses</option>
+                <option value="1">Enero</option>
+                <option value="2">Febrero</option>
+                <option value="3">Marzo</option>
+                <option value="4">Abril</option>
+                <option value="5">Mayo</option>
+                <option value="6">Junio</option>
+                <option value="7">Julio</option>
+                <option value="8">Agosto</option>
+                <option value="9">Septiembre</option>
+                <option value="10">Octubre</option>
+                <option value="11">Noviembre</option>
+                <option value="12">Diciembre</option>
+            </select>
+            <select id="filtro-estado-cuotas" onchange="loadMisCuotas()">
+                <option value="">Todos los estados</option>
+                <option value="pendiente">Pendientes</option>
+                <option value="pagada">Pagadas</option>
+                <option value="vencida">Vencidas</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Lista de cuotas -->
+    <div class="info-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3>📋 Historial de Cuotas</h3>
+            <button class="btn btn-secondary" onclick="loadMisCuotas()">
+                <i class="fas fa-sync-alt"></i> Actualizar
+            </button>
+        </div>
+        
+        <div id="misCuotasContainer">
+            <p class="loading">Cargando cuotas...</p>
+        </div>
+    </div>
+</section>
+
+<!-- Modal para pagar cuota -->
+<div id="pagarCuotaModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content-large">
+        <button class="modal-close-btn" onclick="closePagarCuotaModal()">×</button>
+        
+        <h2 class="modal-title">💳 Pagar Cuota Mensual</h2>
+        
+        <div id="cuota-info-modal" class="cuota-info-box">
+            <!-- Info se carga dinámicamente -->
+        </div>
+        
+        <form id="pagarCuotaForm" onsubmit="submitPagarCuota(event)">
+            <input type="hidden" id="pagar-cuota-id">
+            
+            <div class="form-group">
+                <label for="pagar-monto">Monto a Pagar *</label>
+                <input type="number" 
+                       id="pagar-monto" 
+                       step="0.01" 
+                       required 
+                       readonly>
+            </div>
+            
+            <div class="form-group">
+                <label for="pagar-metodo">Método de Pago *</label>
+                <select id="pagar-metodo" required>
+                    <option value="transferencia">Transferencia Bancaria</option>
+                    <option value="efectivo">Efectivo</option>
+                    <option value="cheque">Cheque</option>
+                    <option value="otro">Otro</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="pagar-numero-comprobante">Número de Comprobante</label>
+                <input type="text" 
+                       id="pagar-numero-comprobante" 
+                       placeholder="Ej: 123456789">
+                <small>Número de referencia de la transferencia o comprobante</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="pagar-comprobante">Comprobante de Pago *</label>
+                <input type="file" 
+                       id="pagar-comprobante" 
+                       accept="image/*,application/pdf" 
+                       required>
+                <small>Imagen o PDF del comprobante de pago</small>
+            </div>
+            
+            <div class="alert-info" style="margin: 20px 0; padding: 15px; background: #e3f2fd; border-left: 4px solid #2196f3; border-radius: 4px;">
+                <strong>ℹ️ Importante:</strong>
+                <p style="margin: 5px 0 0 0;">El pago será revisado por un administrador. Recibirás una notificación cuando sea aprobado.</p>
+            </div>
+            
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="closePagarCuotaModal()">
+                    Cancelar
+                </button>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-paper-plane"></i> Enviar Pago
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
 
 		<!-- HORAS -->
 <section id="horas-section" class="section-content">
@@ -288,6 +406,22 @@ if (!isset($_SESSION['user_id'])) {
 			<p class="loading">Cargando resumen...</p>
 		</div>
 	</div>
+
+	<!-- DEUDA DE HORAS - WIDGET PRINCIPAL -->
+<div class="info-card">
+    <h3>💳 Estado de Deuda de Horas</h3>
+    <div id="deuda-actual-container">
+        <p class="loading">Calculando deuda...</p>
+    </div>
+</div>
+
+<!-- HISTORIAL DE HORAS APROBADAS -->
+<div class="info-card">
+    <h3>📋 Últimas Horas Registradas (Aprobadas)</h3>
+    <div id="historial-deuda-container">
+        <p class="loading">Cargando historial...</p>
+    </div>
+</div>
 
 	<!-- Historial de Registros -->
 	<div class="info-card">

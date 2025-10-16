@@ -12,15 +12,14 @@ class Herramientas
 
     public static function startSession()
     {
-           if (session_status() === PHP_SESSION_NONE) {
-        
-        if (!headers_sent()) {
-            session_start();
-        } else {
-            error_log("⚠️ Headers already sent, no se puede iniciar sesión");
+        if (session_status() === PHP_SESSION_NONE) {
+            if (!headers_sent()) {
+                session_start();
+            } else {
+                error_log("⚠️ Headers already sent, no se puede iniciar sesión");
+            }
         }
     }
-}
 
     public static function safeRedirect(string $ruta)
     {
@@ -54,77 +53,31 @@ class Herramientas
         self::startSession();
 
         $currentURL = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-        
-        $rutasExcluidas = [
-            '/dashboard-admin',
-            '/api/notifications/users',
-            '/api/notifications/create',
-            '/api/notifications/user',
-            '/api/notifications/mark-read',
-            '/api/payment/approve',
-            '/api/payment/reject',
-            '/api/tasks/create',
-            '/api/tasks/user',
-            '/api/tasks/all',
-            '/api/tasks/update-progress',
-            '/api/tasks/add-avance',
-            '/api/tasks/details',
-            '/api/tasks/users',
-            '/api/tasks/nucleos',
-            '/api/tasks/cancel',
-            '/api/users/all',
-            '/api/users/details',
-            '/api/pay/firstPay',
-            '/api/nucleos/create',          
-            '/api/nucleos/all',              
-            '/api/nucleos/details',          
-            '/api/nucleos/update',           
-            '/api/nucleos/delete',           
-            '/api/nucleos/users-available',
-            '/api/materiales/create',
-            '/api/materiales/all',
-            '/api/materiales/details',
-            '/api/materiales/update',
-            '/api/materiales/update-stock',
-            '/api/materiales/delete',
-            '/api/materiales/search',
-            '/api/materiales/assign-task',
-            '/api/materiales/task-materials',
-            '/api/materiales/remove-from-task',
-            '/api/materiales/request',
-            '/api/materiales/requests',
-            '/api/viviendas/all',
-            '/api/viviendas/details',
-            '/api/viviendas/create',
-            '/api/viviendas/update',
-            '/api/viviendas/delete',
-            '/api/viviendas/asignar',
-            '/api/viviendas/desasignar',
-            '/api/viviendas/tipos',
-            '/api/viviendas/my-vivienda',
-            '/api/horas/iniciar',
-            '/api/horas/cerrar',
-            '/api/horas/mis-registros',
-            '/api/horas/registro-abierto',
-            '/api/horas/resumen-semanal',
-            '/api/horas/estadisticas',
-            '/api/horas/editar',
-            '/api/horas/all',
-            '/api/horas/aprobar',
-            '/api/horas/rechazar',
-            '/api/horas/resumen-usuario'
-        ];
-        
-        if (in_array($currentURL, $rutasExcluidas)) {
-            return;
-        }
-
-        if ($currentURL === '/dashboard-admin' && isset($_SESSION['is_admin']) && $_SESSION['is_admin']) {
-            return;
-        }
-
+        $isAdmin = $_SESSION['is_admin'] ?? false;
         $estado = $_SESSION['estado'] ?? 'pendiente';
 
+        // ✅ ADMINISTRADORES: Acceso completo sin restricciones
+        if ($isAdmin) {
+            return;
+        }
+
+        // ✅ USUARIOS ACEPTADOS: Acceso completo sin restricciones
+        if ($estado === 'aceptado') {
+            return;
+        }
+
+        // ⚠️ Rutas permitidas para usuarios NO aceptados (pendiente/enviado)
+        $rutasPermitidasSinAceptacion = [
+            '/api/pay/firstPay',
+            '/pagoPendiente',
+            '/pagoEnviado'
+        ];
+
+        if (in_array($currentURL, $rutasPermitidasSinAceptacion)) {
+            return;
+        }
+
+        // ❌ Para estados NO aceptados, redirigir según el estado
         if (isset(self::$estadoRutas[$estado])) {
             if (self::isApiRequest()) {
                 http_response_code(403);
@@ -140,17 +93,19 @@ class Herramientas
             }
             self::safeRedirect(self::$estadoRutas[$estado]);
         } else {
+            // Estado desconocido o rechazado
             if (self::isApiRequest()) {
                 http_response_code(403);
                 header('Content-Type: application/json');
                 echo json_encode([
                     'success' => false,
                     'error' => 'estado_desconocido',
-                    'message' => 'Estado de cuenta desconocido'
+                    'message' => 'Estado de cuenta desconocido o rechazado'
                 ]);
                 exit();
             }
-            self::safeRedirect('/login');
+            session_destroy();
+            self::safeRedirect('/login?error=invalid_state');
         }
     }
 
@@ -173,5 +128,13 @@ class Herramientas
         }
         
         return false;
+    }
+
+    public static function debug($data, $exit = false)
+    {
+        echo '<pre>';
+        var_dump($data);
+        echo '</pre>';
+        if ($exit) exit;
     }
 }

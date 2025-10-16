@@ -2791,4 +2791,549 @@ function desasignarVivienda(asignacionId) {
 
 console.log('✅ Módulo de Viviendas cargado completamente');
 
+// ==========================================
+// SISTEMA DE CUOTAS MENSUALES - ADMIN (SOLO 3 PRECIOS FIJOS)
+// ==========================================
 
+console.log('🟢 Cargando módulo de cuotas (Admin)');
+
+// ========== INICIALIZACIÓN ==========
+document.addEventListener('DOMContentLoaded', function () {
+    console.log('✓ DOMContentLoaded ejecutado');
+
+    // Listener para cuotas
+    const cuotasMenuItem = document.querySelector('.menu li[data-section="cuotas"]');
+    if (cuotasMenuItem) {
+        console.log('✓ Listener de cuotas agregado');
+        cuotasMenuItem.addEventListener('click', function () {
+            console.log('>>> Sección cuotas admin abierta');
+            inicializarSeccionCuotasAdmin();
+        });
+    }
+
+    // Poblar selector de años
+    const selectAnio = document.getElementById('admin-filtro-anio');
+    if (selectAnio) {
+        const anioActual = new Date().getFullYear();
+        for (let i = 0; i < 3; i++) {
+            const anio = anioActual - i;
+            const option = document.createElement('option');
+            option.value = anio;
+            option.textContent = anio;
+            selectAnio.appendChild(option);
+        }
+    }
+});
+
+// ========== INICIALIZAR SECCIÓN ==========
+async function inicializarSeccionCuotasAdmin() {
+    console.log('📋 Inicializando sección de cuotas admin');
+    
+    try {
+        await Promise.all([
+            loadPreciosCuotas(),
+            loadEstadisticasCuotas(),
+            loadAllCuotasAdmin()
+        ]);
+        
+        console.log('✓ Sección de cuotas admin inicializada');
+    } catch (error) {
+        console.error('❌ Error al inicializar cuotas admin:', error);
+    }
+}
+
+// ========== CARGAR PRECIOS (SOLO 3 FIJOS) ==========
+async function loadPreciosCuotas() {
+    const container = document.getElementById('preciosCuotasContainer');
+    if (!container) {
+        console.error('❌ No se encontró preciosCuotasContainer');
+        return;
+    }
+    
+    container.innerHTML = '<p class="loading">Cargando precios...</p>';
+    
+    try {
+        const response = await fetch('/api/cuotas/precios');
+        const data = await response.json();
+        
+        console.log('📊 Precios recibidos:', data);
+        
+        if (data.success) {
+            renderPreciosCuotas(data.precios);
+        } else {
+            container.innerHTML = '<p class="error">Error al cargar precios</p>';
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        container.innerHTML = '<p class="error">Error de conexión</p>';
+    }
+}
+
+// ========== RENDERIZAR 3 PRECIOS FIJOS ==========
+function renderPreciosCuotas(precios) {
+    const container = document.getElementById('preciosCuotasContainer');
+    
+    if (!precios || precios.length === 0) {
+        container.innerHTML = '<p>No hay precios configurados</p>';
+        return;
+    }
+
+    // Ordenar precios por número de habitaciones (1, 2, 3)
+    precios.sort((a, b) => a.habitaciones - b.habitaciones);
+    
+    let html = '<div class="precios-grid">';
+    
+    precios.forEach(precio => {
+        const iconos = {
+            1: '🏠',
+            2: '🏡',
+            3: '👨‍👩‍👧‍👦'
+        };
+
+        html += `
+            <div class="precio-card">
+                <div class="precio-header">
+                    <div>
+                        <span style="font-size: 32px; display: block; margin-bottom: 10px;">
+                            ${iconos[precio.habitaciones] || '🏠'}
+                        </span>
+                        <h4>${precio.tipo_vivienda}</h4>
+                    </div>
+                    <span class="precio-badge">${precio.habitaciones} hab.</span>
+                </div>
+
+                <div class="precio-monto">
+                    <span class="precio-label">Cuota Mensual:</span>
+                    <span class="precio-valor">$${parseFloat(precio.monto_mensual).toLocaleString('es-UY', {minimumFractionDigits: 2})}</span>
+                </div>
+
+                <div class="precio-footer">
+                    <small>Vigente desde: ${new Date(precio.fecha_vigencia_desde + 'T00:00:00').toLocaleDateString('es-UY')}</small>
+                    <button class="btn-small btn-edit" onclick="editarPrecioCuota(${precio.id_tipo}, '${precio.tipo_vivienda}', ${precio.monto_mensual})">
+                        <i class="fas fa-edit"></i> Editar
+                    </button>
+                </div>
+            </div>
+        `;
+    });
+    
+    html += '</div>';
+    container.innerHTML = html;
+}
+
+// ========== EDITAR PRECIO INDIVIDUAL ==========
+function editarPrecioCuota(idTipo, nombreTipo, montoActual) {
+    document.getElementById('precio-id-tipo').value = idTipo;
+    document.getElementById('precio-tipo-nombre').innerHTML = `
+        <strong style="font-size: 18px; color: #0066cc;">
+            ${nombreTipo}
+        </strong>
+        <p style="margin: 10px 0 0 0; font-size: 13px; color: #666;">
+            Monto actual: $${parseFloat(montoActual).toLocaleString('es-UY', {minimumFractionDigits: 2})}
+        </p>
+    `;
+    document.getElementById('precio-monto').value = '';
+    document.getElementById('editarPrecioModal').style.display = 'flex';
+}
+
+function closeEditarPrecioModal() {
+    document.getElementById('editarPrecioModal').style.display = 'none';
+    document.getElementById('editarPrecioForm').reset();
+}
+
+async function submitEditarPrecio(event) {
+    event.preventDefault();
+    
+    const idTipo = document.getElementById('precio-id-tipo').value;
+    const monto = document.getElementById('precio-monto').value;
+    
+    if (!monto || monto <= 0) {
+        alert('⚠️ Ingresa un monto válido');
+        return;
+    }
+
+    if (!confirm('¿Estás seguro de actualizar este precio?\n\nAfectará a todas las futuras cuotas de este tipo de vivienda.')) {
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append('id_tipo', idTipo);
+    formData.append('monto_mensual', monto);
+    
+    try {
+        const response = await fetch('/api/cuotas/actualizar-precio', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert('✅ ' + data.message);
+            closeEditarPrecioModal();
+            await loadPreciosCuotas();
+        } else {
+            alert('❌ ' + data.message);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Error al actualizar precio');
+    }
+}
+
+// ========== GENERAR CUOTAS ==========
+async function generarCuotasMesActual() {
+    const hoy = new Date();
+    const mes = hoy.getMonth() + 1;
+    const anio = hoy.getFullYear();
+    
+    const nombreMes = obtenerNombreMes(mes);
+
+    if (!confirm(`¿Generar cuotas para ${nombreMes} ${anio}?\n\nSe crearán cuotas para todos los usuarios con vivienda asignada.`)) {
+        return;
+    }
+    
+    await generarCuotasMasivas(mes, anio);
+}
+
+function mostrarGenerarCuotasPersonalizado() {
+    const hoy = new Date();
+    document.getElementById('generar-mes').value = hoy.getMonth() + 1;
+    document.getElementById('generar-anio').value = hoy.getFullYear();
+    document.getElementById('generarCuotasModal').style.display = 'flex';
+}
+
+function closeGenerarCuotasModal() {
+    document.getElementById('generarCuotasModal').style.display = 'none';
+    document.getElementById('generarCuotasForm').reset();
+}
+
+async function submitGenerarCuotas(event) {
+    event.preventDefault();
+    
+    const mes = document.getElementById('generar-mes').value;
+    const anio = document.getElementById('generar-anio').value;
+    
+    const nombreMes = obtenerNombreMes(mes);
+
+    if (!confirm(`¿Generar cuotas para ${nombreMes} ${anio}?\n\nSe crearán cuotas para todos los usuarios con vivienda asignada.`)) {
+        return;
+    }
+    
+    closeGenerarCuotasModal();
+    await generarCuotasMasivas(mes, anio);
+}
+
+async function generarCuotasMasivas(mes, anio) {
+    const formData = new FormData();
+    formData.append('mes', mes);
+    formData.append('anio', anio);
+    
+    try {
+        const response = await fetch('/api/cuotas/generar-masivas', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert('✅ ' + data.message);
+            await loadAllCuotasAdmin();
+            await loadEstadisticasCuotas();
+        } else {
+            alert('❌ ' + data.message);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Error al generar cuotas');
+    }
+}
+
+// ========== CARGAR ESTADÍSTICAS ==========
+async function loadEstadisticasCuotas() {
+    try {
+        const mes = document.getElementById('admin-filtro-mes')?.value || null;
+        const anio = document.getElementById('admin-filtro-anio')?.value || null;
+        
+        let url = '/api/cuotas/estadisticas?';
+        if (mes) url += `mes=${mes}&`;
+        if (anio) url += `anio=${anio}&`;
+        
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        if (data.success) {
+            const stats = data.estadisticas;
+            
+            document.getElementById('admin-total-cuotas').textContent = stats.total_cuotas || 0;
+            document.getElementById('admin-cuotas-pagadas').textContent = stats.pagadas || 0;
+            document.getElementById('admin-cuotas-pendientes').textContent = stats.pendientes || 0;
+            document.getElementById('admin-monto-cobrado').textContent = 
+                '$' + parseFloat(stats.monto_cobrado || 0).toLocaleString('es-UY', {minimumFractionDigits: 2});
+        }
+    } catch (error) {
+        console.error('Error al cargar estadísticas:', error);
+    }
+}
+
+// ========== CARGAR TODAS LAS CUOTAS ==========
+async function loadAllCuotasAdmin() {
+    const container = document.getElementById('allCuotasAdminContainer');
+    if (!container) {
+        console.error('❌ No se encontró allCuotasAdminContainer');
+        return;
+    }
+    
+    container.innerHTML = '<p class="loading">Cargando cuotas...</p>';
+    
+    try {
+        const mes = document.getElementById('admin-filtro-mes')?.value || '';
+        const anio = document.getElementById('admin-filtro-anio')?.value || '';
+        const estado = document.getElementById('admin-filtro-estado')?.value || '';
+        
+        let url = '/api/cuotas/all?';
+        if (mes) url += `mes=${mes}&`;
+        if (anio) url += `anio=${anio}&`;
+        if (estado) url += `estado=${estado}&`;
+        
+        console.log('🌐 Cargando cuotas desde:', url);
+        
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        console.log('📊 Cuotas recibidas:', data);
+        
+        if (data.success) {
+            renderAllCuotasAdmin(data.cuotas);
+            await loadEstadisticasCuotas();
+        } else {
+            container.innerHTML = '<p class="error">Error al cargar cuotas</p>';
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        container.innerHTML = '<p class="error">Error de conexión</p>';
+    }
+}
+
+// ========== RENDERIZAR TABLA DE CUOTAS ==========
+function renderAllCuotasAdmin(cuotas) {
+    const container = document.getElementById('allCuotasAdminContainer');
+    
+    if (!cuotas || cuotas.length === 0) {
+        container.innerHTML = '<div class="no-data"><p>No se encontraron cuotas</p></div>';
+        return;
+    }
+    
+    let html = `
+        <div class="table-responsive">
+            <table class="cuotas-admin-table">
+                <thead>
+                    <tr>
+                        <th>Usuario</th>
+                        <th>Vivienda</th>
+                        <th>Período</th>
+                        <th>Monto</th>
+                        <th>Estado</th>
+                        <th>Horas</th>
+                        <th>Vencimiento</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+    
+    cuotas.forEach(cuota => {
+        const estadoFinal = cuota.estado_actual || cuota.estado;
+        const mes = obtenerNombreMes(cuota.mes);
+        const tienePagoPendiente = cuota.id_pago && cuota.estado_pago === 'pendiente';
+        
+        const nombreUsuario = cuota.nombre_completo || 'Usuario';
+        const emailUsuario = cuota.email || '';
+        
+        html += `
+            <tr class="cuota-row estado-${estadoFinal}">
+                <td>
+                    <strong>${nombreUsuario}</strong><br>
+                    <small>${emailUsuario}</small>
+                </td>
+                <td>${cuota.numero_vivienda}<br><small>${cuota.tipo_vivienda}</small></td>
+                <td>${mes} ${cuota.anio}</td>
+                <td><strong>$${parseFloat(cuota.monto).toLocaleString('es-UY', {minimumFractionDigits: 2})}</strong></td>
+                <td><span class="cuota-badge badge-${estadoFinal}">${formatEstadoCuota(estadoFinal)}</span></td>
+                <td>
+                    <div class="horas-info">
+                        ${cuota.horas_cumplidas || 0}h / ${cuota.horas_requeridas}h
+                        ${cuota.horas_validadas ? '<br><small style="color: #4caf50;">✓ Validadas</small>' : ''}
+                    </div>
+                </td>
+                <td>${new Date(cuota.fecha_vencimiento + 'T00:00:00').toLocaleDateString('es-UY')}</td>
+                <td>
+                    <div class="action-buttons-compact">
+                        ${tienePagoPendiente ? `
+                            <button class="btn-small btn-primary" 
+                                    onclick="abrirValidarPagoModal(${cuota.id_pago}, ${cuota.id_cuota})" 
+                                    title="Validar pago">
+                                <i class="fas fa-check-circle"></i>
+                            </button>
+                        ` : ''}
+                        ${cuota.comprobante_archivo ? `
+                            <button class="btn-small btn-secondary" 
+                                    onclick="verComprobanteAdmin('${cuota.comprobante_archivo}')" 
+                                    title="Ver comprobante">
+                                <i class="fas fa-image"></i>
+                            </button>
+                        ` : ''}
+                    </div>
+                </td>
+            </tr>
+        `;
+    });
+    
+    html += '</tbody></table></div>';
+    container.innerHTML = html;
+}
+
+// ========== VER COMPROBANTE ==========
+function verComprobanteAdmin(archivo) {
+    console.log('🖼️ Abriendo comprobante:', archivo);
+    window.open(`/files/?path=${archivo}`, '_blank');
+}
+
+// ========== VALIDAR PAGO ==========
+async function abrirValidarPagoModal(pagoId, cuotaId) {
+    try {
+        const response = await fetch(`/api/cuotas/detalle?cuota_id=${cuotaId}`);
+        const data = await response.json();
+        
+        if (!data.success) {
+            alert('Error al cargar información');
+            return;
+        }
+        
+        const cuota = data.cuota;
+        const mes = obtenerNombreMes(cuota.mes);
+        const nombreUsuario = cuota.nombre_completo || 'Usuario';
+        const emailUsuario = cuota.email || '';
+        
+        document.getElementById('pago-info-validar').innerHTML = `
+            <div class="pago-info-box">
+                <h4>Información del Pago</h4>
+                <div class="detalle-grid">
+                    <div><strong>Usuario:</strong> ${nombreUsuario}</div>
+                    <div><strong>Email:</strong> ${emailUsuario}</div>
+                    <div><strong>Período:</strong> ${mes} ${cuota.anio}</div>
+                    <div><strong>Vivienda:</strong> ${cuota.numero_vivienda}</div>
+                    <div><strong>Monto:</strong> $${parseFloat(cuota.monto).toLocaleString('es-UY', {minimumFractionDigits: 2})}</div>
+                    <div><strong>Horas:</strong> ${cuota.horas_cumplidas}h / ${cuota.horas_requeridas}h</div>
+                </div>
+                ${cuota.comprobante_archivo ? `
+                    <div style="margin-top: 15px; text-align: center;">
+                        <button class="btn btn-secondary" onclick="verComprobanteAdmin('${cuota.comprobante_archivo}')">
+                            <i class="fas fa-image"></i> Ver Comprobante
+                        </button>
+                    </div>
+                ` : ''}
+            </div>
+        `;
+        
+        document.getElementById('validar-pago-id').value = pagoId;
+        document.getElementById('validarPagoModal').style.display = 'flex';
+        
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al cargar información');
+    }
+}
+
+function closeValidarPagoModal() {
+    document.getElementById('validarPagoModal').style.display = 'none';
+    document.getElementById('validarPagoForm').reset();
+}
+
+async function aprobarPagoAdmin() {
+    if (!confirm('¿Aprobar este pago?')) return;
+    
+    const pagoId = document.getElementById('validar-pago-id').value;
+    const observaciones = document.getElementById('validar-observaciones').value;
+    
+    await procesarValidacionPago(pagoId, 'aprobar', observaciones);
+}
+
+async function rechazarPagoAdmin() {
+    const motivo = prompt('Motivo del rechazo (opcional):');
+    if (motivo === null) return;
+    
+    if (!confirm('¿Rechazar este pago?')) return;
+    
+    const pagoId = document.getElementById('validar-pago-id').value;
+    const observaciones = motivo || document.getElementById('validar-observaciones').value;
+    
+    await procesarValidacionPago(pagoId, 'rechazar', observaciones);
+}
+
+async function procesarValidacionPago(pagoId, accion, observaciones) {
+    const formData = new FormData();
+    formData.append('pago_id', pagoId);
+    formData.append('accion', accion);
+    formData.append('observaciones', observaciones);
+    
+    try {
+        const response = await fetch('/api/cuotas/validar-pago', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert('✅ ' + data.mensaje);
+            closeValidarPagoModal();
+            await loadAllCuotasAdmin();
+            await loadEstadisticasCuotas();
+        } else {
+            alert('❌ ' + data.message);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Error al procesar validación');
+    }
+}
+
+// ========== FUNCIONES AUXILIARES ==========
+function formatEstadoCuota(estado) {
+    const estados = {
+        'pendiente': 'Pendiente',
+        'pagada': 'Pagada',
+        'vencida': 'Vencida',
+        'exonerada': 'Exonerada'
+    };
+    return estados[estado] || estado;
+}
+
+function obtenerNombreMes(mes) {
+    const meses = [
+        'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+        'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+    ];
+    return meses[parseInt(mes) - 1] || mes;
+}
+
+// Exportar funciones globales
+window.loadPreciosCuotas = loadPreciosCuotas;
+window.editarPrecioCuota = editarPrecioCuota;
+window.closeEditarPrecioModal = closeEditarPrecioModal;
+window.submitEditarPrecio = submitEditarPrecio;
+window.generarCuotasMesActual = generarCuotasMesActual;
+window.mostrarGenerarCuotasPersonalizado = mostrarGenerarCuotasPersonalizado;
+window.closeGenerarCuotasModal = closeGenerarCuotasModal;
+window.submitGenerarCuotas = submitGenerarCuotas;
+window.loadAllCuotasAdmin = loadAllCuotasAdmin;
+window.abrirValidarPagoModal = abrirValidarPagoModal;
+window.closeValidarPagoModal = closeValidarPagoModal;
+window.aprobarPagoAdmin = aprobarPagoAdmin;
+window.rechazarPagoAdmin = rechazarPagoAdmin;
+window.verComprobanteAdmin = verComprobanteAdmin;
+window.inicializarSeccionCuotasAdmin = inicializarSeccionCuotasAdmin;
+
+console.log('✅ Módulo de cuotas admin cargado completamente');
