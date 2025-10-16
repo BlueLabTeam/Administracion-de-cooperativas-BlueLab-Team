@@ -2155,12 +2155,12 @@ console.log('✅ Módulo de cuotas de usuario cargado completamente');
 
 
 // ==========================================
-// WIDGET DEUDA DE HORAS (3360h sistema)
+// WIDGET DEUDA DE HORAS (21h mensuales)
 // ==========================================
 
-// Cargar deuda cuando se abre sección de horas
+// Cargar deuda del mes actual
 async function cargarDeudaHoras() {
-    console.log('📊 Cargando deuda de horas');
+    console.log('📊 Cargando deuda de horas del mes');
     
     const containerActual = document.getElementById('deuda-actual-container');
     const containerHistorial = document.getElementById('historial-deuda-container');
@@ -2171,8 +2171,8 @@ async function cargarDeudaHoras() {
     }
 
     try {
-        // Cargar deuda actual
-        containerActual.innerHTML = '<p class="loading">Calculando deuda...</p>';
+        // Cargar deuda del mes actual
+        containerActual.innerHTML = '<p class="loading">Calculando horas del mes...</p>';
         
         const response = await fetch('/api/horas/deuda-actual');
         const data = await response.json();
@@ -2182,18 +2182,18 @@ async function cargarDeudaHoras() {
         if (data.success) {
             renderDeudaActual(data.deuda);
         } else {
-            containerActual.innerHTML = '<p class="error">Error al calcular deuda</p>';
+            containerActual.innerHTML = '<p class="error">Error al calcular horas</p>';
         }
 
-        // Cargar historial de horas aprobadas
+        // Cargar historial mensual
         if (containerHistorial) {
             containerHistorial.innerHTML = '<p class="loading">Cargando historial...</p>';
             
-            const responseHist = await fetch('/api/horas/historial-deuda?limite=10');
+            const responseHist = await fetch('/api/horas/historial-mensual?meses=6');
             const dataHist = await responseHist.json();
             
             if (dataHist.success) {
-                renderHistorialDeuda(dataHist.historial);
+                renderHistorialMensual(dataHist.historial);
             } else {
                 containerHistorial.innerHTML = '<p class="error">Error al cargar historial</p>';
             }
@@ -2202,23 +2202,28 @@ async function cargarDeudaHoras() {
     } catch (error) {
         console.error('❌ Error al cargar deuda:', error);
         if (containerActual) {
-            containerActual.innerHTML = '<p class="error">Error de conexión al calcular deuda</p>';
+            containerActual.innerHTML = '<p class="error">Error de conexión</p>';
         }
     }
 }
 
-// Renderizar deuda actual (3360h sistema)
+// Renderizar deuda del mes actual (21h sistema)
 function renderDeudaActual(deuda) {
     const container = document.getElementById('deuda-actual-container');
     
-    const porcentajePagado = parseFloat(deuda.porcentaje_pagado) || 0;
-    const deudaRestante = parseFloat(deuda.deuda_restante) || 0;
-    const horasAprobadas = parseFloat(deuda.horas_aprobadas) || 0;
-    const deudaInicial = parseFloat(deuda.deuda_inicial) || 3360;
+    const horasTrabajadas = parseFloat(deuda.horas_trabajadas) || 0;
+    const horasRequeridas = parseFloat(deuda.horas_requeridas) || 21;
+    const horasFaltantes = parseFloat(deuda.horas_faltantes) || 0;
+    const horasExcedentes = parseFloat(deuda.horas_excedentes) || 0;
+    const porcentaje = parseFloat(deuda.porcentaje_cumplido) || 0;
+    const estado = deuda.estado || 'pendiente';
     
-    const estaPagando = porcentajePagado > 0;
-    const estaCercaDeCompletar = porcentajePagado >= 80;
-    const estaCompleto = deudaRestante === 0;
+    const estaCompleto = horasTrabajadas >= horasRequeridas;
+    const estaPagando = horasTrabajadas > 0 && !estaCompleto;
+    const estaCercaDeCompletar = porcentaje >= 80 && !estaCompleto;
+
+    // Obtener nombre del mes actual
+    const nombreMes = obtenerNombreMes(deuda.mes);
 
     let html = `
         <div class="deuda-principal-card ${estaCompleto ? 'completado' : estaPagando ? 'progreso' : 'inicial'}">
@@ -2226,9 +2231,9 @@ function renderDeudaActual(deuda) {
             <!-- Encabezado -->
             <div class="deuda-principal-header">
                 <div>
-                    <h4>💼 Deuda Total de Horas</h4>
+                    <h4>⏰ Horas del Mes</h4>
                     <p style="color: #666; font-size: 13px; margin: 5px 0 0 0;">
-                        Sistema de 3360 horas de trabajo cooperativo
+                        ${nombreMes} ${deuda.anio} - 21 horas mensuales requeridas
                     </p>
                 </div>
                 <span class="deuda-principal-badge ${estaCompleto ? 'completado' : estaCercaDeCompletar ? 'cerca' : 'activo'}">
@@ -2239,27 +2244,27 @@ function renderDeudaActual(deuda) {
             <!-- Grid de información -->
             <div class="deuda-principal-grid">
                 <div class="deuda-principal-item">
-                    <i class="fas fa-hourglass-start" style="color: #ff9800;"></i>
+                    <i class="fas fa-calendar-alt" style="color: #329cef;"></i>
                     <div>
-                        <span class="deuda-label">Deuda Inicial</span>
-                        <span class="deuda-valor-grande">${deudaInicial}h</span>
+                        <span class="deuda-label">Horas Requeridas</span>
+                        <span class="deuda-valor-grande">${horasRequeridas}h</span>
                     </div>
                 </div>
                 
                 <div class="deuda-principal-item">
                     <i class="fas fa-check-circle" style="color: #4caf50;"></i>
                     <div>
-                        <span class="deuda-label">Horas Aprobadas</span>
-                        <span class="deuda-valor-grande success">${horasAprobadas}h</span>
+                        <span class="deuda-label">Horas Trabajadas</span>
+                        <span class="deuda-valor-grande success">${horasTrabajadas}h</span>
                     </div>
                 </div>
                 
                 <div class="deuda-principal-item">
-                    <i class="fas fa-tasks" style="color: ${deudaRestante > 0 ? '#f44336' : '#4caf50'};"></i>
+                    <i class="fas fa-hourglass-half" style="color: ${horasFaltantes > 0 ? '#f44336' : '#4caf50'};"></i>
                     <div>
-                        <span class="deuda-label">Deuda Restante</span>
-                        <span class="deuda-valor-grande ${deudaRestante > 0 ? 'error' : 'success'}">
-                            ${deudaRestante}h
+                        <span class="deuda-label">${horasFaltantes > 0 ? 'Horas Faltantes' : 'Horas Extra'}</span>
+                        <span class="deuda-valor-grande ${horasFaltantes > 0 ? 'error' : 'success'}">
+                            ${horasFaltantes > 0 ? horasFaltantes : horasExcedentes}h
                         </span>
                     </div>
                 </div>
@@ -2268,7 +2273,7 @@ function renderDeudaActual(deuda) {
                     <i class="fas fa-chart-pie" style="color: #667eea;"></i>
                     <div>
                         <span class="deuda-label">Progreso</span>
-                        <span class="deuda-valor-grande">${porcentajePagado}%</span>
+                        <span class="deuda-valor-grande">${Math.min(porcentaje, 100)}%</span>
                     </div>
                 </div>
             </div>
@@ -2276,40 +2281,40 @@ function renderDeudaActual(deuda) {
             <!-- Barra de progreso -->
             <div class="deuda-progress-container">
                 <div class="deuda-progress-info">
-                    <span>Progreso Total</span>
-                    <span><strong>${porcentajePagado}%</strong> completado</span>
+                    <span>Progreso del Mes</span>
+                    <span><strong>${Math.min(porcentaje, 100)}%</strong> completado</span>
                 </div>
                 <div class="deuda-progress-bar-main">
-                    <div class="deuda-progress-fill-main" style="width: ${porcentajePagado}%; background: ${estaCompleto ? '#4caf50' : estaCercaDeCompletar ? '#ff9800' : '#667eea'}">
+                    <div class="deuda-progress-fill-main" style="width: ${Math.min(porcentaje, 100)}%; background: ${estaCompleto ? '#4caf50' : estaCercaDeCompletar ? '#ff9800' : '#667eea'}">
                     </div>
                 </div>
                 <div class="deuda-progress-numbers">
-                    <span>${horasAprobadas}h trabajadas</span>
-                    <span>${deudaInicial}h totales</span>
+                    <span>${horasTrabajadas}h trabajadas</span>
+                    <span>${horasRequeridas}h requeridas</span>
                 </div>
             </div>
 
             <!-- Mensaje motivacional -->
             ${estaCompleto ? `
                 <div class="alert-success" style="margin-top: 20px;">
-                    <strong>🎉 ¡Felicitaciones!</strong>
-                    <p>Has completado las <strong>3360 horas</strong> de trabajo cooperativo. ¡Excelente trabajo!</p>
+                    <strong>🎉 ¡Excelente!</strong>
+                    <p>Has completado las <strong>21 horas</strong> mensuales. ${horasExcedentes > 0 ? `Incluso trabajaste <strong>${horasExcedentes}h</strong> extra.` : ''}</p>
                 </div>
             ` : estaCercaDeCompletar ? `
                 <div class="alert-info" style="margin-top: 20px;">
                     <strong>⚡ ¡Ya casi!</strong>
-                    <p>Solo te faltan <strong>${deudaRestante}h</strong> para completar tu deuda total. ¡Sigue así!</p>
+                    <p>Solo te faltan <strong>${horasFaltantes}h</strong> para completar tus horas del mes. ¡Sigue así!</p>
                 </div>
             ` : estaPagando ? `
                 <div class="alert-info" style="margin-top: 20px;">
                     <strong>💪 Buen progreso</strong>
-                    <p>Llevas <strong>${horasAprobadas}h</strong> trabajadas. Te faltan <strong>${deudaRestante}h</strong> para completar.</p>
+                    <p>Llevas <strong>${horasTrabajadas}h</strong> trabajadas. Te faltan <strong>${horasFaltantes}h</strong> para este mes.</p>
                 </div>
             ` : `
                 <div class="alert-warning" style="margin-top: 20px;">
-                    <strong>📢 Comenzá a trabajar</strong>
-                    <p>Tenés que completar <strong>3360 horas</strong> de trabajo cooperativo en total.</p>
-                    <p>Cada mes debés cumplir con las horas asignadas en tus tareas.</p>
+                    <strong>📢 Comienza a trabajar</strong>
+                    <p>Debes completar <strong>21 horas</strong> de trabajo este mes.</p>
+                    <p>Recuerda marcar tu entrada y salida cada día que trabajes.</p>
                 </div>
             `}
 
@@ -2319,15 +2324,15 @@ function renderDeudaActual(deuda) {
     container.innerHTML = html;
 }
 
-// Renderizar historial de horas aprobadas
-function renderHistorialDeuda(historial) {
+// Renderizar historial mensual (últimos 6 meses)
+function renderHistorialMensual(historial) {
     const container = document.getElementById('historial-deuda-container');
     
     if (!historial || historial.length === 0) {
         container.innerHTML = `
             <div class="no-data">
-                <i class="fas fa-clipboard-list" style="font-size: 32px; color: #ddd; margin-bottom: 10px;"></i>
-                <p>No hay registros de horas aprobadas aún</p>
+                <i class="fas fa-calendar-times" style="font-size: 32px; color: #ddd; margin-bottom: 10px;"></i>
+                <p>No hay historial de meses anteriores</p>
             </div>
         `;
         return;
@@ -2338,39 +2343,31 @@ function renderHistorialDeuda(historial) {
             <table class="historial-deuda-table">
                 <thead>
                     <tr>
-                        <th>Fecha</th>
-                        <th>Entrada</th>
-                        <th>Salida</th>
-                        <th>Total</th>
+                        <th>Mes/Año</th>
+                        <th>Días Trabajados</th>
+                        <th>Horas Requeridas</th>
+                        <th>Horas Trabajadas</th>
                         <th>Estado</th>
                     </tr>
                 </thead>
                 <tbody>
     `;
 
-    historial.forEach(reg => {
-        const fecha = new Date(reg.fecha + 'T00:00:00');
-        const fechaFormateada = fecha.toLocaleDateString('es-UY', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric'
-        });
-        
-        const entrada = reg.hora_entrada ? reg.hora_entrada.substring(0, 5) : '--:--';
-        const salida = reg.hora_salida ? reg.hora_salida.substring(0, 5) : 'En curso';
-        const horas = reg.total_horas || '0.00';
-        const estado = reg.estado || 'pendiente';
+    historial.forEach(mes => {
+        const nombreMes = obtenerNombreMes(mes.mes);
+        const horasTrabajadas = parseFloat(mes.total_horas) || 0;
+        const horasRequeridas = parseInt(mes.horas_requeridas) || 21;
+        const cumplido = horasTrabajadas >= horasRequeridas;
 
         html += `
-            <tr class="historial-row estado-${estado}">
-                <td>${fechaFormateada}</td>
-                <td><i class="fas fa-sign-in-alt"></i> ${entrada}</td>
-                <td><i class="fas fa-sign-out-alt"></i> ${salida}</td>
-                <td><strong>${horas}h</strong></td>
+            <tr class="historial-row ${cumplido ? 'estado-aprobado' : ''}">
+                <td><strong>${nombreMes} ${mes.anio}</strong></td>
+                <td>${mes.dias_trabajados} días</td>
+                <td>${horasRequeridas}h</td>
+                <td><strong>${horasTrabajadas}h</strong></td>
                 <td>
-                    <span class="badge-estado ${estado}">
-                        ${estado === 'aprobado' ? '✅' : estado === 'rechazado' ? '❌' : '⏳'}
-                        ${estado}
+                    <span class="badge-estado ${cumplido ? 'aprobado' : 'pendiente'}">
+                        ${cumplido ? '✅ Cumplido' : '⏳ Incompleto'}
                     </span>
                 </td>
             </tr>
@@ -2386,7 +2383,7 @@ function renderHistorialDeuda(historial) {
     container.innerHTML = html;
 }
 
-// Agregar al listener de sección de horas existente
+// Listener para cargar al abrir sección de horas
 const horasMenuItemDeuda = document.querySelector('.menu li[data-section="horas"]');
 if (horasMenuItemDeuda) {
     horasMenuItemDeuda.addEventListener('click', function() {

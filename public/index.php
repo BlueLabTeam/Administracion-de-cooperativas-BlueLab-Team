@@ -132,8 +132,8 @@ $privateRoutes = [
     '/api/horas/aprobar',
     '/api/horas/rechazar',
     '/api/horas/resumen-usuario',
-       '/api/horas/deuda-actual',       
-    '/api/horas/historial-deuda',      
+    '/api/horas/deuda-actual',       
+    '/api/horas/historial-mensual',
     '/api/cuotas/mis-cuotas',
     '/api/cuotas/detalle',
     '/api/cuotas/generar',
@@ -262,7 +262,7 @@ switch ($uri) {
         break;
 
     // API USUARIOS
-   case '/api/users/all':
+    case '/api/users/all':
         (new App\Controllers\UserController())->getAllUsers();
         break;
     case '/api/users/details':
@@ -274,12 +274,9 @@ switch ($uri) {
             echo json_encode(['error' => 'Falta id_usuario']);
         }
         break;
-    
-    // ← AGREGAR ESTOS DOS CASOS
     case '/api/users/my-profile':
         (new App\Controllers\UserController())->getMyProfile();
         break;
-    
     case '/api/users/update-profile':
         (new App\Controllers\UserController())->updateProfile();
         break;
@@ -372,32 +369,25 @@ switch ($uri) {
         (new App\Controllers\ViviendaController())->getMyVivienda();
         break;
 
- 
     // API REGISTRO DE HORAS - USUARIO
     case '/api/horas/iniciar':
         (new App\Controllers\RegistroHorasController())->iniciarJornada();
         break;
-
     case '/api/horas/cerrar':
         (new App\Controllers\RegistroHorasController())->cerrarJornada();
         break;
-
     case '/api/horas/mis-registros':
         (new App\Controllers\RegistroHorasController())->getMisRegistros();
         break;
-
     case '/api/horas/registro-abierto':
         (new App\Controllers\RegistroHorasController())->getRegistroAbiertoHoy();
         break;
-
     case '/api/horas/resumen-semanal':
         (new App\Controllers\RegistroHorasController())->getResumenSemanal();
         break;
-
     case '/api/horas/estadisticas':
         (new App\Controllers\RegistroHorasController())->getEstadisticasMes();
         break;
-
     case '/api/horas/editar':
         (new App\Controllers\RegistroHorasController())->editarRegistro();
         break;
@@ -406,37 +396,37 @@ switch ($uri) {
     case '/api/horas/all':
         (new App\Controllers\RegistroHorasController())->getAllRegistros();
         break;
-
     case '/api/horas/aprobar':
         (new App\Controllers\RegistroHorasController())->aprobarHoras();
         break;
-
     case '/api/horas/rechazar':
         (new App\Controllers\RegistroHorasController())->rechazarHoras();
         break;
-
     case '/api/horas/resumen-usuario':
         (new App\Controllers\RegistroHorasController())->getResumenPorUsuario();
         break;
 
+    // API DEUDA DE HORAS
+    case '/api/horas/deuda-actual':
+        (new App\Controllers\DeudaHorasController())->getDeudaActual();
+        break;
+    case '/api/horas/historial-mensual':
+        (new App\Controllers\DeudaHorasController())->getHistorialMensual();
+        break;
 
-          // API CUOTAS - USUARIO
+    // API CUOTAS - USUARIO
     case '/api/cuotas/mis-cuotas':
         (new App\Controllers\CuotaController())->getMisCuotas();
         break;
-    
     case '/api/cuotas/detalle':
         (new App\Controllers\CuotaController())->getDetalleCuota();
         break;
-    
     case '/api/cuotas/generar':
         (new App\Controllers\CuotaController())->generarMiCuota();
         break;
-    
     case '/api/cuotas/verificar-pago':
         (new App\Controllers\CuotaController())->verificarPagoCuota();
         break;
-    
     case '/api/cuotas/pagar':
         (new App\Controllers\CuotaController())->pagarCuota();
         break;
@@ -445,43 +435,22 @@ switch ($uri) {
     case '/api/cuotas/all':
         (new App\Controllers\CuotaController())->getAllCuotas();
         break;
-    
     case '/api/cuotas/validar-pago':
         (new App\Controllers\CuotaController())->validarPago();
         break;
-    
     case '/api/cuotas/generar-masivas':
         (new App\Controllers\CuotaController())->generarCuotasMasivas();
         break;
-    
     case '/api/cuotas/estadisticas':
         (new App\Controllers\CuotaController())->getEstadisticas();
         break;
-    
     case '/api/cuotas/precios':
         (new App\Controllers\CuotaController())->getPreciosActuales();
         break;
-    
     case '/api/cuotas/actualizar-precio':
         (new App\Controllers\CuotaController())->actualizarPrecio();
         break;
 
-       
-
-    // 🆕 AGREGAR ESTAS 2 RUTAS NUEVAS:
-    case '/api/horas/deuda-actual':
-        (new App\Controllers\DeudaHorasController())->getDeudaActual();
-        break;
-
-    case '/api/horas/historial-deuda':
-        (new App\Controllers\DeudaHorasController())->getHistorialDeuda();
-        break;
-
-    // API REGISTRO DE HORAS - ADMIN
-    case '/api/horas/all':
-        (new App\Controllers\RegistroHorasController())->getAllRegistros();
-        break;
-        
     default:
         http_response_code(404);
         include __DIR__ . '/../src/views/404error.php';

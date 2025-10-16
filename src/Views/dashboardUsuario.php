@@ -407,7 +407,7 @@ if (!isset($_SESSION['user_id'])) {
 		</div>
 	</div>
 
-	<!-- DEUDA DE HORAS - WIDGET PRINCIPAL -->
+<!-- DEUDA DE HORAS - WIDGET PRINCIPAL -->
 <div class="info-card">
     <h3>💳 Estado de Deuda de Horas</h3>
     <div id="deuda-actual-container">
@@ -415,13 +415,6 @@ if (!isset($_SESSION['user_id'])) {
     </div>
 </div>
 
-<!-- HISTORIAL DE HORAS APROBADAS -->
-<div class="info-card">
-    <h3>📋 Últimas Horas Registradas (Aprobadas)</h3>
-    <div id="historial-deuda-container">
-        <p class="loading">Cargando historial...</p>
-    </div>
-</div>
 
 	<!-- Historial de Registros -->
 	<div class="info-card">

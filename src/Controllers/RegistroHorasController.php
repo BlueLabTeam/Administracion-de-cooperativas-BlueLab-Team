@@ -22,6 +22,7 @@ class RegistroHorasController
         
         $this->registroHorasModel = new RegistroHoras();
     }
+    
 
     /**
      * Iniciar jornada (marcar entrada)
@@ -160,6 +161,7 @@ class RegistroHorasController
         exit();
     }
 
+
     /**
      * Obtener registro abierto del día actual
      */
@@ -232,6 +234,86 @@ class RegistroHorasController
         }
         exit();
     }
+    
+     /**
+     * Obtener deuda de horas actual (mes actual)
+     */
+    public function getDeudaActual()
+    {
+        try {
+            ob_clean();
+            header('Content-Type: application/json; charset=utf-8');
+
+            if (!isset($_SESSION['user_id'])) {
+                http_response_code(401);
+                echo json_encode(['success' => false, 'message' => 'No autenticado']);
+                exit();
+            }
+
+            require_once __DIR__ . '/../Models/DeudaHoras.php';
+            $deudaModel = new \App\Models\DeudaHoras();
+            
+            $id_usuario = $_SESSION['user_id'];
+            $deuda = $deudaModel->obtenerDeudaActual($id_usuario);
+
+            echo json_encode([
+                'success' => true,
+                'deuda' => $deuda
+            ]);
+
+        } catch (\Exception $e) {
+            error_log("Error en getDeudaActual: " . $e->getMessage());
+            http_response_code(500);
+            echo json_encode([
+                'success' => false,
+                'message' => 'Error al obtener deuda',
+                'error' => $e->getMessage()
+            ]);
+        }
+        exit();
+    }
+
+
+    /**
+     * Obtener historial mensual de horas
+     */
+    public function getHistorialMensual()
+    {
+        try {
+            ob_clean();
+            header('Content-Type: application/json; charset=utf-8');
+
+            if (!isset($_SESSION['user_id'])) {
+                http_response_code(401);
+                echo json_encode(['success' => false, 'message' => 'No autenticado']);
+                exit();
+            }
+
+            require_once __DIR__ . '/../Models/DeudaHoras.php';
+            $deudaModel = new \App\Models\DeudaHoras();
+            
+            $id_usuario = $_SESSION['user_id'];
+            $meses = $_GET['meses'] ?? 6;
+            
+            $historial = $deudaModel->obtenerHistorialMensual($id_usuario, $meses);
+
+            echo json_encode([
+                'success' => true,
+                'historial' => $historial
+            ]);
+
+        } catch (\Exception $e) {
+            error_log("Error en getHistorialMensual: " . $e->getMessage());
+            http_response_code(500);
+            echo json_encode([
+                'success' => false,
+                'message' => 'Error al obtener historial',
+                'error' => $e->getMessage()
+            ]);
+        }
+        exit();
+    }
+    
 
     /**
      * Obtener estadísticas del mes
