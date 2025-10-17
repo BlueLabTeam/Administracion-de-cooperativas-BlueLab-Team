@@ -38,6 +38,8 @@ class CuotaController
                 'mes' => $_GET['mes'] ?? null,
                 'anio' => $_GET['anio'] ?? null
             ];
+            error_log("🔍 Filtros usados en getMisCuotas: " . json_encode($filtros));
+
 
             $cuotas = $this->cuotaModel->getCuotasUsuario($_SESSION['user_id'], $filtros);
 
@@ -156,6 +158,13 @@ class CuotaController
                 ]);
                 exit();
             }
+            $incluyeDeudaHoras = $_POST['incluye_deuda_horas'] ?? 'false';
+$montoDeudaHoras = $_POST['monto_deuda_horas'] ?? 0;
+
+if ($incluyeDeudaHoras === 'true') {
+    error_log("💰 Pago incluye deuda de horas: $" . $montoDeudaHoras);
+}
+
 
             // Procesar archivo
             $nombreArchivo = time() . '_' . basename($archivo['name']);
@@ -185,14 +194,16 @@ class CuotaController
             error_log("✅ Archivo guardado exitosamente");
 
             // Registrar pago en BD
-            $resultado = $this->cuotaModel->registrarPago(
-                $cuotaId,
-                $_SESSION['user_id'],
-                $montoPagado,
-                $metodoPago,
-                $rutaRelativa,
-                $numeroComprobante
-            );
+           $resultado = $this->cuotaModel->registrarPago(
+    $cuotaId,
+    $_SESSION['user_id'],
+    $montoPagado,
+    $metodoPago,
+    $rutaRelativa,
+    $numeroComprobante,
+    $incluyeDeudaHoras === 'true',  // NUEVO
+    $montoDeudaHoras                // NUEVO
+);
 
             if (!$resultado['success'] && file_exists($destino)) {
                 unlink($destino);
@@ -213,6 +224,133 @@ class CuotaController
         error_log("=== FIN pagarCuota ===");
         exit();
     }
+
+    /**
+ * Verificar si existe cuota del mes para el usuario
+ * ENDPOINT: GET /api/cuotas/verificar-cuota-mes?mes=10&anio=2025
+ */
+public function verificarCuotaMes()
+{
+    header('Content-Type: application/json');
+
+    if (!isset($_SESSION['user_id'])) {
+        http_response_code(401);
+        echo json_encode(['success' => false, 'message' => 'No autenticado']);
+        exit();
+    }
+
+    $mes = $_GET['mes'] ?? date('n');
+    $anio = $_GET['anio'] ?? date('Y');
+
+    try {
+        // ✅ USAR cuotaModel en lugar de conn
+        $cuotas = $this->cuotaModel->getCuotasUsuario($_SESSION['user_id'], [
+            'mes' => $mes,
+            'anio' => $anio
+        ]);
+
+        $existe = count($cuotas) > 0;
+
+        echo json_encode([
+            'success' => true,
+            'existe' => $existe,
+            'mes' => $mes,
+            'anio' => $anio
+        ]);
+
+    } catch (\Exception $e) {
+        error_log("Error en verificarCuotaMes: " . $e->getMessage());
+        http_response_code(500);
+        echo json_encode(['success' => false, 'message' => 'Error al verificar cuota']);
+    }
+    exit();
+}
+
+/**
+ * Generar cuota del mes actual para MI usuario
+ * ENDPOINT: POST /api/cuotas/generar-mi-cuota
+ */
+public function generarMiCuota()
+{
+    header('Content-Type: application/json');
+
+    if (!isset($_SESSION['user_id'])) {
+        http_response_code(401);
+        echo json_encode(['success' => false, 'message' => 'No autenticado']);
+        exit();
+    }
+
+    try {
+        $mes = intval($_POST['mes'] ?? date('n'));
+        $anio = intval($_POST['anio'] ?? date('Y'));
+        $idUsuario = $_SESSION['user_id'];
+
+        error_log("📄 Generando cuota para usuario $idUsuario - Mes: $mes, Año: $anio");
+
+        // ✅ Verificar que el usuario tenga vivienda asignada usando el modelo
+        $vivienda = $this->viviendaModel->getMyVivienda($idUsuario);
+
+        if (!$vivienda || !isset($vivienda['id_vivienda'])) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'No tienes una vivienda asignada. Contacta al administrador.'
+            ]);
+            exit();
+        }
+
+        // ✅ Verificar si ya existe la cuota usando el modelo
+        $cuotasExistentes = $this->cuotaModel->getCuotasUsuario($idUsuario, [
+            'mes' => $mes,
+            'anio' => $anio
+        ]);
+
+        if (count($cuotasExistentes) > 0) {
+            echo json_encode([
+                'success' => true,
+                'message' => 'La cuota del mes ya existe',
+                'cuota_id' => $cuotasExistentes[0]['id_cuota']
+            ]);
+            exit();
+        }
+
+        // ✅ Generar la cuota usando el procedimiento almacenado del modelo
+        $resultado = $this->cuotaModel->generarCuotasMensuales($mes, $anio);
+
+        if ($resultado['success']) {
+            // Obtener la cuota recién creada
+            $cuotasNuevas = $this->cuotaModel->getCuotasUsuario($idUsuario, [
+                'mes' => $mes,
+                'anio' => $anio
+            ]);
+
+            if (count($cuotasNuevas) > 0) {
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Cuota generada correctamente',
+                    'cuota' => $cuotasNuevas[0]
+                ]);
+            } else {
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Cuota generada pero no encontrada'
+                ]);
+            }
+        } else {
+            echo json_encode($resultado);
+        }
+
+    } catch (\Exception $e) {
+        error_log("❌ Error en generarMiCuota: " . $e->getMessage());
+        error_log("Stack trace: " . $e->getTraceAsString());
+        http_response_code(500);
+        echo json_encode([
+            'success' => false,
+            'message' => 'Error al generar cuota: ' . $e->getMessage()
+        ]);
+    }
+    exit();
+}
+
 
     // ========================================
     // FUNCIONES DE ADMINISTRADOR

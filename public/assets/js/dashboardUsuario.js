@@ -1607,10 +1607,13 @@ window.cargarDatosUsuario = cargarDatosUsuario;
 
 
 // ==========================================
-// SISTEMA DE CUOTAS MENSUALES - USUARIO
+// SISTEMA DE CUOTAS MENSUALES CON DEUDA DE HORAS - USUARIO
 // ==========================================
 
-console.log('🟢 Cargando módulo de cuotas');
+console.log('🟢 Cargando módulo de cuotas con deuda de horas');
+
+// Variable global para almacenar deuda de horas
+let deudaHorasActual = 0;
 
 // ========== INICIALIZACIÓN ==========
 document.addEventListener('DOMContentLoaded', function() {
@@ -1636,11 +1639,60 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// ========== INICIALIZAR SECCIÓN ==========
-async function inicializarSeccionCuotas() {
-    console.log('📋 Inicializando sección de cuotas');
+async function generarCuotaMesActualSiNoExiste() {
+    console.log('🔄 Verificando cuota del mes actual...');
     
     try {
+        const hoy = new Date();
+        const mesActual = hoy.getMonth() + 1;
+        const anioActual = hoy.getFullYear();
+        
+        // Verificar si ya existe la cuota
+        const response = await fetch(`/api/cuotas/verificar-cuota-mes?mes=${mesActual}&anio=${anioActual}`);
+        const data = await response.json();
+        
+        console.log('📊 Verificación de cuota:', data);
+        
+        if (data.success && !data.existe) {
+            console.log('⚠️ No existe cuota del mes actual, generando...');
+            
+            // Generar cuota del mes actual
+            const formData = new FormData();
+            formData.append('mes', mesActual);
+            formData.append('anio', anioActual);
+            
+            const responseGenerar = await fetch('/api/cuotas/generar-mi-cuota', {
+                method: 'POST',
+                body: formData
+            });
+            
+            const dataGenerar = await responseGenerar.json();
+            
+            if (dataGenerar.success) {
+                console.log('✅ Cuota generada:', dataGenerar.message);
+            } else {
+                console.warn('⚠️ No se pudo generar cuota:', dataGenerar.message);
+            }
+        } else if (data.existe) {
+            console.log('✅ Cuota del mes ya existe');
+        }
+    } catch (error) {
+        console.error('❌ Error al verificar/generar cuota:', error);
+    }
+}
+
+// ========== INICIALIZAR SECCIÓN ==========
+async function inicializarSeccionCuotas() {
+    console.log('📋 Inicializando sección de cuotas con deuda');
+    
+    try {
+        // ✅ PASO 1: Generar cuota del mes actual si no existe
+        await generarCuotaMesActualSiNoExiste();
+        
+        // ✅ PASO 2: Cargar deuda de horas
+        await loadDeudaHorasParaCuotas();
+        
+        // ✅ PASO 3: Cargar el resto
         await Promise.all([
             loadInfoViviendaCuota(),
             loadMisCuotas()
@@ -1653,6 +1705,33 @@ async function inicializarSeccionCuotas() {
     }
 }
 
+
+// ========== CARGAR DEUDA DE HORAS ==========
+async function loadDeudaHorasParaCuotas() {
+    console.log('💰 Cargando deuda de horas para cuotas');
+    
+    try {
+        const response = await fetch('/api/horas/deuda-actual');
+        const data = await response.json();
+        
+        if (data.success && data.deuda) {
+            // Sumar deuda del mes actual + deuda acumulada
+            const deudaMesActual = parseFloat(data.deuda.deuda_mes_actual) || 0;
+            const deudaAcumulada = parseFloat(data.deuda.deuda_acumulada) || 0;
+            deudaHorasActual = deudaMesActual + deudaAcumulada;
+            
+            console.log('💵 Deuda total de horas: $' + deudaHorasActual);
+            console.log('   - Mes actual: $' + deudaMesActual);
+            console.log('   - Acumulada: $' + deudaAcumulada);
+        } else {
+            deudaHorasActual = 0;
+            console.warn('⚠️ No se pudo cargar deuda de horas');
+        }
+    } catch (error) {
+        console.error('❌ Error al cargar deuda de horas:', error);
+        deudaHorasActual = 0;
+    }
+}
 // ========== CARGAR INFO DE VIVIENDA ==========
 async function loadInfoViviendaCuota() {
     const container = document.getElementById('info-vivienda-cuota');
@@ -1680,7 +1759,7 @@ async function loadInfoViviendaCuota() {
                     </div>
                 </div>
                 <div class="alert-info" style="margin-top: 15px;">
-                    <strong>ℹ️ Cuota Mensual:</strong> El monto se calcula automáticamente según el tipo de vivienda asignada.
+                    <strong>ℹ️ Importante:</strong> El monto total a pagar incluye la cuota de vivienda más la deuda por horas no trabajadas ($160 por hora faltante).
                 </div>
             `;
         } else {
@@ -1717,7 +1796,16 @@ async function loadMisCuotas() {
         const response = await fetch(url);
         const data = await response.json();
         
+        console.log('📊 Cuotas recibidas:', data);
+        
         if (data.success) {
+            // ✅ DEBUG: Solo si hay cuotas
+            if (data.cuotas && data.cuotas.length > 0) {
+                console.log('🔍 PRIMERA CUOTA:', data.cuotas[0]);
+                console.log('💵 monto_base:', data.cuotas[0]?.monto_base);
+                console.log('💵 monto:', data.cuotas[0]?.monto);
+            }
+            
             renderMisCuotasOrganizadas(data.cuotas);
             updateCuotasStats(data.cuotas);
         } else {
@@ -1729,7 +1817,9 @@ async function loadMisCuotas() {
     }
 }
 
-// ========== RENDERIZAR CUOTAS ORGANIZADAS (PAGABLES ARRIBA, HISTORIAL ABAJO) ==========
+
+
+// ========== RENDERIZAR CUOTAS CON DEUDA TOTAL ==========
 function renderMisCuotasOrganizadas(cuotas) {
     const container = document.getElementById('misCuotasContainer');
     
@@ -1745,10 +1835,12 @@ function renderMisCuotasOrganizadas(cuotas) {
     
     // Separar cuotas pagables de historial
     const cuotasPagables = cuotas.filter(c => {
-        const estadoFinal = c.estado_actual || c.estado;
-        const tienePagoPendiente = c.id_pago && c.estado_pago === 'pendiente';
-        return estadoFinal !== 'pagada' && !tienePagoPendiente;
-    });
+    const estadoFinal = c.estado_actual || c.estado;
+    // Mostrar en destacada si:
+    // 1. No está pagada Y no tiene pago pendiente de validación
+    // 2. O tiene un pago pendiente de validación (mostrará badge diferente)
+    return estadoFinal !== 'pagada';
+});
     
     const cuotasHistorial = cuotas.filter(c => {
         const estadoFinal = c.estado_actual || c.estado;
@@ -1758,12 +1850,96 @@ function renderMisCuotasOrganizadas(cuotas) {
     
     let html = '';
     
-    // SECCIÓN: CUOTAS PENDIENTES DE PAGO
+    // ⭐ SECCIÓN DESTACADA: DEUDA TOTAL (SI HAY CUOTAS PENDIENTES)
+    if (cuotasPagables.length > 0) {
+        const cuotaMasReciente = cuotasPagables[0];
+        
+        // 🔥 FIX: Usar monto_base en lugar de monto
+        const montoCuota = parseFloat(cuotaMasReciente.monto_base || cuotaMasReciente.monto || 0);
+        const montoTotal = montoCuota + deudaHorasActual;
+        
+        console.log('💰 Cuota más reciente:', cuotaMasReciente);
+        console.log('💵 Monto cuota base:', montoCuota);
+        console.log('💵 Deuda horas:', deudaHorasActual);
+        console.log('💵 Total calculado:', montoTotal);
+        
+        html += `
+            <div class="deuda-total-destacada">
+                <div class="deuda-total-header">
+                    <h2 style="margin: 0; color: #fff;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Deuda Total del Mes
+                    </h2>
+                    <span class="deuda-total-badge">REQUIERE PAGO</span>
+                </div>
+                
+                <div class="deuda-total-body">
+                    <div class="deuda-breakdown">
+                        <div class="deuda-breakdown-item">
+                            <i class="fas fa-home"></i>
+                            <div>
+                                <span class="deuda-label">Cuota de Vivienda</span>
+                                <span class="deuda-monto">$${montoCuota.toLocaleString('es-UY', {minimumFractionDigits: 2})}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="deuda-breakdown-divider">+</div>
+                        
+                        <div class="deuda-breakdown-item deuda-horas">
+                            <i class="fas fa-clock"></i>
+                            <div>
+                                <span class="deuda-label">Deuda por Horas No Trabajadas</span>
+                                <span class="deuda-monto error">$${deudaHorasActual.toLocaleString('es-UY', {minimumFractionDigits: 2})}</span>
+                                <small style="color: #ff8a80; display: block; margin-top: 5px;">
+                                    ($160 por cada hora faltante)
+                                </small>
+                            </div>
+                        </div>
+                        
+                        <div class="deuda-breakdown-divider">=</div>
+                        
+                        <div class="deuda-breakdown-item deuda-total">
+                            <i class="fas fa-calculator"></i>
+                            <div>
+                                <span class="deuda-label">TOTAL A PAGAR</span>
+                                <span class="deuda-monto-total">$${montoTotal.toLocaleString('es-UY', {minimumFractionDigits: 2})}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="deuda-total-actions">
+                        <button class="btn-pagar-deuda-total" onclick="abrirPagarDeudaTotal(${cuotaMasReciente.id_cuota}, ${montoTotal})">
+                            <i class="fas fa-credit-card"></i>
+                            Pagar Deuda Total
+                        </button>
+                        <button class="btn btn-secondary" onclick="verDetalleDeudaTotal(${cuotaMasReciente.id_cuota})">
+                            <i class="fas fa-info-circle"></i>
+                            Ver Detalle Completo
+                        </button>
+                    </div>
+                    
+                    <div class="alert-info" style="margin-top: 20px; background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.2);">
+                        <strong style="color: #fff;">💡 Información Importante:</strong>
+                        <ul style="margin: 10px 0 0 20px; color: rgba(255, 255, 255, 0.9);">
+                            <li>Este pago cubre tu cuota del mes actual + las horas no trabajadas acumuladas.</li>
+                            <li>Una vez realizado el pago, debes adjuntar el comprobante para validación.</li>
+                            <li>El administrador revisará y aprobará tu pago.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <hr style="margin: 40px 0; border: none; border-top: 2px solid #e0e0e0;">
+        `;
+    }
+
+    
+    // SECCIÓN: CUOTAS PENDIENTES
     if (cuotasPagables.length > 0) {
         html += `
             <div class="cuotas-section">
                 <h3 style="color: #f44336; margin-bottom: 20px;">
-                    <i class="fas fa-exclamation-circle"></i> Cuotas Pendientes de Pago (${cuotasPagables.length})
+                    <i class="fas fa-exclamation-circle"></i> Cuotas Pendientes (${cuotasPagables.length})
                 </h3>
                 <div class="cuotas-grid">
         `;
@@ -1779,7 +1955,7 @@ function renderMisCuotasOrganizadas(cuotas) {
         `;
     }
     
-    // SECCIÓN: HISTORIAL (PAGADAS Y PENDIENTES DE VALIDACIÓN)
+    // SECCIÓN: HISTORIAL
     html += `
         <div class="cuotas-section">
             <h3 style="color: #666; margin-bottom: 20px;">
@@ -1802,6 +1978,9 @@ function renderMisCuotasOrganizadas(cuotas) {
     container.innerHTML = html;
 }
 
+
+   
+
 // ========== RENDERIZAR TARJETA DE CUOTA ==========
 function renderCuotaCard(cuota) {
     const estadoFinal = cuota.estado_actual || cuota.estado;
@@ -1812,6 +1991,26 @@ function renderCuotaCard(cuota) {
     const esVencida = estadoFinal === 'vencida';
     const esPagada = cuota.estado === 'pagada';
     const tienePagoPendiente = cuota.id_pago && cuota.estado_pago === 'pendiente';
+    
+    // 🔥 DEBUG: Log para cada cuota
+    console.log(`📋 Cuota ${cuota.id_cuota} (${mes} ${cuota.anio}):`, {
+        estado: estadoFinal,
+        esPagada,
+        tienePagoPendiente,
+        monto_base: cuota.monto_base,
+        deudaHorasActual
+    });
+    
+    // Calcular montos - SIEMPRE usar monto_base para cuota
+    const montoCuota = parseFloat(cuota.monto_base || 0);
+    
+    // Si NO está pagada y NO tiene pago pendiente, mostrar TOTAL (cuota + deuda)
+    // Si está pagada o tiene pago pendiente, mostrar solo lo que pagó
+    const montoMostrar = (estadoFinal !== 'pagada' && !tienePagoPendiente) 
+        ? montoCuota + deudaHorasActual 
+        : montoCuota;
+    
+    console.log(`💵 Monto a mostrar: $${montoMostrar} (Cuota: $${montoCuota} + Deuda: $${deudaHorasActual})`);
     
     return `
         <div class="cuota-card estado-${estadoFinal}">
@@ -1827,9 +2026,18 @@ function renderCuotaCard(cuota) {
             
             <div class="cuota-card-body">
                 <div class="cuota-monto">
-                    <span class="cuota-monto-label">Monto:</span>
-                    <span class="cuota-monto-valor">$${parseFloat(cuota.monto).toLocaleString('es-UY', {minimumFractionDigits: 2})}</span>
+                    <span class="cuota-monto-label">Monto ${estadoFinal !== 'pagada' && !tienePagoPendiente && deudaHorasActual > 0 ? 'Total' : ''}:</span>
+                    <span class="cuota-monto-valor">$${montoMostrar.toLocaleString('es-UY', {minimumFractionDigits: 2})}</span>
                 </div>
+                
+                ${estadoFinal !== 'pagada' && !tienePagoPendiente && deudaHorasActual > 0 ? `
+                    <div class="cuota-desglose">
+                        <small style="color: #666;">
+                            Cuota: $${montoCuota.toLocaleString('es-UY', {minimumFractionDigits: 2})} + 
+                            Deuda horas: $${deudaHorasActual.toLocaleString('es-UY', {minimumFractionDigits: 2})}
+                        </small>
+                    </div>
+                ` : ''}
                 
                 <div class="cuota-info-grid">
                     <div class="cuota-info-item">
@@ -1862,15 +2070,22 @@ function renderCuotaCard(cuota) {
             </div>
             
             <div class="cuota-card-footer">
-                ${!esPagada && !tienePagoPendiente ? `
-                    <button class="btn btn-primary btn-small" onclick="abrirPagarCuotaModal(${cuota.id_cuota})">
-                        <i class="fas fa-credit-card"></i> Pagar Cuota
-                    </button>
-                ` : ''}
-                
                 ${cuota.comprobante_archivo ? `
                     <button class="btn btn-secondary btn-small" onclick="verComprobante('${cuota.comprobante_archivo}')">
                         <i class="fas fa-image"></i> Ver Comprobante
+                    </button>
+                ` : ''}
+                
+                <!-- ✅ BOTÓN DE PAGAR - SIEMPRE VISIBLE SI NO ESTÁ PAGADA -->
+                ${estadoFinal !== 'pagada' && !tienePagoPendiente ? `
+                    <button class="btn btn-primary btn-small" onclick="abrirPagarDeudaTotal(${cuota.id_cuota}, ${montoMostrar})">
+                        <i class="fas fa-credit-card"></i> Pagar Ahora
+                    </button>
+                ` : ''}
+                
+                ${tienePagoPendiente ? `
+                    <button class="btn btn-secondary btn-small" disabled title="Pago en revisión">
+                        <i class="fas fa-hourglass-half"></i> En Validación
                     </button>
                 ` : ''}
                 
@@ -1880,6 +2095,262 @@ function renderCuotaCard(cuota) {
             </div>
         </div>
     `;
+}
+
+// ========== PAGAR DEUDA TOTAL ==========
+async function abrirPagarDeudaTotal(cuotaId, montoTotal) {
+    console.log('💳 Abriendo modal para pagar deuda total');
+    console.log('   Cuota ID:', cuotaId);
+    console.log('   Monto total:', montoTotal);
+    
+    try {
+        const response = await fetch(`/api/cuotas/detalle?cuota_id=${cuotaId}`);
+        const data = await response.json();
+        
+        if (!data.success) {
+            alert('❌ Error al cargar información de la cuota');
+            return;
+        }
+        
+        const cuota = data.cuota;
+        const mes = obtenerNombreMes(cuota.mes);
+        const montoCuota = parseFloat(cuota.monto);
+        
+        const infoContainer = document.getElementById('cuota-info-modal');
+        
+        infoContainer.innerHTML = `
+            <div class="cuota-detalle-modal">
+                <h4>📋 Detalle del Pago Total</h4>
+                
+                <div class="pago-total-breakdown">
+                    <div class="breakdown-section">
+                        <h5><i class="fas fa-home"></i> Cuota de Vivienda</h5>
+                        <div class="detalle-grid">
+                            <div><strong>Período:</strong> ${mes} ${cuota.anio}</div>
+                            <div><strong>Vivienda:</strong> ${cuota.numero_vivienda}</div>
+                            <div><strong>Tipo:</strong> ${cuota.tipo_vivienda}</div>
+                            <div><strong>Monto Cuota:</strong> $${montoCuota.toLocaleString('es-UY', {minimumFractionDigits: 2})}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="breakdown-divider">+</div>
+                    
+                    <div class="breakdown-section deuda-section">
+                        <h5><i class="fas fa-clock"></i> Deuda por Horas No Trabajadas</h5>
+                        <div class="alert-warning" style="margin: 10px 0;">
+                            <p><strong>Monto por horas faltantes:</strong> $${deudaHorasActual.toLocaleString('es-UY', {minimumFractionDigits: 2})}</p>
+                            <small>Tarifa: $160 por cada hora no trabajada</small>
+                        </div>
+                    </div>
+                    
+                    <div class="breakdown-divider">=</div>
+                    
+                    <div class="breakdown-section total-section">
+                        <h5><i class="fas fa-calculator"></i> Total a Pagar</h5>
+                        <div class="monto-total-grande">
+                            $${montoTotal.toLocaleString('es-UY', {minimumFractionDigits: 2})}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="alert-info" style="margin-top: 20px;">
+                    <strong>ℹ️ Importante:</strong>
+                    <p>Este pago incluye tanto la cuota mensual de tu vivienda como la deuda acumulada por horas no trabajadas.</p>
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('pagar-cuota-id').value = cuotaId;
+        document.getElementById('pagar-monto').value = montoTotal;
+        document.getElementById('pagarCuotaForm').reset();
+        document.getElementById('pagar-cuota-id').value = cuotaId;
+        document.getElementById('pagar-monto').value = montoTotal;
+        
+        document.getElementById('pagarCuotaModal').style.display = 'flex';
+        
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Error al cargar información');
+    }
+}
+
+// ========== VER DETALLE DEUDA TOTAL ==========
+async function verDetalleDeudaTotal(cuotaId) {
+    try {
+        const response = await fetch(`/api/cuotas/detalle?cuota_id=${cuotaId}`);
+        const data = await response.json();
+        
+        if (!data.success) {
+            alert('Error al cargar detalles');
+            return;
+        }
+        
+        // Obtener también deuda de horas
+        const responseHoras = await fetch('/api/horas/deuda-actual');
+        const dataHoras = await responseHoras.json();
+        
+        const cuota = data.cuota;
+        const mes = obtenerNombreMes(cuota.mes);
+        const montoCuota = parseFloat(cuota.monto);
+        const montoTotal = montoCuota + deudaHorasActual;
+        
+        const deudaInfo = dataHoras.success ? dataHoras.deuda : null;
+        
+        const modal = `
+            <div class="modal-detail" onclick="if(event.target.classList.contains('modal-detail')) this.remove()">
+                <div class="modal-detail-content">
+                    <button onclick="this.closest('.modal-detail').remove()" class="modal-close-button">×</button>
+                    
+                    <h2 class="modal-detail-header">💰 Detalle Completo de Deuda</h2>
+                    
+                    <div class="cuota-detalle-completo">
+                        <!-- CUOTA MENSUAL -->
+                        <div class="detalle-section">
+                            <h3><i class="fas fa-home"></i> Cuota de Vivienda</h3>
+                            <div class="detalle-grid">
+                                <div><strong>Período:</strong> ${mes} ${cuota.anio}</div>
+                                <div><strong>Vivienda:</strong> ${cuota.numero_vivienda}</div>
+                                <div><strong>Tipo:</strong> ${cuota.tipo_vivienda}</div>
+                                <div><strong>Monto:</strong> $${montoCuota.toLocaleString('es-UY', {minimumFractionDigits: 2})}</div>
+                                <div><strong>Vencimiento:</strong> ${new Date(cuota.fecha_vencimiento + 'T00:00:00').toLocaleDateString('es-UY')}</div>
+                            </div>
+                        </div>
+                        
+                        <!-- DEUDA DE HORAS -->
+                        <div class="detalle-section" style="background: #fff3e0; border-left: 4px solid #ff9800;">
+                            <h3><i class="fas fa-clock"></i> Deuda por Horas No Trabajadas</h3>
+                            ${deudaInfo ? `
+                                <div class="detalle-grid">
+                                    <div><strong>Horas requeridas (mensuales):</strong> ${deudaInfo.horas_requeridas}h</div>
+                                    <div><strong>Horas trabajadas (mes actual):</strong> ${deudaInfo.horas_trabajadas}h</div>
+                                    <div><strong>Horas faltantes (mes actual):</strong> ${deudaInfo.horas_faltantes}h</div>
+                                    <div><strong>Tarifa por hora:</strong> $${deudaInfo.costo_por_hora}</div>
+                                </div>
+                                
+                                <div style="margin-top: 15px; padding: 15px; background: white; border-radius: 8px;">
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                                        <span><strong>Deuda del mes actual:</strong></span>
+                                        <span style="color: #f44336;">$${deudaInfo.deuda_mes_actual.toLocaleString('es-UY', {minimumFractionDigits: 2})}</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                                        <span><strong>Deuda acumulada (meses anteriores):</strong></span>
+                                        <span style="color: #f44336;">$${deudaInfo.deuda_acumulada.toLocaleString('es-UY', {minimumFractionDigits: 2})}</span>
+                                    </div>
+                                    <hr style="margin: 10px 0;">
+                                    <div style="display: flex; justify-content: space-between; font-size: 18px;">
+                                        <span><strong>Total deuda por horas:</strong></span>
+                                        <span style="color: #f44336; font-weight: bold;">$${deudaInfo.deuda_en_pesos.toLocaleString('es-UY', {minimumFractionDigits: 2})}</span>
+                                    </div>
+                                </div>
+                            ` : `
+                                <p>No se pudo cargar información de horas</p>
+                            `}
+                        </div>
+                        
+                        <!-- TOTAL -->
+                        <div class="detalle-section" style="background: #e3f2fd; border-left: 4px solid #2196F3;">
+                            <h3><i class="fas fa-calculator"></i> Total a Pagar</h3>
+                            <div style="text-align: center; padding: 20px;">
+                                <div style="font-size: 14px; color: #666; margin-bottom: 10px;">
+                                    Cuota Vivienda + Deuda Horas
+                                </div>
+                                <div style="font-size: 36px; font-weight: bold; color: #2196F3;">
+                                    $${montoTotal.toLocaleString('es-UY', {minimumFractionDigits: 2})}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="alert-info" style="margin-top: 20px;">
+                            <strong>💡 Información:</strong>
+                            <ul style="margin: 10px 0 0 20px;">
+                                <li>La deuda por horas se calcula multiplicando las horas faltantes por $160.</li>
+                                <li>Se acumula de todos los meses en que no se cumplieron las 21 horas requeridas.</li>
+                                <li>Al pagar, saldarás tanto la cuota del mes como toda la deuda acumulada.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="modal-detail-footer">
+                        <button onclick="this.closest('.modal-detail').remove()" class="btn btn-secondary">Cerrar</button>
+                        <button onclick="this.closest('.modal-detail').remove(); abrirPagarDeudaTotal(${cuotaId}, ${montoTotal})" class="btn btn-primary">
+                            <i class="fas fa-credit-card"></i> Proceder al Pago
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.insertAdjacentHTML('beforeend', modal);
+        
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al cargar detalles');
+    }
+}
+
+// ========== CERRAR MODAL PAGO ==========
+function closePagarCuotaModal() {
+    document.getElementById('pagarCuotaModal').style.display = 'none';
+    document.getElementById('pagarCuotaForm').reset();
+}
+
+// ========== ENVIAR PAGO ==========
+async function submitPagarCuota(event) {
+    event.preventDefault();
+    console.log('💾 Enviando pago de cuota con deuda');
+    
+    const cuotaId = document.getElementById('pagar-cuota-id').value;
+    const monto = document.getElementById('pagar-monto').value;
+    const metodo = document.getElementById('pagar-metodo').value;
+    const numeroComprobante = document.getElementById('pagar-numero-comprobante').value;
+    const archivo = document.getElementById('pagar-comprobante').files[0];
+    
+    if (!archivo) {
+        alert('⚠️ Debes adjuntar el comprobante de pago');
+        return;
+    }
+    
+    const montoNum = parseFloat(monto);
+    const mensaje = deudaHorasActual > 0 
+        ? `¿Estás seguro de enviar este pago?\n\nMonto total: ${montoNum.toLocaleString('es-UY', {minimumFractionDigits: 2})}\n\nEsto incluye:\n- Cuota de vivienda\n- Deuda por horas no trabajadas`
+        : '¿Estás seguro de enviar este pago?';
+    
+    if (!confirm(mensaje)) {
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append('cuota_id', cuotaId);
+    formData.append('monto_pagado', monto);
+    formData.append('metodo_pago', metodo);
+    formData.append('numero_comprobante', numeroComprobante);
+    formData.append('comprobante', archivo);
+    
+    // Agregar flag si incluye deuda de horas
+    if (deudaHorasActual > 0) {
+        formData.append('incluye_deuda_horas', 'true');
+        formData.append('monto_deuda_horas', deudaHorasActual);
+    }
+    
+    try {
+        const response = await fetch('/api/cuotas/pagar', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert('✅ ' + data.mensaje + '\n\nTu pago será revisado por un administrador.');
+            closePagarCuotaModal();
+            await inicializarSeccionCuotas(); // Recargar todo
+        } else {
+            alert('❌ ' + data.message);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Error al enviar el pago');
+    }
 }
 
 // ========== ACTUALIZAR ESTADÍSTICAS ==========
@@ -1897,118 +2368,12 @@ function updateCuotasStats(cuotas) {
     if (vencidasEl) vencidasEl.textContent = vencidas;
 }
 
-// ========== VER COMPROBANTE (ABRE IMAGEN) ==========
+// ========== VER COMPROBANTE ==========
 function verComprobante(archivo) {
-    // Abrir imagen en nueva ventana
     window.open(`/files/?path=${archivo}`, '_blank');
 }
 
-// ========== RESTO DE FUNCIONES (sin cambios) ==========
-async function abrirPagarCuotaModal(cuotaId) {
-    console.log('💳 Abriendo modal para pagar cuota:', cuotaId);
-    
-    try {
-        const response = await fetch(`/api/cuotas/detalle?cuota_id=${cuotaId}`);
-        const data = await response.json();
-        
-        if (!data.success) {
-            alert('❌ Error al cargar información de la cuota');
-            return;
-        }
-        
-        const cuota = data.cuota;
-        const validacion = data.validacion;
-        
-        if (!validacion.puede_pagar) {
-            mostrarAlertaHorasInsuficientes(validacion);
-            return;
-        }
-        
-        const infoContainer = document.getElementById('cuota-info-modal');
-        const mes = obtenerNombreMes(cuota.mes);
-        
-        infoContainer.innerHTML = `
-            <div class="cuota-detalle-modal">
-                <h4>📋 Información de la Cuota</h4>
-                <div class="detalle-grid">
-                    <div><strong>Período:</strong> ${mes} ${cuota.anio}</div>
-                    <div><strong>Vivienda:</strong> ${cuota.numero_vivienda}</div>
-                    <div><strong>Tipo:</strong> ${cuota.tipo_vivienda}</div>
-                    <div><strong>Monto:</strong> $${parseFloat(cuota.monto).toLocaleString('es-UY', {minimumFractionDigits: 2})}</div>
-                </div>
-                <div class="alert-success" style="margin-top: 15px;">
-                    <i class="fas fa-check-circle"></i>
-                    <strong>✅ Horas de trabajo cumplidas:</strong> ${cuota.horas_cumplidas}h / ${cuota.horas_requeridas}h
-                </div>
-            </div>
-        `;
-        
-        document.getElementById('pagar-cuota-id').value = cuotaId;
-        document.getElementById('pagar-monto').value = cuota.monto;
-        document.getElementById('pagarCuotaForm').reset();
-        document.getElementById('pagar-cuota-id').value = cuotaId;
-        document.getElementById('pagar-monto').value = cuota.monto;
-        
-        document.getElementById('pagarCuotaModal').style.display = 'flex';
-        
-    } catch (error) {
-        console.error('Error:', error);
-        alert('❌ Error al cargar información de la cuota');
-    }
-}
-
-function closePagarCuotaModal() {
-    document.getElementById('pagarCuotaModal').style.display = 'none';
-    document.getElementById('pagarCuotaForm').reset();
-}
-
-async function submitPagarCuota(event) {
-    event.preventDefault();
-    console.log('💾 Enviando pago de cuota');
-    
-    const cuotaId = document.getElementById('pagar-cuota-id').value;
-    const monto = document.getElementById('pagar-monto').value;
-    const metodo = document.getElementById('pagar-metodo').value;
-    const numeroComprobante = document.getElementById('pagar-numero-comprobante').value;
-    const archivo = document.getElementById('pagar-comprobante').files[0];
-    
-    if (!archivo) {
-        alert('⚠️ Debes adjuntar el comprobante de pago');
-        return;
-    }
-    
-    if (!confirm('¿Estás seguro de enviar este pago?')) {
-        return;
-    }
-    
-    const formData = new FormData();
-    formData.append('cuota_id', cuotaId);
-    formData.append('monto_pagado', monto);
-    formData.append('metodo_pago', metodo);
-    formData.append('numero_comprobante', numeroComprobante);
-    formData.append('comprobante', archivo);
-    
-    try {
-        const response = await fetch('/api/cuotas/pagar', {
-            method: 'POST',
-            body: formData
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            alert('✅ ' + data.mensaje);
-            closePagarCuotaModal();
-            await loadMisCuotas();
-        } else {
-            alert('❌ ' + data.message);
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        alert('❌ Error al enviar el pago');
-    }
-}
-
+// ========== VER DETALLE CUOTA INDIVIDUAL ==========
 async function verDetalleCuota(cuotaId) {
     try {
         const response = await fetch(`/api/cuotas/detalle?cuota_id=${cuotaId}`);
@@ -2036,7 +2401,7 @@ async function verDetalleCuota(cuotaId) {
                             <div class="detalle-grid">
                                 <div><strong>Período:</strong> ${mes} ${cuota.anio}</div>
                                 <div><strong>Estado:</strong> <span class="badge-${cuota.estado}">${formatEstadoCuota(cuota.estado)}</span></div>
-                                <div><strong>Monto:</strong> $${parseFloat(cuota.monto).toLocaleString('es-UY', {minimumFractionDigits: 2})}</div>
+                                <div><strong>Monto:</strong> ${parseFloat(cuota.monto).toLocaleString('es-UY', {minimumFractionDigits: 2})}</div>
                                 <div><strong>Vencimiento:</strong> ${new Date(cuota.fecha_vencimiento + 'T00:00:00').toLocaleDateString('es-UY')}</div>
                             </div>
                         </div>
@@ -2054,14 +2419,7 @@ async function verDetalleCuota(cuotaId) {
                             <div class="detalle-grid">
                                 <div><strong>Requeridas:</strong> ${cuota.horas_requeridas}h</div>
                                 <div><strong>Cumplidas:</strong> ${cuota.horas_cumplidas || 0}h</div>
-                                <div><strong>Estado:</strong> ${validacion.puede_pagar ? '✅ Cumplidas' : '❌ Insuficientes'}</div>
                             </div>
-                            ${!validacion.puede_pagar && validacion.horas_faltantes ? `
-                                <div class="alert-warning" style="margin-top: 10px;">
-                                    <strong>⚠️ Faltan ${validacion.horas_faltantes}h de trabajo</strong>
-                                    <p>Debes completar las horas requeridas antes de poder pagar</p>
-                                </div>
-                            ` : ''}
                         </div>
                         
                         ${cuota.observaciones ? `
@@ -2087,44 +2445,7 @@ async function verDetalleCuota(cuotaId) {
     }
 }
 
-function mostrarAlertaHorasInsuficientes(validacion) {
-    const modal = `
-        <div class="modal-detail" onclick="if(event.target.classList.contains('modal-detail')) this.remove()">
-            <div class="modal-detail-content">
-                <button onclick="this.closest('.modal-detail').remove()" class="modal-close-button">×</button>
-                
-                <h2 class="modal-detail-header" style="color: #f44336;">⚠️ No Puedes Pagar Aún</h2>
-                
-                <div class="alert-warning" style="padding: 20px; margin: 20px 0;">
-                    <h3 style="margin-top: 0;">${validacion.mensaje}</h3>
-                    
-                    <div style="margin: 20px 0;">
-                        <div style="margin: 10px 0;">
-                            <strong>Horas cumplidas:</strong> ${validacion.horas_cumplidas || 0}h
-                        </div>
-                        <div style="margin: 10px 0;">
-                            <strong>Horas requeridas:</strong> ${validacion.horas_requeridas}h
-                        </div>
-                        <div style="margin: 10px 0; color: #f44336;">
-                            <strong>Horas faltantes:</strong> ${validacion.horas_faltantes}h
-                        </div>
-                    </div>
-                    
-                    <p style="margin-top: 15px;">
-                        Debes completar las horas de trabajo del mes antes de poder realizar el pago de la cuota.
-                    </p>
-                </div>
-                
-                <div class="modal-detail-footer">
-                    <button onclick="this.closest('.modal-detail').remove()" class="btn btn-primary">Entendido</button>
-                </div>
-            </div>
-        </div>
-    `;
-    
-    document.body.insertAdjacentHTML('beforeend', modal);
-}
-
+// ========== FUNCIONES AUXILIARES ==========
 function formatEstadoCuota(estado) {
     const estados = {
         'pendiente': 'Pendiente',
@@ -2144,15 +2465,16 @@ function obtenerNombreMes(mes) {
 }
 
 // Exportar funciones globales
+window.inicializarSeccionCuotas = inicializarSeccionCuotas;
 window.loadMisCuotas = loadMisCuotas;
-window.abrirPagarCuotaModal = abrirPagarCuotaModal;
+window.abrirPagarDeudaTotal = abrirPagarDeudaTotal;
+window.verDetalleDeudaTotal = verDetalleDeudaTotal;
 window.closePagarCuotaModal = closePagarCuotaModal;
 window.submitPagarCuota = submitPagarCuota;
 window.verDetalleCuota = verDetalleCuota;
 window.verComprobante = verComprobante;
 
-console.log('✅ Módulo de cuotas de usuario cargado completamente');
-
+console.log('✅ Módulo de cuotas con deuda de horas cargado completamente');
 
 // ==========================================
 // WIDGET DEUDA DE HORAS (21h mensuales)
@@ -2392,5 +2714,16 @@ if (horasMenuItemDeuda) {
         }, 500);
     });
 }
+
+window.inicializarSeccionCuotas = inicializarSeccionCuotas;
+window.loadMisCuotas = loadMisCuotas;
+window.abrirPagarDeudaTotal = abrirPagarDeudaTotal;
+window.verDetalleDeudaTotal = verDetalleDeudaTotal;
+window.closePagarCuotaModal = closePagarCuotaModal;
+window.submitPagarCuota = submitPagarCuota;
+window.verDetalleCuota = verDetalleCuota;
+window.verComprobante = verComprobante;
+
+console.log('✅ Módulo de cuotas corregido cargado');
 
 console.log('✅ Widget de deuda de horas cargado');

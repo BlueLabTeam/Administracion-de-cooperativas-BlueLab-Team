@@ -139,6 +139,8 @@ $privateRoutes = [
     '/api/cuotas/generar',
     '/api/cuotas/verificar-pago',
     '/api/cuotas/pagar',
+    '/api/cuotas/verificar-cuota-mes',
+    '/api/cuotas/generar-mi-cuota',
     '/api/cuotas/all',
     '/api/cuotas/validar-pago',
     '/api/cuotas/generar-masivas',
@@ -414,7 +416,7 @@ switch ($uri) {
         (new App\Controllers\DeudaHorasController())->getHistorialMensual();
         break;
 
-    // API CUOTAS - USUARIO
+         // API CUOTAS - USUARIO
     case '/api/cuotas/mis-cuotas':
         (new App\Controllers\CuotaController())->getMisCuotas();
         break;
@@ -424,6 +426,15 @@ switch ($uri) {
     case '/api/cuotas/generar':
         (new App\Controllers\CuotaController())->generarMiCuota();
         break;
+    
+    case '/api/cuotas/verificar-cuota-mes':
+        (new App\Controllers\CuotaController())->verificarCuotaMes();
+        break;
+    case '/api/cuotas/generar-mi-cuota':
+        (new App\Controllers\CuotaController())->generarMiCuota();
+        break;
+   
+    
     case '/api/cuotas/verificar-pago':
         (new App\Controllers\CuotaController())->verificarPagoCuota();
         break;

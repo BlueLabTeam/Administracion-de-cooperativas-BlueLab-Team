@@ -1,9 +1,9 @@
 /* ==========================================
-   ESTILOS PARA REGISTRO DE HORAS
-   dashboardHoras.css
+   REGISTRO DE HORAS - VERSIÓN OPTIMIZADA
+   Colores: Azul (#329cef, #320a95) y Blanco
    ========================================== */
 
-/* Controles del Reloj */
+/* ========== CONTROLES DEL RELOJ ========== */
 .clock-controls {
     display: flex;
     flex-direction: column;
@@ -13,7 +13,7 @@
     background: linear-gradient(135deg, #329cef 0%, #320a95 100%);
     border-radius: 12px;
     color: white;
-    box-shadow: 0 8px 20px rgba(50, 10, 149, 0.3);
+    box-shadow: 0 8px 20px rgba(50, 156, 239, 0.3);
 }
 
 .current-time {
@@ -22,7 +22,7 @@
     gap: 15px;
     font-size: 2.5em;
     font-weight: bold;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .current-time i {
@@ -53,7 +53,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     background: white;
     color: #320a95;
 }
@@ -64,8 +64,8 @@
 
 .btn-clock:hover:not(:disabled) {
     transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0,0,0,0.2);
-    background: linear-gradient(135deg, #fff 0%, #f0f0ff 100%);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    background: linear-gradient(135deg, #fff 0%, #f0f4ff 100%);
 }
 
 .btn-clock:active:not(:disabled) {
@@ -77,7 +77,7 @@
     cursor: not-allowed;
 }
 
-/* Información de registro activo */
+/* ========== INFORMACIÓN DE REGISTRO ACTIVO ========== */
 #registro-activo-info {
     width: 100%;
     margin-top: 15px;
@@ -101,7 +101,7 @@
     }
 }
 
-/* Resumen Semanal */
+/* ========== RESUMEN SEMANAL ========== */
 .resumen-semana-header {
     background: linear-gradient(135deg, #329cef 0%, #320a95 100%);
     padding: 20px;
@@ -109,19 +109,19 @@
     margin-bottom: 25px;
     text-align: center;
     color: white;
-    box-shadow: 0 4px 15px rgba(50, 10, 149, 0.2);
+    box-shadow: 0 4px 15px rgba(50, 156, 239, 0.2);
 }
 
 .resumen-semana-header p {
     margin: 8px 0;
     font-size: 1.05em;
-    color: white; /* Asegurar que el texto sea blanco */
+    color: white;
 }
 
 .resumen-semana-header strong {
     font-size: 1.3em;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
-    color: white; /* Texto blanco para el strong */
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+    color: white;
 }
 
 .resumen-dias-grid {
@@ -144,12 +144,12 @@
 
 .dia-card:hover {
     transform: translateY(-3px);
-    box-shadow: 0 6px 15px rgba(50, 156, 239, 0.2);
+    box-shadow: 0 6px 15px rgba(50, 156, 239, 0.15);
 }
 
 .dia-card.con-registro {
     border-color: #4caf50;
-    background: linear-gradient(135deg, #f1f8f4 0%, #e8f5e9 100%);
+    background: linear-gradient(135deg, #f0f9f4 0%, #e8f5e9 100%);
 }
 
 .dia-card.sin-registro {
@@ -165,13 +165,13 @@
 }
 
 .dia-card.fin-de-semana {
-    background: linear-gradient(135deg, #fff8e1 0%, #ffe082 100%);
+    background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
     border-color: #ffb300;
 }
 
 .dia-card.fin-de-semana.con-registro {
     background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
-    border-color: #66bb6a;
+    border-color: #4caf50;
 }
 
 .dia-header {
@@ -180,7 +180,7 @@
     align-items: center;
     margin-bottom: 12px;
     padding-bottom: 10px;
-    border-bottom: 2px solid rgba(50, 10, 149, 0.1);
+    border-bottom: 2px solid rgba(50, 156, 239, 0.1);
     flex-wrap: wrap;
     gap: 5px;
 }
@@ -188,6 +188,7 @@
 .dia-header strong {
     font-size: 1.1em;
     color: #320a95;
+    font-weight: 700;
 }
 
 .dia-fecha {
@@ -204,7 +205,7 @@
     font-size: 0.7em;
     font-weight: bold;
     text-transform: uppercase;
-    box-shadow: 0 2px 5px rgba(50, 10, 149, 0.3);
+    box-shadow: 0 2px 5px rgba(50, 156, 239, 0.3);
 }
 
 .badge-finde {
@@ -241,7 +242,7 @@
 
 .no-registro {
     text-align: center;
-    color: #999; /* Color gris para "Sin registro" */
+    color: #999;
     padding: 20px 0;
     font-style: italic;
 }
@@ -251,10 +252,10 @@
     font-size: 2em;
     margin-bottom: 8px;
     opacity: 0.5;
-    color: #999; /* Color gris para el icono */
+    color: #999;
 }
 
-/* Badges de estado */
+/* ========== BADGES DE ESTADO ========== */
 .badge-estado {
     display: inline-flex;
     align-items: center;
@@ -271,26 +272,26 @@
 }
 
 .badge-estado.pendiente {
-    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+    background: #fff3e0;
     color: #856404;
 }
 
 .badge-estado.aprobado {
-    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
-    color: #155724;
+    background: #e8f5e9;
+    color: #1b5e20;
 }
 
 .badge-estado.rechazado {
-    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
-    color: #721c24;
+    background: #fff3e0;
+    color: #856404;
 }
 
-/* Tabla de Registros */
+/* ========== TABLA DE REGISTROS ========== */
 .registros-table-wrapper {
     overflow-x: auto;
     margin-top: 15px;
     border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 .registros-table {
@@ -318,10 +319,11 @@
 .registros-table td {
     padding: 12px;
     border-bottom: 1px solid #e0e0e0;
+    color: #333;
 }
 
 .registros-table tbody tr:hover {
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    background: #f8f9fa;
 }
 
 .registro-row.estado-pendiente {
@@ -356,6 +358,7 @@
     flex-wrap: wrap;
 }
 
+/* ========== BOTONES PEQUEÑOS ========== */
 .btn-small {
     padding: 6px 12px;
     border: none;
@@ -371,14 +374,13 @@
 }
 
 .btn-small.btn-edit {
-    background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+    background: linear-gradient(135deg, #329cef 0%, #1976d2 100%);
     color: white;
 }
 
 .btn-small.btn-edit:hover {
-    background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(33, 150, 243, 0.3);
+    box-shadow: 0 4px 8px rgba(50, 156, 239, 0.3);
 }
 
 .btn-small.btn-warning {
@@ -387,29 +389,28 @@
 }
 
 .btn-small.btn-warning:hover {
-    background: linear-gradient(135deg, #f57c00 0%, #ef6c00 100%);
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(255, 152, 0, 0.3);
 }
 
 .btn-small.btn-info {
-    background: linear-gradient(135deg, #00bcd4 0%, #0097a7 100%);
+    background: linear-gradient(135deg, #329cef 0%, #0097a7 100%);
     color: white;
 }
 
 .btn-small.btn-info:hover {
-    background: linear-gradient(135deg, #0097a7 0%, #00838f 100%);
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 188, 212, 0.3);
+    box-shadow: 0 4px 8px rgba(50, 156, 239, 0.3);
 }
 
-/* Input de fecha */
+/* ========== INPUT DE FECHA ========== */
 .date-input {
     padding: 10px 12px;
     border: 2px solid #e0e0e0;
     border-radius: 6px;
     font-size: 0.9em;
     transition: all 0.2s ease;
+    color: #333;
 }
 
 .date-input:focus {
@@ -418,14 +419,14 @@
     box-shadow: 0 0 0 3px rgba(50, 156, 239, 0.1);
 }
 
-/* Modal de edición */
+/* ========== MODAL DE EDICIÓN ========== */
 .modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(50, 10, 149, 0.5);
+    background: rgba(50, 156, 239, 0.5);
     backdrop-filter: blur(5px);
     display: flex;
     align-items: center;
@@ -447,7 +448,7 @@
     width: 90%;
     max-height: 90vh;
     overflow-y: auto;
-    box-shadow: 0 15px 50px rgba(50, 10, 149, 0.4);
+    box-shadow: 0 15px 50px rgba(50, 156, 239, 0.4);
     animation: slideUp 0.3s ease;
     position: relative;
 }
@@ -494,6 +495,7 @@
     font-weight: 700;
 }
 
+/* ========== FORMULARIOS ========== */
 .form-group {
     margin-bottom: 20px;
 }
@@ -515,6 +517,7 @@
     font-size: 1em;
     font-family: inherit;
     transition: all 0.2s ease;
+    color: #333;
 }
 
 .form-group input[type="time"]:focus,
@@ -537,7 +540,45 @@
     margin-top: 25px;
 }
 
-/* Ajustes responsive */
+/* ========== LOADING ========== */
+.loading {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+}
+
+.loading::after {
+    content: '';
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-left: 10px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #329cef;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* ========== NO DATA ========== */
+.no-data {
+    text-align: center;
+    padding: 40px;
+    color: #999;
+}
+
+.no-data i {
+    display: block;
+    font-size: 48px;
+    margin-bottom: 15px;
+    color: #ddd;
+}
+
+/* ========== RESPONSIVE ========== */
 @media (max-width: 1200px) {
     .resumen-dias-grid {
         grid-template-columns: repeat(4, 1fr);
@@ -583,42 +624,3 @@
         min-height: 150px;
     }
 }
-
-/* Loading spinner */
-.loading {
-    text-align: center;
-    padding: 40px;
-    color: #666;
-}
-
-.loading::after {
-    content: '';
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    margin-left: 10px;
-    border: 3px solid #f3f3f3;
-    border-top: 3px solid #329cef;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-/* No data message */
-.no-data {
-    text-align: center;
-    padding: 40px;
-    color: #999;
-}
-
-.no-data i {
-    display: block;
-    font-size: 48px;
-    margin-bottom: 15px;
-    color: #ddd;
-}
-

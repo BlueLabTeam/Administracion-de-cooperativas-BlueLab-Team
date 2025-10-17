@@ -20,6 +20,7 @@ if (!isset($_SESSION['user_id'])) {
 	<link rel="stylesheet" href="/assets/css/dashboardTareas.css" />
 	<link rel="stylesheet" href="/assets/css/dashboardHoras.css" />
 	<link rel="stylesheet" href="/assets/css/dashboardDeudaHoras.css" />
+	<link rel="stylesheet" href="/assets/css/dashboardDeudaTotal.css" />
 	<link rel="stylesheet" href="/assets/css/dashboardUtils.css" />
 	<link rel="stylesheet" href="/assets/css/dashboardViviendas.css" />
 	<link rel="stylesheet" href="/assets/css/dashboardCuotas.css" />
@@ -199,40 +200,56 @@ if (!isset($_SESSION['user_id'])) {
 		</section>
 
 		<!-- APORTES -->
-		<section id="cuotas-section" class="section-content">
-    <h2 class="section-title">💰 Mis Cuotas Mensuales</h2>
-    
-    <!-- Resumen de cuotas -->
+		<div id="cuotas-section" class="section-content">
+    <div class="section-header">
+        <h2>💳 Mis Cuotas Mensuales</h2>
+        <p>Gestiona tus pagos de vivienda y deuda de horas</p>
+    </div>
+
+    <!-- Estadísticas Rápidas -->
     <div class="stats-grid">
-        <div class="stat-card">
-            <i class="fas fa-file-invoice-dollar"></i>
-            <h4>Cuotas Pendientes</h4>
-            <p id="cuotas-pendientes-count">0</p>
+        <div class="stat-card pendiente">
+            <div class="stat-icon">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-info">
+                <span class="stat-label">Pendientes</span>
+                <span class="stat-value" id="cuotas-pendientes-count">0</span>
+            </div>
         </div>
-        <div class="stat-card">
-            <i class="fas fa-check-circle"></i>
-            <h4>Cuotas Pagadas</h4>
-            <p id="cuotas-pagadas-count">0</p>
+
+        <div class="stat-card success">
+            <div class="stat-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-info">
+                <span class="stat-label">Pagadas</span>
+                <span class="stat-value" id="cuotas-pagadas-count">0</span>
+            </div>
         </div>
-        <div class="stat-card">
-            <i class="fas fa-exclamation-triangle"></i>
-            <h4>Cuotas Vencidas</h4>
-            <p id="cuotas-vencidas-count">0</p>
+
+        <div class="stat-card error">
+            <div class="stat-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="stat-info">
+                <span class="stat-label">Vencidas</span>
+                <span class="stat-value" id="cuotas-vencidas-count">0</span>
+            </div>
         </div>
     </div>
 
-    <!-- Información de vivienda y precio -->
-    <div class="info-card" id="info-vivienda-cuota">
-        <h3>📍 Tu Vivienda</h3>
+    <!-- Información de Vivienda -->
+    <div id="info-vivienda-cuota" class="info-section">
         <p class="loading">Cargando información...</p>
     </div>
 
     <!-- Filtros -->
-    <div class="info-card">
-        <div class="cuotas-filters">
-            <select id="filtro-anio-cuotas" onchange="loadMisCuotas()">
-                <option value="">Todos los años</option>
-            </select>
+    <div class="filters-container">
+        <div class="filter-group">
+            <label for="filtro-mes-cuotas">
+                <i class="fas fa-calendar"></i> Mes:
+            </label>
             <select id="filtro-mes-cuotas" onchange="loadMisCuotas()">
                 <option value="">Todos los meses</option>
                 <option value="1">Enero</option>
@@ -248,88 +265,109 @@ if (!isset($_SESSION['user_id'])) {
                 <option value="11">Noviembre</option>
                 <option value="12">Diciembre</option>
             </select>
+        </div>
+
+        <div class="filter-group">
+            <label for="filtro-anio-cuotas">
+                <i class="fas fa-calendar-alt"></i> Año:
+            </label>
+            <select id="filtro-anio-cuotas" onchange="loadMisCuotas()">
+                <option value="">Todos los años</option>
+                <!-- Se llena dinámicamente con JS -->
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label for="filtro-estado-cuotas">
+                <i class="fas fa-filter"></i> Estado:
+            </label>
             <select id="filtro-estado-cuotas" onchange="loadMisCuotas()">
                 <option value="">Todos los estados</option>
-                <option value="pendiente">Pendientes</option>
-                <option value="pagada">Pagadas</option>
-                <option value="vencida">Vencidas</option>
+                <option value="pendiente">Pendiente</option>
+                <option value="pagada">Pagada</option>
+                <option value="vencida">Vencida</option>
             </select>
         </div>
     </div>
 
-    <!-- Lista de cuotas -->
-    <div class="info-card">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h3>📋 Historial de Cuotas</h3>
-            <button class="btn btn-secondary" onclick="loadMisCuotas()">
-                <i class="fas fa-sync-alt"></i> Actualizar
-            </button>
-        </div>
-        
-        <div id="misCuotasContainer">
-            <p class="loading">Cargando cuotas...</p>
-        </div>
+    <!-- Lista de Cuotas -->
+    <div id="misCuotasContainer" class="cuotas-container">
+        <p class="loading">Cargando cuotas...</p>
     </div>
-</section>
+</div>
 
-<!-- Modal para pagar cuota -->
+<!-- ==========================================
+     MODAL: PAGAR CUOTA
+     ========================================== -->
+
 <div id="pagarCuotaModal" class="modal-overlay" style="display: none;">
     <div class="modal-content-large">
         <button class="modal-close-btn" onclick="closePagarCuotaModal()">×</button>
         
-        <h2 class="modal-title">💳 Pagar Cuota Mensual</h2>
-        
-        <div id="cuota-info-modal" class="cuota-info-box">
-            <!-- Info se carga dinámicamente -->
+        <h2 class="modal-title">
+            <i class="fas fa-credit-card"></i> Realizar Pago
+        </h2>
+
+        <!-- Información de la cuota -->
+        <div id="cuota-info-modal" class="cuota-info-modal">
+            <!-- Se llena dinámicamente -->
         </div>
-        
-        <form id="pagarCuotaForm" onsubmit="submitPagarCuota(event)">
-            <input type="hidden" id="pagar-cuota-id">
-            
+
+        <!-- Formulario de Pago -->
+        <form id="pagarCuotaForm" onsubmit="submitPagarCuota(event)" enctype="multipart/form-data">
+            <input type="hidden" id="pagar-cuota-id" name="cuota_id">
+            <input type="hidden" id="pagar-monto" name="monto_pagado">
+
             <div class="form-group">
-                <label for="pagar-monto">Monto a Pagar *</label>
-                <input type="number" 
-                       id="pagar-monto" 
-                       step="0.01" 
-                       required 
-                       readonly>
-            </div>
-            
-            <div class="form-group">
-                <label for="pagar-metodo">Método de Pago *</label>
-                <select id="pagar-metodo" required>
+                <label for="pagar-metodo">
+                    <i class="fas fa-money-check-alt"></i> Método de Pago *
+                </label>
+                <select id="pagar-metodo" name="metodo_pago" required>
                     <option value="transferencia">Transferencia Bancaria</option>
-                    <option value="efectivo">Efectivo</option>
+                    <option value="deposito">Depósito en Efectivo</option>
                     <option value="cheque">Cheque</option>
-                    <option value="otro">Otro</option>
+                    <option value="efectivo">Efectivo</option>
                 </select>
             </div>
-            
+
             <div class="form-group">
-                <label for="pagar-numero-comprobante">Número de Comprobante</label>
-                <input type="text" 
-                       id="pagar-numero-comprobante" 
-                       placeholder="Ej: 123456789">
-                <small>Número de referencia de la transferencia o comprobante</small>
+                <label for="pagar-numero-comprobante">
+                    <i class="fas fa-hashtag"></i> Número de Comprobante
+                </label>
+                <input 
+                    type="text" 
+                    id="pagar-numero-comprobante" 
+                    name="numero_comprobante"
+                    placeholder="Ej: 123456789"
+                    maxlength="50">
+                <small class="form-help">Opcional: Número de referencia o transacción</small>
             </div>
-            
+
             <div class="form-group">
-                <label for="pagar-comprobante">Comprobante de Pago *</label>
-                <input type="file" 
-                       id="pagar-comprobante" 
-                       accept="image/*,application/pdf" 
-                       required>
-                <small>Imagen o PDF del comprobante de pago</small>
+                <label for="pagar-comprobante">
+                    <i class="fas fa-file-upload"></i> Comprobante de Pago *
+                </label>
+                <input 
+                    type="file" 
+                    id="pagar-comprobante" 
+                    name="comprobante"
+                    accept="image/*,.pdf"
+                    required>
+                <small class="form-help">Sube una foto o PDF del comprobante (máx. 5MB)</small>
             </div>
-            
-            <div class="alert-info" style="margin: 20px 0; padding: 15px; background: #e3f2fd; border-left: 4px solid #2196f3; border-radius: 4px;">
-                <strong>ℹ️ Importante:</strong>
-                <p style="margin: 5px 0 0 0;">El pago será revisado por un administrador. Recibirás una notificación cuando sea aprobado.</p>
+
+            <div class="alert-warning" style="margin: 20px 0;">
+                <strong>⚠️ Importante:</strong>
+                <ul style="margin: 10px 0 0 20px; padding-left: 0;">
+                    <li>Asegúrate de que el comprobante sea legible</li>
+                    <li>El pago será revisado por un administrador</li>
+                    <li>Recibirás una notificación cuando sea validado</li>
+                </ul>
             </div>
-            
+
             <div class="form-actions">
                 <button type="button" class="btn btn-secondary" onclick="closePagarCuotaModal()">
-                    Cancelar
+                    <i class="fas fa-times"></i> Cancelar
                 </button>
                 <button type="submit" class="btn btn-primary">
                     <i class="fas fa-paper-plane"></i> Enviar Pago
@@ -338,6 +376,7 @@ if (!isset($_SESSION['user_id'])) {
         </form>
     </div>
 </div>
+
 
 
 		<!-- HORAS -->

@@ -126,70 +126,93 @@ class DeudaHoras
      * Suma las horas faltantes de todos los meses anteriores × $160
      */
     private function calcularDeudaAcumulada($id_usuario, $mes_actual, $anio_actual)
-    {
-        try {
-            error_log("=== calcularDeudaAcumulada ===");
-            
-            // Obtener todos los meses desde que el usuario se registró hasta el mes anterior
-            $stmt = $this->conn->prepare("
-                SELECT DISTINCT YEAR(fecha) as anio, MONTH(fecha) as mes
-                FROM Registro_Horas
-                WHERE id_usuario = :id_usuario
-                AND (
-                    YEAR(fecha) < :anio_actual OR 
-                    (YEAR(fecha) = :anio_actual AND MONTH(fecha) < :mes_actual)
-                )
-                ORDER BY anio, mes
+{
+    try {
+        // Obtener meses anteriores
+        $stmt = $this->conn->prepare("
+            SELECT DISTINCT YEAR(fecha) as anio, MONTH(fecha) as mes
+            FROM Registro_Horas
+            WHERE id_usuario = :id_usuario
+            AND (
+                YEAR(fecha) < :anio_actual OR 
+                (YEAR(fecha) = :anio_actual AND MONTH(fecha) < :mes_actual)
+            )
+            ORDER BY anio, mes
+        ");
+        
+        $stmt->execute([
+            'id_usuario' => $id_usuario,
+            'anio_actual' => $anio_actual,
+            'mes_actual' => $mes_actual
+        ]);
+        
+        $meses_anteriores = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $deuda_acumulada = 0;
+        
+        foreach ($meses_anteriores as $periodo) {
+            // ✅ VERIFICAR SI YA FUE PAGADA
+            $stmtPagada = $this->conn->prepare("
+                SELECT COUNT(*) as pagada
+                FROM Pagos_Cuotas pc
+                INNER JOIN Cuotas_Mensuales cm ON pc.id_cuota = cm.id_cuota
+                WHERE cm.id_usuario = :id_usuario
+                AND cm.mes = :mes
+                AND cm.anio = :anio
+                AND pc.incluye_deuda_horas = TRUE
+                AND pc.estado_validacion = 'aprobado'
             ");
             
-            $stmt->execute([
+            $stmtPagada->execute([
                 'id_usuario' => $id_usuario,
-                'anio_actual' => $anio_actual,
-                'mes_actual' => $mes_actual
+                'mes' => $periodo['mes'],
+                'anio' => $periodo['anio']
             ]);
             
-            $meses_anteriores = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $pagada = $stmtPagada->fetchColumn();
             
-            $deuda_acumulada = 0;
-            
-            foreach ($meses_anteriores as $periodo) {
-                // Obtener horas trabajadas en ese mes
-                $stmtHoras = $this->conn->prepare("
-                    SELECT COALESCE(SUM(total_horas), 0) as total_horas
-                    FROM Registro_Horas
-                    WHERE id_usuario = :id_usuario
-                    AND MONTH(fecha) = :mes
-                    AND YEAR(fecha) = :anio
-                    AND hora_salida IS NOT NULL
-                    AND total_horas > 0
-                ");
-                
-                $stmtHoras->execute([
-                    'id_usuario' => $id_usuario,
-                    'mes' => $periodo['mes'],
-                    'anio' => $periodo['anio']
-                ]);
-                
-                $horas_mes = (float)$stmtHoras->fetchColumn();
-                
-                // Si no cumplió las 21 horas, calcular deuda
-                if ($horas_mes < $this->horas_mensuales_requeridas) {
-                    $horas_faltantes = $this->horas_mensuales_requeridas - $horas_mes;
-                    $deuda_mes = $horas_faltantes * $this->costo_hora_faltante;
-                    $deuda_acumulada += $deuda_mes;
-                    
-                    error_log("Mes {$periodo['mes']}/{$periodo['anio']}: {$horas_mes}h trabajadas, faltan {$horas_faltantes}h = \${$deuda_mes}");
-                }
+            // Si ya fue pagada, saltar este mes
+            if ($pagada > 0) {
+                error_log("Mes {$periodo['mes']}/{$periodo['anio']} - Deuda ya pagada, omitiendo");
+                continue;
             }
             
-            error_log("Deuda acumulada total: $" . $deuda_acumulada);
-            return $deuda_acumulada;
+            // Obtener horas trabajadas
+            $stmtHoras = $this->conn->prepare("
+                SELECT COALESCE(SUM(total_horas), 0) as total_horas
+                FROM Registro_Horas
+                WHERE id_usuario = :id_usuario
+                AND MONTH(fecha) = :mes
+                AND YEAR(fecha) = :anio
+                AND hora_salida IS NOT NULL
+                AND total_horas > 0
+            ");
             
-        } catch (\PDOException $e) {
-            error_log("Error en calcularDeudaAcumulada: " . $e->getMessage());
-            return 0;
+            $stmtHoras->execute([
+                'id_usuario' => $id_usuario,
+                'mes' => $periodo['mes'],
+                'anio' => $periodo['anio']
+            ]);
+            
+            $horas_mes = (float)$stmtHoras->fetchColumn();
+            
+            // Si no cumplió las 21 horas, calcular deuda
+            if ($horas_mes < $this->horas_mensuales_requeridas) {
+                $horas_faltantes = $this->horas_mensuales_requeridas - $horas_mes;
+                $deuda_mes = $horas_faltantes * $this->costo_hora_faltante;
+                $deuda_acumulada += $deuda_mes;
+                
+                error_log("Mes {$periodo['mes']}/{$periodo['anio']}: {$horas_mes}h trabajadas, faltan {$horas_faltantes}h = \${$deuda_mes}");
+            }
         }
+        
+        error_log("Deuda acumulada total: $" . $deuda_acumulada);
+        return $deuda_acumulada;
+        
+    } catch (\PDOException $e) {
+        error_log("Error en calcularDeudaAcumulada: " . $e->getMessage());
+        return 0;
     }
+}
 
     /**
      * Obtener historial de los últimos N meses

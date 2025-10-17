@@ -1,0 +1,626 @@
+/* ==========================================
+   DEUDA TOTAL - VERSIÓN OPTIMIZADA COMPLETA
+   Colores: Azul (#329cef, #320a95) y Blanco
+   ========================================== */
+
+/* ========== ESTADÍSTICAS DE CUOTAS ========== */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border-left: 4px solid #e0e0e0;
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(50, 156, 239, 0.15);
+}
+
+.stat-card.pendiente {
+    border-left-color: #ff9800;
+}
+
+.stat-card.success {
+    border-left-color: #4caf50;
+}
+
+.stat-card.error {
+    border-left-color: #ff9800;
+}
+
+.stat-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    flex-shrink: 0;
+}
+
+.stat-card.pendiente .stat-icon {
+    background: #fff3e0;
+    color: #f57c00;
+}
+
+.stat-card.success .stat-icon {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.stat-card.error .stat-icon {
+    background: #fff3e0;
+    color: #f57c00;
+}
+
+.stat-info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.stat-label {
+    font-size: 13px;
+    color: #666;
+    margin: 0;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stat-value {
+    font-size: 28px;
+    font-weight: bold;
+    color: #320a95;
+    margin: 0;
+}
+
+/* ========== DEUDA TOTAL DESTACADA ========== */
+.deuda-total-destacada {
+    background: linear-gradient(135deg, #329cef 0%, #320a95 100%);
+    border-radius: 16px;
+    padding: 30px;
+    margin-bottom: 40px;
+    box-shadow: 0 10px 40px rgba(50, 156, 239, 0.3);
+    color: white;
+    animation: slideInDown 0.6s ease-out;
+}
+
+@keyframes slideInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.deuda-total-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.deuda-total-header h2 {
+    margin: 0;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: white;
+    font-weight: 700;
+}
+
+.deuda-total-header h2 i {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.7;
+        transform: scale(1.1);
+    }
+}
+
+.deuda-total-badge {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    padding: 8px 20px;
+    border-radius: 50px;
+    font-weight: bold;
+    font-size: 12px;
+    letter-spacing: 1px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: white;
+}
+
+.deuda-total-body {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    padding: 25px;
+}
+
+/* ========== DESGLOSE DE DEUDA ========== */
+.deuda-breakdown {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+
+.deuda-breakdown-item {
+    flex: 1;
+    min-width: 200px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    padding: 20px;
+    border-radius: 12px;
+    display: flex;
+    gap: 15px;
+    align-items: flex-start;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.deuda-breakdown-item:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+.deuda-breakdown-item i {
+    font-size: 24px;
+    color: rgba(255, 255, 255, 0.9);
+    margin-top: 5px;
+}
+
+.deuda-breakdown-item > div {
+    flex: 1;
+}
+
+.deuda-breakdown-item .deuda-label {
+    display: block;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.deuda-breakdown-item .deuda-monto {
+    display: block;
+    font-size: 24px;
+    font-weight: bold;
+    color: white;
+}
+
+.deuda-breakdown-item.deuda-horas {
+    border-color: rgba(255, 152, 0, 0.5);
+}
+
+.deuda-breakdown-item.deuda-horas .deuda-monto {
+    color: #ffb74d;
+}
+
+.deuda-breakdown-item.deuda-total {
+    background: rgba(255, 255, 255, 0.2);
+    border: 3px solid white;
+}
+
+.deuda-breakdown-item .deuda-monto-total {
+    display: block;
+    font-size: 32px;
+    font-weight: bold;
+    color: white;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.deuda-breakdown-divider {
+    font-size: 32px;
+    font-weight: bold;
+    color: rgba(255, 255, 255, 0.6);
+    flex: 0 0 auto;
+}
+
+/* ========== BOTÓN PAGAR ========== */
+.deuda-total-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 25px;
+    flex-wrap: wrap;
+}
+
+.btn-pagar-deuda-total {
+    flex: 1;
+    min-width: 200px;
+    padding: 18px 30px;
+    background: white;
+    color: #329cef;
+    border: none;
+    border-radius: 12px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-pagar-deuda-total:hover {
+    background: #f0f0f0;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.btn-pagar-deuda-total:active {
+    transform: translateY(0);
+}
+
+.btn-pagar-deuda-total i {
+    font-size: 20px;
+}
+
+/* ========== MODAL BREAKDOWN ========== */
+.pago-total-breakdown {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.breakdown-section {
+    background: #f5f5f5;
+    padding: 20px;
+    border-radius: 12px;
+    border-left: 4px solid #329cef;
+    transition: all 0.3s ease;
+}
+
+.breakdown-section:hover {
+    background: #f0f0f0;
+    transform: translateX(5px);
+}
+
+.breakdown-section h5 {
+    margin: 0 0 15px 0;
+    color: #320a95;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.breakdown-section.deuda-section {
+    border-left-color: #ff9800;
+    background: #fff8f0;
+}
+
+.breakdown-section.total-section {
+    border-left-color: #4caf50;
+    background: #e8f5e9;
+}
+
+.monto-total-grande {
+    text-align: center;
+    font-size: 42px;
+    font-weight: bold;
+    color: #320a95;
+    padding: 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border: 2px solid #329cef;
+}
+
+.cuota-desglose {
+    margin-top: 8px;
+    padding: 8px 12px;
+    background: rgba(50, 156, 239, 0.1);
+    border-radius: 6px;
+    border-left: 3px solid #329cef;
+    color: #320a95;
+    font-size: 14px;
+}
+
+/* ========== FILTROS ========== */
+.filters-container {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.filter-group {
+    flex: 1;
+    min-width: 200px;
+}
+
+.filter-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #320a95;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.filter-group label i {
+    color: #329cef;
+}
+
+.filter-group select {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    color: #333;
+}
+
+.filter-group select:focus {
+    outline: none;
+    border-color: #329cef;
+    box-shadow: 0 0 0 3px rgba(50, 156, 239, 0.1);
+}
+
+/* ========== ALERTAS ========== */
+.deuda-total-destacada .alert-info {
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 15px;
+    border-radius: 8px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.deuda-total-destacada .alert-info strong {
+    color: white;
+}
+
+.deuda-total-destacada .alert-info ul {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.alert-warning {
+    background: #fff3e0;
+    border-left: 4px solid #ff9800;
+    color: #856404;
+}
+
+.alert-warning strong {
+    color: #f57c00;
+}
+
+.alert-success {
+    background: #e8f5e9;
+    border-left: 4px solid #4caf50;
+    color: #1b5e20;
+}
+
+.alert-success strong {
+    color: #2e7d32;
+}
+
+.alert-info {
+    background: #e3f2fd;
+    border-left: 4px solid #329cef;
+    color: #0d47a1;
+}
+
+.alert-info strong {
+    color: #1565c0;
+}
+
+.alert-warning,
+.alert-success,
+.alert-info {
+    padding: 15px 20px;
+    border-radius: 8px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+/* ========== INFO SECTION ========== */
+.info-section {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 25px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-left: 4px solid #329cef;
+}
+
+.info-section h3 {
+    margin: 0 0 15px 0;
+    color: #320a95;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+}
+
+/* ========== ANIMACIONES ========== */
+.cuota-card {
+    animation: fadeInUp 0.4s ease-out;
+    animation-fill-mode: both;
+}
+
+.cuota-card:nth-child(1) { animation-delay: 0.05s; }
+.cuota-card:nth-child(2) { animation-delay: 0.1s; }
+.cuota-card:nth-child(3) { animation-delay: 0.15s; }
+.cuota-card:nth-child(4) { animation-delay: 0.2s; }
+.cuota-card:nth-child(5) { animation-delay: 0.25s; }
+.cuota-card:nth-child(6) { animation-delay: 0.3s; }
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ========== LOADING Y NO DATA ========== */
+.loading {
+    text-align: center;
+    padding: 40px;
+    color: #999;
+    font-size: 16px;
+}
+
+.loading::before {
+    content: '';
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #329cef;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-right: 10px;
+    vertical-align: middle;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.no-data {
+    text-align: center;
+    padding: 60px 20px;
+    color: #999;
+    background: #fafafa;
+    border-radius: 8px;
+}
+
+.no-data i {
+    display: block;
+    margin-bottom: 15px;
+    font-size: 2em;
+    color: #ddd;
+}
+
+.no-data p {
+    margin: 0;
+    font-size: 16px;
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 992px) {
+    .deuda-breakdown {
+        flex-direction: column;
+    }
+    
+    .deuda-breakdown-item {
+        min-width: 100%;
+    }
+    
+    .deuda-breakdown-divider {
+        transform: rotate(90deg);
+        margin: 10px 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .deuda-total-destacada {
+        padding: 20px;
+    }
+    
+    .deuda-total-header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+    
+    .deuda-total-header h2 {
+        font-size: 20px;
+        justify-content: center;
+    }
+    
+    .deuda-total-actions {
+        flex-direction: column;
+    }
+    
+    .btn-pagar-deuda-total {
+        width: 100%;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .filters-container {
+        flex-direction: column;
+    }
+    
+    .filter-group {
+        width: 100%;
+    }
+    
+    .deuda-breakdown-item .deuda-monto {
+        font-size: 20px;
+    }
+    
+    .deuda-breakdown-item .deuda-monto-total {
+        font-size: 24px;
+    }
+    
+    .monto-total-grande {
+        font-size: 32px;
+    }
+}
+
+@media (max-width: 480px) {
+    .stat-card {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .stat-value {
+        font-size: 24px;
+    }
+}

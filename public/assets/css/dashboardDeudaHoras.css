@@ -1,6 +1,6 @@
 /* ==========================================
-   ESTILOS WIDGET DEUDA DE HORAS
-   dashboardDeudaHoras.css
+   DEUDA DE HORAS - VERSIÓN OPTIMIZADA
+   Colores: Azul (#329cef, #320a95) y Blanco
    ========================================== */
 
 /* ========== TARJETA PRINCIPAL DE DEUDA ========== */
@@ -8,18 +8,17 @@
     background: white;
     border-radius: 12px;
     padding: 30px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 15px rgba(50, 156, 239, 0.1);
     margin-bottom: 25px;
-    border: 2px solid #e0e0e0;
+    border: 2px solid #e3f2fd;
     transition: all 0.3s ease;
 }
 
 .deuda-principal-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(50, 156, 239, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(50, 156, 239, 0.15);
 }
 
-/* Estados de la tarjeta */
 .deuda-principal-card.inicial {
     border-left: 5px solid #ff9800;
 }
@@ -40,7 +39,7 @@
     align-items: flex-start;
     margin-bottom: 25px;
     padding-bottom: 20px;
-    border-bottom: 2px solid rgba(50, 10, 149, 0.1);
+    border-bottom: 2px solid rgba(50, 156, 239, 0.1);
 }
 
 .deuda-principal-header h4 {
@@ -96,36 +95,35 @@
     padding: 20px;
     background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
     border-radius: 10px;
-    border: 1px solid #e0e0e0;
+    border-left: 4px solid #329cef;
     transition: all 0.3s ease;
 }
 
 .deuda-principal-item:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(50, 156, 239, 0.15);
-    border-color: #329cef;
 }
 
 .deuda-principal-item i {
     font-size: 2em;
     opacity: 0.9;
+    color: #329cef;
 }
 
-/* Iconos específicos para cada métrica */
 .deuda-principal-item i.fa-hourglass-start {
-    color: #ff9800; /* Naranja para deuda inicial */
+    color: #ff9800;
 }
 
 .deuda-principal-item i.fa-check-circle {
-    color: #4caf50; /* Verde para horas aprobadas */
+    color: #4caf50;
 }
 
 .deuda-principal-item i.fa-tasks {
-    color: #f44336; /* Rojo para deuda restante */
+    color: #ff9800;
 }
 
 .deuda-principal-item i.fa-chart-pie {
-    color: #667eea; /* Morado para progreso */
+    color: #329cef;
 }
 
 .deuda-principal-item > div {
@@ -154,10 +152,10 @@
 }
 
 .deuda-valor-grande.error {
-    color: #f44336;
+    color: #ff9800;
 }
 
-/* ========== BARRA DE PROGRESO PRINCIPAL ========== */
+/* ========== BARRA DE PROGRESO ========== */
 .deuda-progress-container {
     background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
     border-radius: 10px;
@@ -206,17 +204,9 @@
 }
 
 /* ========== ALERTAS ========== */
-.alert-success,
-.alert-info,
-.alert-warning {
-    padding: 15px 20px;
-    border-radius: 8px;
-    border-left: 4px solid;
-}
-
 .alert-success {
-    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
-    border-color: #4caf50;
+    background: #e8f5e9;
+    border-left: 4px solid #4caf50;
     color: #1b5e20;
 }
 
@@ -225,8 +215,8 @@
 }
 
 .alert-info {
-    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-    border-color: #329cef;
+    background: #e3f2fd;
+    border-left: 4px solid #329cef;
     color: #0d47a1;
 }
 
@@ -235,13 +225,23 @@
 }
 
 .alert-warning {
-    background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
-    border-color: #ff9800;
-    color: #e65100;
+    background: #fff3e0;
+    border-left: 4px solid #ff9800;
+    color: #856404;
 }
 
 .alert-warning strong {
     color: #f57c00;
+}
+
+.alert-success,
+.alert-info,
+.alert-warning {
+    padding: 15px 20px;
+    border-radius: 8px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
 }
 
 /* ========== HISTORIAL DE HORAS ========== */
@@ -272,14 +272,6 @@
     letter-spacing: 0.5px;
 }
 
-.historial-deuda-table th:first-child {
-    border-top-left-radius: 8px;
-}
-
-.historial-deuda-table th:last-child {
-    border-top-right-radius: 8px;
-}
-
 .historial-deuda-table td {
     padding: 12px;
     border-bottom: 1px solid #e0e0e0;
@@ -291,7 +283,7 @@
 }
 
 .historial-row:hover {
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    background: #f8f9fa;
 }
 
 .historial-row.estado-aprobado {
@@ -303,21 +295,7 @@
     margin-right: 5px;
 }
 
-/* ========== NO DATA ========== */
-.no-data {
-    text-align: center;
-    padding: 40px 20px;
-    color: #999;
-    background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
-    border-radius: 8px;
-}
-
-.no-data i {
-    display: block;
-    margin-bottom: 10px;
-}
-
-/* ========== BADGE ESTADOS ========== */
+/* ========== BADGES DE ESTADO ========== */
 .badge-estado {
     display: inline-flex;
     align-items: center;
@@ -330,18 +308,34 @@
 }
 
 .badge-estado.aprobado {
-    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
-    color: #155724;
+    background: #e8f5e9;
+    color: #1b5e20;
 }
 
 .badge-estado.rechazado {
-    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
-    color: #721c24;
+    background: #fff3e0;
+    color: #856404;
 }
 
 .badge-estado.pendiente {
-    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
-    color: #856404;
+    background: #e3f2fd;
+    color: #0d47a1;
+}
+
+/* ========== NO DATA ========== */
+.no-data {
+    text-align: center;
+    padding: 40px 20px;
+    color: #999;
+    background: #fafafa;
+    border-radius: 8px;
+}
+
+.no-data i {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 2em;
+    color: #ddd;
 }
 
 /* ========== RESPONSIVE ========== */
@@ -357,10 +351,6 @@
     .deuda-principal-header {
         flex-direction: column;
         gap: 15px;
-    }
-
-    .deuda-principal-badge {
-        align-self: flex-start;
     }
 
     .deuda-valor-grande {
@@ -386,10 +376,6 @@
         flex-direction: column;
         text-align: center;
         gap: 10px;
-    }
-
-    .deuda-principal-item i {
-        font-size: 1.5em;
     }
 
     .deuda-progress-numbers {

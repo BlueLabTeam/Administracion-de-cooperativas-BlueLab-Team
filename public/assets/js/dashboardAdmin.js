@@ -3151,15 +3151,15 @@ function renderAllCuotasAdmin(cuotas) {
         const nombreUsuario = cuota.nombre_completo || 'Usuario';
         const emailUsuario = cuota.email || '';
         
-        html += `
-            <tr class="cuota-row estado-${estadoFinal}">
-                <td>
-                    <strong>${nombreUsuario}</strong><br>
-                    <small>${emailUsuario}</small>
-                </td>
-                <td>${cuota.numero_vivienda}<br><small>${cuota.tipo_vivienda}</small></td>
-                <td>${mes} ${cuota.anio}</td>
-                <td><strong>$${parseFloat(cuota.monto).toLocaleString('es-UY', {minimumFractionDigits: 2})}</strong></td>
+       html += `
+    <tr class="cuota-row estado-${estadoFinal}">
+        <td>
+            <strong>${nombreUsuario}</strong><br>
+            <small>${emailUsuario}</small>
+        </td>
+        <td>${cuota.numero_vivienda}<br><small>${cuota.tipo_vivienda}</small></td>
+        <td>${mes} ${cuota.anio}</td>
+        <td><strong>$${parseFloat(cuota.monto_total || cuota.monto_base || cuota.monto || 0).toLocaleString('es-UY', {minimumFractionDigits: 2})}</strong></td>
                 <td><span class="cuota-badge badge-${estadoFinal}">${formatEstadoCuota(estadoFinal)}</span></td>
                 <td>
                     <div class="horas-info">
