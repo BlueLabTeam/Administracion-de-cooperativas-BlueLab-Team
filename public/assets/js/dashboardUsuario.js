@@ -702,6 +702,134 @@ function updateClock() {
     }
 }
 
+// ========== CARGAR DEUDA DE HORAS WIDGET ==========
+async function cargarDeudaHorasWidget() {
+    const container = document.getElementById('deuda-actual-container');
+    if (!container) {
+        console.log('⚠️ Container deuda-actual-container no encontrado');
+        return;
+    }
+    
+    container.innerHTML = '<p class="loading">Calculando deuda...</p>';
+    
+    try {
+        const response = await fetch('/api/horas/deuda-actual');
+        const data = await response.json();
+        
+        console.log('💰 Deuda de horas recibida:', data);
+        
+        if (data.success && data.deuda) {
+            renderDeudaHorasWidget(data.deuda);
+        } else {
+            container.innerHTML = '<p class="error">No se pudo cargar la deuda de horas</p>';
+        }
+        
+    } catch (error) {
+        console.error('❌ Error al cargar deuda:', error);
+        container.innerHTML = '<p class="error">Error de conexión</p>';
+    }
+}
+
+function renderDeudaHorasWidget(deuda) {
+    const container = document.getElementById('deuda-actual-container');
+    
+    const estado = deuda.estado || 'pendiente';
+    const colorEstado = estado === 'cumplido' ? 'success' : 
+                       estado === 'progreso' ? 'warning' : 'error';
+    
+    const deudaPesos = parseFloat(deuda.deuda_en_pesos || 0);
+    const tieneDeuda = deudaPesos > 0;
+    
+    container.innerHTML = `
+        <div class="deuda-widget ${colorEstado}">
+            <div class="deuda-header">
+                <div class="deuda-icono">
+                    <i class="fas ${tieneDeuda ? 'fa-exclamation-triangle' : 'fa-check-circle'}"></i>
+                </div>
+                <div class="deuda-titulo">
+                    <h4>${tieneDeuda ? 'Tienes Deuda de Horas' : 'Sin Deuda de Horas'}</h4>
+                    <p>Período: ${getNombreMes(deuda.mes)} ${deuda.anio}</p>
+                </div>
+            </div>
+            
+            <div class="deuda-body">
+                <div class="deuda-monto-principal ${tieneDeuda ? 'error' : 'success'}">
+                    $${deudaPesos.toLocaleString('es-UY', {minimumFractionDigits: 2})}
+                </div>
+                
+                <div class="deuda-desglose">
+                    <div class="desglose-item">
+                        <span class="label">Horas Requeridas:</span>
+                        <span class="valor">${deuda.horas_requeridas_mensuales}h/mes</span>
+                    </div>
+                    <div class="desglose-item">
+                        <span class="label">Sistema Semanal:</span>
+                        <span class="valor">${deuda.horas_requeridas_semanales}h/semana</span>
+                    </div>
+                    <div class="desglose-item">
+                        <span class="label">Horas Trabajadas:</span>
+                        <span class="valor">${deuda.horas_trabajadas}h</span>
+                    </div>
+                    <div class="desglose-item">
+                        <span class="label">Promedio Semanal:</span>
+                        <span class="valor">${deuda.promedio_semanal}h/sem</span>
+                    </div>
+                    <div class="desglose-item ${tieneDeuda ? 'error' : 'success'}">
+                        <span class="label">Horas Faltantes:</span>
+                        <span class="valor">${deuda.horas_faltantes}h</span>
+                    </div>
+                    <div class="desglose-item">
+                        <span class="label">Costo por Hora:</span>
+                        <span class="valor">$${deuda.costo_por_hora}</span>
+                    </div>
+                </div>
+                
+                <div class="deuda-progreso">
+                    <div class="progreso-header">
+                        <span>Progreso Mensual</span>
+                        <span class="porcentaje">${deuda.porcentaje_cumplido}%</span>
+                    </div>
+                    <div class="barra-progreso">
+                        <div class="barra-fill" style="width: ${Math.min(deuda.porcentaje_cumplido, 100)}%; 
+                             background: ${deuda.porcentaje_cumplido >= 100 ? '#4caf50' : 
+                                          deuda.porcentaje_cumplido >= 50 ? '#ff9800' : '#f44336'}">
+                        </div>
+                    </div>
+                </div>
+                
+                ${deuda.deuda_acumulada > 0 ? `
+                    <div class="alert-warning" style="margin-top: 15px;">
+                        <strong>⚠️ Deuda Acumulada:</strong>
+                        <p>$${parseFloat(deuda.deuda_acumulada).toLocaleString('es-UY', {minimumFractionDigits: 2})} 
+                        de meses anteriores</p>
+                    </div>
+                ` : ''}
+                
+                ${tieneDeuda ? `
+                    <div class="alert-info" style="margin-top: 15px;">
+                        <strong>ℹ️ Información:</strong>
+                        <p>Esta deuda se sumará automáticamente a tu próxima cuota mensual de vivienda.</p>
+                        <p>Sistema: <strong>21 horas semanales</strong> (84h mensuales).</p>
+                    </div>
+                ` : `
+                    <div class="alert-success" style="margin-top: 15px;">
+                        <strong>🎉 ¡Excelente!</strong>
+                        <p>Has cumplido con tus horas requeridas. No tendrás cargos adicionales en tu cuota.</p>
+                    </div>
+                `}
+            </div>
+        </div>
+    `;
+}
+
+function getNombreMes(mes) {
+    const meses = [
+        'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+        'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+    ];
+    return meses[parseInt(mes) - 1] || mes;
+}
+
 // ========== INICIALIZAR SECCIÓN ==========
 async function inicializarSeccionHoras() {
     console.log('🔄 Inicializando sección de horas');
@@ -714,7 +842,8 @@ async function inicializarSeccionHoras() {
         await Promise.all([
             loadResumenSemanal(),
             loadMisRegistros(),
-            cargarEstadisticas()
+            cargarEstadisticas(),
+            cargarDeudaHorasWidget() // ✅ AGREGAR ESTA LÍNEA
         ]);
 
         console.log('✅ Sección inicializada correctamente');
@@ -2185,9 +2314,7 @@ function renderCuotaCard(cuota) {
                     </button>
                 ` : ''}
                 
-                <button class="btn btn-secondary btn-small" onclick="verDetalleCuota(${cuota.id_cuota})">
-                    <i class="fas fa-info-circle"></i> Detalles
-                </button>
+               
             </div>
         </div>
     `;
@@ -3099,6 +3226,21 @@ function obtenerNombreMes(mes) {
     ];
     return meses[parseInt(mes) - 1] || mes;
 }
+
+
+// Mostrar nombre del archivo seleccionado
+document.getElementById('pagar-comprobante')?.addEventListener('change', function(e) {
+    const fileName = e.target.files[0]?.name || '';
+    const fileNameDisplay = document.getElementById('file-name');
+    if (fileNameDisplay) {
+        if (fileName) {
+            fileNameDisplay.textContent = '📎 Archivo seleccionado: ' + fileName;
+            fileNameDisplay.style.color = '#4caf50';
+        } else {
+            fileNameDisplay.textContent = '';
+        }
+    }
+});
 
 // Exportar funciones
 window.cargarDeudaHoras = cargarDeudaHoras;
