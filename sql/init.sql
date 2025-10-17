@@ -362,7 +362,8 @@ CREATE TABLE IF NOT EXISTS Registro_Horas (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ==========================================
--- SISTEMA DE CUOTAS MENSUALES (CORREGIDO)
+-- SISTEMA DE CUOTAS MENSUALES (ACTUALIZADO)
+-- 21 HORAS SEMANALES (84h MENSUALES) + SOLO TRANSFERENCIA
 -- ==========================================
 
 -- Tabla de configuración de precios
@@ -401,8 +402,8 @@ CREATE TABLE Cuotas_Mensuales (
     fecha_vencimiento DATE NOT NULL,
     fecha_generacion DATETIME DEFAULT CURRENT_TIMESTAMP,
     
-    -- Control de horas
-    horas_requeridas DECIMAL(5,2) DEFAULT 21.00,
+    -- ⭐ CAMBIO: Control de horas SEMANALES (21h × 4 semanas = 84h mensuales)
+    horas_requeridas DECIMAL(5,2) DEFAULT 84.00 COMMENT '21 horas semanales × 4 semanas = 84 horas mensuales',
     horas_cumplidas DECIMAL(5,2) DEFAULT 0.00,
     horas_validadas BOOLEAN DEFAULT FALSE,
     
@@ -460,29 +461,30 @@ INNER JOIN Viviendas v ON cm.id_vivienda = v.id_vivienda
 INNER JOIN Tipo_Vivienda tv ON v.id_tipo = tv.id_tipo
 LEFT JOIN Pagos_Cuotas pc ON cm.id_cuota = pc.id_cuota AND pc.estado_validacion != 'rechazado';
 
--- Tabla de pagos de cuotas
+-- ⭐ CAMBIO: Tabla de pagos de cuotas - SOLO TRANSFERENCIA
 CREATE TABLE IF NOT EXISTS Pagos_Cuotas (
     id_pago INT PRIMARY KEY AUTO_INCREMENT,
     id_cuota INT NOT NULL,
     id_usuario INT NOT NULL,
     monto_pagado DECIMAL(10,2) NOT NULL,
-    metodo_pago ENUM('transferencia', 'deposito', 'cheque', 'efectivo') DEFAULT 'transferencia',
-    comprobante_archivo VARCHAR(200),
-    numero_comprobante VARCHAR(50),
+    metodo_pago ENUM('transferencia') DEFAULT 'transferencia' COMMENT 'Solo se acepta transferencia bancaria',
+    comprobante_archivo VARCHAR(200) NOT NULL COMMENT 'Comprobante de transferencia obligatorio',
+    numero_comprobante VARCHAR(50) COMMENT 'Número de referencia de la transferencia',
     fecha_pago DATETIME DEFAULT CURRENT_TIMESTAMP,
     estado_validacion ENUM('pendiente', 'aprobado', 'rechazado') DEFAULT 'pendiente',
     observaciones_validacion TEXT,
     fecha_validacion DATETIME NULL,
-    incluye_deuda_horas TINYINT(1) DEFAULT 0,
-    monto_deuda_horas DECIMAL(10,2) DEFAULT 0.00,
+    incluye_deuda_horas TINYINT(1) DEFAULT 0 COMMENT 'Indica si el pago incluye deuda de horas no trabajadas',
+    monto_deuda_horas DECIMAL(10,2) DEFAULT 0.00 COMMENT 'Monto específico de deuda por horas (84h mensuales requeridas)',
     FOREIGN KEY (id_cuota) REFERENCES Cuotas_Mensuales(id_cuota) ON DELETE CASCADE,
     FOREIGN KEY (id_usuario) REFERENCES Usuario(id_usuario),
     INDEX idx_cuota (id_cuota),
-    INDEX idx_estado (estado_validacion)
+    INDEX idx_estado (estado_validacion),
+    INDEX idx_fecha_pago (fecha_pago)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ==========================================
--- PROCEDIMIENTO ALMACENADO
+-- PROCEDIMIENTO ALMACENADO (ACTUALIZADO)
 -- ==========================================
 
 DROP PROCEDURE IF EXISTS GenerarCuotasMensuales;
@@ -555,12 +557,13 @@ BEGIN
         AND estado != 'pagada'
         AND (anio < p_anio OR (anio = p_anio AND mes < p_mes));
         
+        -- ⭐ CAMBIO: Insertar con 84.00 horas requeridas (21h semanales × 4 semanas)
         INSERT INTO Cuotas_Mensuales 
             (id_usuario, id_vivienda, mes, anio, monto, monto_pendiente_anterior, 
              fecha_vencimiento, horas_requeridas, estado)
         VALUES 
             (v_id_usuario, v_id_vivienda, p_mes, p_anio, v_monto_base, v_deuda_anterior,
-             v_fecha_vencimiento, 21.00, 'pendiente');
+             v_fecha_vencimiento, 84.00, 'pendiente');
         
     END LOOP;
     
@@ -608,6 +611,7 @@ AFTER UPDATE ON Registro_Horas
 FOR EACH ROW
 BEGIN
     IF NEW.estado = 'aprobado' AND OLD.estado != 'aprobado' THEN
+        -- Actualizar horas cumplidas en la cuota correspondiente
         UPDATE Cuotas_Mensuales
         SET horas_cumplidas = (
             SELECT COALESCE(SUM(total_horas), 0)
@@ -645,3 +649,107 @@ BEGIN
 END//
 
 DELIMITER ;
+
+-- ==========================================
+-- ACTUALIZAR DATOS EXISTENTES (SI LOS HAY)
+-- ==========================================
+
+-- Actualizar cuotas existentes con horas_requeridas = 21 a 84
+UPDATE Cuotas_Mensuales 
+SET horas_requeridas = 84.00 
+WHERE horas_requeridas = 21.00 
+AND estado != 'pagada';
+
+-- Actualizar pagos existentes a transferencia (si tienen otro método)
+UPDATE Pagos_Cuotas 
+SET metodo_pago = 'transferencia' 
+WHERE metodo_pago != 'transferencia';
+
+-- ==========================================
+-- COMENTARIOS ADICIONALES
+-- ==========================================
+
+-- Agregar comentarios descriptivos
+ALTER TABLE Cuotas_Mensuales 
+MODIFY COLUMN horas_requeridas DECIMAL(5,2) DEFAULT 84.00 
+COMMENT '21 horas semanales × 4 semanas = 84 horas mensuales requeridas';
+
+ALTER TABLE Pagos_Cuotas
+MODIFY COLUMN metodo_pago ENUM('transferencia') DEFAULT 'transferencia' 
+COMMENT 'Solo se acepta transferencia bancaria como método de pago';
+
+ALTER TABLE Pagos_Cuotas
+MODIFY COLUMN monto_deuda_horas DECIMAL(10,2) DEFAULT 0.00 
+COMMENT 'Deuda por horas no trabajadas: (84h - horas_cumplidas) × $160';
+
+-- ==========================================
+-- VERIFICACIONES
+-- ==========================================
+
+-- Verificar configuración de precios
+SELECT 
+    tv.nombre as 'Tipo Vivienda',
+    tv.habitaciones as 'Habitaciones',
+    cc.monto_mensual as 'Cuota Mensual',
+    cc.activo as 'Activo'
+FROM Config_Cuotas cc
+INNER JOIN Tipo_Vivienda tv ON cc.id_tipo = tv.id_tipo
+WHERE cc.activo = TRUE
+ORDER BY tv.habitaciones;
+
+-- Verificar horas requeridas en cuotas
+SELECT 
+    DISTINCT horas_requeridas as 'Horas Requeridas',
+    COUNT(*) as 'Cantidad de Cuotas'
+FROM Cuotas_Mensuales
+GROUP BY horas_requeridas;
+
+-- Verificar métodos de pago
+SELECT 
+    DISTINCT metodo_pago as 'Método de Pago',
+    COUNT(*) as 'Cantidad de Pagos'
+FROM Pagos_Cuotas
+GROUP BY metodo_pago;
+
+-- ==========================================
+-- DOCUMENTACIÓN
+-- ==========================================
+
+/*
+SISTEMA DE CUOTAS - CONFIGURACIÓN ACTUALIZADA
+
+1. HORAS DE TRABAJO:
+   - Sistema: SEMANAL
+   - Requerido: 21 horas por semana
+   - Mensual: 84 horas (21h × 4 semanas)
+   - Penalización: $160 por cada hora no trabajada
+
+2. MÉTODO DE PAGO:
+   - Único método aceptado: TRANSFERENCIA BANCARIA
+   - Comprobante: OBLIGATORIO (imagen o PDF)
+   - Validación: Por administrador
+
+3. ESTRUCTURA DE PAGO:
+   - Cuota base: Según tipo de vivienda
+   - Deuda de horas: (84 - horas_trabajadas) × $160
+   - Deuda anterior: Cuotas no pagadas de meses previos
+   - TOTAL = cuota_base + deuda_horas + deuda_anterior
+
+4. FLUJO DE PAGO:
+   a. Usuario completa 84h mensuales (21h/semana)
+   b. Del día 25 al último del mes: período de pago habilitado
+   c. Usuario realiza transferencia y sube comprobante
+   d. Admin valida el pago
+   e. Sistema marca cuota como pagada
+   f. Si incluía deuda_horas, se salda automáticamente
+
+5. PRECIOS INICIALES:
+   - Mono-ambiente (1 hab): $5,000
+   - 2 Dormitorios: $7,500
+   - 3 Dormitorios: $10,000
+
+6. GENERACIÓN AUTOMÁTICA:
+   - Evento: Primer día de cada mes a las 00:01
+   - Procedimiento: GenerarCuotasMensuales
+   - Usuarios: Solo con vivienda activa y estado 'aceptado'
+*/

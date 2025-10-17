@@ -8,6 +8,9 @@ use PDO;
 class Cuota
 {
     private $conn;
+    
+    // ⭐ SISTEMA SEMANAL: 21h/semana × 4 semanas = 84h mensuales
+    private $horas_mensuales_requeridas = 84;
 
     public function __construct()
     {
@@ -56,57 +59,90 @@ class Cuota
     }
 
     /**
-     * Obtener cuotas del usuario (USA VISTA)
+     * Obtener cuotas del usuario
      */
     public function getCuotasUsuario($idUsuario, $filtros = [])
     {
         try {
-        $sql = "
-            SELECT 
-                cm.*,
-                cm.monto as monto_base,  -- ✅ AGREGAR ESTO
-                (cm.monto + COALESCE(
-                    (SELECT SUM(monto_deuda_horas) 
-                     FROM Pagos_Cuotas 
-                     WHERE id_cuota = cm.id_cuota 
-                     AND estado_validacion = 'aprobado' 
-                     AND incluye_deuda_horas = TRUE
-                     LIMIT 1), 0)
-                ) as monto_total,
-                vc.*
-            FROM Cuotas_Mensuales cm
-            INNER JOIN Vista_Cuotas_Completa vc ON cm.id_cuota = vc.id_cuota
-            WHERE vc.id_usuario = :id_usuario
-        ";
+            $params = ['id_usuario' => $idUsuario];
+            
+            $sql = "
+                SELECT 
+                    cm.id_cuota,
+                    cm.id_usuario,
+                    cm.id_vivienda,
+                    cm.mes,
+                    cm.anio,
+                    cm.monto,
+                    cm.monto as monto_base,
+                    cm.monto_pendiente_anterior,
+                    (cm.monto + cm.monto_pendiente_anterior) as monto_total,
+                    cm.estado,
+                    cm.fecha_vencimiento,
+                    cm.fecha_generacion,
+                    cm.horas_requeridas,
+                    cm.horas_cumplidas,
+                    cm.horas_validadas,
+                    cm.observaciones,
+                    v.numero_vivienda,
+                    tv.nombre as tipo_vivienda,
+                    tv.habitaciones,
+                    u.nombre_completo,
+                    u.email,
+                    pc.id_pago,
+                    pc.monto_pagado,
+                    pc.fecha_pago,
+                    pc.comprobante_archivo,
+                    pc.estado_validacion as estado_pago,
+                    pc.observaciones_validacion,
+                    CASE 
+                        WHEN cm.fecha_vencimiento < CURDATE() AND cm.estado = 'pendiente' THEN 'vencida'
+                        ELSE cm.estado
+                    END as estado_actual
+                FROM Cuotas_Mensuales cm
+                INNER JOIN Viviendas v ON cm.id_vivienda = v.id_vivienda
+                INNER JOIN Tipo_Vivienda tv ON v.id_tipo = tv.id_tipo
+                INNER JOIN Usuario u ON cm.id_usuario = u.id_usuario
+                LEFT JOIN Pagos_Cuotas pc ON cm.id_cuota = pc.id_cuota AND pc.estado_validacion != 'rechazado'
+                WHERE cm.id_usuario = :id_usuario
+            ";
             
             if (!empty($filtros['mes'])) {
-                $sql .= " AND mes = :mes";
+                $sql .= " AND cm.mes = :mes";
                 $params['mes'] = $filtros['mes'];
             }
             
             if (!empty($filtros['anio'])) {
-                $sql .= " AND anio = :anio";
+                $sql .= " AND cm.anio = :anio";
                 $params['anio'] = $filtros['anio'];
             }
             
             if (!empty($filtros['estado'])) {
                 if ($filtros['estado'] === 'vencida') {
-                    $sql .= " AND estado_actual = 'vencida'";
+                    $sql .= " AND cm.fecha_vencimiento < CURDATE() AND cm.estado = 'pendiente'";
                 } else {
-                    $sql .= " AND estado = :estado";
+                    $sql .= " AND cm.estado = :estado";
                     $params['estado'] = $filtros['estado'];
                 }
             }
             
-            $sql .= " ORDER BY anio DESC, mes DESC";
+            $sql .= " ORDER BY cm.anio DESC, cm.mes DESC";
+            
+            error_log("📊 SQL: " . $sql);
+            error_log("📊 Params: " . json_encode($params));
             
             $stmt = $this->conn->prepare($sql);
             $stmt->execute($params);
             
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $resultado = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            error_log("📊 Cuotas encontradas: " . count($resultado));
+            
+            return $resultado;
             
         } catch (\PDOException $e) {
-            error_log("Error en getCuotasUsuario: " . $e->getMessage());
+            error_log("❌ Error en getCuotasUsuario: " . $e->getMessage());
+            error_log("❌ SQL: " . ($sql ?? 'N/A'));
+            error_log("❌ Params: " . json_encode($params ?? []));
             return [];
         }
     }
@@ -212,6 +248,7 @@ class Cuota
 
     /**
      * Registrar pago de cuota
+     * ⭐ SOLO TRANSFERENCIA BANCARIA
      */
     public function registrarPago(
         $cuotaId, 
@@ -240,6 +277,11 @@ class Cuota
                 throw new \Exception('Esta cuota ya está pagada');
             }
             
+            // ⭐ VALIDAR: Solo transferencia
+            if ($metodoPago !== 'transferencia') {
+                throw new \Exception('Método de pago inválido. Solo se acepta transferencia bancaria.');
+            }
+            
             $stmt = $this->conn->prepare("
                 INSERT INTO Pagos_Cuotas 
                 (id_cuota, id_usuario, monto_pagado, metodo_pago, comprobante_archivo, 
@@ -253,7 +295,7 @@ class Cuota
                 'id_cuota' => $cuotaId,
                 'id_usuario' => $idUsuario,
                 'monto_pagado' => $montoPagado,
-                'metodo_pago' => $metodoPago,
+                'metodo_pago' => 'transferencia', // Forzar transferencia
                 'comprobante_archivo' => $comprobanteArchivo,
                 'numero_comprobante' => $numeroComprobante,
                 'incluye_deuda_horas' => $incluyeDeudaHoras ? 1 : 0,
@@ -383,6 +425,156 @@ class Cuota
             return [
                 'success' => false,
                 'message' => 'Error al actualizar precio'
+            ];
+        }
+    }
+
+    /**
+     * Generar cuota individual del mes para un usuario específico
+     */
+    public function generarCuotaIndividual($idUsuario, $mes, $anio)
+    {
+        try {
+            error_log("📄 [generarCuotaIndividual] Usuario: $idUsuario | Mes: $mes | Año: $anio");
+
+            // 1. Verificar si ya existe
+            $cuotasExistentes = $this->getCuotasUsuario($idUsuario, [
+                'mes' => $mes,
+                'anio' => $anio
+            ]);
+
+            if (count($cuotasExistentes) > 0) {
+                error_log("📄 Cuota ya existe: " . $cuotasExistentes[0]['id_cuota']);
+                $cuota = $cuotasExistentes[0];
+                $cuota['monto_base'] = $cuota['monto'];
+                
+                return [
+                    'success' => true,
+                    'message' => 'La cuota del mes ya existe',
+                    'cuota_id' => $cuota['id_cuota'],
+                    'cuota' => $cuota
+                ];
+            }
+
+            // 2. Obtener vivienda del usuario
+            $stmtVivienda = $this->conn->prepare("
+                SELECT DISTINCT av.id_vivienda, v.id_tipo
+                FROM Asignacion_Vivienda av
+                INNER JOIN Viviendas v ON av.id_vivienda = v.id_vivienda
+                INNER JOIN Usuario u ON (av.id_usuario = u.id_usuario OR av.id_nucleo = u.id_nucleo)
+                WHERE u.id_usuario = :id_usuario
+                AND av.activa = TRUE
+                LIMIT 1
+            ");
+            $stmtVivienda->execute(['id_usuario' => $idUsuario]);
+            $vivienda = $stmtVivienda->fetch(\PDO::FETCH_ASSOC);
+
+            if (!$vivienda) {
+                return [
+                    'success' => false,
+                    'message' => 'No tienes una vivienda asignada. Contacta al administrador.'
+                ];
+            }
+
+            // 3. Obtener precio del tipo de vivienda
+            $stmtPrecio = $this->conn->prepare("
+                SELECT monto_mensual
+                FROM Config_Cuotas
+                WHERE id_tipo = :id_tipo
+                AND activo = TRUE
+                LIMIT 1
+            ");
+            $stmtPrecio->execute(['id_tipo' => $vivienda['id_tipo']]);
+            $config = $stmtPrecio->fetch(\PDO::FETCH_ASSOC);
+
+            if (!$config) {
+                return [
+                    'success' => false,
+                    'message' => 'No se encontró configuración de precio para tu vivienda'
+                ];
+            }
+
+            $montoCuota = floatval($config['monto_mensual']);
+            error_log("📄 Monto cuota base: $montoCuota");
+
+            // 4. Calcular deuda acumulada
+            $stmtDeuda = $this->conn->prepare("
+                SELECT COALESCE(SUM(monto + monto_pendiente_anterior), 0) as deuda_anterior
+                FROM Cuotas_Mensuales
+                WHERE id_usuario = :id_usuario
+                AND estado != 'pagada'
+                AND (anio < :anio OR (anio = :anio AND mes < :mes))
+            ");
+            $stmtDeuda->execute([
+                'id_usuario' => $idUsuario,
+                'mes' => $mes,
+                'anio' => $anio
+            ]);
+            $deudaAnterior = floatval($stmtDeuda->fetchColumn());
+            error_log("📄 Deuda anterior: $deudaAnterior");
+
+            // 5. Fecha de vencimiento
+            $fechaVencimiento = date('Y-m-t', strtotime("$anio-$mes-01"));
+
+            // 6. Insertar cuota con 84 horas requeridas
+            $stmtInsert = $this->conn->prepare("
+                INSERT INTO Cuotas_Mensuales 
+                (id_usuario, id_vivienda, mes, anio, monto, monto_pendiente_anterior, 
+                 fecha_vencimiento, horas_requeridas, estado)
+                VALUES 
+                (:id_usuario, :id_vivienda, :mes, :anio, :monto, :deuda_anterior,
+                 :fecha_venc, 84.00, 'pendiente')
+            ");
+
+            $insertSuccess = $stmtInsert->execute([
+                'id_usuario' => $idUsuario,
+                'id_vivienda' => $vivienda['id_vivienda'],
+                'mes' => $mes,
+                'anio' => $anio,
+                'monto' => $montoCuota,
+                'deuda_anterior' => $deudaAnterior,
+                'fecha_venc' => $fechaVencimiento
+            ]);
+
+            if (!$insertSuccess) {
+                error_log("❌ Error al insertar: " . print_r($stmtInsert->errorInfo(), true));
+                return [
+                    'success' => false,
+                    'message' => 'Error al crear la cuota en la base de datos'
+                ];
+            }
+
+            $nuevaCuotaId = $this->conn->lastInsertId();
+            error_log("✅ Cuota creada con ID: $nuevaCuotaId");
+
+            // 7. Recuperar cuota completa
+            $cuotaCreada = $this->getCuotaById($nuevaCuotaId);
+            
+            if ($cuotaCreada) {
+                if (!isset($cuotaCreada['monto_base'])) {
+                    $cuotaCreada['monto_base'] = $cuotaCreada['monto'];
+                }
+                
+                return [
+                    'success' => true,
+                    'message' => 'Cuota generada correctamente',
+                    'cuota' => $cuotaCreada,
+                    'cuota_id' => $nuevaCuotaId
+                ];
+            } else {
+                return [
+                    'success' => false,
+                    'message' => 'Cuota creada pero no se pudo recuperar',
+                    'cuota_id' => $nuevaCuotaId
+                ];
+            }
+
+        } catch (\PDOException $e) {
+            error_log("❌ Exception en generarCuotaIndividual: " . $e->getMessage());
+            error_log("Stack: " . $e->getTraceAsString());
+            return [
+                'success' => false,
+                'message' => 'Error al generar cuota: ' . $e->getMessage()
             ];
         }
     }

@@ -430,10 +430,9 @@ switch ($uri) {
     case '/api/cuotas/verificar-cuota-mes':
         (new App\Controllers\CuotaController())->verificarCuotaMes();
         break;
-    case '/api/cuotas/generar-mi-cuota':
-        (new App\Controllers\CuotaController())->generarMiCuota();
-        break;
-   
+   case '/api/cuotas/generar-mi-cuota':
+    (new App\Controllers\CuotaController())->generarMiCuota();
+    break;
     
     case '/api/cuotas/verificar-pago':
         (new App\Controllers\CuotaController())->verificarPagoCuota();

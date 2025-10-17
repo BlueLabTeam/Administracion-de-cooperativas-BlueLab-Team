@@ -272,7 +272,12 @@ public function verificarCuotaMes()
  */
 public function generarMiCuota()
 {
-    header('Content-Type: application/json');
+    // Limpiar output buffer
+    while (ob_get_level() > 0) {
+        ob_end_clean();
+    }
+    
+    header('Content-Type: application/json; charset=utf-8');
 
     if (!isset($_SESSION['user_id'])) {
         http_response_code(401);
@@ -283,75 +288,26 @@ public function generarMiCuota()
     try {
         $mes = intval($_POST['mes'] ?? date('n'));
         $anio = intval($_POST['anio'] ?? date('Y'));
-        $idUsuario = $_SESSION['user_id'];
+        
+        $resultado = $this->cuotaModel->generarCuotaIndividual(
+            $_SESSION['user_id'], 
+            $mes, 
+            $anio
+        );
 
-        error_log("📄 Generando cuota para usuario $idUsuario - Mes: $mes, Año: $anio");
-
-        // ✅ Verificar que el usuario tenga vivienda asignada usando el modelo
-        $vivienda = $this->viviendaModel->getMyVivienda($idUsuario);
-
-        if (!$vivienda || !isset($vivienda['id_vivienda'])) {
-            echo json_encode([
-                'success' => false,
-                'message' => 'No tienes una vivienda asignada. Contacta al administrador.'
-            ]);
-            exit();
-        }
-
-        // ✅ Verificar si ya existe la cuota usando el modelo
-        $cuotasExistentes = $this->cuotaModel->getCuotasUsuario($idUsuario, [
-            'mes' => $mes,
-            'anio' => $anio
-        ]);
-
-        if (count($cuotasExistentes) > 0) {
-            echo json_encode([
-                'success' => true,
-                'message' => 'La cuota del mes ya existe',
-                'cuota_id' => $cuotasExistentes[0]['id_cuota']
-            ]);
-            exit();
-        }
-
-        // ✅ Generar la cuota usando el procedimiento almacenado del modelo
-        $resultado = $this->cuotaModel->generarCuotasMensuales($mes, $anio);
-
-        if ($resultado['success']) {
-            // Obtener la cuota recién creada
-            $cuotasNuevas = $this->cuotaModel->getCuotasUsuario($idUsuario, [
-                'mes' => $mes,
-                'anio' => $anio
-            ]);
-
-            if (count($cuotasNuevas) > 0) {
-                echo json_encode([
-                    'success' => true,
-                    'message' => 'Cuota generada correctamente',
-                    'cuota' => $cuotasNuevas[0]
-                ]);
-            } else {
-                echo json_encode([
-                    'success' => false,
-                    'message' => 'Cuota generada pero no encontrada'
-                ]);
-            }
-        } else {
-            echo json_encode($resultado);
-        }
+        echo json_encode($resultado);
 
     } catch (\Exception $e) {
         error_log("❌ Error en generarMiCuota: " . $e->getMessage());
-        error_log("Stack trace: " . $e->getTraceAsString());
         http_response_code(500);
         echo json_encode([
             'success' => false,
-            'message' => 'Error al generar cuota: ' . $e->getMessage()
+            'message' => 'Error al generar cuota'
         ]);
     }
+    
     exit();
 }
-
-
     // ========================================
     // FUNCIONES DE ADMINISTRADOR
     // ========================================
