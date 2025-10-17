@@ -74,6 +74,8 @@ services:
       - db_data_slave:/var/lib/mysql
       - ./docker/db/slave/config/:/etc/mysql/conf.d
       - ./docker/db/slave/init-slave.sh:/docker-entrypoint-initdb.d/init-slave.sh
+      - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./sql/seeds.sql:/docker-entrypoint-initdb.d/seeds.sql
 
 volumes:
   db_data:
