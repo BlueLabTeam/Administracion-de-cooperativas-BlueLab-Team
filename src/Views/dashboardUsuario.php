@@ -24,6 +24,8 @@ if (!isset($_SESSION['user_id'])) {
 	<link rel="stylesheet" href="/assets/css/dashboardUtils.css" />
 	<link rel="stylesheet" href="/assets/css/dashboardViviendas.css" />
 	<link rel="stylesheet" href="/assets/css/dashboardCuotas.css" />
+	<link rel="stylesheet" href="/assets/css/dashboardPagos.css" />
+	
 </head>
 
 <body>

@@ -1,6 +1,6 @@
 /* ==========================================
-   DEUDA TOTAL - VERSIÓN OPTIMIZADA COMPLETA
-   Colores: Azul (#329cef, #320a95) y Blanco
+   DEUDA TOTAL - VERSIÓN MEJORADA
+   Colores: Azul (#0066cc, #0054AA, #003d82) y Blanco
    ========================================== */
 
 /* ========== ESTADÍSTICAS DE CUOTAS ========== */
@@ -25,7 +25,7 @@
 
 .stat-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(50, 156, 239, 0.15);
+    box-shadow: 0 4px 12px rgba(0, 102, 204, 0.15);
 }
 
 .stat-card.pendiente {
@@ -84,19 +84,41 @@
 .stat-value {
     font-size: 28px;
     font-weight: bold;
-    color: #320a95;
+    color: #0054AA;
     margin: 0;
 }
 
-/* ========== DEUDA TOTAL DESTACADA ========== */
+/* ========== DEUDA TOTAL DESTACADA - MEJORADA ========== */
 .deuda-total-destacada {
-    background: linear-gradient(135deg, #329cef 0%, #320a95 100%);
-    border-radius: 16px;
-    padding: 30px;
+    background: linear-gradient(135deg, #0e75db 0%, #084e9e 100%);
+    border-radius: 20px;
+    padding: 35px;
     margin-bottom: 40px;
-    box-shadow: 0 10px 40px rgba(50, 156, 239, 0.3);
+    box-shadow: 0 10px 40px rgba(0, 102, 204, 0.3);
     color: white;
     animation: slideInDown 0.6s ease-out;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Efecto de brillo sutil */
+.deuda-total-destacada::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.deuda-total-destacada.pagada-mes {
+    background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+}
+
+.deuda-total-destacada.periodo-bloqueado {
+    background: linear-gradient(135deg, #607d8b 0%, #455a64 100%);
 }
 
 @keyframes slideInDown {
@@ -115,18 +137,21 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 30px;
-    padding-bottom: 20px;
+    padding-bottom: 25px;
     border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+    position: relative;
+    z-index: 1;
 }
 
 .deuda-total-header h2 {
     margin: 0;
-    font-size: 24px;
+    font-size: 26px;
     display: flex;
     align-items: center;
     gap: 12px;
     color: white;
     font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .deuda-total-header h2 i {
@@ -139,129 +164,160 @@
         transform: scale(1);
     }
     50% {
-        opacity: 0.7;
+        opacity: 0.8;
         transform: scale(1.1);
     }
 }
 
 .deuda-total-badge {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.25);
     backdrop-filter: blur(10px);
-    padding: 8px 20px;
+    padding: 10px 24px;
     border-radius: 50px;
     font-weight: bold;
-    font-size: 12px;
+    font-size: 13px;
     letter-spacing: 1px;
-    border: 2px solid rgba(255, 255, 255, 0.3);
+    border: 2px solid rgba(255, 255, 255, 0.4);
     color: white;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    text-transform: uppercase;
+}
+
+.deuda-total-badge.badge-pagada {
+    background: rgba(76, 175, 80, 0.3);
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+.deuda-total-badge.badge-requerida {
+    background: rgba(255, 152, 0, 0.3);
+    border-color: rgba(255, 152, 0, 0.5);
+    animation: blink 2s infinite;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+.deuda-total-badge.badge-bloqueado {
+    background: rgba(96, 125, 139, 0.3);
+    border-color: rgba(255, 255, 255, 0.3);
 }
 
 .deuda-total-body {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.12);
     backdrop-filter: blur(10px);
-    border-radius: 12px;
-    padding: 25px;
+    border-radius: 16px;
+    padding: 30px;
+    position: relative;
+    z-index: 1;
+    box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-/* ========== DESGLOSE DE DEUDA ========== */
+/* ========== DESGLOSE DE DEUDA - MEJORADO ========== */
 .deuda-breakdown {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr auto 1fr;
     align-items: center;
-    gap: 20px;
+    gap: 25px;
     margin-bottom: 30px;
-    flex-wrap: wrap;
 }
 
 .deuda-breakdown-item {
-    flex: 1;
-    min-width: 200px;
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(5px);
-    padding: 20px;
-    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(8px);
+    padding: 25px;
+    border-radius: 16px;
     display: flex;
-    gap: 15px;
-    align-items: flex-start;
-    border: 2px solid rgba(255, 255, 255, 0.1);
+    flex-direction: column;
+    gap: 12px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
     transition: all 0.3s ease;
+    text-align: center;
 }
 
 .deuda-breakdown-item:hover {
-    background: rgba(255, 255, 255, 0.15);
-    border-color: rgba(255, 255, 255, 0.3);
-    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
 }
 
 .deuda-breakdown-item i {
-    font-size: 24px;
-    color: rgba(255, 255, 255, 0.9);
-    margin-top: 5px;
-}
-
-.deuda-breakdown-item > div {
-    flex: 1;
+    font-size: 36px;
+    color: white;
+    margin-bottom: 8px;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
 }
 
 .deuda-breakdown-item .deuda-label {
-    display: block;
-    font-size: 13px;
-    color: rgba(255, 255, 255, 0.8);
-    margin-bottom: 8px;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.85);
     text-transform: uppercase;
     font-weight: 600;
+    letter-spacing: 1px;
 }
 
 .deuda-breakdown-item .deuda-monto {
-    display: block;
-    font-size: 24px;
+    font-size: 28px;
     font-weight: bold;
     color: white;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .deuda-breakdown-item.deuda-horas {
-    border-color: rgba(255, 152, 0, 0.5);
+    border-color: rgba(255, 183, 77, 0.5);
+    background: rgba(255, 152, 0, 0.15);
 }
 
-.deuda-breakdown-item.deuda-horas .deuda-monto {
+.deuda-breakdown-item.deuda-horas i {
     color: #ffb74d;
 }
 
+.deuda-breakdown-item.deuda-horas .deuda-monto.error {
+    color: #ffb74d;
+}
+
+.deuda-breakdown-item.deuda-horas .deuda-monto.success {
+    color: #a5d6a7;
+}
+
 .deuda-breakdown-item.deuda-total {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.25);
     border: 3px solid white;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
 }
 
 .deuda-breakdown-item .deuda-monto-total {
-    display: block;
-    font-size: 32px;
+    font-size: 36px;
     font-weight: bold;
     color: white;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    text-shadow: 0 3px 10px rgba(0, 0, 0, 0.4);
 }
 
 .deuda-breakdown-divider {
-    font-size: 32px;
+    font-size: 40px;
     font-weight: bold;
     color: rgba(255, 255, 255, 0.6);
-    flex: 0 0 auto;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-/* ========== BOTÓN PAGAR ========== */
+/* ========== BOTÓN PAGAR - MEJORADO ========== */
 .deuda-total-actions {
     display: flex;
     gap: 15px;
-    margin-top: 25px;
+    margin-top: 30px;
     flex-wrap: wrap;
 }
 
 .btn-pagar-deuda-total {
     flex: 1;
-    min-width: 200px;
-    padding: 18px 30px;
+    min-width: 220px;
+    padding: 20px 35px;
     background: white;
-    color: #329cef;
+    color: #0066cc;
     border: none;
-    border-radius: 12px;
+    border-radius: 14px;
     font-size: 18px;
     font-weight: bold;
     cursor: pointer;
@@ -270,97 +326,194 @@
     justify-content: center;
     gap: 12px;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
     position: relative;
     overflow: hidden;
 }
 
+.btn-pagar-deuda-total::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(0, 102, 204, 0.1);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.btn-pagar-deuda-total:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
 .btn-pagar-deuda-total:hover {
-    background: #f0f0f0;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    background: #f0f7ff;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
 }
 
 .btn-pagar-deuda-total:active {
-    transform: translateY(0);
+    transform: translateY(-1px);
+}
+
+.btn-pagar-deuda-total:disabled {
+    background: rgba(255, 255, 255, 0.5);
+    color: rgba(0, 102, 204, 0.5);
+    cursor: not-allowed;
+    transform: none;
 }
 
 .btn-pagar-deuda-total i {
-    font-size: 20px;
+    font-size: 22px;
+    position: relative;
+    z-index: 1;
 }
 
-/* ========== MODAL BREAKDOWN ========== */
-.pago-total-breakdown {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+.btn-pagar-deuda-total span {
+    position: relative;
+    z-index: 1;
 }
 
-.breakdown-section {
-    background: #f5f5f5;
-    padding: 20px;
-    border-radius: 12px;
-    border-left: 4px solid #329cef;
-    transition: all 0.3s ease;
-}
-
-.breakdown-section:hover {
-    background: #f0f0f0;
-    transform: translateX(5px);
-}
-
-.breakdown-section h5 {
-    margin: 0 0 15px 0;
-    color: #320a95;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+/* Botón secundario mejorado */
+.deuda-total-actions .btn-secondary {
+    flex: 0 0 auto;
+    min-width: 160px;
+    background: rgba(255, 255, 255, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 20px 30px;
+    border-radius: 14px;
     font-size: 16px;
+    font-weight: 600;
+    backdrop-filter: blur(10px);
+}
+
+.deuda-total-actions .btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-2px);
+}
+
+/* ========== PROGRESO DE HORAS - MEJORADO ========== */
+.cuota-horas-progress {
+    margin-top: 25px;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+}
+
+.cuota-horas-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.95);
     font-weight: 600;
 }
 
-.breakdown-section.deuda-section {
-    border-left-color: #ff9800;
-    background: #fff8f0;
+.cuota-progress-bar-container {
+    width: 100%;
+    height: 35px;
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.3);
+    border: 2px solid rgba(255, 255, 255, 0.1);
 }
 
-.breakdown-section.total-section {
-    border-left-color: #4caf50;
-    background: #e8f5e9;
-}
-
-.monto-total-grande {
-    text-align: center;
-    font-size: 42px;
+.cuota-progress-bar-fill {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
     font-weight: bold;
-    color: #320a95;
-    padding: 20px;
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    border: 2px solid #329cef;
-}
-
-.cuota-desglose {
-    margin-top: 8px;
-    padding: 8px 12px;
-    background: rgba(50, 156, 239, 0.1);
-    border-radius: 6px;
-    border-left: 3px solid #329cef;
-    color: #320a95;
     font-size: 14px;
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 18px;
+    background: linear-gradient(90deg, #4caf50 0%, #66bb6a 100%);
+    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.4);
 }
 
-/* ========== FILTROS ========== */
+/* ========== ALERTAS - MEJORADAS ========== */
+.deuda-total-destacada .alert-success {
+    background: rgba(76, 175, 80, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-left: 5px solid #81c784;
+    color: white;
+    padding: 20px;
+    border-radius: 12px;
+    margin-top: 20px;
+    backdrop-filter: blur(10px);
+}
+
+.deuda-total-destacada .alert-success strong {
+    color: #a5d6a7;
+    font-size: 16px;
+}
+
+.deuda-total-destacada .alert-info {
+    background: rgba(33, 150, 243, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-left: 5px solid #64b5f6;
+    color: rgba(255, 255, 255, 0.95);
+    padding: 20px;
+    border-radius: 12px;
+    margin-top: 20px;
+    backdrop-filter: blur(10px);
+}
+
+.deuda-total-destacada .alert-info strong {
+    color: #90caf9;
+    font-size: 16px;
+}
+
+.deuda-total-destacada .alert-warning {
+    background: rgba(255, 152, 0, 0.2);
+    border: 2px solid rgba(255, 183, 77, 0.3);
+    border-left: 5px solid #ffb74d;
+    color: white;
+    padding: 20px;
+    border-radius: 12px;
+    margin-top: 20px;
+    backdrop-filter: blur(10px);
+}
+
+.deuda-total-destacada .alert-warning strong {
+    color: #ffd54f;
+    font-size: 16px;
+}
+
+.deuda-total-destacada .alert-error {
+    background: rgba(244, 67, 54, 0.2);
+    border: 2px solid rgba(239, 83, 80, 0.3);
+    border-left: 5px solid #ef5350;
+    color: white;
+    padding: 20px;
+    border-radius: 12px;
+    margin-top: 20px;
+    backdrop-filter: blur(10px);
+}
+
+.deuda-total-destacada .alert-error strong {
+    color: #ff8a80;
+    font-size: 16px;
+}
+
+/* ========== FILTROS - MEJORADOS ========== */
 .filters-container {
     display: flex;
     gap: 15px;
-    margin-bottom: 25px;
+    margin-bottom: 30px;
     flex-wrap: wrap;
     background: white;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 25px;
+    border-radius: 16px;
+    box-shadow: 0 2px 10px rgba(0, 102, 204, 0.1);
+    border: 1px solid #e3f2fd;
 }
 
 .filter-group {
@@ -369,205 +522,181 @@
 }
 
 .filter-group label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 600;
-    color: #320a95;
-    font-size: 14px;
     display: flex;
     align-items: center;
     gap: 8px;
+    margin-bottom: 10px;
+    font-weight: 600;
+    color: #0054AA;
+    font-size: 14px;
 }
 
 .filter-group label i {
-    color: #329cef;
+    color: #0066cc;
+    font-size: 16px;
 }
 
 .filter-group select {
     width: 100%;
-    padding: 10px;
+    padding: 12px;
     border: 2px solid #e0e0e0;
-    border-radius: 8px;
+    border-radius: 10px;
     font-size: 14px;
     transition: all 0.3s ease;
     color: #333;
+    background: white;
 }
 
 .filter-group select:focus {
     outline: none;
-    border-color: #329cef;
-    box-shadow: 0 0 0 3px rgba(50, 156, 239, 0.1);
+    border-color: #0066cc;
+    box-shadow: 0 0 0 4px rgba(0, 102, 204, 0.1);
 }
 
-/* ========== ALERTAS ========== */
-.deuda-total-destacada .alert-info {
-    background: rgba(255, 255, 255, 0.1);
-    border: 2px solid rgba(255, 255, 255, 0.2);
-    color: white;
-    padding: 15px;
-    border-radius: 8px;
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-}
-
-.deuda-total-destacada .alert-info strong {
-    color: white;
-}
-
-.deuda-total-destacada .alert-info ul {
-    color: rgba(255, 255, 255, 0.9);
-}
-
-.alert-warning {
-    background: #fff3e0;
-    border-left: 4px solid #ff9800;
-    color: #856404;
-}
-
-.alert-warning strong {
-    color: #f57c00;
-}
-
-.alert-success {
-    background: #e8f5e9;
-    border-left: 4px solid #4caf50;
-    color: #1b5e20;
-}
-
-.alert-success strong {
-    color: #2e7d32;
-}
-
-.alert-info {
-    background: #e3f2fd;
-    border-left: 4px solid #329cef;
-    color: #0d47a1;
-}
-
-.alert-info strong {
-    color: #1565c0;
-}
-
-.alert-warning,
-.alert-success,
-.alert-info {
-    padding: 15px 20px;
-    border-radius: 8px;
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-}
-
-/* ========== INFO SECTION ========== */
+/* ========== INFO SECTION - MEJORADA ========== */
 .info-section {
     background: white;
-    border-radius: 12px;
-    padding: 25px;
-    margin-bottom: 25px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    border-left: 4px solid #329cef;
+    border-radius: 16px;
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 10px rgba(0, 102, 204, 0.1);
+    border-left: 5px solid #0066cc;
+    border: 1px solid #e3f2fd;
 }
 
 .info-section h3 {
-    margin: 0 0 15px 0;
-    color: #320a95;
-    font-size: 18px;
+    margin: 0 0 20px 0;
+    color: #0054AA;
+    font-size: 20px;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     font-weight: 700;
 }
 
-/* ========== ANIMACIONES ========== */
-.cuota-card {
-    animation: fadeInUp 0.4s ease-out;
-    animation-fill-mode: both;
+.info-section h3 i {
+    color: #0066cc;
+    font-size: 24px;
 }
 
-.cuota-card:nth-child(1) { animation-delay: 0.05s; }
-.cuota-card:nth-child(2) { animation-delay: 0.1s; }
-.cuota-card:nth-child(3) { animation-delay: 0.15s; }
-.cuota-card:nth-child(4) { animation-delay: 0.2s; }
-.cuota-card:nth-child(5) { animation-delay: 0.25s; }
-.cuota-card:nth-child(6) { animation-delay: 0.3s; }
-
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+/* ========== WIDGET DE DEUDA DE HORAS - MEJORADO ========== */
+.deuda-widget {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fbff 100%);
+    border-radius: 20px;
+    padding: 35px;
+    box-shadow: 0 8px 30px rgba(0, 102, 204, 0.12);
+    margin-bottom: 30px;
+    border: 2px solid #e3f2fd;
+    transition: all 0.3s ease;
 }
 
-/* ========== LOADING Y NO DATA ========== */
-.loading {
+.deuda-widget:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 40px rgba(0, 102, 204, 0.18);
+}
+
+.deuda-widget.success {
+    border-left: 6px solid #4caf50;
+    background: linear-gradient(135deg, #ffffff 0%, #f1f8f4 100%);
+}
+
+.deuda-widget.warning {
+    border-left: 6px solid #ff9800;
+    background: linear-gradient(135deg, #ffffff 0%, #fff8f0 100%);
+}
+
+.deuda-widget.error {
+    border-left: 6px solid #f44336;
+    background: linear-gradient(135deg, #ffffff 0%, #fff5f5 100%);
+}
+
+.deuda-header {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    margin-bottom: 30px;
+    padding-bottom: 25px;
+    border-bottom: 2px solid #e3f2fd;
+}
+
+.deuda-icono {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    color: #0066cc;
+    box-shadow: 0 6px 20px rgba(0, 102, 204, 0.2);
+}
+
+.deuda-widget.success .deuda-icono {
+    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+    color: #4caf50;
+}
+
+.deuda-widget.error .deuda-icono {
+    background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+    color: #f44336;
+}
+
+.deuda-titulo h4 {
+    margin: 0;
+    font-size: 26px;
+    color: #0054AA;
+    font-weight: 700;
+}
+
+.deuda-titulo p {
+    margin: 8px 0 0 0;
+    font-size: 14px;
+    color: #666;
+    font-weight: 600;
+}
+
+.deuda-monto-principal {
+    font-size: 64px;
+    font-weight: bold;
     text-align: center;
     padding: 40px;
-    color: #999;
-    font-size: 16px;
+    margin-bottom: 30px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    box-shadow: inset 0 4px 12px rgba(0, 0, 0, 0.08);
+    border: 2px solid #e0e0e0;
 }
 
-.loading::before {
-    content: '';
-    display: inline-block;
-    width: 30px;
-    height: 30px;
-    border: 3px solid #f3f3f3;
-    border-top: 3px solid #329cef;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin-right: 10px;
-    vertical-align: middle;
+.deuda-monto-principal.success {
+    color: #4caf50;
+    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+    border-color: #a5d6a7;
 }
 
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+.deuda-monto-principal.error {
+    color: #f44336;
+    background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+    border-color: #ef9a9a;
 }
 
-.no-data {
-    text-align: center;
-    padding: 60px 20px;
-    color: #999;
-    background: #fafafa;
-    border-radius: 8px;
-}
-
-.no-data i {
-    display: block;
-    margin-bottom: 15px;
-    font-size: 2em;
-    color: #ddd;
-}
-
-.no-data p {
-    margin: 0;
-    font-size: 16px;
-}
-
-/* ========== RESPONSIVE ========== */
+/* ========== RESPONSIVE - MEJORADO ========== */
 @media (max-width: 992px) {
     .deuda-breakdown {
-        flex-direction: column;
-    }
-    
-    .deuda-breakdown-item {
-        min-width: 100%;
+        grid-template-columns: 1fr;
+        gap: 15px;
     }
     
     .deuda-breakdown-divider {
         transform: rotate(90deg);
-        margin: 10px 0;
+        margin: 0;
     }
 }
 
 @media (max-width: 768px) {
     .deuda-total-destacada {
-        padding: 20px;
+        padding: 25px;
+        border-radius: 16px;
     }
     
     .deuda-total-header {
@@ -577,8 +706,20 @@
     }
     
     .deuda-total-header h2 {
-        font-size: 20px;
+        font-size: 22px;
         justify-content: center;
+    }
+    
+    .deuda-breakdown-item {
+        padding: 20px;
+    }
+    
+    .deuda-breakdown-item .deuda-monto {
+        font-size: 24px;
+    }
+    
+    .deuda-breakdown-item .deuda-monto-total {
+        font-size: 28px;
     }
     
     .deuda-total-actions {
@@ -587,6 +728,12 @@
     
     .btn-pagar-deuda-total {
         width: 100%;
+        min-width: 100%;
+    }
+    
+    .deuda-total-actions .btn-secondary {
+        width: 100%;
+        min-width: 100%;
     }
     
     .stats-grid {
@@ -595,22 +742,11 @@
     
     .filters-container {
         flex-direction: column;
+        padding: 20px;
     }
     
     .filter-group {
         width: 100%;
-    }
-    
-    .deuda-breakdown-item .deuda-monto {
-        font-size: 20px;
-    }
-    
-    .deuda-breakdown-item .deuda-monto-total {
-        font-size: 24px;
-    }
-    
-    .monto-total-grande {
-        font-size: 32px;
     }
 }
 
@@ -623,153 +759,30 @@
     .stat-value {
         font-size: 24px;
     }
+    
+    .deuda-total-header h2 {
+        font-size: 20px;
+    }
+    
+    .deuda-breakdown-item i {
+        font-size: 28px;
+    }
+    
+    .deuda-breakdown-item .deuda-monto {
+        font-size: 20px;
+    }
+    
+    .deuda-breakdown-item .deuda-monto-total {
+        font-size: 24px;
+    }
+    
+    .btn-pagar-deuda-total {
+        padding: 16px 24px;
+        font-size: 16px;
+    }
+    
+    .deuda-monto-principal {
+        font-size: 48px;
+        padding: 30px;
+    }
 }
-/* ==========================================
-   WIDGET DE DEUDA DE HORAS
-   Integrado con Deuda Total
-   ========================================== */
-
-.deuda-widget {
-    background: white;
-    border-radius: 16px;
-    padding: 30px;
-    box-shadow: 0 10px 40px rgba(50, 156, 239, 0.15);
-    margin-bottom: 30px;
-    border-left: 5px solid #329cef;
-    transition: all 0.3s ease;
-    animation: fadeInUp 0.6s ease-out;
-}
-
-.deuda-widget:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 45px rgba(50, 156, 239, 0.2);
-}
-
-.deuda-widget.success {
-    border-left-color: #4caf50;
-    background: linear-gradient(135deg, #ffffff 0%, #f0f9f4 100%);
-}
-
-.deuda-widget.warning {
-    border-left-color: #ff9800;
-    background: linear-gradient(135deg, #ffffff 0%, #fff8f0 100%);
-}
-
-.deuda-widget.error {
-    border-left-color: #f44336;
-    background: linear-gradient(135deg, #ffffff 0%, #fff5f5 100%);
-}
-
-/* Header del Widget */
-.deuda-header {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    margin-bottom: 30px;
-    padding-bottom: 20px;
-    border-bottom: 2px solid rgba(50, 156, 239, 0.1);
-}
-
-.deuda-icono {
-    width: 70px;
-    height: 70px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 32px;
-    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-    color: #329cef;
-    box-shadow: 0 4px 15px rgba(50, 156, 239, 0.25);
-    transition: all 0.3s ease;
-}
-
-.deuda-icono:hover {
-    transform: scale(1.05);
-}
-
-.deuda-widget.success .deuda-icono {
-    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
-    color: #4caf50;
-}
-
-.deuda-widget.error .deuda-icono {
-    background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
-    color: #f44336;
-    animation: pulse-icon 2s infinite;
-}
-
-.deuda-widget.warning .deuda-icono {
-    background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
-    color: #ff9800;
-}
-
-@keyframes pulse-icon {
-    0%, 100% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.08); opacity: 0.85; }
-}
-
-.deuda-titulo {
-    flex: 1;
-}
-
-.deuda-titulo h4 {
-    margin: 0;
-    font-size: 24px;
-    color: #320a95;
-    font-weight: 700;
-    line-height: 1.3;
-}
-
-.deuda-titulo p {
-    margin: 8px 0 0 0;
-    font-size: 14px;
-    color: #666;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-/* Body del Widget */
-.deuda-body {
-    padding: 15px 0;
-}
-
-.deuda-monto-principal {
-    font-size: 56px;
-    font-weight: bold;
-    text-align: center;
-    padding: 30px;
-    margin-bottom: 30px;
-    border-radius: 12px;
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    box-shadow: inset 0 3px 10px rgba(0, 0, 0, 0.08);
-    transition: all 0.3s ease;
-}
-
-.deuda-monto-principal:hover {
-    transform: scale(1.02);
-}
-
-.deuda-monto-principal.success {
-    color: #4caf50;
-    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
-}
-
-.deuda-monto-principal.error {
-    color: #f44336;
-    background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
-}
-
-/* Desglose */
-.deuda-desglose {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 15px;
-    margin: 30px 0;
-    padding: 25px;
-    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
-    border-radius: 12px;
-    border: 2px solid #e0e0e0;
-}
-
