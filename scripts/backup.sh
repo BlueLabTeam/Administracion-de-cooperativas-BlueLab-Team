@@ -1,39 +1,55 @@
 #!/bin/bash
-#/scripts/backup.sh
+# === Configuración general ===
+PROJECT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+BACKUP_DIR="$PROJECT_DIR/storage/backups"
+UPLOADS_DIR="$PROJECT_DIR/storage/uploads"
+LOGS_DIR="$PROJECT_DIR/logs"
 
-set -e
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_PATH="$(dirname "$SCRIPT_DIR")"
-ENV_FILE="$PROJECT_PATH/.env"
+# === Configuración de base de datos ===
+HOST="gestcoop_db_slave"
+USER="root"
+PASS="rootbluelab2025"
+DB="proyecto2025"
 
-if [ ! -f "$ENV_FILE" ]; then
-    echo "❌ No se encontró el archivo .env en: $ENV_FILE"
-    exit 1
-fi
+# === Preparación de directorios ===
+mkdir -p "$BACKUP_DIR" "$LOGS_DIR"
 
-DATE=$(date +%Y-%m-%d_%H-%M)
-BACKUP_PATH="${BACKUP_PATH:-$PROJECT_PATH/storage/backups}"
-FILE="$BACKUP_PATH/backup_$DATE.sql"
+# === Variables de fecha ===
+FECHA=$(date +%Y%m%d_%H%M)
+SQL_FILE="$BACKUP_DIR/backup_${DB}_$FECHA.sql"
+UPLOADS_FILE="$BACKUP_DIR/uploads_$FECHA.tar.gz"
+LOG_FILE="$LOGS_DIR/backup.log"
 
-DB_HOST_SLAVE="${DB_HOST_SLAVE:-gestcoop_db}"
-DB_USER="${DB_USER:-root}"
-DB_PASSWORD="${DB_ROOT_PASSWORD}"
-DB_NAME="${DB_NAME:-proyecto2025}"
+echo "📦 Iniciando proceso de backup - $FECHA"
 
-pwd
-
-export $(grep -v '^#' "$ENV_FILE" | xargs)
-
-echo "⏳ Realizando backup..."
-
-mkdir -p "$BACKUP_PATH"
-
-docker exec "$DB_HOST_SLAVE" \
-mysqldump -uroot -p"$DB_ROOT_PASSWORD" --databases "$DB_NAME" > "$FILE"
+# === Backup de la base de datos ===
+echo "🗄️  Respaldo de base de datos..."
+docker exec "$HOST" mysqldump -u"$USER" -p"$PASS" "$DB" > "$SQL_FILE" 2>> "$LOG_FILE"
 
 if [ $? -eq 0 ]; then
-    echo "✅ Backup completado: $BACKUP_FILE"
+    echo "✅ Base de datos respaldada correctamente: $SQL_FILE"
+    echo "$(date '+%F %T') - DB backup OK" >> "$LOG_FILE"
 else
-    echo "❌ Error al realizar el backup"
-    exit 1
+    echo "❌ Error durante el backup de la base de datos"
+    echo "$(date '+%F %T') - ERROR en DB backup" >> "$LOG_FILE"
 fi
+
+# === Backup de los archivos subidos ===
+if [ -d "$UPLOADS_DIR" ]; then
+    echo "📂 Respaldo de archivos de usuario..."
+    tar -czf "$UPLOADS_FILE" -C "$UPLOADS_DIR" . 2>> "$LOG_FILE"
+    
+    if [ $? -eq 0 ]; then
+        echo "✅ Archivos de uploads respaldados: $UPLOADS_FILE"
+        echo "$(date '+%F %T') - Uploads backup OK" >> "$LOG_FILE"
+    else
+        echo "❌ Error durante el backup de uploads"
+        echo "$(date '+%F %T') - ERROR en uploads backup" >> "$LOG_FILE"
+    fi
+else
+    echo "⚠️  Carpeta de uploads no encontrada, se omite."
+    echo "$(date '+%F %T') - WARNING: uploads folder not found" >> "$LOG_FILE"
+fi
+
+echo "🎉 Backup completado."
+echo "   Archivos guardados en: $BACKUP_DIR"

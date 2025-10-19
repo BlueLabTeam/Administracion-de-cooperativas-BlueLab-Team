@@ -20,6 +20,7 @@ DB_HOST="${DB_HOST:-127.0.0.1}"
 DB_PORT="${DB_PORT:-3306}"
 WAIT_TIMEOUT="${WAIT_TIMEOUT:-60}"
 ENV_FILE_PATH="${ENV_FILE_PATH:-./gestcoop-env/.env}"  # Path al .env de producción
+BACKUP_HOUR="${BACKUP_HOUR:-2}"  # Hora del día para backup (0-23)
 
 # ===== Usuario real (para chown) =====
 REAL_USER="${SUDO_USER:-$(logname 2>/dev/null || echo $USER)}"
@@ -187,6 +188,37 @@ setup_project(){
   log "Setup completado."
 }
 
+backups(){
+  PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
+  SCRIPT_PATH="$PROJECT_DIR/scripts/backup.sh"
+  LOG_PATH="$PROJECT_DIR/logs/cron_backup.log"
+
+  HORA="${1:-2}"
+
+  # Cron job (hora configurable)
+  CRON_JOB="0 $HORA * * * cd $PROJECT_DIR && ./scripts/backup.sh >> $LOG_PATH 2>&1"
+
+  echo "🔧 Configurando cron para ejecutar backups diarios a las $HORA:00..."
+
+  # Asegurar que cron esté instalado
+  if ! command -v cron &> /dev/null; then
+    echo "📦 Instalando cron..."
+    sudo apt update && sudo apt install -y cron
+  fi
+
+  # Crear carpeta si no existe
+  mkdir -p "$PROJECT_DIR/storage/backups"
+
+  # Agregar job (evitando duplicados)
+  (crontab -l 2>/dev/null | grep -v "$SCRIPT_PATH" ; echo "$CRON_JOB") | crontab -
+
+  # Reiniciar servicio cron
+  sudo service cron restart
+
+  echo "✅ Cron configurado correctamente."
+  echo "   El backup se ejecutará todos los días a las $HORA:00 y se guardará en storage/backups/"
+}
+
 ### ===== MAIN =====
 log "Iniciando provisioning para GestCoop"
 
@@ -214,6 +246,8 @@ if [ ! -f "$TARGET_DIR/.env" ]; then
 fi
 
 setup_project "$TARGET_DIR"
+
+backups ${BACKUP_HOUR:-2}
 
 log "Provisionamiento completado. Revisa 'docker ps' para ver contenedores corriendo."
 log "Contenedores activos:"
