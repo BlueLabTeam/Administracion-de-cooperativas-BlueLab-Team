@@ -326,17 +326,6 @@
     background: #f8f9fa;
 }
 
-.registro-row.estado-pendiente {
-    background: linear-gradient(135deg, #fffbf0 0%, #fff9e6 100%);
-}
-
-.registro-row.estado-aprobado {
-    background: linear-gradient(135deg, #f0f9f4 0%, #e8f5e9 100%);
-}
-
-.registro-row.estado-rechazado {
-    background: linear-gradient(135deg, #fef5f5 0%, #fdecea 100%);
-}
 
 .en-curso {
     color: #ff9800;
@@ -345,63 +334,13 @@
 }
 
 .descripcion-cell {
-    max-width: 200px;
+       max-width: 300px;  
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
-.acciones-cell {
-    display: flex;
-    gap: 5px;
-    justify-content: center;
-    flex-wrap: wrap;
-}
 
-/* ========== BOTONES PEQUEÑOS ========== */
-.btn-small {
-    padding: 6px 12px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 0.85em;
-    transition: all 0.2s ease;
-    font-weight: 600;
-}
-
-.btn-small i {
-    font-size: 1em;
-}
-
-.btn-small.btn-edit {
-    background: linear-gradient(135deg, #329cef 0%, #1976d2 100%);
-    color: white;
-}
-
-.btn-small.btn-edit:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(50, 156, 239, 0.3);
-}
-
-.btn-small.btn-warning {
-    background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
-    color: white;
-}
-
-.btn-small.btn-warning:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(255, 152, 0, 0.3);
-}
-
-.btn-small.btn-info {
-    background: linear-gradient(135deg, #329cef 0%, #0097a7 100%);
-    color: white;
-}
-
-.btn-small.btn-info:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(50, 156, 239, 0.3);
-}
 
 /* ========== INPUT DE FECHA ========== */
 .date-input {
@@ -419,126 +358,9 @@
     box-shadow: 0 0 0 3px rgba(50, 156, 239, 0.1);
 }
 
-/* ========== MODAL DE EDICIÓN ========== */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(50, 156, 239, 0.5);
-    backdrop-filter: blur(5px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 10000;
-    animation: fadeIn 0.3s ease;
-}
 
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
 
-.modal-content {
-    background: white;
-    padding: 30px;
-    border-radius: 15px;
-    max-width: 500px;
-    width: 90%;
-    max-height: 90vh;
-    overflow-y: auto;
-    box-shadow: 0 15px 50px rgba(50, 156, 239, 0.4);
-    animation: slideUp 0.3s ease;
-    position: relative;
-}
 
-@keyframes slideUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.modal-close-btn {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    background: none;
-    border: none;
-    font-size: 2em;
-    cursor: pointer;
-    color: #999;
-    transition: all 0.2s;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-}
-
-.modal-close-btn:hover {
-    color: #320a95;
-    background: #f0f0f0;
-    transform: rotate(90deg);
-}
-
-.modal-title {
-    margin: 0 0 25px 0;
-    color: #320a95;
-    font-size: 1.6em;
-    font-weight: 700;
-}
-
-/* ========== FORMULARIOS ========== */
-.form-group {
-    margin-bottom: 20px;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 600;
-    color: #320a95;
-}
-
-.form-group input[type="time"],
-.form-group input[type="date"],
-.form-group textarea {
-    width: 100%;
-    padding: 12px;
-    border: 2px solid #e0e0e0;
-    border-radius: 8px;
-    font-size: 1em;
-    font-family: inherit;
-    transition: all 0.2s ease;
-    color: #333;
-}
-
-.form-group input[type="time"]:focus,
-.form-group input[type="date"]:focus,
-.form-group textarea:focus {
-    outline: none;
-    border-color: #329cef;
-    box-shadow: 0 0 0 3px rgba(50, 156, 239, 0.1);
-}
-
-.form-group textarea {
-    resize: vertical;
-    min-height: 80px;
-}
-
-.form-actions {
-    display: flex;
-    gap: 10px;
-    justify-content: flex-end;
-    margin-top: 25px;
-}
 
 /* ========== LOADING ========== */
 .loading {

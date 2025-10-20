@@ -3164,7 +3164,7 @@ function renderAllCuotasAdmin(cuotas) {
                 <td>
                     <div class="horas-info">
                         ${cuota.horas_cumplidas || 0}h / ${cuota.horas_requeridas}h
-                        ${cuota.horas_validadas ? '<br><small style="color: #4caf50;">✓ Validadas</small>' : ''}
+                        ${cuota.horas_validadas ? '<br><small style="color: #ffffffff;">✓ Validadas</small>' : ''}
                     </div>
                 </td>
                 <td>${new Date(cuota.fecha_vencimiento + 'T00:00:00').toLocaleDateString('es-UY')}</td>

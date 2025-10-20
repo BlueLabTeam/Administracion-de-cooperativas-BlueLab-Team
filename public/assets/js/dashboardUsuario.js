@@ -1194,7 +1194,7 @@ function getEstadoBadge(estado) {
     return badges[estado] || '';
 }
 
-// ========== HISTORIAL DE REGISTROS ==========
+// ========== HISTORIAL DE REGISTROS (VERSIÓN SIMPLIFICADA) ==========
 async function loadMisRegistros() {
     const container = document.getElementById('historial-registros-container');
     if (!container) return;
@@ -1249,8 +1249,6 @@ function renderHistorialRegistros(registros) {
                         <th>Entrada</th>
                         <th>Salida</th>
                         <th>Total</th>
-                        <th>Estado</th>
-                        <th>Descripción</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -1264,49 +1262,20 @@ function renderHistorialRegistros(registros) {
         const entrada = reg.hora_entrada ? reg.hora_entrada.substring(0, 5) : '--:--';
         const salida = reg.hora_salida ? reg.hora_salida.substring(0, 5) : '<span class="en-curso">En curso</span>';
         const horas = reg.total_horas || '0.00';
-        const estado = reg.estado || 'pendiente';
-        const descripcion = reg.descripcion || '-';
-
-        const puedeEditar = estado === 'pendiente' && reg.hora_salida !== null;
-        const estaRechazado = estado === 'rechazado';
 
         html += `
-            <tr class="registro-row estado-${estado}">
+            <tr class="registro-row">
                 <td><strong>${fechaFormateada}</strong></td>
                 <td>${diaSemana}</td>
                 <td><i class="fas fa-sign-in-alt"></i> ${entrada}</td>
                 <td><i class="fas fa-sign-out-alt"></i> ${salida}</td>
                 <td><strong>${horas}h</strong></td>
                 <td>
-                    <span class="badge-estado ${estado}">
-                        ${formatearEstadoHoras(estado)}
-                    </span>
-                </td>
-                <td class="descripcion-cell" title="${descripcion}">${truncarTexto(descripcion, 30)}</td>
-                <td>
-                    <div class="acciones-cell">
-                        ${puedeEditar ? `
-                            <button class="btn-small btn-edit" 
-                                    onclick="editarRegistro(${reg.id_registro})" 
-                                    title="Editar registro">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                        ` : ''}
-                        ${estaRechazado && reg.observaciones ? `
-                            <button class="btn-small btn-warning" 
-                                    onclick="verObservaciones('${escaparComillas(reg.observaciones)}')"
-                                    title="Ver motivo de rechazo">
-                                <i class="fas fa-exclamation-triangle"></i>
-                            </button>
-                        ` : ''}
-                        ${reg.observaciones && !estaRechazado ? `
-                            <button class="btn-small btn-info" 
-                                    onclick="verObservaciones('${escaparComillas(reg.observaciones)}')"
-                                    title="Ver observaciones">
-                                <i class="fas fa-info-circle"></i>
-                            </button>
-                        ` : ''}
-                    </div>
+                    ${reg.descripcion ? `
+                        <button class="btn-small btn-secondary" onclick="verDescripcionRegistro('${reg.descripcion.replace(/'/g, "\\'")}', '${fechaFormateada}')" title="Ver descripción">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    ` : '-'}
                 </td>
             </tr>
         `;
@@ -1321,14 +1290,33 @@ function renderHistorialRegistros(registros) {
     container.innerHTML = html;
 }
 
-// ========== FUNCIONES AUXILIARES ==========
-function formatearEstadoHoras(estado) {
-    const estados = {
-        'pendiente': 'Pendiente',
-        'aprobado': 'Aprobado',
-        'rechazado': 'Rechazado'
-    };
-    return estados[estado] || estado;
+// Función para ver la descripción en un modal
+function verDescripcionRegistro(descripcion, fecha) {
+    const modal = `
+        <div class="modal-detail" onclick="if(event.target.classList.contains('modal-detail')) this.remove()">
+            <div class="modal-detail-content" style="max-width: 600px;">
+                <button onclick="this.closest('.modal-detail').remove()" class="modal-close-button">×</button>
+                
+                <h2 class="modal-detail-header">
+                    <i class="fas fa-file-alt"></i> Descripción del Registro
+                </h2>
+                
+                <div class="modal-detail-section">
+                    <p><strong>Fecha:</strong> ${fecha}</p>
+                </div>
+                
+                <div class="modal-detail-section" style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
+                    <p style="margin: 0; white-space: pre-wrap;">${descripcion}</p>
+                </div>
+                
+                <div class="modal-detail-footer">
+                    <button onclick="this.closest('.modal-detail').remove()" class="btn btn-secondary">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modal);
 }
 
 function formatearFechaSimple(fecha) {
@@ -1345,14 +1333,10 @@ function obtenerDiaSemana(fecha) {
     return dias[fecha.getDay()];
 }
 
-function truncarTexto(texto, maxLength) {
-    if (!texto || texto.length <= maxLength) return texto;
-    return texto.substring(0, maxLength) + '...';
-}
+// Exportar funciones
+window.loadMisRegistros = loadMisRegistros;
+window.verDescripcionRegistro = verDescripcionRegistro;
 
-function escaparComillas(texto) {
-    return texto.replace(/'/g, "\\'").replace(/"/g, '\\"');
-}
 
 // ========== FILTRAR REGISTROS ==========
 async function filtrarRegistros() {
@@ -1373,117 +1357,14 @@ async function filtrarRegistros() {
     await loadMisRegistros();
 }
 
-// ========== EDITAR REGISTRO ==========
-async function editarRegistro(idRegistro) {
-    console.log(`✏️ Editando registro ID: ${idRegistro}`);
-
-    try {
-        // Cargar datos del registro
-        const response = await fetch('/api/horas/mis-registros');
-        const data = await response.json();
-
-        if (!data.success) {
-            alert('❌ Error al cargar datos del registro');
-            return;
-        }
-
-        const registro = data.registros.find(r => r.id_registro == idRegistro);
-
-        if (!registro) {
-            alert('❌ Registro no encontrado');
-            return;
-        }
-
-        // Llenar formulario
-        document.getElementById('edit-id-registro').value = registro.id_registro;
-        document.getElementById('edit-hora-entrada').value = registro.hora_entrada.substring(0, 5);
-        document.getElementById('edit-hora-salida').value = registro.hora_salida ? registro.hora_salida.substring(0, 5) : '';
-        document.getElementById('edit-descripcion').value = registro.descripcion || '';
-
-        // Mostrar modal
-        document.getElementById('editarRegistroModal').style.display = 'flex';
-
-    } catch (error) {
-        console.error('❌ Error al cargar registro:', error);
-        alert('❌ Error al cargar el registro para editar');
-    }
-}
-
-function closeEditarRegistroModal() {
-    const modal = document.getElementById('editarRegistroModal');
-    if (modal) {
-        modal.style.display = 'none';
-    }
-
-    const form = document.getElementById('editarRegistroForm');
-    if (form) {
-        form.reset();
-    }
-}
-
-async function submitEditarRegistro(event) {
-    event.preventDefault();
-    console.log('💾 Guardando cambios en registro');
-
-    const horaEntrada = document.getElementById('edit-hora-entrada').value;
-    const horaSalida = document.getElementById('edit-hora-salida').value;
-
-    // Validar que la salida sea posterior a la entrada
-    if (horaSalida && horaSalida <= horaEntrada) {
-        alert('⚠️ La hora de salida debe ser posterior a la hora de entrada');
-        return;
-    }
-
-    const formData = new FormData();
-    formData.append('id_registro', document.getElementById('edit-id-registro').value);
-    formData.append('hora_entrada', horaEntrada + ':00');
-
-    if (horaSalida) {
-        formData.append('hora_salida', horaSalida + ':00');
-    }
-
-    formData.append('descripcion', document.getElementById('edit-descripcion').value);
-
-    try {
-        const response = await fetch('/api/horas/editar', {
-            method: 'POST',
-            body: formData,
-            credentials: 'same-origin'
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-            alert('✅ ' + data.message);
-            closeEditarRegistroModal();
-            await inicializarSeccionHoras();
-        } else {
-            alert('❌ ' + data.message);
-        }
-
-    } catch (error) {
-        console.error('❌ Error al guardar cambios:', error);
-        alert('❌ Error de conexión al guardar');
-    }
-}
-
-// ========== VER OBSERVACIONES ==========
-function verObservaciones(observaciones) {
-    const mensaje = observaciones || 'Sin observaciones';
-    alert(`📋 Observaciones del administrador:\n\n${mensaje}`);
-}
 
 console.log('✅ Sistema de registro de horas cargado completamente');
 
-// Exportar funciones globales necesarias
+
 window.marcarEntrada = marcarEntrada;
 window.marcarSalida = marcarSalida;
 window.loadResumenSemanal = loadResumenSemanal;
 window.filtrarRegistros = filtrarRegistros;
-window.editarRegistro = editarRegistro;
-window.closeEditarRegistroModal = closeEditarRegistroModal;
-window.submitEditarRegistro = submitEditarRegistro;
-window.verObservaciones = verObservaciones;
 
 
 
@@ -1499,22 +1380,34 @@ function toggleEditProfile() {
     const editDiv = document.getElementById('profile-edit');
     const btnText = document.getElementById('btn-edit-text');
     
-    if (editDiv.style.display === 'none') {
-        // Mostrar formulario de edición
+    // Debug: verificar que los elementos existen
+    if (!viewDiv || !editDiv) {
+        console.error('Error: No se encontraron los divs de perfil');
+        console.log('viewDiv:', viewDiv);
+        console.log('editDiv:', editDiv);
+        return;
+    }
+    
+    if (editDiv.style.display === 'none' || editDiv.style.display === '') {
+        // Mostrar formulario de ediciÃ³n
         loadProfileData();
         viewDiv.style.display = 'none';
         editDiv.style.display = 'block';
-        btnText.textContent = 'Cancelar';
+        if (btnText) btnText.textContent = 'Cancelar';
     } else {
         // Mostrar vista de solo lectura
         viewDiv.style.display = 'block';
         editDiv.style.display = 'none';
-        btnText.textContent = 'Editar Perfil';
+        if (btnText) btnText.textContent = 'Editar Perfil';
         
-        // Limpiar campos de contraseña
-        document.getElementById('edit-password-actual').value = '';
-        document.getElementById('edit-password-nueva').value = '';
-        document.getElementById('edit-password-confirmar').value = '';
+        // Limpiar campos de contraseÃ±a
+        const passActual = document.getElementById('edit-password-actual');
+        const passNueva = document.getElementById('edit-password-nueva');
+        const passConfirmar = document.getElementById('edit-password-confirmar');
+        
+        if (passActual) passActual.value = '';
+        if (passNueva) passNueva.value = '';
+        if (passConfirmar) passConfirmar.value = '';
     }
 }
 
@@ -2702,7 +2595,7 @@ function renderMisCuotasOrganizadas(cuotas) {
                         <i class="fas fa-calculator"></i>
                         <div>
                             <span class="deuda-label">TOTAL ${estaPagada ? 'PAGADO' : 'A PAGAR'}</span>
-                            <span class="deuda-monto-total" style="color: ${estaPagada ? '#4caf50' : '#fff'};">
+                            <span class="deuda-monto-total" style="color: ${estaPagada ? '#ffffffff' : '#fff'};">
                                 $${montoTotal.toLocaleString('es-UY', {minimumFractionDigits: 2})}
                             </span>
                         </div>
@@ -2712,7 +2605,7 @@ function renderMisCuotasOrganizadas(cuotas) {
                 ${estaPagada ? `
                     <!-- 🎉 CUOTA YA PAGADA -->
                     <div class="alert-success" style="margin-top: 20px; background: rgba(76, 175, 80, 0.2); border-color: rgba(76, 175, 80, 0.4);">
-                        <strong style="color: #4caf50;">🎉 ¡Pago Completado!</strong>
+                        <strong style="color: #ffffffff;">🎉 ¡Pago Completado!</strong>
                         <p style="color: rgba(255, 255, 255, 0.9); margin: 10px 0 0 0;">
                             Has pagado exitosamente tu cuota de ${obtenerNombreMes(cuotaMasReciente.mes)} ${cuotaMasReciente.anio}.
                             ${cuotaMasReciente.fecha_pago ? `<br>Fecha de pago: ${new Date(cuotaMasReciente.fecha_pago).toLocaleDateString('es-UY')}` : ''}
