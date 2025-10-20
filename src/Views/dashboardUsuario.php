@@ -25,6 +25,7 @@ if (!isset($_SESSION['user_id'])) {
 	<link rel="stylesheet" href="/assets/css/dashboardViviendas.css" />
 	<link rel="stylesheet" href="/assets/css/dashboardCuotas.css" />
 	<link rel="stylesheet" href="/assets/css/dashboardPagos.css" />
+	<link rel="stylesheet" href="/assets/css/dashboardSolicitudes.css" />
 	
 </head>
 
@@ -180,14 +181,90 @@ if (!isset($_SESSION['user_id'])) {
 </section>
 
 		<!-- SOLICITUDES -->
-		<section id="solicitudes-section" class="section-content">
-			<h2 class="section-title">📝 Mis Solicitudes</h2>
-			<div class="info-card">
-				<h3>Solicitudes Realizadas</h3>
-				<p>Aquí podrás ver el estado de tus solicitudes a la cooperativa.</p>
-				<p><em>No tienes solicitudes pendientes.</em></p>
-			</div>
-		</section>
+<section id="solicitudes-section" class="section-content">
+    <h2 class="section-title">📩 Mis Solicitudes</h2>
+
+    <!-- Botón Nueva Solicitud -->
+    <div class="info-card">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h3>Gestiona tus Solicitudes</h3>
+                <p>Envía consultas, justificaciones o reporta problemas al administrador</p>
+            </div>
+            <button class="btn btn-primary" onclick="abrirModalNuevaSolicitud()">
+                <i class="fas fa-plus"></i> Nueva Solicitud
+            </button>
+        </div>
+    </div>
+
+    <!-- Estadísticas Rápidas -->
+    <div class="stats-grid">
+        <div class="stat-card pendiente">
+            <div class="stat-icon">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-info">
+                <span class="stat-label">Pendientes</span>
+                <span class="stat-value" id="solicitudes-pendientes-count">0</span>
+            </div>
+        </div>
+
+        <div class="stat-card warning">
+            <div class="stat-icon">
+                <i class="fas fa-eye"></i>
+            </div>
+            <div class="stat-info">
+                <span class="stat-label">En Revisión</span>
+                <span class="stat-value" id="solicitudes-revision-count">0</span>
+            </div>
+        </div>
+
+        <div class="stat-card success">
+            <div class="stat-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-info">
+                <span class="stat-label">Resueltas</span>
+                <span class="stat-value" id="solicitudes-resueltas-count">0</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="filters-container">
+        <div class="filter-group">
+            <label for="filtro-estado-solicitudes">
+                <i class="fas fa-filter"></i> Estado:
+            </label>
+            <select id="filtro-estado-solicitudes" onchange="loadMisSolicitudes()">
+                <option value="">Todos los estados</option>
+                <option value="pendiente">Pendiente</option>
+                <option value="en_revision">En Revisión</option>
+                <option value="resuelta">Resuelta</option>
+                <option value="rechazada">Rechazada</option>
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label for="filtro-tipo-solicitudes">
+                <i class="fas fa-tag"></i> Tipo:
+            </label>
+            <select id="filtro-tipo-solicitudes" onchange="loadMisSolicitudes()">
+                <option value="">Todos los tipos</option>
+                <option value="horas">Registro de Horas</option>
+                <option value="pago">Pagos/Cuotas</option>
+                <option value="vivienda">Vivienda</option>
+                <option value="general">Consulta General</option>
+                <option value="otro">Otro</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Lista de Solicitudes -->
+    <div id="misSolicitudesContainer" class="solicitudes-container">
+        <p class="loading">Cargando solicitudes...</p>
+    </div>
+</section>
 
 		<!-- MI VIVIENDA -->
 		<section id="vivienda-section" class="section-content">

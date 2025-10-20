@@ -147,6 +147,14 @@ $privateRoutes = [
     '/api/cuotas/estadisticas',
     '/api/cuotas/precios',
     '/api/cuotas/actualizar-precio',
+    '/api/solicitudes/create',
+    '/api/solicitudes/mis-solicitudes',
+    '/api/solicitudes/detalle',
+    '/api/solicitudes/responder',
+    '/api/solicitudes/all',
+    '/api/solicitudes/update-estado',
+    '/api/solicitudes/estadisticas',
+
 ];
 
 // Aplicar middleware según el tipo de ruta
@@ -459,6 +467,31 @@ switch ($uri) {
         break;
     case '/api/cuotas/actualizar-precio':
         (new App\Controllers\CuotaController())->actualizarPrecio();
+        break;
+
+        // API SOLICITUDES - USUARIO
+    case '/api/solicitudes/create':
+        (new App\Controllers\SolicitudController())->create();
+        break;
+    case '/api/solicitudes/mis-solicitudes':
+        (new App\Controllers\SolicitudController())->getMisSolicitudes();
+        break;
+    case '/api/solicitudes/detalle':
+        (new App\Controllers\SolicitudController())->getDetalle();
+        break;
+    case '/api/solicitudes/responder':
+        (new App\Controllers\SolicitudController())->addRespuesta();
+        break;
+    
+    // API SOLICITUDES - ADMIN
+    case '/api/solicitudes/all':
+        (new App\Controllers\SolicitudController())->getAllSolicitudes();
+        break;
+    case '/api/solicitudes/update-estado':
+        (new App\Controllers\SolicitudController())->updateEstado();
+        break;
+    case '/api/solicitudes/estadisticas':
+        (new App\Controllers\SolicitudController())->getEstadisticas();
         break;
 
     default:

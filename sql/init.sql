@@ -711,3 +711,70 @@ SELECT
 FROM Pagos_Cuotas
 GROUP BY metodo_pago;
 
+-- ==========================================
+-- 1. TABLA DE SOLICITUDES
+-- ==========================================
+
+CREATE TABLE IF NOT EXISTS Solicitudes (
+    id_solicitud INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT NOT NULL,
+    tipo_solicitud ENUM('horas', 'pago', 'vivienda', 'general', 'otro') DEFAULT 'general',
+    asunto VARCHAR(255) NOT NULL,
+    descripcion TEXT NOT NULL,
+    archivo_adjunto VARCHAR(500) NULL COMMENT 'Ruta relativa del archivo (certificados, etc.)',
+    estado ENUM('pendiente', 'en_revision', 'resuelta', 'rechazada') DEFAULT 'pendiente',
+    prioridad ENUM('baja', 'media', 'alta') DEFAULT 'media',
+    fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+    fecha_actualizacion DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    FOREIGN KEY (id_usuario) REFERENCES Usuario(id_usuario) ON DELETE CASCADE,
+    INDEX idx_usuario (id_usuario),
+    INDEX idx_estado (estado),
+    INDEX idx_fecha (fecha_creacion DESC)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ==========================================
+-- 2. TABLA DE RESPUESTAS A SOLICITUDES
+-- ==========================================
+
+CREATE TABLE IF NOT EXISTS Respuestas_Solicitudes (
+    id_respuesta INT AUTO_INCREMENT PRIMARY KEY,
+    id_solicitud INT NOT NULL,
+    id_usuario INT NOT NULL COMMENT 'Quien responde (admin o usuario original)',
+    es_admin BOOLEAN DEFAULT FALSE COMMENT 'TRUE si es respuesta del admin',
+    mensaje TEXT NOT NULL,
+    archivo_adjunto VARCHAR(500) NULL,
+    fecha_respuesta DATETIME DEFAULT CURRENT_TIMESTAMP,
+    
+    FOREIGN KEY (id_solicitud) REFERENCES Solicitudes(id_solicitud) ON DELETE CASCADE,
+    FOREIGN KEY (id_usuario) REFERENCES Usuario(id_usuario) ON DELETE CASCADE,
+    INDEX idx_solicitud (id_solicitud),
+    INDEX idx_fecha (fecha_respuesta DESC)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ==========================================
+-- 3. VISTA COMPLETA DE SOLICITUDES
+-- ==========================================
+
+CREATE OR REPLACE VIEW Vista_Solicitudes_Completa AS
+SELECT 
+    s.id_solicitud,
+    s.id_usuario,
+    u.nombre_completo,
+    u.email,
+    u.cedula,
+    s.tipo_solicitud,
+    s.asunto,
+    s.descripcion,
+    s.archivo_adjunto,
+    s.estado,
+    s.prioridad,
+    s.fecha_creacion,
+    s.fecha_actualizacion,
+    COUNT(rs.id_respuesta) as total_respuestas,
+    MAX(rs.fecha_respuesta) as ultima_respuesta
+FROM Solicitudes s
+INNER JOIN Usuario u ON s.id_usuario = u.id_usuario
+LEFT JOIN Respuestas_Solicitudes rs ON s.id_solicitud = rs.id_solicitud
+GROUP BY s.id_solicitud
+ORDER BY s.fecha_creacion DESC;

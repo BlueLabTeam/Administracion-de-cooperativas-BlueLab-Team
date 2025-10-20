@@ -18,6 +18,7 @@
 	<link rel="stylesheet" href="/assets/css/dashboardNucleos.css" /> 
 	<link rel="stylesheet" href="/assets/css/dashboardMateriales.css" /> 
 	<link rel="stylesheet" href="/assets/css/dashboardCuotas.css" />
+	<link rel="stylesheet" href="/assets/css/dashboardSolicitudes.css" />
 </head>
 
 <body>
@@ -766,6 +767,126 @@
 		<span class="close-modal">&times;</span>
 		<img class="modal-content" id="modalImage">
 	</div>
+
+	<!-- SECCIÓN SOLICITUDES ADMIN -->
+<section id="solicitudes-section" class="section-content">
+    <h2 class="section-title">📩 Gestión de Solicitudes</h2>
+
+    <!-- Estadísticas -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-inbox"></i>
+            </div>
+            <div class="stat-info">
+                <span class="stat-label">Total</span>
+                <span class="stat-value" id="solicitudes-total-admin">0</span>
+            </div>
+        </div>
+
+        <div class="stat-card pendiente">
+            <div class="stat-icon">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-info">
+                <span class="stat-label">Pendientes</span>
+                <span class="stat-value" id="solicitudes-pendientes-admin">0</span>
+            </div>
+        </div>
+
+        <div class="stat-card warning">
+            <div class="stat-icon">
+                <i class="fas fa-eye"></i>
+            </div>
+            <div class="stat-info">
+                <span class="stat-label">En Revisión</span>
+                <span class="stat-value" id="solicitudes-revision-admin">0</span>
+            </div>
+        </div>
+
+        <div class="stat-card success">
+            <div class="stat-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-info">
+                <span class="stat-label">Resueltas</span>
+                <span class="stat-value" id="solicitudes-resueltas-admin">0</span>
+            </div>
+        </div>
+
+        <div class="stat-card error">
+            <div class="stat-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="stat-info">
+                <span class="stat-label">Alta Prioridad</span>
+                <span class="stat-value" id="solicitudes-altas-admin">0</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="info-card">
+        <div class="filters-container">
+            <div class="filter-group">
+                <label for="filtro-estado-solicitudes-admin">
+                    <i class="fas fa-filter"></i> Estado:
+                </label>
+                <select id="filtro-estado-solicitudes-admin" onchange="loadAllSolicitudes()">
+                    <option value="">Todos los estados</option>
+                    <option value="pendiente">Pendiente</option>
+                    <option value="en_revision">En Revisión</option>
+                    <option value="resuelta">Resuelta</option>
+                    <option value="rechazada">Rechazada</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="filtro-tipo-solicitudes-admin">
+                    <i class="fas fa-tag"></i> Tipo:
+                </label>
+                <select id="filtro-tipo-solicitudes-admin" onchange="loadAllSolicitudes()">
+                    <option value="">Todos los tipos</option>
+                    <option value="horas">Registro de Horas</option>
+                    <option value="pago">Pagos/Cuotas</option>
+                    <option value="vivienda">Vivienda</option>
+                    <option value="general">Consulta General</option>
+                    <option value="otro">Otro</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="filtro-prioridad-solicitudes-admin">
+                    <i class="fas fa-exclamation-circle"></i> Prioridad:
+                </label>
+                <select id="filtro-prioridad-solicitudes-admin" onchange="loadAllSolicitudes()">
+                    <option value="">Todas las prioridades</option>
+                    <option value="alta">Alta</option>
+                    <option value="media">Media</option>
+                    <option value="baja">Baja</option>
+                </select>
+            </div>
+
+            <button class="btn btn-secondary" onclick="loadAllSolicitudes(); loadEstadisticasSolicitudes();">
+                <i class="fas fa-sync-alt"></i> Actualizar
+            </button>
+        </div>
+    </div>
+
+    <!-- Lista de Solicitudes -->
+    <div class="info-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3>📋 Todas las Solicitudes</h3>
+            <button class="btn btn-secondary" onclick="loadAllSolicitudes()">
+                <i class="fas fa-sync-alt"></i> Recargar
+            </button>
+        </div>
+        
+        <div id="solicitudesAdminContainer" class="solicitudes-container">
+            <p class="loading">Cargando solicitudes...</p>
+        </div>
+    </div>
+</section>
 
 	<script src="/assets/js/dashboardAdmin.js"></script>
 </body>
