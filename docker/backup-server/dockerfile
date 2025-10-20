@@ -1,0 +1,39 @@
+# Dockerfile para servidor de backups
+FROM ubuntu:22.04
+
+# Evitar interacciones durante la instalación
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Instalar SSH y rsync, limpiar cache
+RUN apt-get update && \
+    apt-get install -y openssh-server rsync && \
+    rm -rf /var/lib/apt/lists/*
+    # Generar host keys si no existen
+RUN ssh-keygen -A
+
+# Crear usuario 'gestbackup' con home y shell bash
+RUN useradd -m -d /home/gestbackup -s /bin/bash gestbackup && \
+    echo "gestbackup:gestbackup" | chpasswd
+
+# Crear directorios necesarios
+RUN mkdir -p /var/run/sshd /data/backups
+
+# Crear carpeta .ssh para el usuario
+RUN mkdir -p /home/gestbackup/.ssh && \
+    chmod 700 /home/gestbackup/.ssh && \
+    chown -R gestbackup:gestbackup /home/gestbackup
+
+# Ajustar permisos del directorio de backups
+RUN chown -R gestbackup:gestbackup /data/backups
+RUN chmod 700 /data/backups
+
+# Configurar SSH para permitir login con contraseña y usar claves
+RUN sed -i 's/^#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config && \
+    sed -i 's/^#PubkeyAuthentication yes/PubkeyAuthentication yes/' /etc/ssh/sshd_config
+
+# Exponer puerto SSH
+EXPOSE 22
+
+# Comando por defecto
+CMD ["/usr/sbin/sshd", "-D"]
+
