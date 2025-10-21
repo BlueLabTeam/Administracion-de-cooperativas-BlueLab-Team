@@ -1,0 +1,289 @@
+/* ==========================================
+   JUSTIFICACIONES DE HORAS - USUARIO
+   ========================================== */
+
+.justificaciones-widget {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    border-radius: 12px;
+    padding: 15px;
+    margin-top: 15px;
+    border: 2px solid rgba(76, 175, 80, 0.3);
+}
+
+.justificaciones-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid rgba(76, 175, 80, 0.2);
+}
+
+.justificaciones-totales {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.total-horas {
+    background: #4caf50;
+    color: white;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.total-descuento {
+    background: #2196F3;
+    color: white;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.justificaciones-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 250px;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+/* Scrollbar personalizado */
+.justificaciones-lista::-webkit-scrollbar {
+    width: 6px;
+}
+
+.justificaciones-lista::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+.justificaciones-lista::-webkit-scrollbar-thumb {
+    background: rgba(76, 175, 80, 0.5);
+    border-radius: 10px;
+}
+
+.justificacion-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    padding: 12px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+    transition: all 0.2s ease;
+}
+
+.justificacion-item:hover {
+    transform: translateX(3px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+}
+
+.justificacion-info {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    flex: 1;
+}
+
+.justificacion-icon {
+    background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 14px;
+}
+
+.justificacion-detalles {
+    flex: 1;
+}
+
+.btn-ver-archivo {
+    background: #2196F3;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 13px;
+}
+
+.btn-ver-archivo:hover {
+    background: #1976D2;
+    transform: scale(1.05);
+}
+
+.btn-ver-todas-justificaciones {
+    width: 100%;
+    margin-top: 15px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-ver-todas-justificaciones:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(102, 126, 234, 0.4);
+}
+
+/* ==========================================
+   MODAL HISTORIAL COMPLETO
+   ========================================== */
+
+.periodo-justificaciones {
+    margin-bottom: 30px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 20px;
+    border-left: 4px solid #4caf50;
+}
+
+.periodo-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid rgba(76, 175, 80, 0.2);
+}
+
+.periodo-header h4 {
+    margin: 0;
+    color: #333;
+    font-size: 20px;
+}
+
+.periodo-totales {
+    display: flex;
+    gap: 15px;
+}
+
+.total-horas-periodo {
+    background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 15px;
+    box-shadow: 0 2px 6px rgba(76, 175, 80, 0.3);
+}
+
+.total-descuento-periodo {
+    background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 15px;
+    box-shadow: 0 2px 6px rgba(33, 150, 243, 0.3);
+}
+
+.justificaciones-del-periodo {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.justificacion-detalle-item {
+    background: white;
+    border-radius: 10px;
+    padding: 18px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.2s ease;
+}
+
+.justificacion-detalle-item:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
+}
+
+.justificacion-encabezado {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.justificacion-encabezado strong {
+    color: #333;
+    font-size: 16px;
+}
+
+.descuento-tag {
+    background: linear-gradient(135deg, #f44336 0%, #e53935 100%);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: bold;
+    margin-left: auto;
+}
+
+.justificacion-cuerpo p {
+    margin: 8px 0;
+    line-height: 1.6;
+    color: #555;
+}
+
+.justificacion-cuerpo strong {
+    color: #333;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .justificaciones-widget {
+        padding: 12px;
+    }
+    
+    .justificaciones-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .justificaciones-totales {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .justificacion-item {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .btn-ver-archivo {
+        width: 100%;
+    }
+    
+    .periodo-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .periodo-totales {
+        width: 100%;
+        justify-content: flex-start;
+    }
+}

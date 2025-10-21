@@ -3168,24 +3168,41 @@ function renderAllCuotasAdmin(cuotas) {
                     </div>
                 </td>
                 <td>${new Date(cuota.fecha_vencimiento + 'T00:00:00').toLocaleDateString('es-UY')}</td>
-                <td>
-                    <div class="action-buttons-compact">
-                        ${tienePagoPendiente ? `
-                            <button class="btn-small btn-primary" 
-                                    onclick="abrirValidarPagoModal(${cuota.id_pago}, ${cuota.id_cuota})" 
-                                    title="Validar pago">
-                                <i class="fas fa-check-circle"></i>
-                            </button>
-                        ` : ''}
-                        ${cuota.comprobante_archivo ? `
-                            <button class="btn-small btn-secondary" 
-                                    onclick="verComprobanteAdmin('${cuota.comprobante_archivo}')" 
-                                    title="Ver comprobante">
-                                <i class="fas fa-image"></i>
-                            </button>
-                        ` : ''}
-                    </div>
-                </td>
+              <td>
+    <div class="action-buttons-compact">
+        ${tienePagoPendiente ? `
+            <button class="btn-small btn-primary" 
+                    onclick="abrirValidarPagoModal(${cuota.id_pago}, ${cuota.id_cuota})" 
+                    title="Validar pago">
+                <i class="fas fa-check-circle"></i>
+            </button>
+        ` : ''}
+        
+        ${cuota.comprobante_archivo ? `
+            <button class="btn-small btn-secondary" 
+                    onclick="verComprobanteAdmin('${cuota.comprobante_archivo}')" 
+                    title="Ver comprobante">
+                <i class="fas fa-image"></i>
+            </button>
+        ` : ''}
+        
+        <!-- ✅ BOTÓN JUSTIFICAR HORAS -->
+        ${cuota.horas_cumplidas < cuota.horas_requeridas ? `
+            <button class="btn-small btn-success" 
+                    onclick="abrirModalJustificarHoras(
+                        ${cuota.id_cuota}, 
+                        ${cuota.id_usuario}, 
+                        '${(cuota.nombre_completo || 'Usuario').replace(/'/g, "\\'")}',
+                        ${cuota.mes},
+                        ${cuota.anio},
+                        ${cuota.horas_requeridas - (cuota.horas_cumplidas || 0)}
+                    )" 
+                    title="Justificar horas faltantes">
+                <i class="fas fa-check-circle"></i> Justificar
+            </button>
+        ` : ''}
+    </div>
+</td>
             </tr>
         `;
     });
@@ -3798,3 +3815,310 @@ window.submitRespuestaAdmin = submitRespuestaAdmin;
 window.cambiarEstadoSolicitud = cambiarEstadoSolicitud;
 
 console.log('✅ Módulo de solicitudes ADMIN cargado completamente');
+
+// ==========================================
+// SISTEMA DE JUSTIFICACIÓN DE HORAS - ADMIN
+// ==========================================
+
+console.log('🟢 Cargando módulo de justificación de horas');
+
+/**
+ * Abrir modal para justificar horas
+ * @param {number} cuotaId - ID de la cuota
+ * @param {number} idUsuario - ID del usuario
+ * @param {string} nombreUsuario - Nombre completo del usuario
+ * @param {number} mes - Mes de la cuota
+ * @param {number} anio - Año de la cuota
+ * @param {number} horasFaltantes - Horas faltantes del usuario
+ */
+async function abrirModalJustificarHoras(cuotaId, idUsuario, nombreUsuario, mes, anio, horasFaltantes) {
+    console.log('📝 Abriendo modal justificar horas:', {
+        cuotaId,
+        idUsuario,
+        nombreUsuario,
+        mes,
+        anio,
+        horasFaltantes
+    });
+
+    // Cargar justificaciones existentes
+    let justificacionesHTML = '';
+    try {
+        const response = await fetch(`/api/justificaciones/usuario?id_usuario=${idUsuario}&mes=${mes}&anio=${anio}`);
+        const data = await response.json();
+        
+        if (data.success && data.justificaciones.length > 0) {
+            const totalJustificado = data.justificaciones.reduce((sum, j) => sum + parseFloat(j.horas_justificadas), 0);
+            
+            justificacionesHTML = `
+                <div class="alert-info" style="margin-bottom: 20px;">
+                    <strong>ℹ️ Justificaciones Existentes:</strong>
+                    <p>Total ya justificado: <strong>${totalJustificado}h</strong></p>
+                    <ul style="margin: 10px 0 0 20px; padding: 0;">
+                        ${data.justificaciones.map(j => `
+                            <li>
+                                ${j.horas_justificadas}h - ${j.motivo} 
+                                <small style="color: #666;">(${new Date(j.fecha_justificacion).toLocaleDateString('es-UY')})</small>
+                                <button class="btn-small btn-danger" onclick="eliminarJustificacion(${j.id_justificacion}, ${cuotaId}, ${idUsuario}, ${mes}, ${anio})" title="Eliminar">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </li>
+                        `).join('')}
+                    </ul>
+                </div>
+            `;
+        }
+    } catch (error) {
+        console.error('Error al cargar justificaciones:', error);
+    }
+
+    const modal = `
+        <div id="justificarHorasModal" class="modal-overlay">
+            <div class="modal-content-large">
+                <button class="modal-close-btn" onclick="cerrarModalJustificarHoras()">×</button>
+                
+                <h2 class="modal-title">
+                    <i class="fas fa-check-circle"></i> Justificar Horas
+                </h2>
+
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <strong>👤 Usuario:</strong> ${nombreUsuario}<br>
+                    <strong>📅 Período:</strong> ${obtenerNombreMes(mes)} ${anio}<br>
+                    <strong>⏰ Horas Faltantes:</strong> <span style="color: ${horasFaltantes > 0 ? '#f44336' : '#4caf50'}; font-weight: bold;">${horasFaltantes}h</span>
+                </div>
+
+                ${justificacionesHTML}
+
+                <form id="justificarHorasForm" onsubmit="submitJustificarHoras(event, ${cuotaId}, ${idUsuario}, ${mes}, ${anio})" enctype="multipart/form-data">
+                    <input type="hidden" name="id_usuario" value="${idUsuario}">
+                    <input type="hidden" name="mes" value="${mes}">
+                    <input type="hidden" name="anio" value="${anio}">
+
+                    <div class="form-group">
+                        <label for="horas-justificadas">
+                            <i class="fas fa-clock"></i> Horas a Justificar *
+                        </label>
+                        <input 
+                            type="number" 
+                            id="horas-justificadas" 
+                            name="horas_justificadas"
+                            min="0.5"
+                            max="${horasFaltantes}"
+                            step="0.5"
+                            placeholder="Ej: 8"
+                            required>
+                        <small class="form-help">Máximo: ${horasFaltantes}h (Descuento: $160 por hora)</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="motivo-justificacion">
+                            <i class="fas fa-file-alt"></i> Motivo de la Justificación *
+                        </label>
+                        <select id="motivo-justificacion" name="motivo" required onchange="toggleOtroMotivo(this)">
+                            <option value="">Seleccione un motivo...</option>
+                            <option value="Certificado médico">🏥 Certificado médico</option>
+                            <option value="Licencia por maternidad/paternidad">👶 Licencia por maternidad/paternidad</option>
+                            <option value="Duelo familiar">💔 Duelo familiar</option>
+                            <option value="Emergencia familiar">🚨 Emergencia familiar</option>
+                            <option value="Trámite legal obligatorio">⚖️ Trámite legal obligatorio</option>
+                            <option value="Otro">✏️ Otro (especificar)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="otro-motivo-group" style="display: none;">
+                        <label for="otro-motivo">
+                            <i class="fas fa-edit"></i> Especifique el motivo *
+                        </label>
+                        <input 
+                            type="text" 
+                            id="otro-motivo" 
+                            name="otro_motivo"
+                            placeholder="Describa brevemente el motivo">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="observaciones-justificacion">
+                            <i class="fas fa-comment"></i> Observaciones Adicionales
+                        </label>
+                        <textarea 
+                            id="observaciones-justificacion" 
+                            name="observaciones"
+                            rows="3"
+                            placeholder="Información adicional sobre la justificación..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="archivo-justificacion">
+                            <i class="fas fa-paperclip"></i> Archivo de Respaldo (Opcional)
+                        </label>
+                        <input 
+                            type="file" 
+                            id="archivo-justificacion" 
+                            name="archivo"
+                            accept="image/*,.pdf">
+                        <small class="form-help">Certificado médico, documentación legal, etc. (máx. 5MB)</small>
+                    </div>
+
+                    <div class="alert-warning">
+                        <strong>⚠️ Confirmación:</strong>
+                        <p>Al justificar horas, se descontará $160 por cada hora de la deuda del usuario.</p>
+                        <p>Esta acción quedará registrada en el sistema.</p>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="cerrarModalJustificarHoras()">
+                            <i class="fas fa-times"></i> Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-check"></i> Justificar Horas
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', modal);
+}
+
+/**
+ * Mostrar campo "Otro motivo" si se selecciona
+ */
+function toggleOtroMotivo(select) {
+    const otroGroup = document.getElementById('otro-motivo-group');
+    const otroInput = document.getElementById('otro-motivo');
+    
+    if (select.value === 'Otro') {
+        otroGroup.style.display = 'block';
+        otroInput.required = true;
+    } else {
+        otroGroup.style.display = 'none';
+        otroInput.required = false;
+        otroInput.value = '';
+    }
+}
+
+/**
+ * Cerrar modal
+ */
+function cerrarModalJustificarHoras() {
+    const modal = document.getElementById('justificarHorasModal');
+    if (modal) modal.remove();
+}
+
+/**
+ * Enviar justificación
+ */
+async function submitJustificarHoras(event, cuotaId, idUsuario, mes, anio) {
+    event.preventDefault();
+    console.log('📤 Enviando justificación');
+
+    const form = document.getElementById('justificarHorasForm');
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const btnHTML = submitBtn.innerHTML;
+
+    // Validar motivo
+    const motivoSelect = document.getElementById('motivo-justificacion');
+    let motivo = motivoSelect.value;
+    
+    if (motivo === 'Otro') {
+        const otroMotivo = document.getElementById('otro-motivo').value.trim();
+        if (!otroMotivo) {
+            alert('⚠️ Debes especificar el motivo');
+            return;
+        }
+        motivo = 'Otro: ' + otroMotivo;
+    }
+
+    // Confirmar acción
+    const horas = parseFloat(document.getElementById('horas-justificadas').value);
+    const descuento = horas * 160;
+    
+    if (!confirm(`¿Estás seguro de justificar ${horas}h?\n\nDescuento: $${descuento.toLocaleString('es-UY', {minimumFractionDigits: 2})}\n\nMotivo: ${motivo}`)) {
+        return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
+
+    try {
+        const formData = new FormData(form);
+        // Sobrescribir el motivo si es "Otro"
+        formData.set('motivo', motivo);
+
+        const response = await fetch('/api/justificaciones/crear', {
+            method: 'POST',
+            body: formData,
+            credentials: 'same-origin'
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            alert('✅ ' + data.message);
+            cerrarModalJustificarHoras();
+            
+            // Recargar cuotas
+            await loadAllCuotasAdmin();
+            await loadEstadisticasCuotas();
+        } else {
+            alert('❌ ' + data.message);
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = btnHTML;
+        }
+
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Error de conexión');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = btnHTML;
+    }
+}
+
+/**
+ * Eliminar justificación
+ */
+async function eliminarJustificacion(idJustificacion, cuotaId, idUsuario, mes, anio) {
+    if (!confirm('¿Estás seguro de eliminar esta justificación?\n\nLa deuda de horas volverá a sumarse.')) {
+        return;
+    }
+
+    try {
+        const formData = new FormData();
+        formData.append('id_justificacion', idJustificacion);
+
+        const response = await fetch('/api/justificaciones/eliminar', {
+            method: 'POST',
+            body: formData,
+            credentials: 'same-origin'
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            alert('✅ ' + data.message);
+            cerrarModalJustificarHoras();
+            
+            // Reabrir modal actualizado
+            setTimeout(() => {
+                // Necesitarías pasar los datos necesarios, o recargar la página
+                loadAllCuotasAdmin();
+            }, 500);
+        } else {
+            alert('❌ ' + data.message);
+        }
+
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Error de conexión');
+    }
+}
+
+// Exportar funciones
+window.abrirModalJustificarHoras = abrirModalJustificarHoras;
+window.cerrarModalJustificarHoras = cerrarModalJustificarHoras;
+window.submitJustificarHoras = submitJustificarHoras;
+window.eliminarJustificacion = eliminarJustificacion;
+window.toggleOtroMotivo = toggleOtroMotivo;
+
+console.log('✅ Módulo de justificación de horas cargado completamente');

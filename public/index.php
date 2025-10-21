@@ -70,7 +70,7 @@ $loginOnlyRoutes = [
     '/api/pay/firstPay',
     '/api/viviendas/tipos',
     '/api/users/my-profile',       
-    '/api/users/update-profile',    
+    '/api/users/update-profile',
 ];
 
 $privateRoutes = [
@@ -154,7 +154,10 @@ $privateRoutes = [
     '/api/solicitudes/all',
     '/api/solicitudes/update-estado',
     '/api/solicitudes/estadisticas',
-
+    // ✅ NUEVAS RUTAS DE JUSTIFICACIONES
+    '/api/justificaciones/crear',
+    '/api/justificaciones/usuario',
+    '/api/justificaciones/eliminar',
 ];
 
 // Aplicar middleware según el tipo de ruta
@@ -424,7 +427,7 @@ switch ($uri) {
         (new App\Controllers\DeudaHorasController())->getHistorialMensual();
         break;
 
-         // API CUOTAS - USUARIO
+    // API CUOTAS - USUARIO
     case '/api/cuotas/mis-cuotas':
         (new App\Controllers\CuotaController())->getMisCuotas();
         break;
@@ -434,14 +437,12 @@ switch ($uri) {
     case '/api/cuotas/generar':
         (new App\Controllers\CuotaController())->generarMiCuota();
         break;
-    
     case '/api/cuotas/verificar-cuota-mes':
         (new App\Controllers\CuotaController())->verificarCuotaMes();
         break;
-   case '/api/cuotas/generar-mi-cuota':
-    (new App\Controllers\CuotaController())->generarMiCuota();
-    break;
-    
+    case '/api/cuotas/generar-mi-cuota':
+        (new App\Controllers\CuotaController())->generarMiCuota();
+        break;
     case '/api/cuotas/verificar-pago':
         (new App\Controllers\CuotaController())->verificarPagoCuota();
         break;
@@ -469,7 +470,7 @@ switch ($uri) {
         (new App\Controllers\CuotaController())->actualizarPrecio();
         break;
 
-        // API SOLICITUDES - USUARIO
+    // API SOLICITUDES - USUARIO
     case '/api/solicitudes/create':
         (new App\Controllers\SolicitudController())->create();
         break;
@@ -492,6 +493,17 @@ switch ($uri) {
         break;
     case '/api/solicitudes/estadisticas':
         (new App\Controllers\SolicitudController())->getEstadisticas();
+        break;
+
+    // ✅ API JUSTIFICACIONES DE HORAS - ADMIN
+    case '/api/justificaciones/crear':
+        (new App\Controllers\JustificacionHorasController())->crearJustificacion();
+        break;
+    case '/api/justificaciones/usuario':
+        (new App\Controllers\JustificacionHorasController())->getJustificacionesUsuario();
+        break;
+    case '/api/justificaciones/eliminar':
+        (new App\Controllers\JustificacionHorasController())->eliminarJustificacion();
         break;
 
     default:

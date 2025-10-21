@@ -52,8 +52,10 @@ class Herramientas
     {
         self::startSession();
 
-        $currentURL = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-        $isAdmin = $_SESSION['is_admin'] ?? false;
+           $currentURL = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+        
+        // ✅ Detectar admin por ROL o flag is_admin
+        $isAdmin = ($_SESSION['is_admin'] ?? false) || ($_SESSION['rol'] ?? '') === 'admin';
         $estado = $_SESSION['estado'] ?? 'pendiente';
 
         // ✅ ADMINISTRADORES: Acceso completo sin restricciones

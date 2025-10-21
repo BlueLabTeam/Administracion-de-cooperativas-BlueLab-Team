@@ -25,7 +25,7 @@ class DeudaHoras
      * Horas cumplidas: las que tiene registradas (aprobadas o no)
      * Deuda: (Horas faltantes) × $160
      */
-    public function obtenerDeudaActual($id_usuario)
+     public function obtenerDeudaActual($id_usuario)
     {
         try {
             error_log("=== obtenerDeudaActual (Sistema Semanal: 21h/semana) ===");
@@ -55,14 +55,39 @@ class DeudaHoras
             $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
             $horas_trabajadas = (float)$resultado['total_horas'];
             
+            // ✅ OBTENER HORAS JUSTIFICADAS DEL MES ACTUAL
+            $stmt = $this->conn->prepare("
+                SELECT COALESCE(SUM(horas_justificadas), 0) as horas_justificadas,
+                       COALESCE(SUM(monto_descontado), 0) as monto_descontado
+                FROM Justificaciones_Horas
+                WHERE id_usuario = :id_usuario
+                AND mes = :mes
+                AND anio = :anio
+                AND estado = 'aprobada'
+            ");
+            
+            $stmt->execute([
+                'id_usuario' => $id_usuario,
+                'mes' => $mes_actual,
+                'anio' => $anio_actual
+            ]);
+            
+            $justificacion = $stmt->fetch(PDO::FETCH_ASSOC);
+            $horas_justificadas = (float)($justificacion['horas_justificadas'] ?? 0);
+            $monto_justificado = (float)($justificacion['monto_descontado'] ?? 0);
+            
             error_log("Horas trabajadas este mes: " . $horas_trabajadas . "h");
+            error_log("Horas justificadas este mes: " . $horas_justificadas . "h");
+            error_log("Monto justificado: $" . $monto_justificado);
             error_log("Horas requeridas mensuales: " . $this->horas_mensuales_requeridas . "h (21h/semana × 4)");
             
-            // Calcular horas faltantes o excedentes
-            $horas_faltantes = max(0, $this->horas_mensuales_requeridas - $horas_trabajadas);
-            $horas_excedentes = max(0, $horas_trabajadas - $this->horas_mensuales_requeridas);
+            // ✅ CALCULAR HORAS FALTANTES CONSIDERANDO JUSTIFICACIONES
+            // Horas faltantes = Requeridas - Trabajadas - Justificadas
+            $horas_efectivas = $horas_trabajadas + $horas_justificadas;
+            $horas_faltantes = max(0, $this->horas_mensuales_requeridas - $horas_efectivas);
+            $horas_excedentes = max(0, $horas_efectivas - $this->horas_mensuales_requeridas);
             
-            // CALCULAR DEUDA EN PESOS: Horas faltantes × $160
+            // ✅ CALCULAR DEUDA EN PESOS: Solo las horas REALMENTE faltantes
             $deuda_mes_actual = $horas_faltantes * $this->costo_hora_faltante;
             
             // Obtener deuda acumulada de meses anteriores
@@ -72,14 +97,14 @@ class DeudaHoras
             $deuda_total = $deuda_mes_actual + $deuda_anterior;
             
             $porcentaje_cumplido = $this->horas_mensuales_requeridas > 0 
-                ? round(($horas_trabajadas / $this->horas_mensuales_requeridas) * 100, 2)
+                ? round(($horas_efectivas / $this->horas_mensuales_requeridas) * 100, 2)
                 : 0;
 
             // Determinar estado
             $estado = 'pendiente';
-            if ($horas_trabajadas >= $this->horas_mensuales_requeridas) {
+            if ($horas_efectivas >= $this->horas_mensuales_requeridas) {
                 $estado = 'cumplido';
-            } elseif ($horas_trabajadas > 0) {
+            } elseif ($horas_efectivas > 0) {
                 $estado = 'progreso';
             }
 
@@ -89,12 +114,12 @@ class DeudaHoras
             $semanas_transcurridas = max(1, $semana_actual - $semana_inicio_mes + 1);
             $promedio_semanal = $semanas_transcurridas > 0 ? $horas_trabajadas / $semanas_transcurridas : 0;
 
+            error_log("Horas efectivas (trabajadas + justificadas): " . $horas_efectivas . "h");
             error_log("Horas faltantes: " . $horas_faltantes . "h");
             error_log("Deuda mes actual: $" . $deuda_mes_actual);
             error_log("Deuda acumulada: $" . $deuda_anterior);
             error_log("Deuda total: $" . $deuda_total);
             error_log("Porcentaje cumplido: " . $porcentaje_cumplido . "%");
-            error_log("Promedio semanal: " . round($promedio_semanal, 2) . "h/semana");
 
             return [
                 'mes' => $mes_actual,
@@ -102,10 +127,13 @@ class DeudaHoras
                 'horas_requeridas_mensuales' => $this->horas_mensuales_requeridas,
                 'horas_requeridas_semanales' => $this->horas_semanales_requeridas,
                 'horas_trabajadas' => round($horas_trabajadas, 2),
+                'horas_justificadas' => round($horas_justificadas, 2),
+                'horas_efectivas' => round($horas_efectivas, 2),
                 'horas_faltantes' => round($horas_faltantes, 2),
                 'horas_excedentes' => round($horas_excedentes, 2),
                 'promedio_semanal' => round($promedio_semanal, 2),
                 'semanas_transcurridas' => $semanas_transcurridas,
+                'monto_justificado' => round($monto_justificado, 2),
                 'deuda_mes_actual' => round($deuda_mes_actual, 2),
                 'deuda_acumulada' => round($deuda_anterior, 2),
                 'deuda_en_pesos' => round($deuda_total, 2),
@@ -124,10 +152,13 @@ class DeudaHoras
                 'horas_requeridas_mensuales' => $this->horas_mensuales_requeridas,
                 'horas_requeridas_semanales' => $this->horas_semanales_requeridas,
                 'horas_trabajadas' => 0,
+                'horas_justificadas' => 0,
+                'horas_efectivas' => 0,
                 'horas_faltantes' => $this->horas_mensuales_requeridas,
                 'horas_excedentes' => 0,
                 'promedio_semanal' => 0,
                 'semanas_transcurridas' => 1,
+                'monto_justificado' => 0,
                 'deuda_mes_actual' => $this->horas_mensuales_requeridas * $this->costo_hora_faltante,
                 'deuda_acumulada' => 0,
                 'deuda_en_pesos' => $this->horas_mensuales_requeridas * $this->costo_hora_faltante,

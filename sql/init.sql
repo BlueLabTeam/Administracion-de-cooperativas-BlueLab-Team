@@ -778,3 +778,98 @@ INNER JOIN Usuario u ON s.id_usuario = u.id_usuario
 LEFT JOIN Respuestas_Solicitudes rs ON s.id_solicitud = rs.id_solicitud
 GROUP BY s.id_solicitud
 ORDER BY s.fecha_creacion DESC;
+
+
+-- ==========================================
+-- TABLA DE JUSTIFICACIONES DE HORAS
+-- ==========================================
+
+CREATE TABLE IF NOT EXISTS Justificaciones_Horas (
+    id_justificacion INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT NOT NULL,
+    mes INT NOT NULL CHECK (mes BETWEEN 1 AND 12),
+    anio INT NOT NULL,
+    horas_justificadas DECIMAL(5,2) NOT NULL DEFAULT 0.00,
+    motivo TEXT NOT NULL,
+    archivo_adjunto VARCHAR(500) NULL COMMENT 'Certificado médico, permiso, etc.',
+    monto_descontado DECIMAL(10,2) NOT NULL DEFAULT 0.00 COMMENT 'horas_justificadas × $160',
+    id_admin INT NOT NULL COMMENT 'Admin que aprobó la justificación',
+    fecha_justificacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+    estado ENUM('aprobada', 'rechazada') DEFAULT 'aprobada',
+    observaciones TEXT NULL,
+    
+    FOREIGN KEY (id_usuario) REFERENCES Usuario(id_usuario) ON DELETE CASCADE,
+    FOREIGN KEY (id_admin) REFERENCES Usuario(id_usuario),
+    
+    INDEX idx_usuario_periodo (id_usuario, mes, anio),
+    INDEX idx_fecha (fecha_justificacion DESC)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ==========================================
+-- VISTA COMPLETA CON JUSTIFICACIONES
+-- ==========================================
+
+CREATE OR REPLACE VIEW Vista_Cuotas_Con_Justificaciones AS
+SELECT 
+    cm.id_cuota,
+    cm.id_usuario,
+    u.nombre_completo,
+    u.email,
+    cm.id_vivienda,
+    v.numero_vivienda,
+    tv.nombre as tipo_vivienda,
+    tv.habitaciones,
+    cm.mes,
+    cm.anio,
+    cm.monto as monto_base,
+    cm.monto_pendiente_anterior,
+    
+    -- Cálculo de deuda de horas
+    cm.horas_requeridas,
+    cm.horas_cumplidas,
+    GREATEST(0, cm.horas_requeridas - cm.horas_cumplidas) as horas_faltantes_base,
+    
+    -- Horas justificadas del mes
+    COALESCE(SUM(jh.horas_justificadas), 0) as horas_justificadas,
+    COALESCE(SUM(jh.monto_descontado), 0) as monto_justificado,
+    
+    -- Horas faltantes DESPUÉS de justificaciones
+    GREATEST(0, cm.horas_requeridas - cm.horas_cumplidas - COALESCE(SUM(jh.horas_justificadas), 0)) as horas_faltantes_real,
+    
+    -- Deuda en pesos DESPUÉS de justificaciones
+    GREATEST(0, cm.horas_requeridas - cm.horas_cumplidas - COALESCE(SUM(jh.horas_justificadas), 0)) * 160 as deuda_horas_pesos,
+    
+    -- Monto total a pagar
+    (cm.monto + cm.monto_pendiente_anterior + 
+     (GREATEST(0, cm.horas_requeridas - cm.horas_cumplidas - COALESCE(SUM(jh.horas_justificadas), 0)) * 160)) as monto_total,
+    
+    cm.estado,
+    cm.fecha_vencimiento,
+    cm.horas_validadas,
+    cm.observaciones,
+    
+    -- Info de pago
+    pc.id_pago,
+    pc.monto_pagado,
+    pc.fecha_pago,
+    pc.comprobante_archivo,
+    pc.estado_validacion as estado_pago,
+    pc.observaciones_validacion,
+    
+    -- Estado actual
+    CASE 
+        WHEN cm.fecha_vencimiento < CURDATE() AND cm.estado = 'pendiente' THEN 'vencida'
+        ELSE cm.estado
+    END as estado_actual
+    
+FROM Cuotas_Mensuales cm
+INNER JOIN Usuario u ON cm.id_usuario = u.id_usuario
+INNER JOIN Viviendas v ON cm.id_vivienda = v.id_vivienda
+INNER JOIN Tipo_Vivienda tv ON v.id_tipo = tv.id_tipo
+LEFT JOIN Justificaciones_Horas jh ON 
+    cm.id_usuario = jh.id_usuario AND 
+    cm.mes = jh.mes AND 
+    cm.anio = jh.anio AND
+    jh.estado = 'aprobada'
+LEFT JOIN Pagos_Cuotas pc ON cm.id_cuota = pc.id_cuota AND pc.estado_validacion != 'rechazado'
+GROUP BY cm.id_cuota;

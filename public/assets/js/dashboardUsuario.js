@@ -3583,3 +3583,428 @@ window.cerrarModalResponder = cerrarModalResponder;
 window.submitRespuesta = submitRespuesta;
 
 console.log('✅ Módulo de solicitudes cargado completamente');
+
+// ==========================================
+// JUSTIFICACIONES DE HORAS - VISTA USUARIO
+// ==========================================
+
+/**
+ * Cargar justificaciones del usuario en el widget de deuda
+ */
+async function cargarJustificacionesUsuario() {
+    const container = document.getElementById('justificaciones-usuario-container');
+    if (!container) {
+        console.log('⚠️ Container de justificaciones no encontrado');
+        return;
+    }
+    
+    container.innerHTML = '<p class="loading">Cargando justificaciones...</p>';
+    
+    try {
+        const hoy = new Date();
+        const mes = hoy.getMonth() + 1;
+        const anio = hoy.getFullYear();
+        
+        // Obtener ID del usuario desde sesión
+        const profileResponse = await fetch('/api/users/my-profile');
+        const profileData = await profileResponse.json();
+        
+        if (!profileData.success) {
+            throw new Error('No se pudo obtener el perfil del usuario');
+        }
+        
+        const userId = profileData.user.id_usuario;
+        
+        // Obtener justificaciones del mes actual
+        const response = await fetch(`/api/justificaciones/usuario?id_usuario=${userId}&mes=${mes}&anio=${anio}`);
+        const data = await response.json();
+        
+        console.log('📋 Justificaciones recibidas:', data);
+        
+        if (data.success && data.justificaciones) {
+            renderJustificacionesUsuario(data.justificaciones);
+        } else {
+            container.innerHTML = '<p style="color: #999; font-size: 12px;">No hay justificaciones este mes</p>';
+        }
+        
+    } catch (error) {
+        console.error('❌ Error al cargar justificaciones:', error);
+        container.innerHTML = '<p style="color: #f44336; font-size: 12px;">Error al cargar justificaciones</p>';
+    }
+}
+
+/**
+ * Renderizar justificaciones en formato compacto
+ */
+function renderJustificacionesUsuario(justificaciones) {
+    const container = document.getElementById('justificaciones-usuario-container');
+    
+    if (!justificaciones || justificaciones.length === 0) {
+        container.innerHTML = '<p style="color: #999; font-size: 12px; text-align: center;">No tienes justificaciones este mes</p>';
+        return;
+    }
+    
+    const totalJustificado = justificaciones.reduce((sum, j) => sum + parseFloat(j.horas_justificadas), 0);
+    const totalDescontado = justificaciones.reduce((sum, j) => sum + parseFloat(j.monto_descontado), 0);
+    
+    let html = `
+        <div class="justificaciones-widget">
+            <div class="justificaciones-header">
+                <h4 style="margin: 0; color: #4caf50; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-check-circle"></i>
+                    Horas Justificadas
+                </h4>
+                <div class="justificaciones-totales">
+                    <span class="total-horas">${totalJustificado.toFixed(1)}h</span>
+                    <span class="total-descuento">-$${totalDescontado.toFixed(2)}</span>
+                </div>
+            </div>
+            
+            <div class="justificaciones-lista">
+    `;
+    
+    justificaciones.forEach((just, index) => {
+        const fecha = new Date(just.fecha_justificacion).toLocaleDateString('es-UY', {
+            day: '2-digit',
+            month: '2-digit'
+        });
+        
+        html += `
+            <div class="justificacion-item">
+                <div class="justificacion-info">
+                    <div class="justificacion-icon">
+                        <i class="fas fa-clipboard-check"></i>
+                    </div>
+                    <div class="justificacion-detalles">
+                        <strong style="color: #333; font-size: 13px;">
+                            ${just.horas_justificadas}h × $160 = $${parseFloat(just.monto_descontado).toFixed(2)}
+                        </strong>
+                        <p style="margin: 3px 0 0 0; font-size: 11px; color: #666;">
+                            ${truncarTexto(just.motivo, 50)}
+                        </p>
+                        <small style="color: #999; font-size: 10px;">
+                            <i class="fas fa-calendar"></i> ${fecha}
+                            ${just.admin_nombre ? `· Por ${just.admin_nombre}` : ''}
+                        </small>
+                    </div>
+                </div>
+                ${just.archivo_adjunto ? `
+                    <button class="btn-ver-archivo" onclick="verArchivoJustificacion('${just.archivo_adjunto}')" title="Ver archivo">
+                        <i class="fas fa-paperclip"></i>
+                    </button>
+                ` : ''}
+            </div>
+        `;
+    });
+    
+    html += `
+            </div>
+            
+            <button class="btn-ver-todas-justificaciones" onclick="verTodasJustificaciones()">
+                <i class="fas fa-list"></i> Ver Historial Completo
+            </button>
+        </div>
+    `;
+    
+    container.innerHTML = html;
+}
+
+/**
+ * Ver archivo adjunto de justificación
+ */
+function verArchivoJustificacion(archivo) {
+    window.open(`/files/?path=${archivo}`, '_blank');
+}
+
+/**
+ * Ver todas las justificaciones (historial completo)
+ */
+async function verTodasJustificaciones() {
+    try {
+        const profileResponse = await fetch('/api/users/my-profile');
+        const profileData = await profileResponse.json();
+        
+        if (!profileData.success) {
+            throw new Error('No se pudo obtener el perfil');
+        }
+        
+        const userId = profileData.user.id_usuario;
+        
+        // Obtener TODAS las justificaciones (sin filtrar por mes)
+        const response = await fetch(`/api/justificaciones/usuario?id_usuario=${userId}`);
+        const data = await response.json();
+        
+        if (!data.success) {
+            alert('❌ Error al cargar historial');
+            return;
+        }
+        
+        mostrarModalHistorialJustificaciones(data.justificaciones || []);
+        
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Error de conexión');
+    }
+}
+
+/**
+ * Modal con historial completo de justificaciones
+ */
+function mostrarModalHistorialJustificaciones(justificaciones) {
+    if (!justificaciones || justificaciones.length === 0) {
+        alert('ℹ️ No tienes justificaciones registradas');
+        return;
+    }
+    
+    // Agrupar por mes/año
+    const porPeriodo = {};
+    justificaciones.forEach(j => {
+        const key = `${j.anio}-${String(j.mes).padStart(2, '0')}`;
+        if (!porPeriodo[key]) {
+            porPeriodo[key] = {
+                mes: j.mes,
+                anio: j.anio,
+                justificaciones: [],
+                totalHoras: 0,
+                totalDescuento: 0
+            };
+        }
+        porPeriodo[key].justificaciones.push(j);
+        porPeriodo[key].totalHoras += parseFloat(j.horas_justificadas);
+        porPeriodo[key].totalDescuento += parseFloat(j.monto_descontado);
+    });
+    
+    // Ordenar por período (más reciente primero)
+    const periodos = Object.values(porPeriodo).sort((a, b) => {
+        if (a.anio !== b.anio) return b.anio - a.anio;
+        return b.mes - a.mes;
+    });
+    
+    let html = '';
+    
+    periodos.forEach(periodo => {
+        const nombreMes = obtenerNombreMes(periodo.mes);
+        
+        html += `
+            <div class="periodo-justificaciones">
+                <div class="periodo-header">
+                    <h4>${nombreMes} ${periodo.anio}</h4>
+                    <div class="periodo-totales">
+                        <span class="total-horas-periodo">${periodo.totalHoras.toFixed(1)}h</span>
+                        <span class="total-descuento-periodo">-$${periodo.totalDescuento.toFixed(2)}</span>
+                    </div>
+                </div>
+                
+                <div class="justificaciones-del-periodo">
+        `;
+        
+        periodo.justificaciones.forEach(just => {
+            const fecha = new Date(just.fecha_justificacion).toLocaleDateString('es-UY', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            
+            html += `
+                <div class="justificacion-detalle-item">
+                    <div class="justificacion-encabezado">
+                        <i class="fas fa-check-circle" style="color: #4caf50;"></i>
+                        <strong>${just.horas_justificadas}h justificadas</strong>
+                        <span class="descuento-tag">-$${parseFloat(just.monto_descontado).toFixed(2)}</span>
+                    </div>
+                    
+                    <div class="justificacion-cuerpo">
+                        <p><strong>Motivo:</strong> ${just.motivo}</p>
+                        ${just.observaciones ? `<p><strong>Observaciones:</strong> ${just.observaciones}</p>` : ''}
+                        <p style="font-size: 12px; color: #666;">
+                            <i class="fas fa-calendar"></i> ${fecha}
+                            ${just.admin_nombre ? `· Aprobado por: ${just.admin_nombre}` : ''}
+                        </p>
+                        ${just.archivo_adjunto ? `
+                            <a href="/files/?path=${just.archivo_adjunto}" target="_blank" class="btn btn-secondary btn-small">
+                                <i class="fas fa-paperclip"></i> Ver Archivo
+                            </a>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        });
+        
+        html += `
+                </div>
+            </div>
+        `;
+    });
+    
+    const modal = `
+        <div class="modal-detail" onclick="if(event.target.classList.contains('modal-detail')) this.remove()">
+            <div class="modal-detail-content" style="max-width: 900px;">
+                <button onclick="this.closest('.modal-detail').remove()" class="modal-close-button">×</button>
+                
+                <h2 class="modal-detail-header">
+                    <i class="fas fa-history"></i> Historial de Justificaciones
+                </h2>
+                
+                <div class="modal-detail-section">
+                    <div class="alert-info">
+                        <strong>ℹ️ Información:</strong>
+                        <p>Aquí puedes ver todas las horas que han sido justificadas y descontadas de tu deuda mensual.</p>
+                        <p>Tarifa: <strong>$160 por hora</strong> · Sistema: <strong>21h semanales (84h mensuales)</strong></p>
+                    </div>
+                </div>
+                
+                ${html}
+                
+                <div class="modal-detail-footer">
+                    <button onclick="this.closest('.modal-detail').remove()" class="btn btn-secondary">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modal);
+}
+
+/**
+ * Modificar renderDeudaHorasWidget para incluir justificaciones
+ */
+function renderDeudaHorasWidget(deuda) {
+    const container = document.getElementById('deuda-actual-container');
+    
+    const estado = deuda.estado || 'pendiente';
+    const colorEstado = estado === 'cumplido' ? 'success' : 
+                       estado === 'progreso' ? 'warning' : 'error';
+    
+    const deudaPesos = parseFloat(deuda.deuda_en_pesos || 0);
+    const tieneDeuda = deudaPesos > 0;
+    const horasJustificadas = parseFloat(deuda.horas_justificadas || 0);
+    const montoJustificado = parseFloat(deuda.monto_justificado || 0);
+    
+    container.innerHTML = `
+        <div class="deuda-widget ${colorEstado}">
+            <div class="deuda-header">
+                <div class="deuda-icono">
+                    <i class="fas ${tieneDeuda ? 'fa-exclamation-triangle' : 'fa-check-circle'}"></i>
+                </div>
+                <div class="deuda-titulo">
+                    <h4>${tieneDeuda ? 'Tienes Deuda de Horas' : 'Sin Deuda de Horas'}</h4>
+                    <p>Período: ${getNombreMes(deuda.mes)} ${deuda.anio}</p>
+                </div>
+            </div>
+            
+            <div class="deuda-body">
+                <div class="deuda-monto-principal ${tieneDeuda ? 'error' : 'success'}">
+                    ${deudaPesos.toLocaleString('es-UY', {minimumFractionDigits: 2})}
+                </div>
+                
+                <div class="deuda-desglose">
+                    <div class="desglose-item">
+                        <span class="label">Horas Requeridas:</span>
+                        <span class="valor">${deuda.horas_requeridas_mensuales}h/mes</span>
+                    </div>
+                    <div class="desglose-item">
+                        <span class="label">Sistema Semanal:</span>
+                        <span class="valor">${deuda.horas_requeridas_semanales}h/semana</span>
+                    </div>
+                    <div class="desglose-item">
+                        <span class="label">Horas Trabajadas:</span>
+                        <span class="valor">${deuda.horas_trabajadas}h</span>
+                    </div>
+                    
+                    ${horasJustificadas > 0 ? `
+                        <div class="desglose-item" style="background: rgba(76, 175, 80, 0.1); border-left: 3px solid #4caf50; padding-left: 10px;">
+                            <span class="label" style="color: #4caf50;">
+                                <i class="fas fa-check-circle"></i> Horas Justificadas:
+                            </span>
+                            <span class="valor" style="color: #4caf50; font-weight: bold;">
+                                +${horasJustificadas}h
+                            </span>
+                        </div>
+                        <div class="desglose-item" style="background: rgba(76, 175, 80, 0.1); border-left: 3px solid #4caf50; padding-left: 10px;">
+                            <span class="label" style="color: #4caf50;">
+                                <i class="fas fa-dollar-sign"></i> Descuento Aplicado:
+                            </span>
+                            <span class="valor" style="color: #4caf50; font-weight: bold;">
+                                -${montoJustificado.toFixed(2)}
+                            </span>
+                        </div>
+                    ` : ''}
+                    
+                    <div class="desglose-item">
+                        <span class="label">Promedio Semanal:</span>
+                        <span class="valor">${deuda.promedio_semanal}h/sem</span>
+                    </div>
+                    <div class="desglose-item ${tieneDeuda ? 'error' : 'success'}">
+                        <span class="label">Horas Faltantes:</span>
+                        <span class="valor">${deuda.horas_faltantes}h</span>
+                    </div>
+                    <div class="desglose-item">
+                        <span class="label">Costo por Hora:</span>
+                        <span class="valor">${deuda.costo_por_hora}</span>
+                    </div>
+                </div>
+                
+                <div class="deuda-progreso">
+                    <div class="progreso-header">
+                        <span>Progreso Mensual</span>
+                        <span class="porcentaje">${deuda.porcentaje_cumplido}%</span>
+                    </div>
+                    <div class="barra-progreso">
+                        <div class="barra-fill" style="width: ${Math.min(deuda.porcentaje_cumplido, 100)}%; 
+                             background: ${deuda.porcentaje_cumplido >= 100 ? '#4caf50' : 
+                                          deuda.porcentaje_cumplido >= 50 ? '#ff9800' : '#f44336'};">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- ✅ NUEVA SECCIÓN: JUSTIFICACIONES -->
+                <div id="justificaciones-usuario-container" style="margin-top: 20px;">
+                    <!-- Se carga dinámicamente -->
+                </div>
+                
+                ${deuda.deuda_acumulada > 0 ? `
+                    <div class="alert-warning" style="margin-top: 15px;">
+                        <strong>⚠️ Deuda Acumulada:</strong>
+                        <p>${parseFloat(deuda.deuda_acumulada).toLocaleString('es-UY', {minimumFractionDigits: 2})} 
+                        de meses anteriores</p>
+                    </div>
+                ` : ''}
+                
+                ${horasJustificadas > 0 ? `
+                    <div class="alert-success" style="margin-top: 15px;">
+                        <strong>✅ Horas Justificadas Aplicadas</strong>
+                        <p>Se han descontado <strong>${horasJustificadas}h</strong> justificadas (-${montoJustificado.toFixed(2)}) de tu deuda.</p>
+                        <p>Deuda final: <strong>${deudaPesos.toLocaleString('es-UY', {minimumFractionDigits: 2})}</strong></p>
+                    </div>
+                ` : ''}
+                
+                ${tieneDeuda ? `
+                    <div class="alert-info" style="margin-top: 15px;">
+                        <strong>ℹ️ Información:</strong>
+                        <p>Esta deuda se sumará automáticamente a tu próxima cuota mensual de vivienda.</p>
+                        <p>Sistema: <strong>21 horas semanales</strong> (84h mensuales).</p>
+                    </div>
+                ` : `
+                    <div class="alert-success" style="margin-top: 15px;">
+                        <strong>🎉 ¡Excelente!</strong>
+                        <p>Has cumplido con tus horas requeridas. No tendrás cargos adicionales en tu cuota.</p>
+                    </div>
+                `}
+            </div>
+        </div>
+    `;
+    
+    // ✅ CARGAR JUSTIFICACIONES DESPUÉS DE RENDERIZAR
+    setTimeout(() => {
+        cargarJustificacionesUsuario();
+    }, 100);
+}
+
+// Exportar funciones
+window.cargarJustificacionesUsuario = cargarJustificacionesUsuario;
+window.verTodasJustificaciones = verTodasJustificaciones;
+window.verArchivoJustificacion = verArchivoJustificacion;
+
+console.log('✅ Módulo de justificaciones para usuario cargado');
