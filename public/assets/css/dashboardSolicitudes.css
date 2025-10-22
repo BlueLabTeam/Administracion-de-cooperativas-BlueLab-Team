@@ -785,24 +785,7 @@ form {
     60%, 100% { content: '...'; }
 }
 
-/* ========== ERROR ========== */
-.error {
-    background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
-    border-left: 4px solid #f44336;
-    color: #b71c1c;
-    padding: 20px;
-    border-radius: 10px;
-    margin: 20px 0;
-}
 
-.error h3 {
-    margin: 0 0 10px 0;
-    color: #b71c1c;
-}
-
-.error p {
-    margin: 0 0 15px 0;
-}
 
 /* ========== RESPONSIVE ========== */
 @media (max-width: 768px) {
