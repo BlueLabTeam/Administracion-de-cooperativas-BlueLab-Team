@@ -1789,11 +1789,16 @@ let deudaHorasActual = 0;
 document.addEventListener('DOMContentLoaded', function() {
     const cuotasMenuItem = document.querySelector('.menu li[data-section="cuotas"]');
     if (cuotasMenuItem) {
-        cuotasMenuItem.addEventListener('click', function() {
-            console.log('>>> Sección cuotas abierta');
-            inicializarSeccionCuotas();
-        });
-    }
+    cuotasMenuItem.addEventListener('click', async function() {
+        console.log('>>> Sección cuotas abierta');
+        
+        // Limpiar cache
+        ultimoCheckCuotas = null;
+        
+        // Recargar todo
+        await inicializarSeccionCuotas();
+    });
+}
 
     // Poblar selector de años
     const selectAnio = document.getElementById('filtro-anio-cuotas');
@@ -2015,8 +2020,120 @@ function renderMisCuotasOrganizadas(cuotas) {
 const cuotaMasReciente = cuotas[0];
 
 // Calcular deuda total
-const montoCuota = parseFloat(cuotaMasReciente.monto_base || cuotaMasReciente.monto || 0);
+const montoCuota = parseFloat(cuotaMasReciente.monto_base || cuotaMasReciente.monto_actual || cuotaMasReciente.monto || 0);
 const montoTotal = montoCuota + deudaHorasActual;
+
+console.log('💵 Cálculo de montos:', {
+    monto_base: cuotaMasReciente.monto_base,
+    monto_actual: cuotaMasReciente.monto_actual,
+    monto: cuotaMasReciente.monto,
+    montoCuota,
+    deudaHorasActual,
+    montoTotal
+});
+
+let ultimoCheckCuotas = null;
+
+async function verificarCambiosCuotas() {
+    try {
+        const mesActual = new Date().getMonth() + 1;
+        const anioActual = new Date().getFullYear();
+        
+        const response = await fetch(`/api/cuotas/mis-cuotas?mes=${mesActual}&anio=${anioActual}`);
+        const data = await response.json();
+        
+        if (data.success && data.cuotas.length > 0) {
+            const cuotaActual = data.cuotas[0];
+            const checksum = `${cuotaActual.id_cuota}-${cuotaActual.monto}-${cuotaActual.monto_base}`;
+            
+            if (ultimoCheckCuotas === null) {
+                ultimoCheckCuotas = checksum;
+            } else if (ultimoCheckCuotas !== checksum) {
+                console.log('🔄 Detectado cambio en cuota, recargando...');
+                ultimoCheckCuotas = checksum;
+                
+                // Recargar solo si estamos en la sección de cuotas
+                const cuotasSection = document.getElementById('cuotas-section');
+                if (cuotasSection && cuotasSection.classList.contains('active')) {
+                    await inicializarSeccionCuotas();
+                    
+                    // Mostrar notificación
+                    mostrarNotificacionCambio();
+                }
+            }
+        }
+    } catch (error) {
+        console.error('Error verificando cambios:', error);
+    }
+}
+
+function mostrarNotificacionCambio() {
+    const notif = document.createElement('div');
+    notif.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 15px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 10000;
+        animation: slideIn 0.3s ease-out;
+    `;
+    notif.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <i class="fas fa-sync-alt fa-spin"></i>
+            <div>
+                <strong>Actualización Detectada</strong>
+                <p style="margin: 5px 0 0 0; font-size: 13px;">Los precios de tu cuota han sido actualizados</p>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(notif);
+    
+    setTimeout(() => {
+        notif.style.animation = 'slideOut 0.3s ease-in';
+        setTimeout(() => notif.remove(), 300);
+    }, 5000);
+}
+
+// Iniciar polling cada 30 segundos (solo en sección cuotas)
+setInterval(() => {
+    const cuotasSection = document.getElementById('cuotas-section');
+    if (cuotasSection && cuotasSection.classList.contains('active')) {
+        verificarCambiosCuotas();
+    }
+}, 30000); // 30 segundos
+
+// Verificar al cargar la sección
+const originalInicializarSeccionCuotas = window.inicializarSeccionCuotas;
+window.inicializarSeccionCuotas = async function() {
+    await originalInicializarSeccionCuotas();
+    await verificarCambiosCuotas();
+};
+
+function obtenerPrecioActualizado(cuota) {
+    const precio = parseFloat(
+        cuota.monto_base || 
+        cuota.monto_actual || 
+        cuota.monto || 
+        0
+    );
+    
+    console.log(`💰 Precio para cuota ${cuota.id_cuota}:`, {
+        monto_base: cuota.monto_base,
+        monto_actual: cuota.monto_actual,
+        monto: cuota.monto,
+        precio_final: precio
+    });
+    
+    return precio;
+}
+
+window.obtenerPrecioActualizado = obtenerPrecioActualizado;
+
 
 // Verificar estado de pago
 const estadoFinal = cuotaMasReciente.estado_actual || cuotaMasReciente.estado;
@@ -2260,7 +2377,7 @@ function renderCuotaCard(cuota) {
     });
     
     // Calcular montos - SIEMPRE usar monto_base para cuota
-    const montoCuota = parseFloat(cuota.monto_base || 0);
+     const montoCuota = obtenerPrecioActualizado(cuota);
     
     // Si NO está pagada y NO tiene pago pendiente, mostrar TOTAL (cuota + deuda)
     // Si está pagada o tiene pago pendiente, mostrar solo lo que pagó

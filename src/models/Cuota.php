@@ -62,131 +62,160 @@ class Cuota
      * Obtener cuotas del usuario
      */
     public function getCuotasUsuario($idUsuario, $filtros = [])
-    {
-        try {
-            $params = ['id_usuario' => $idUsuario];
-            
-            $sql = "
-                SELECT 
-                    cm.id_cuota,
-                    cm.id_usuario,
-                    cm.id_vivienda,
-                    cm.mes,
-                    cm.anio,
-                    cm.monto,
-                    cm.monto as monto_base,
-                    cm.monto_pendiente_anterior,
-                    (cm.monto + cm.monto_pendiente_anterior) as monto_total,
-                    cm.estado,
-                    cm.fecha_vencimiento,
-                    cm.fecha_generacion,
-                    cm.horas_requeridas,
-                    cm.horas_cumplidas,
-                    cm.horas_validadas,
-                    cm.observaciones,
-                    v.numero_vivienda,
-                    tv.nombre as tipo_vivienda,
-                    tv.habitaciones,
-                    u.nombre_completo,
-                    u.email,
-                    pc.id_pago,
-                    pc.monto_pagado,
-                    pc.fecha_pago,
-                    pc.comprobante_archivo,
-                    pc.estado_validacion as estado_pago,
-                    pc.observaciones_validacion,
-                    CASE 
-                        WHEN cm.fecha_vencimiento < CURDATE() AND cm.estado = 'pendiente' THEN 'vencida'
-                        ELSE cm.estado
-                    END as estado_actual
-                FROM Cuotas_Mensuales cm
-                INNER JOIN Viviendas v ON cm.id_vivienda = v.id_vivienda
-                INNER JOIN Tipo_Vivienda tv ON v.id_tipo = tv.id_tipo
-                INNER JOIN Usuario u ON cm.id_usuario = u.id_usuario
-                LEFT JOIN Pagos_Cuotas pc ON cm.id_cuota = pc.id_cuota AND pc.estado_validacion != 'rechazado'
-                WHERE cm.id_usuario = :id_usuario
-            ";
-            
-            if (!empty($filtros['mes'])) {
-                $sql .= " AND cm.mes = :mes";
-                $params['mes'] = $filtros['mes'];
-            }
-            
-            if (!empty($filtros['anio'])) {
-                $sql .= " AND cm.anio = :anio";
-                $params['anio'] = $filtros['anio'];
-            }
-            
-            if (!empty($filtros['estado'])) {
-                if ($filtros['estado'] === 'vencida') {
-                    $sql .= " AND cm.fecha_vencimiento < CURDATE() AND cm.estado = 'pendiente'";
-                } else {
-                    $sql .= " AND cm.estado = :estado";
-                    $params['estado'] = $filtros['estado'];
-                }
-            }
-            
-            $sql .= " ORDER BY cm.anio DESC, cm.mes DESC";
-            
-            error_log("📊 SQL: " . $sql);
-            error_log("📊 Params: " . json_encode($params));
-            
-            $stmt = $this->conn->prepare($sql);
-            $stmt->execute($params);
-            
-            $resultado = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            error_log("📊 Cuotas encontradas: " . count($resultado));
-            
-            return $resultado;
-            
-        } catch (\PDOException $e) {
-            error_log("❌ Error en getCuotasUsuario: " . $e->getMessage());
-            error_log("❌ SQL: " . ($sql ?? 'N/A'));
-            error_log("❌ Params: " . json_encode($params ?? []));
-            return [];
+{
+    try {
+        $params = ['id_usuario' => $idUsuario];
+        
+        $sql = "
+            SELECT 
+                cm.id_cuota,
+                cm.id_usuario,
+                cm.id_vivienda,
+                cm.mes,
+                cm.anio,
+                -- ✅ USAR PRECIO ACTUAL DE CONFIG SI ESTÁ PENDIENTE
+                CASE 
+                    WHEN cm.estado IN ('pendiente', 'vencida') THEN cc.monto_mensual
+                    ELSE cm.monto
+                END as monto,
+                cm.monto as monto_original,
+                cc.monto_mensual as monto_base,
+                cm.monto_pendiente_anterior,
+                (CASE 
+                    WHEN cm.estado IN ('pendiente', 'vencida') THEN cc.monto_mensual
+                    ELSE cm.monto
+                END + cm.monto_pendiente_anterior) as monto_total,
+                cm.estado,
+                cm.fecha_vencimiento,
+                cm.fecha_generacion,
+                cm.horas_requeridas,
+                cm.horas_cumplidas,
+                cm.horas_validadas,
+                cm.observaciones,
+                v.numero_vivienda,
+                tv.nombre as tipo_vivienda,
+                tv.habitaciones,
+                u.nombre_completo,
+                u.email,
+                pc.id_pago,
+                pc.monto_pagado,
+                pc.fecha_pago,
+                pc.comprobante_archivo,
+                pc.estado_validacion as estado_pago,
+                pc.observaciones_validacion,
+                CASE 
+                    WHEN cm.fecha_vencimiento < CURDATE() AND cm.estado = 'pendiente' THEN 'vencida'
+                    ELSE cm.estado
+                END as estado_actual
+            FROM Cuotas_Mensuales cm
+            INNER JOIN Viviendas v ON cm.id_vivienda = v.id_vivienda
+            INNER JOIN Tipo_Vivienda tv ON v.id_tipo = tv.id_tipo
+            -- ✅ JOIN CON CONFIG_CUOTAS PARA PRECIO ACTUAL
+            INNER JOIN Config_Cuotas cc ON tv.id_tipo = cc.id_tipo AND cc.activo = TRUE
+            INNER JOIN Usuario u ON cm.id_usuario = u.id_usuario
+            LEFT JOIN Pagos_Cuotas pc ON cm.id_cuota = pc.id_cuota AND pc.estado_validacion != 'rechazado'
+            WHERE cm.id_usuario = :id_usuario
+        ";
+        
+        if (!empty($filtros['mes'])) {
+            $sql .= " AND cm.mes = :mes";
+            $params['mes'] = $filtros['mes'];
         }
+        
+        if (!empty($filtros['anio'])) {
+            $sql .= " AND cm.anio = :anio";
+            $params['anio'] = $filtros['anio'];
+        }
+        
+        if (!empty($filtros['estado'])) {
+            if ($filtros['estado'] === 'vencida') {
+                $sql .= " AND cm.fecha_vencimiento < CURDATE() AND cm.estado = 'pendiente'";
+            } else {
+                $sql .= " AND cm.estado = :estado";
+                $params['estado'] = $filtros['estado'];
+            }
+        }
+        
+        $sql .= " ORDER BY cm.anio DESC, cm.mes DESC";
+        
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute($params);
+        
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+    } catch (\PDOException $e) {
+        error_log("❌ Error en getCuotasUsuario: " . $e->getMessage());
+        return [];
     }
+}
 
     /**
      * Obtener todas las cuotas (Admin)
      */
     public function getAllCuotas($filtros = [])
-    {
-        try {
-            $sql = "SELECT * FROM Vista_Cuotas_Completa WHERE 1=1";
-            $params = [];
-            
-            if (!empty($filtros['mes'])) {
-                $sql .= " AND mes = :mes";
-                $params['mes'] = $filtros['mes'];
-            }
-            
-            if (!empty($filtros['anio'])) {
-                $sql .= " AND anio = :anio";
-                $params['anio'] = $filtros['anio'];
-            }
-            
-            if (!empty($filtros['estado'])) {
-                if ($filtros['estado'] === 'vencida') {
-                    $sql .= " AND estado_actual = 'vencida'";
-                } else {
-                    $sql .= " AND estado = :estado";
-                    $params['estado'] = $filtros['estado'];
-                }
-            }
-            
-            $sql .= " ORDER BY anio DESC, mes DESC, nombre_completo ASC";
-            
-            $stmt = $this->conn->prepare($sql);
-            $stmt->execute($params);
-            
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-            
-        } catch (\PDOException $e) {
-            error_log("Error en getAllCuotas: " . $e->getMessage());
-            return [];
+{
+    try {
+        $sql = "
+            SELECT 
+                cm.*,
+                -- ✅ PRECIO ACTUAL PARA PENDIENTES
+                CASE 
+                    WHEN cm.estado IN ('pendiente', 'vencida') THEN cc.monto_mensual
+                    ELSE cm.monto
+                END as monto_actual,
+                cc.monto_mensual as monto_base,
+                v.numero_vivienda,
+                tv.nombre as tipo_vivienda,
+                u.nombre_completo,
+                u.email,
+                pc.estado_validacion as estado_pago,
+                pc.comprobante_archivo,
+                CASE 
+                    WHEN cm.fecha_vencimiento < CURDATE() AND cm.estado = 'pendiente' THEN 'vencida'
+                    ELSE cm.estado
+                END as estado_actual
+            FROM Cuotas_Mensuales cm
+            INNER JOIN Viviendas v ON cm.id_vivienda = v.id_vivienda
+            INNER JOIN Tipo_Vivienda tv ON v.id_tipo = tv.id_tipo
+            INNER JOIN Config_Cuotas cc ON tv.id_tipo = cc.id_tipo AND cc.activo = TRUE
+            INNER JOIN Usuario u ON cm.id_usuario = u.id_usuario
+            LEFT JOIN Pagos_Cuotas pc ON cm.id_cuota = pc.id_cuota
+            WHERE 1=1
+        ";
+        
+        $params = [];
+        
+        if (!empty($filtros['mes'])) {
+            $sql .= " AND cm.mes = :mes";
+            $params['mes'] = $filtros['mes'];
         }
+        
+        if (!empty($filtros['anio'])) {
+            $sql .= " AND cm.anio = :anio";
+            $params['anio'] = $filtros['anio'];
+        }
+        
+        if (!empty($filtros['estado'])) {
+            if ($filtros['estado'] === 'vencida') {
+                $sql .= " AND cm.fecha_vencimiento < CURDATE() AND cm.estado = 'pendiente'";
+            } else {
+                $sql .= " AND cm.estado = :estado";
+                $params['estado'] = $filtros['estado'];
+            }
+        }
+        
+        $sql .= " ORDER BY cm.anio DESC, cm.mes DESC, u.nombre_completo ASC";
+        
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute($params);
+        
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+    } catch (\PDOException $e) {
+        error_log("Error en getAllCuotas: " . $e->getMessage());
+        return [];
     }
+}
 
     /**
      * Obtener detalle de cuota por ID
@@ -401,33 +430,66 @@ class Cuota
      * Actualizar precio
      */
     public function actualizarPrecio($idTipo, $montoMensual)
-    {
-        try {
-            $stmt = $this->conn->prepare("
-                UPDATE Config_Cuotas 
-                SET monto_mensual = :monto
-                WHERE id_tipo = :id_tipo
-                AND activo = TRUE
-            ");
-            
-            $stmt->execute([
-                'monto' => $montoMensual,
-                'id_tipo' => $idTipo
-            ]);
-            
-            return [
-                'success' => true,
-                'message' => 'Precio actualizado exitosamente'
-            ];
-            
-        } catch (\PDOException $e) {
-            error_log("Error en actualizarPrecio: " . $e->getMessage());
-            return [
-                'success' => false,
-                'message' => 'Error al actualizar precio'
-            ];
-        }
+{
+    try {
+        $this->conn->beginTransaction();
+        
+        // 1️⃣ Actualizar precio en Config_Cuotas
+        $stmt = $this->conn->prepare("
+            UPDATE Config_Cuotas 
+            SET monto_mensual = :monto
+            WHERE id_tipo = :id_tipo
+            AND activo = TRUE
+        ");
+        
+        $stmt->execute([
+            'monto' => $montoMensual,
+            'id_tipo' => $idTipo
+        ]);
+        
+        error_log("✅ Precio actualizado en Config_Cuotas");
+        
+        // 2️⃣ Actualizar cuotas PENDIENTES/VENCIDAS del mes actual
+        $mesActual = date('n');
+        $anioActual = date('Y');
+        
+        $stmtUpdate = $this->conn->prepare("
+            UPDATE Cuotas_Mensuales cm
+            INNER JOIN Viviendas v ON cm.id_vivienda = v.id_vivienda
+            SET cm.monto = :nuevo_monto
+            WHERE v.id_tipo = :id_tipo
+            AND cm.estado IN ('pendiente', 'vencida')
+            AND cm.mes = :mes
+            AND cm.anio = :anio
+        ");
+        
+        $stmtUpdate->execute([
+            'nuevo_monto' => $montoMensual,
+            'id_tipo' => $idTipo,
+            'mes' => $mesActual,
+            'anio' => $anioActual
+        ]);
+        
+        $cuotasActualizadas = $stmtUpdate->rowCount();
+        error_log("✅ Cuotas actualizadas: $cuotasActualizadas");
+        
+        $this->conn->commit();
+        
+        return [
+            'success' => true,
+            'message' => "Precio actualizado. $cuotasActualizadas cuotas del mes actual fueron ajustadas.",
+            'cuotas_actualizadas' => $cuotasActualizadas
+        ];
+        
+    } catch (\PDOException $e) {
+        $this->conn->rollBack();
+        error_log("❌ Error en actualizarPrecio: " . $e->getMessage());
+        return [
+            'success' => false,
+            'message' => 'Error al actualizar precio: ' . $e->getMessage()
+        ];
     }
+}
 
     /**
      * Generar cuota individual del mes para un usuario específico
