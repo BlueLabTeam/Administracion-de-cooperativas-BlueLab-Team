@@ -111,6 +111,60 @@ class Herramientas
         }
     }
 
+    public static function validarAdmin()
+{
+    self::startSession();
+
+    // Verifica si el usuario está logueado
+    if (!isset($_SESSION['user_id'])) {
+        if (self::isApiRequest()) {
+            http_response_code(401);
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => false,
+                'error' => 'no_autenticado',
+                'message' => 'Debe iniciar sesión'
+            ]);
+            exit();
+        }
+        self::safeRedirect('/login');
+    }
+
+    // Verifica si tiene rol o flag de admin
+    $isAdmin = ($_SESSION['is_admin'] ?? false) || ($_SESSION['rol'] ?? '') === 'admin';
+    if (!$isAdmin) {
+        if (self::isApiRequest()) {
+            http_response_code(403);
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => false,
+                'error' => 'no_autorizado',
+                'message' => 'Acceso restringido a administradores'
+            ]);
+            exit();
+        }
+        self::safeRedirect('/dashboard');
+    }
+}
+
+   public static function jsonResponse(bool $success, string $message, array $data = [], int $statusCode = 200)
+    {
+        http_response_code($statusCode);
+        header('Content-Type: application/json; charset=utf-8');
+        
+        $response = [
+            'success' => $success,
+            'message' => $message
+        ];
+        
+        // Merge con datos adicionales
+        $response = array_merge($response, $data);
+        
+        echo json_encode($response, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+        exit();
+    }
+
+
     private static function isApiRequest(): bool
     {
         $currentURL = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);

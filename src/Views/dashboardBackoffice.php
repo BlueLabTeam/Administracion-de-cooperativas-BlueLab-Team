@@ -19,6 +19,7 @@
 	<link rel="stylesheet" href="/assets/css/dashboardMateriales.css" /> 
 	<link rel="stylesheet" href="/assets/css/dashboardCuotas.css" />
 	<link rel="stylesheet" href="/assets/css/dashboardSolicitudes.css" />
+	<link rel="stylesheet" href="/assets/css/dashboardReportes.css" />
 </head>
 
 <body>
@@ -144,13 +145,77 @@
 		</section>
 
 		<!-- SECCIÓN REPORTES -->
-		<section id="reportes-section" class="section-content">
-			<h2 class="section-title">Reportes</h2>
-			<div class="info-card">
-				<p>Sección de reportes en desarrollo...</p>
-			</div>
-		</section>
-
+<section id="reportes-section" class="section-content">
+    <h2 class="section-title">📊 Reportes Mensuales</h2>
+    
+    <!-- Selector de período -->
+    <div class="info-card">
+        <h3>⚙️ Seleccionar Período</h3>
+        <div class="reportes-filters">
+            <select id="reporte-mes">
+                <option value="">Seleccione mes...</option>
+                <option value="1">Enero</option>
+                <option value="2">Febrero</option>
+                <option value="3">Marzo</option>
+                <option value="4">Abril</option>
+                <option value="5">Mayo</option>
+                <option value="6">Junio</option>
+                <option value="7">Julio</option>
+                <option value="8">Agosto</option>
+                <option value="9">Septiembre</option>
+                <option value="10">Octubre</option>
+                <option value="11">Noviembre</option>
+                <option value="12">Diciembre</option>
+            </select>
+            
+            <select id="reporte-anio">
+                <option value="">Seleccione año...</option>
+            </select>
+            
+            <button class="btn btn-primary" onclick="generarReporte()">
+                <i class="fas fa-chart-bar"></i> Generar Reporte
+            </button>
+            
+            <button class="btn btn-success" onclick="exportarReporteCSV()" id="btn-exportar" style="display: none;">
+                <i class="fas fa-file-excel"></i> Exportar CSV
+            </button>
+        </div>
+    </div>
+    
+    <!-- Resumen general -->
+    <div id="reporte-resumen-container" style="display: none;">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <i class="fas fa-users"></i>
+                <h4>Total Usuarios</h4>
+                <p id="reporte-total-usuarios">0</p>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-clock"></i>
+                <h4>Horas Trabajadas</h4>
+                <p id="reporte-total-horas">0</p>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-tasks"></i>
+                <h4>Tareas Completadas</h4>
+                <p id="reporte-tareas-completadas">0</p>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-percentage"></i>
+                <h4>Cumplimiento Promedio</h4>
+                <p id="reporte-cumplimiento-promedio">0%</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Tabla de usuarios -->
+    <div class="info-card" id="reporte-tabla-container" style="display: none;">
+        <h3>📋 Detalle por Usuario</h3>
+        <div class="table-responsive" id="reporteTableContainer">
+            <p class="loading">Cargando reporte...</p>
+        </div>
+    </div>
+</section>
 
 
 <!-- SECCIÓN VIVIENDAS -->

@@ -4122,3 +4122,256 @@ window.eliminarJustificacion = eliminarJustificacion;
 window.toggleOtroMotivo = toggleOtroMotivo;
 
 console.log('✅ Módulo de justificación de horas cargado completamente');
+
+// ==========================================
+// SISTEMA DE REPORTES MENSUALES - CON CSS INLINE
+// ==========================================
+
+console.log('🟢 Cargando módulo de Reportes (CSS INLINE)');
+
+// Variables globales
+let reporteActual = null;
+
+// Inicializar selector de años
+document.addEventListener('DOMContentLoaded', function() {
+    const reportesMenuItem = document.querySelector('.menu li[data-section="reportes"]');
+    if (reportesMenuItem) {
+        reportesMenuItem.addEventListener('click', function() {
+            console.log('>>> Sección reportes abierta');
+            inicializarReportes();
+        });
+    }
+});
+
+function inicializarReportes() {
+    const selectAnio = document.getElementById('reporte-anio');
+    if (selectAnio) {
+        const anioActual = new Date().getFullYear();
+        selectAnio.innerHTML = '<option value="">Seleccione año...</option>';
+        for (let i = 0; i < 3; i++) {
+            const anio = anioActual - i;
+            const option = document.createElement('option');
+            option.value = anio;
+            option.textContent = anio;
+            if (i === 0) option.selected = true;
+            selectAnio.appendChild(option);
+        }
+    }
+    
+    const selectMes = document.getElementById('reporte-mes');
+    if (selectMes) {
+        const mesActual = new Date().getMonth() + 1;
+        selectMes.value = mesActual;
+    }
+}
+
+async function generarReporte() {
+    const mes = document.getElementById('reporte-mes').value;
+    const anio = document.getElementById('reporte-anio').value;
+    
+    if (!mes || !anio) {
+        alert('⚠️ Selecciona mes y año');
+        return;
+    }
+    
+    const container = document.getElementById('reporteTableContainer');
+    container.innerHTML = '<p style="text-align: center; padding: 40px; color: #005CB9;">Generando reporte...</p>';
+    
+    document.getElementById('reporte-resumen-container').style.display = 'none';
+    document.getElementById('reporte-tabla-container').style.display = 'none';
+    document.getElementById('btn-exportar').style.display = 'none';
+    
+    try {
+        const url = `/api/reporte/mensual?mes=${mes}&anio=${anio}`;
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin'
+        });
+        
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            const text = await response.text();
+            console.error('❌ Error:', text.substring(0, 500));
+            alert('❌ Error del servidor');
+            return;
+        }
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            reporteActual = data.reporte;
+            mostrarReporte(data.reporte);
+        } else {
+            alert('❌ ' + data.message);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Error de conexión');
+    }
+}
+
+function mostrarReporte(reporte) {
+    document.getElementById('reporte-total-usuarios').textContent = reporte.resumen.total_usuarios || 0;
+    document.getElementById('reporte-total-horas').textContent = 
+        Math.round(reporte.resumen.total_horas_trabajadas || 0) + 'h';
+    document.getElementById('reporte-tareas-completadas').textContent = 
+        (reporte.resumen.total_tareas_completadas || 0) + '/' + (reporte.resumen.total_tareas_asignadas || 0);
+    document.getElementById('reporte-cumplimiento-promedio').textContent = 
+        (reporte.resumen.promedio_cumplimiento || 0) + '%';
+    
+    document.getElementById('reporte-resumen-container').style.display = 'block';
+    document.getElementById('reporte-tabla-container').style.display = 'block';
+    document.getElementById('btn-exportar').style.display = 'inline-block';
+    
+    renderTablaReporte(reporte.usuarios);
+}
+
+function renderTablaReporte(usuarios) {
+    const container = document.getElementById('reporteTableContainer');
+    
+    if (!usuarios || usuarios.length === 0) {
+        container.innerHTML = '<p style="text-align: center; padding: 40px; color: #999;">No hay usuarios para este período</p>';
+        return;
+    }
+    
+    let html = `
+        <div style="overflow-x: auto; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+            <table style="width: 100%; border-collapse: collapse; background: white; min-width: 1000px;">
+                <thead>
+                    <tr style="background: linear-gradient(135deg, #005CB9 0%, #004a94 100%); color: white;">
+                        <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px; text-transform: uppercase;">Usuario</th>
+                        <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px; text-transform: uppercase;">Vivienda</th>
+                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px; text-transform: uppercase;">Horas</th>
+                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px; text-transform: uppercase;">Cumplimiento</th>
+                        <th style="padding: 15px 12px; text-align: right; font-weight: 600; font-size: 13px; text-transform: uppercase;">Deuda ($)</th>
+                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px; text-transform: uppercase;">Tareas</th>
+                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px; text-transform: uppercase;">Cuota</th>
+                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px; text-transform: uppercase;">Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+    
+    usuarios.forEach((usuario, index) => {
+        const cumplimiento = usuario.porcentaje_cumplimiento || 0;
+        
+        let cumplimientoColor = '#dc3545';
+        if (cumplimiento >= 90) cumplimientoColor = '#28a745';
+        else if (cumplimiento >= 70) cumplimientoColor = '#17a2b8';
+        else if (cumplimiento >= 50) cumplimientoColor = '#ffc107';
+        
+        let estadoColor = '#dc3545';
+        let estadoText = 'Crítico';
+        if (usuario.estado_general === 'excelente') {
+            estadoColor = '#28a745';
+            estadoText = 'Excelente';
+        } else if (usuario.estado_general === 'bueno') {
+            estadoColor = '#17a2b8';
+            estadoText = 'Bueno';
+        } else if (usuario.estado_general === 'regular') {
+            estadoColor = '#ffc107';
+            estadoText = 'Regular';
+        }
+        
+        let cuotaColor = '#999';
+        let cuotaText = 'Sin cuota';
+        if (usuario.estado_cuota === 'pagada') {
+            cuotaColor = '#28a745';
+            cuotaText = 'Pagada';
+        } else if (usuario.estado_cuota === 'pendiente') {
+            cuotaColor = '#ffc107';
+            cuotaText = 'Pendiente';
+        } else if (usuario.estado_cuota === 'vencida') {
+            cuotaColor = '#dc3545';
+            cuotaText = 'Vencida';
+        }
+        
+        html += `
+            <tr style="border-bottom: 1px solid #e9ecef; transition: all 0.2s ease;" 
+                onmouseover="this.style.background='#f1f3f5'" 
+                onmouseout="this.style.background='white'">
+                
+                <td style="padding: 14px 12px; font-size: 13px; color: #333;">
+                    <div style="font-weight: 600; color: #005CB9;">${usuario.nombre_completo}</div>
+                    <div style="font-size: 11px; color: #6c757d; margin-top: 3px;">${usuario.email}</div>
+                </td>
+                
+                <td style="padding: 14px 12px; font-size: 13px; color: #333;">
+                    <div style="font-weight: 600;">${usuario.vivienda || 'Sin asignar'}</div>
+                    ${usuario.tipo_vivienda ? `<div style="font-size: 11px; color: #6c757d; margin-top: 3px;">${usuario.tipo_vivienda}</div>` : ''}
+                </td>
+                
+                <td style="padding: 14px 12px; font-size: 13px; text-align: center; font-weight: 600;">
+                    <div>${usuario.horas_aprobadas || 0}h / ${usuario.horas_requeridas || 0}h</div>
+                    ${(usuario.horas_pendientes || 0) > 0 ? 
+                        `<div style="font-size: 11px; color: #ff9800; margin-top: 3px;">⏳ ${usuario.horas_pendientes}h pend.</div>` : 
+                        ''
+                    }
+                </td>
+                
+                <td style="padding: 14px 12px; text-align: center;">
+                    <div style="display: flex; align-items: center; gap: 10px; justify-content: center;">
+                        <div style="flex: 0 0 80px; height: 8px; background: #e9ecef; border-radius: 10px; overflow: hidden;">
+                            <div style="height: 100%; background: ${cumplimientoColor}; border-radius: 10px; width: ${cumplimiento}%; transition: width 0.5s ease;"></div>
+                        </div>
+                        <span style="font-weight: 600; font-size: 12px; color: #333; white-space: nowrap;">${cumplimiento}%</span>
+                    </div>
+                </td>
+                
+                <td style="padding: 14px 12px; text-align: right; font-weight: 600; font-size: 13px; color: ${(usuario.deuda_horas || 0) > 0 ? '#dc3545' : '#005CB9'};">
+                    ${(usuario.deuda_horas || 0) > 0 ? 
+                        `$${(usuario.deuda_horas || 0).toLocaleString('es-UY', {minimumFractionDigits: 2})}` : 
+                        '✓ Sin deuda'
+                    }
+                </td>
+                
+                <td style="padding: 14px 12px; text-align: center; font-weight: 600;">
+                    <div>${usuario.tareas_completadas || 0}/${usuario.tareas_asignadas || 0}</div>
+                    ${(usuario.tareas_asignadas || 0) > 0 ? 
+                        `<div style="font-size: 11px; color: #6c757d; margin-top: 3px;">${usuario.progreso_tareas || 0}% completado</div>` : 
+                        '<div style="font-size: 11px; color: #6c757d; margin-top: 3px;">Sin tareas</div>'
+                    }
+                </td>
+                
+                <td style="padding: 14px 12px; text-align: center;">
+                    <div style="display: inline-block; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; text-transform: uppercase; background: ${cuotaColor}; color: ${cuotaColor === '#ffc107' ? '#333' : 'white'};">
+                        ${cuotaText}
+                    </div>
+                    ${(usuario.monto_cuota || 0) > 0 ? 
+                        `<div style="font-size: 11px; color: #6c757d; margin-top: 5px;">$${(usuario.monto_cuota || 0).toLocaleString('es-UY', {minimumFractionDigits: 2})}</div>` : 
+                        ''
+                    }
+                </td>
+                
+                <td style="padding: 14px 12px; text-align: center;">
+                    <div style="display: inline-block; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; text-transform: uppercase; background: ${estadoColor}; color: ${estadoColor === '#ffc107' ? '#333' : 'white'};">
+                        ${estadoText}
+                    </div>
+                </td>
+            </tr>
+        `;
+    });
+    
+    html += '</tbody></table></div>';
+    container.innerHTML = html;
+}
+
+async function exportarReporteCSV() {
+    if (!reporteActual) {
+        alert('⚠️ Genera un reporte primero');
+        return;
+    }
+    
+    const mes = document.getElementById('reporte-mes').value;
+    const anio = document.getElementById('reporte-anio').value;
+    
+    window.location.href = `/api/reporte/exportar?mes=${mes}&anio=${anio}&formato=csv`;
+}
+
+// Exportar funciones globales
+window.inicializarReportes = inicializarReportes;
+window.generarReporte = generarReporte;
+window.exportarReporteCSV = exportarReporteCSV;
+
+console.log('✅ Módulo de Reportes con CSS INLINE cargado');

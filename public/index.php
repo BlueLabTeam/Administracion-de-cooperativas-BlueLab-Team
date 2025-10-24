@@ -154,10 +154,15 @@ $privateRoutes = [
     '/api/solicitudes/all',
     '/api/solicitudes/update-estado',
     '/api/solicitudes/estadisticas',
-    // ✅ NUEVAS RUTAS DE JUSTIFICACIONES
     '/api/justificaciones/crear',
     '/api/justificaciones/usuario',
     '/api/justificaciones/eliminar',
+    '/api/reporte/mensual',
+    '/api/reporte/horas',
+    '/api/reporte/tareas',
+    '/api/reporte/cuotas',
+    '/api/reporte/estadisticas',
+    '/api/reporte/exportar',
 ];
 
 // Aplicar middleware según el tipo de ruta
@@ -505,6 +510,31 @@ switch ($uri) {
     case '/api/justificaciones/eliminar':
         (new App\Controllers\JustificacionHorasController())->eliminarJustificacion();
         break;
+
+        // API REPORTES - ADMIN
+case '/api/reporte/mensual':
+    (new App\Controllers\ReporteController())->generarReporteMensual();
+    break;
+
+case '/api/reporte/horas':
+    (new App\Controllers\ReporteController())->getResumenHorasMensual();
+    break;
+
+case '/api/reporte/tareas':
+    (new App\Controllers\ReporteController())->getResumenTareasMensual();
+    break;
+
+case '/api/reporte/cuotas':
+    (new App\Controllers\ReporteController())->getResumenCuotasMensual();
+    break;
+
+case '/api/reporte/estadisticas':
+    (new App\Controllers\ReporteController())->getEstadisticasGenerales();
+    break;
+
+case '/api/reporte/exportar':
+    (new App\Controllers\ReporteController())->exportarReporteMensual();
+    break;
 
     default:
         http_response_code(404);
