@@ -4375,3 +4375,339 @@ window.generarReporte = generarReporte;
 window.exportarReporteCSV = exportarReporteCSV;
 
 console.log('✅ Módulo de Reportes con CSS INLINE cargado');
+
+// ==========================================
+// SISTEMA DE SOLICITUDES DE NÚCLEOS - ADMIN
+// ==========================================
+
+console.log('🟢 Cargando módulo de solicitudes de núcleos (Admin)');
+
+// ========== INICIALIZACIÓN ==========
+document.addEventListener('DOMContentLoaded', function() {
+    // Listener para la sección de núcleos
+    const nucleoMenuItem = document.querySelector('.menu li[data-section="nucleo"]');
+    if (nucleoMenuItem) {
+        nucleoMenuItem.addEventListener('click', function() {
+            console.log('>>> Sección núcleos abierta');
+            loadNucleosFamiliares();
+            
+            // Cargar solicitudes pendientes después de un momento
+            setTimeout(() => {
+                cargarSolicitudesPendientesNucleo();
+            }, 500);
+        });
+    }
+});
+
+/**
+ * Cargar solicitudes pendientes de núcleos
+ */
+async function cargarSolicitudesPendientesNucleo() {
+    const container = document.getElementById('solicitudesNucleoContainer');
+    
+    // Si no existe el container, crearlo
+    if (!container) {
+        console.log('📌 Container de solicitudes no existe, creándolo...');
+        insertarContainerSolicitudes();
+    }
+    
+    const containerFinal = document.getElementById('solicitudesNucleoContainer');
+    if (!containerFinal) {
+        console.warn('⚠️ No se pudo crear el container de solicitudes');
+        return;
+    }
+    
+    containerFinal.innerHTML = '<p class="loading">Cargando solicitudes...</p>';
+    
+    try {
+        const response = await fetch('/api/nucleos/solicitudes-pendientes');
+        const data = await response.json();
+        
+        console.log('📋 Solicitudes recibidas:', data);
+        
+        if (data.success) {
+            renderSolicitudesNucleoAdmin(data.solicitudes);
+        } else {
+            containerFinal.innerHTML = '<p class="error">Error al cargar solicitudes</p>';
+        }
+    } catch (error) {
+        console.error('❌ Error:', error);
+        containerFinal.innerHTML = '<p class="error">Error de conexión</p>';
+    }
+}
+
+/**
+ * Insertar container de solicitudes si no existe
+ */
+function insertarContainerSolicitudes() {
+    const nucleoSection = document.getElementById('nucleo-section');
+    if (!nucleoSection) {
+        console.warn('⚠️ Sección de núcleos no encontrada');
+        return;
+    }
+    
+    // Buscar el botón "Crear Nuevo Núcleo"
+    const crearBtn = nucleoSection.querySelector('button[onclick*="showCreateNucleoForm"]');
+    
+    if (crearBtn) {
+        // Insertar después del botón
+        const containerHTML = `
+            <div style="margin-top: 30px;">
+                <h3 style="color: #333; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-inbox" style="color: #667eea;"></i>
+                    Solicitudes Pendientes
+                </h3>
+                <div id="solicitudesNucleoContainer"></div>
+            </div>
+        `;
+        
+        crearBtn.insertAdjacentHTML('afterend', containerHTML);
+    } else {
+        // Si no encuentra el botón, insertar al inicio de la sección
+        const containerHTML = `
+            <div style="margin-bottom: 30px;">
+                <h3 style="color: #333; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-inbox" style="color: #667eea;"></i>
+                    Solicitudes Pendientes
+                </h3>
+                <div id="solicitudesNucleoContainer"></div>
+            </div>
+        `;
+        
+        nucleoSection.insertAdjacentHTML('afterbegin', containerHTML);
+    }
+}
+
+/**
+ * Renderizar solicitudes pendientes
+ */
+function renderSolicitudesNucleoAdmin(solicitudes) {
+    const container = document.getElementById('solicitudesNucleoContainer');
+    
+    if (!solicitudes || solicitudes.length === 0) {
+        container.innerHTML = `
+            <div style="
+                background: #f8f9fa;
+                border: 2px dashed #ddd;
+                border-radius: 12px;
+                padding: 40px;
+                text-align: center;
+                color: #999;
+            ">
+                <i class="fas fa-inbox" style="font-size: 48px; margin-bottom: 15px; display: block;"></i>
+                <p style="margin: 0; font-size: 16px;">No hay solicitudes pendientes</p>
+            </div>
+        `;
+        return;
+    }
+    
+    let html = '<div style="display: grid; gap: 15px;">';
+    
+    solicitudes.forEach(sol => {
+        const fecha = new Date(sol.fecha_solicitud).toLocaleDateString('es-UY', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        
+        html += `
+            <div class="solicitud-nucleo-card" style="
+                background: white;
+                border: 2px solid #e0e0e0;
+                border-left: 5px solid #667eea;
+                border-radius: 12px;
+                padding: 20px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+                transition: all 0.3s ease;
+            ">
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px;">
+                    <div style="flex: 1;">
+                        <h4 style="margin: 0 0 5px 0; color: #333; font-size: 18px;">
+                            👤 ${sol.nombre_completo}
+                        </h4>
+                        <p style="margin: 0; color: #999; font-size: 13px;">
+                            <i class="fas fa-envelope"></i> ${sol.email} · 
+                            <i class="fas fa-id-card"></i> ${sol.cedula}
+                        </p>
+                    </div>
+                    <span style="
+                        background: #fff3cd;
+                        color: #856404;
+                        padding: 5px 12px;
+                        border-radius: 20px;
+                        font-size: 12px;
+                        font-weight: 600;
+                        white-space: nowrap;
+                    ">
+                        ⏳ Pendiente
+                    </span>
+                </div>
+                
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                    <p style="margin: 0 0 10px 0; color: #666; font-size: 14px;">
+                        <i class="fas fa-arrow-right" style="color: #667eea;"></i>
+                        <strong>Solicita unirse a:</strong> 
+                        <span style="color: #667eea; font-weight: 600;">👨‍👩‍👧‍👦 ${sol.nombre_nucleo}</span>
+                    </p>
+                    
+                    ${sol.direccion_nucleo ? `
+                        <p style="margin: 0 0 10px 0; color: #666; font-size: 13px;">
+                            <i class="fas fa-map-marker-alt" style="color: #999;"></i> ${sol.direccion_nucleo}
+                        </p>
+                    ` : ''}
+                    
+                    <p style="margin: 0; color: #999; font-size: 13px;">
+                        <i class="fas fa-users"></i> 
+                        Miembros actuales: <strong>${sol.miembros_actuales}</strong>
+                    </p>
+                </div>
+                
+                ${sol.mensaje ? `
+                    <div style="background: #e3f2fd; border-left: 4px solid #2196F3; padding: 12px; margin-bottom: 15px; border-radius: 4px;">
+                        <strong style="color: #1976d2; font-size: 13px;">💬 Mensaje del usuario:</strong>
+                        <p style="margin: 8px 0 0 0; color: #333; font-size: 14px;">${sol.mensaje}</p>
+                    </div>
+                ` : ''}
+                
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 15px; padding-top: 15px; border-top: 1px solid #e0e0e0;">
+                    <span style="color: #999; font-size: 13px;">
+                        <i class="fas fa-calendar"></i> ${fecha}
+                    </span>
+                    
+                    <div style="display: flex; gap: 10px;">
+                        <button 
+                            class="btn btn-success btn-small" 
+                            onclick="aprobarSolicitudNucleoAdmin(${sol.id_solicitud_nucleo}, '${sol.nombre_completo.replace(/'/g, "\\'")}', '${sol.nombre_nucleo.replace(/'/g, "\\'")}')"
+                            style="padding: 8px 16px;">
+                            <i class="fas fa-check"></i> Aprobar
+                        </button>
+                        <button 
+                            class="btn btn-danger btn-small" 
+                            onclick="rechazarSolicitudNucleoAdmin(${sol.id_solicitud_nucleo}, '${sol.nombre_completo.replace(/'/g, "\\'")}')"
+                            style="padding: 8px 16px;">
+                            <i class="fas fa-times"></i> Rechazar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    
+    html += '</div>';
+    container.innerHTML = html;
+}
+
+/**
+ * Aprobar solicitud de núcleo
+ */
+async function aprobarSolicitudNucleoAdmin(idSolicitud, nombreUsuario, nombreNucleo) {
+    const observaciones = prompt(`Aprobar solicitud de "${nombreUsuario}" para unirse a "${nombreNucleo}".\n\nObservaciones (opcional):`);
+    
+    if (observaciones === null) {
+        // Usuario canceló
+        return;
+    }
+    
+    if (!confirm(`¿Aprobar la solicitud de "${nombreUsuario}" para unirse al núcleo "${nombreNucleo}"?`)) {
+        return;
+    }
+    
+    try {
+        const formData = new FormData();
+        formData.append('id_solicitud', idSolicitud);
+        formData.append('observaciones', observaciones || '');
+        
+        const response = await fetch('/api/nucleos/aprobar-solicitud', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert('✅ ' + data.message);
+            
+            // Recargar núcleos y solicitudes
+            loadNucleosFamiliares();
+            cargarSolicitudesPendientesNucleo();
+        } else {
+            alert('❌ ' + data.message);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Error de conexión');
+    }
+}
+
+/**
+ * Rechazar solicitud de núcleo
+ */
+async function rechazarSolicitudNucleoAdmin(idSolicitud, nombreUsuario) {
+    const motivo = prompt(`Rechazar solicitud de "${nombreUsuario}".\n\nMotivo del rechazo (recomendado):`);
+    
+    if (motivo === null) {
+        // Usuario canceló
+        return;
+    }
+    
+    if (!confirm(`¿Rechazar la solicitud de "${nombreUsuario}"?`)) {
+        return;
+    }
+    
+    try {
+        const formData = new FormData();
+        formData.append('id_solicitud', idSolicitud);
+        formData.append('motivo', motivo || 'Solicitud rechazada');
+        
+        const response = await fetch('/api/nucleos/rechazar-solicitud', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert('✅ Solicitud rechazada');
+            
+            // Recargar solicitudes
+            cargarSolicitudesPendientesNucleo();
+        } else {
+            alert('❌ ' + data.message);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Error de conexión');
+    }
+}
+
+/**
+ * Ver todas las solicitudes (historial completo)
+ */
+async function verTodasSolicitudesNucleo() {
+    try {
+        const response = await fetch('/api/nucleos/solicitudes-pendientes');
+        const data = await response.json();
+        
+        if (!data.success) {
+            alert('❌ Error al cargar solicitudes');
+            return;
+        }
+        
+        // Aquí podrías crear un modal más completo con historial
+        // Por ahora solo muestra las pendientes
+        alert(`Tienes ${data.solicitudes.length} solicitud(es) pendiente(s)`);
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Error de conexión');
+    }
+}
+
+// Exportar funciones globales
+window.cargarSolicitudesPendientesNucleo = cargarSolicitudesPendientesNucleo;
+window.aprobarSolicitudNucleoAdmin = aprobarSolicitudNucleoAdmin;
+window.rechazarSolicitudNucleoAdmin = rechazarSolicitudNucleoAdmin;
+window.verTodasSolicitudesNucleo = verTodasSolicitudesNucleo;
+
+console.log('✅ Módulo de solicitudes de núcleos (Admin) cargado completamente');

@@ -273,4 +273,274 @@ class NucleoController
         }
         exit();
     }
+
+    // ========== NUEVOS ENDPOINTS PARA SOLICITUDES ==========
+
+    /**
+     * Obtener núcleos disponibles para solicitar (Usuario)
+     */
+    public function getNucleosDisponibles()
+    {
+        header('Content-Type: application/json');
+
+        if (!isset($_SESSION['user_id'])) {
+            http_response_code(401);
+            echo json_encode(['success' => false, 'message' => 'No autenticado']);
+            exit();
+        }
+
+        try {
+            $nucleos = $this->nucleoModel->getNucleosDisponibles();
+            echo json_encode(['success' => true, 'nucleos' => $nucleos]);
+        } catch (\Exception $e) {
+            error_log("Error en getNucleosDisponibles: " . $e->getMessage());
+            http_response_code(500);
+            echo json_encode(['success' => false, 'message' => 'Error al cargar núcleos']);
+        }
+        exit();
+    }
+
+    /**
+     * Crear solicitud para unirse a un núcleo (Usuario)
+     */
+    public function solicitarUnirse()
+    {
+        header('Content-Type: application/json');
+
+        if (!isset($_SESSION['user_id'])) {
+            http_response_code(401);
+            echo json_encode(['success' => false, 'message' => 'No autenticado']);
+            exit();
+        }
+
+        try {
+            $idNucleo = $_POST['id_nucleo'] ?? null;
+            $mensaje = $_POST['mensaje'] ?? '';
+
+            if (!$idNucleo) {
+                echo json_encode(['success' => false, 'message' => 'ID de núcleo requerido']);
+                exit();
+            }
+
+            $solicitudId = $this->nucleoModel->crearSolicitudNucleo(
+                $_SESSION['user_id'],
+                $idNucleo,
+                $mensaje
+            );
+
+            echo json_encode([
+                'success' => true,
+                'message' => 'Solicitud enviada correctamente. Espera la aprobación del administrador.',
+                'id_solicitud' => $solicitudId
+            ]);
+        } catch (\Exception $e) {
+            error_log("Error en solicitarUnirse: " . $e->getMessage());
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+        }
+        exit();
+    }
+
+    /**
+     * Obtener solicitudes del usuario actual
+     */
+    public function getMisSolicitudesNucleo()
+    {
+        header('Content-Type: application/json');
+
+        if (!isset($_SESSION['user_id'])) {
+            http_response_code(401);
+            echo json_encode(['success' => false, 'message' => 'No autenticado']);
+            exit();
+        }
+
+        try {
+            $solicitudes = $this->nucleoModel->getSolicitudesUsuario($_SESSION['user_id']);
+            echo json_encode(['success' => true, 'solicitudes' => $solicitudes]);
+        } catch (\Exception $e) {
+            error_log("Error en getMisSolicitudesNucleo: " . $e->getMessage());
+            http_response_code(500);
+            echo json_encode(['success' => false, 'message' => 'Error al cargar solicitudes']);
+        }
+        exit();
+    }
+
+    /**
+     * Cancelar solicitud pendiente (Usuario)
+     */
+    public function cancelarSolicitudNucleo()
+    {
+        header('Content-Type: application/json');
+
+        if (!isset($_SESSION['user_id'])) {
+            http_response_code(401);
+            echo json_encode(['success' => false, 'message' => 'No autenticado']);
+            exit();
+        }
+
+        try {
+            $solicitudId = $_POST['id_solicitud'] ?? null;
+
+            if (!$solicitudId) {
+                echo json_encode(['success' => false, 'message' => 'ID de solicitud requerido']);
+                exit();
+            }
+
+            $resultado = $this->nucleoModel->cancelarSolicitud($solicitudId, $_SESSION['user_id']);
+
+            if ($resultado) {
+                echo json_encode(['success' => true, 'message' => 'Solicitud cancelada']);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'No se pudo cancelar la solicitud']);
+            }
+        } catch (\Exception $e) {
+            error_log("Error en cancelarSolicitudNucleo: " . $e->getMessage());
+            http_response_code(500);
+            echo json_encode(['success' => false, 'message' => 'Error al cancelar solicitud']);
+        }
+        exit();
+    }
+
+    /**
+     * Obtener solicitudes pendientes (Admin)
+     */
+    public function getSolicitudesPendientesAdmin()
+    {
+        header('Content-Type: application/json');
+
+        if (!isset($_SESSION['user_id']) || !$_SESSION['is_admin']) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'No autorizado']);
+            exit();
+        }
+
+        try {
+            $solicitudes = $this->nucleoModel->getSolicitudesPendientes();
+            echo json_encode(['success' => true, 'solicitudes' => $solicitudes]);
+        } catch (\Exception $e) {
+            error_log("Error en getSolicitudesPendientesAdmin: " . $e->getMessage());
+            http_response_code(500);
+            echo json_encode(['success' => false, 'message' => 'Error al cargar solicitudes']);
+        }
+        exit();
+    }
+
+    /**
+     * Aprobar solicitud de núcleo (Admin)
+     */
+    public function aprobarSolicitudNucleo()
+    {
+        header('Content-Type: application/json');
+
+        if (!isset($_SESSION['user_id']) || !$_SESSION['is_admin']) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'No autorizado']);
+            exit();
+        }
+
+        try {
+            $solicitudId = $_POST['id_solicitud'] ?? null;
+            $observaciones = $_POST['observaciones'] ?? '';
+
+            if (!$solicitudId) {
+                echo json_encode(['success' => false, 'message' => 'ID de solicitud requerido']);
+                exit();
+            }
+
+            $this->nucleoModel->aprobarSolicitudNucleo(
+                $solicitudId,
+                $_SESSION['user_id'],
+                $observaciones
+            );
+
+            echo json_encode([
+                'success' => true,
+                'message' => 'Usuario agregado al núcleo correctamente'
+            ]);
+        } catch (\Exception $e) {
+            error_log("Error en aprobarSolicitudNucleo: " . $e->getMessage());
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+        }
+        exit();
+    }
+
+    /**
+     * Rechazar solicitud de núcleo (Admin)
+     */
+    public function rechazarSolicitudNucleo()
+    {
+        header('Content-Type: application/json');
+
+        if (!isset($_SESSION['user_id']) || !$_SESSION['is_admin']) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'No autorizado']);
+            exit();
+        }
+
+        try {
+            $solicitudId = $_POST['id_solicitud'] ?? null;
+            $motivo = $_POST['motivo'] ?? 'Solicitud rechazada';
+
+            if (!$solicitudId) {
+                echo json_encode(['success' => false, 'message' => 'ID de solicitud requerido']);
+                exit();
+            }
+
+            $this->nucleoModel->rechazarSolicitudNucleo(
+                $solicitudId,
+                $_SESSION['user_id'],
+                $motivo
+            );
+
+            echo json_encode(['success' => true, 'message' => 'Solicitud rechazada']);
+        } catch (\Exception $e) {
+            error_log("Error en rechazarSolicitudNucleo: " . $e->getMessage());
+            http_response_code(500);
+            echo json_encode(['success' => false, 'message' => 'Error al rechazar solicitud']);
+        }
+        exit();
+    }
+
+    /**
+     * Obtener información del núcleo familiar del usuario actual
+     */
+   /**
+ * Obtener información del núcleo familiar del usuario actual
+ */
+public function getMiNucleoInfo()
+{
+    header('Content-Type: application/json');
+
+    if (!isset($_SESSION['user_id'])) {
+        http_response_code(401);
+        echo json_encode(['success' => false, 'message' => 'No autenticado']);
+        exit();
+    }
+
+    try {
+        $resultado = $this->nucleoModel->getMiNucleoCompleto($_SESSION['user_id']);
+
+        if (!$resultado) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'No perteneces a ningún núcleo'
+            ]);
+            exit();
+        }
+
+        echo json_encode([
+            'success' => true,
+            'nucleo' => $resultado['nucleo'],
+            'miembros' => $resultado['miembros'],
+            'mi_id' => $_SESSION['user_id']
+        ]);
+        
+    } catch (\Exception $e) {
+        error_log("Error en getMiNucleoInfo: " . $e->getMessage());
+        http_response_code(500);
+        echo json_encode(['success' => false, 'message' => 'Error al cargar información']);
+    }
+    exit();
+}
 }

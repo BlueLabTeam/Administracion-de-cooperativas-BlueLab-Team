@@ -163,6 +163,14 @@ $privateRoutes = [
     '/api/reporte/cuotas',
     '/api/reporte/estadisticas',
     '/api/reporte/exportar',
+    '/api/nucleos/disponibles',
+'/api/nucleos/solicitar-unirse',
+ '/api/nucleos/mi-nucleo-info',
+'/api/nucleos/mis-solicitudes',
+'/api/nucleos/cancelar-solicitud',
+'/api/nucleos/solicitudes-pendientes',
+'/api/nucleos/aprobar-solicitud',
+'/api/nucleos/rechazar-solicitud',
 ];
 
 // Aplicar middleware según el tipo de ruta
@@ -534,6 +542,35 @@ case '/api/reporte/estadisticas':
 
 case '/api/reporte/exportar':
     (new App\Controllers\ReporteController())->exportarReporteMensual();
+    break;
+
+    // API NÚCLEOS - SOLICITUDES (Usuario)
+case '/api/nucleos/disponibles':
+    (new App\Controllers\NucleoController())->getNucleosDisponibles();
+    break;
+case '/api/nucleos/solicitar-unirse':
+    (new App\Controllers\NucleoController())->solicitarUnirse();
+    break;
+case '/api/nucleos/mis-solicitudes':
+    (new App\Controllers\NucleoController())->getMisSolicitudesNucleo();
+    break;
+case '/api/nucleos/cancelar-solicitud':
+    (new App\Controllers\NucleoController())->cancelarSolicitudNucleo();
+    break;
+
+// API NÚCLEOS - SOLICITUDES (Admin)
+case '/api/nucleos/solicitudes-pendientes':
+    (new App\Controllers\NucleoController())->getSolicitudesPendientesAdmin();
+    break;
+case '/api/nucleos/aprobar-solicitud':
+    (new App\Controllers\NucleoController())->aprobarSolicitudNucleo();
+    break;
+case '/api/nucleos/rechazar-solicitud':
+    (new App\Controllers\NucleoController())->rechazarSolicitudNucleo();
+    break;
+
+    case '/api/nucleos/mi-nucleo-info':
+    (new App\Controllers\NucleoController())->getMiNucleoInfo();
     break;
 
     default:

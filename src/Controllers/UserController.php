@@ -3,10 +3,12 @@
 namespace App\Controllers;
 
 use App\Models\User;
+use App\config\Database;
 
 class UserController
 {
     private $userModel;
+    private $conn;
 
     public function __construct()
     {
@@ -14,6 +16,7 @@ class UserController
             session_start();
         }
         $this->userModel = new User();
+        $this->conn = Database::getConnection();
     }
 
 
@@ -56,46 +59,76 @@ class UserController
      * Obtener perfil del usuario autenticado
      */
     public function getMyProfile()
-    {
-        header('Content-Type: application/json');
+{
+    // 🔥 CRITICAL: Limpiar TODOS los buffers y suprimir CUALQUIER output previo
+    while (ob_get_level()) {
+        ob_end_clean();
+    }
+    
+    // Suprimir warnings/notices
+    error_reporting(E_ERROR | E_PARSE);
+    
+    header('Content-Type: application/json; charset=utf-8');
+    header('Cache-Control: no-cache, must-revalidate');
 
-        if (!isset($_SESSION['user_id'])) {
-            http_response_code(401);
-            echo json_encode(['success' => false, 'message' => 'No autenticado']);
-            exit();
-        }
-
-        try {
-            $user = $this->userModel->findById($_SESSION['user_id']);
-            
-            if ($user) {
-                // Obtener teléfono si existe
-                $telefono = $this->userModel->getTelefonoByUserId($_SESSION['user_id']);
-                
-                echo json_encode([
-                    'success' => true,
-                    'user' => [
-                        'id_usuario' => $user->getId(),
-                        'nombre_completo' => $user->getNombreCompleto(),
-                        'cedula' => $user->getCedula(),
-                        'email' => $user->getEmail(),
-                        'direccion' => $user->getDireccion(),
-                        'fecha_nacimiento' => $user->getFechaNacimiento(),
-                        'fecha_ingreso' => $user->getFechaIngreso(),
-                        'estado' => $user->getEstado(),
-                        'telefono' => $telefono
-                    ]
-                ]);
-            } else {
-                echo json_encode(['success' => false, 'message' => 'Usuario no encontrado']);
-            }
-        } catch (\Exception $e) {
-            error_log("Error en getMyProfile: " . $e->getMessage());
-            http_response_code(500);
-            echo json_encode(['success' => false, 'message' => 'Error al obtener perfil']);
-        }
+    if (!isset($_SESSION['user_id'])) {
+        http_response_code(401);
+        echo json_encode(['success' => false, 'message' => 'No autenticado'], JSON_UNESCAPED_UNICODE);
         exit();
     }
+
+    try {
+        $sql = "SELECT 
+                    u.id_usuario,
+                    u.nombre_completo,
+                    u.cedula,
+                    u.email,
+                    u.direccion,
+                    u.fecha_nacimiento,
+                    u.fecha_ingreso,
+                    u.estado,
+                    u.id_nucleo,
+                    u.id_rol,
+                    ut.telefono,
+                    r.nombre_rol
+                FROM Usuario u
+                LEFT JOIN Usuario_Telefono ut ON u.id_usuario = ut.id_usuario
+                LEFT JOIN Rol r ON u.id_rol = r.id_rol
+                WHERE u.id_usuario = :user_id";
+        
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([':user_id' => $_SESSION['user_id']]);
+        $user = $stmt->fetch(\PDO::FETCH_ASSOC);
+        
+        if ($user) {
+            // Convertir a tipos correctos
+            $user['id_usuario'] = (int)$user['id_usuario'];
+            $user['id_nucleo'] = $user['id_nucleo'] ? (int)$user['id_nucleo'] : null;
+            $user['id_rol'] = $user['id_rol'] ? (int)$user['id_rol'] : null;
+            
+            echo json_encode([
+                'success' => true,
+                'user' => $user
+            ], JSON_UNESCAPED_UNICODE);
+        } else {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Usuario no encontrado'
+            ], JSON_UNESCAPED_UNICODE);
+        }
+    } catch (\Exception $e) {
+        error_log("Error en getMyProfile: " . $e->getMessage());
+        http_response_code(500);
+        echo json_encode([
+            'success' => false,
+            'message' => 'Error al obtener perfil',
+            'debug' => $e->getMessage() // Solo para debugging
+        ], JSON_UNESCAPED_UNICODE);
+    }
+    
+    // 🔥 Asegurar que no se ejecute nada más
+    die();
+}
 
     /**
      * Actualizar perfil del usuario

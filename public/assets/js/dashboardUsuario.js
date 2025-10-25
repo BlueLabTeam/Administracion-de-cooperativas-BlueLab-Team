@@ -799,7 +799,6 @@ function renderMyVivienda(vivienda) {
         </div>
     `;
 }
-
 // ==========================================
 // SISTEMA DE REGISTRO DE HORAS - USUARIO
 // ==========================================
@@ -4125,3 +4124,1116 @@ window.verTodasJustificaciones = verTodasJustificaciones;
 window.verArchivoJustificacion = verArchivoJustificacion;
 
 console.log('✅ Módulo de justificaciones para usuario cargado');
+
+// ==========================================
+// SISTEMA DE NÚCLEOS FAMILIARES - USUARIO
+// ==========================================
+
+console.log('🟢 Cargando módulo de núcleos para usuario');
+
+// ========== INICIALIZACIÓN OPTIMIZADA ==========
+document.addEventListener('DOMContentLoaded', function() {
+    // ✅ Ejecutar inmediatamente cuando el DOM esté listo
+    verificarEstadoNucleo();
+    
+    // ✅ También ejecutar cuando se active la sección de inicio
+    const inicioMenuItem = document.querySelector('.menu li[data-section="inicio"]');
+    if (inicioMenuItem) {
+        inicioMenuItem.addEventListener('click', function() {
+            // Pequeño delay para que la sección se active primero
+            setTimeout(() => {
+                verificarEstadoNucleo();
+            }, 100);
+        });
+    }
+});
+
+// Agregar animación CSS
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+`;
+document.head.appendChild(style);
+
+console.log('✅ Módulo de núcleos cargado');
+
+/**
+ * Verificar si el usuario tiene núcleo o debe solicitar uno
+ */
+async function verificarEstadoNucleo() {
+    try {
+        console.log('🔍 Verificando estado de núcleo...');
+        
+        const response = await fetch('/api/users/my-profile');
+        const data = await response.json();
+        
+        console.log('📊 Datos de perfil:', data);
+        
+        if (data.success && data.user) {
+            // ✅ BUSCAR SECCIÓN DE INICIO
+            const inicioSection = document.getElementById('inicio-section');
+            
+            if (!inicioSection) {
+                console.error('❌ No se encontró la sección de inicio');
+                return;
+            }
+            
+            // Remover cualquier card/banner anterior
+            const elementosAnteriores = inicioSection.querySelectorAll('.nucleo-info-card, .banner-nucleo-invitation');
+            elementosAnteriores.forEach(el => el.remove());
+            
+            const idNucleo = data.user.id_nucleo;
+            console.log('🔍 id_nucleo del usuario:', idNucleo);
+            
+            if (idNucleo) {
+                // ✅ TIENE NÚCLEO - Mostrar info
+                console.log('✅ Usuario tiene núcleo:', idNucleo);
+                await mostrarInfoNucleoEnInicio(idNucleo, inicioSection);
+            } else {
+                // ❌ NO TIENE NÚCLEO - Mostrar banner
+                console.log('⚠️ Usuario sin núcleo, mostrando banner');
+                mostrarBannerNucleoEnInicio(inicioSection);
+            }
+        }
+    } catch (error) {
+        console.error('❌ Error al verificar núcleo:', error);
+    }
+}
+
+/**
+ * Mostrar información del núcleo en la sección de inicio
+ */
+async function mostrarInfoNucleoEnInicio(idNucleo, inicioSection) {
+    try {
+        console.log('📡 Cargando info del núcleo para inicio...');
+        
+        const response = await fetch('/api/nucleos/mi-nucleo-info');
+        const data = await response.json();
+        
+        if (!data.success || !data.nucleo) {
+            console.error('❌ Error al cargar núcleo');
+            return;
+        }
+        
+        const nucleo = data.nucleo;
+        const miembros = data.miembros || [];
+        const miId = data.mi_id;
+        
+        let miembrosHTML = '';
+        
+        if (miembros.length > 0) {
+            // Mostrar hasta 4 miembros
+            const miembrosMostrar = miembros.slice(0, 4);
+            const miembrosRestantes = miembros.length - 4;
+            
+            miembrosHTML = `
+                <div class="miembros-grid-compact" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; margin-top: 15px;">
+                    ${miembrosMostrar.map(miembro => `
+                        <div style="
+                            background: rgba(255,255,255,0.1);
+                            padding: 12px;
+                            border-radius: 8px;
+                            display: flex;
+                            align-items: center;
+                            gap: 10px;
+                            border-left: 3px solid ${miembro.id_usuario == miId ? '#fff' : 'transparent'};
+                        ">
+                            <i class="fas fa-user-circle" style="font-size: 20px; color: rgba(255,255,255,0.8);"></i>
+                            <div style="flex: 1; min-width: 0;">
+                                <strong style="color: white; display: block; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                    ${miembro.nombre_completo}
+                                    ${miembro.id_usuario == miId ? '<span style="font-size: 11px; opacity: 0.8;"> (Tú)</span>' : ''}
+                                </strong>
+                                ${miembro.nombre_rol ? `
+                                    <small style="color: rgba(255,255,255,0.7); font-size: 11px;">${miembro.nombre_rol}</small>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `).join('')}
+                    ${miembrosRestantes > 0 ? `
+                        <div style="
+                            background: rgba(255,255,255,0.1);
+                            padding: 12px;
+                            border-radius: 8px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            color: white;
+                            font-weight: 600;
+                        ">
+                            +${miembrosRestantes} más
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+        
+        const infoHTML = `
+            <div class="nucleo-info-card" style="
+                background: linear-gradient(135deg, #329cef 0%, #320a95 100%);
+                color: white;
+                padding: 25px;
+                border-radius: 12px;
+                margin-bottom: 30px;
+                box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+                animation: slideInDown 0.5s ease-out;
+            ">
+                <div style="display: flex; align-items: start; gap: 20px; margin-bottom: 20px;">
+                    <div style="
+                        background: rgba(255,255,255,0.2);
+                        width: 70px;
+                        height: 70px;
+                        border-radius: 50%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 35px;
+                        backdrop-filter: blur(10px);
+                        flex-shrink: 0;
+                    ">
+                        👨‍👩‍👧‍👦
+                    </div>
+                    <div style="flex: 1;">
+                        <p style="margin: 0 0 5px 0; opacity: 0.9; font-size: 13px; font-weight: 500;">
+                            Tu Núcleo Familiar
+                        </p>
+                        <h3 style="margin: 0 0 10px 0; font-size: 22px; font-weight: 700;">
+                            ${nucleo.nombre_nucleo || 'Sin nombre'}
+                        </h3>
+                        <div style="display: flex; gap: 15px; font-size: 13px; opacity: 0.95; flex-wrap: wrap;">
+                            ${nucleo.direccion ? `
+                                <span style="display: flex; align-items: center; gap: 5px;">
+                                    <i class="fas fa-map-marker-alt"></i> ${nucleo.direccion}
+                                </span>
+                            ` : ''}
+                            <span style="display: flex; align-items: center; gap: 5px;">
+                                <i class="fas fa-users"></i> ${nucleo.total_miembros} miembro${nucleo.total_miembros != 1 ? 's' : ''}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="border-top: 1px solid rgba(255,255,255,0.2); padding-top: 15px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <strong style="font-size: 14px;">Miembros del Núcleo</strong>
+                        <button 
+                            onclick="verDetallesNucleoDesdeInicio(${idNucleo})" 
+                            style="
+                                background: rgba(255,255,255,0.2);
+                                border: none;
+                                color: white;
+                                padding: 6px 12px;
+                                border-radius: 6px;
+                                font-size: 12px;
+                                cursor: pointer;
+                                transition: all 0.3s;
+                            "
+                            onmouseover="this.style.background='rgba(255,255,255,0.3)'"
+                            onmouseout="this.style.background='rgba(255,255,255,0.2)'">
+                            <i class="fas fa-info-circle"></i> Ver Todo
+                        </button>
+                    </div>
+                    ${miembrosHTML}
+                </div>
+            </div>
+        `;
+        
+        // Insertar al principio de la sección de inicio (después del título)
+        const tituloInicio = inicioSection.querySelector('.section-title');
+        if (tituloInicio) {
+            tituloInicio.insertAdjacentHTML('afterend', infoHTML);
+        } else {
+            inicioSection.insertAdjacentHTML('afterbegin', infoHTML);
+        }
+        
+        console.log('✅ Card de núcleo insertado en inicio');
+        
+    } catch (error) {
+        console.error('❌ Error al mostrar núcleo en inicio:', error);
+    }
+}
+
+/**
+ * Mostrar banner para unirse a un núcleo en la sección de inicio
+ */
+function mostrarBannerNucleoEnInicio(inicioSection) {
+    const banner = `
+        <div class="banner-nucleo-invitation" style="
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            animation: slideInDown 0.5s ease-out;
+        ">
+            <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+                <div style="font-size: 48px;">👨‍👩‍👧‍👦</div>
+                <div style="flex: 1; min-width: 250px;">
+                    <h3 style="margin: 0 0 10px 0; font-size: 20px;">¿Quieres unirte a un Núcleo Familiar?</h3>
+                    <p style="margin: 0; opacity: 0.9;">
+                        Los núcleos familiares permiten compartir viviendas y tareas. 
+                        Explora los núcleos disponibles y envía una solicitud.
+                    </p>
+                </div>
+                <button 
+                    onclick="abrirModalNucleosDisponibles()" 
+                    class="btn btn-light"
+                    style="
+                        padding: 12px 24px; 
+                        font-weight: 600; 
+                        background: white; 
+                        color: #667eea; 
+                        border: none; 
+                        border-radius: 8px; 
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                        white-space: nowrap;
+                    "
+                    onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.2)';"
+                    onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none';">
+                    <i class="fas fa-users"></i> Ver Núcleos
+                </button>
+            </div>
+        </div>
+    `;
+    
+    // Insertar al principio (después del título)
+    const tituloInicio = inicioSection.querySelector('.section-title');
+    if (tituloInicio) {
+        tituloInicio.insertAdjacentHTML('afterend', banner);
+    } else {
+        inicioSection.insertAdjacentHTML('afterbegin', banner);
+    }
+    
+    console.log('✅ Banner de núcleo insertado en inicio');
+}
+
+/**
+ * Ver detalles del núcleo desde el inicio
+ */
+async function verDetallesNucleoDesdeInicio(idNucleo) {
+    // Reutilizar la función existente
+    await verDetallesNucleoActual(idNucleo);
+}
+
+/**
+ * Mostrar información del núcleo familiar actual del usuario
+ */
+async function mostrarInfoNucleoActual(idNucleo) {
+    try {
+        console.log('📡 Cargando info del núcleo:', idNucleo);
+        
+        // Obtener detalles del núcleo
+        const response = await fetch(`/api/nucleos/mi-nucleo-info`);
+        const data = await response.json();
+        
+        console.log('📊 Respuesta de mi-nucleo-info:', data);
+        
+        if (!data.success) {
+            console.error('❌ Error al cargar núcleo:', data.message);
+            return;
+        }
+        
+        if (!data.nucleo) {
+            console.warn('⚠️ No se encontró información del núcleo');
+            return;
+        }
+        
+        const nucleo = data.nucleo;
+        
+        // ✅ BUSCAR CONTENEDOR
+        const posiblesContenedores = [
+            document.querySelector('.dashboard-content'),
+            document.querySelector('.section-content.active'),
+            document.querySelector('main'),
+            document.querySelector('#inicio-section'),
+            document.querySelector('.container')
+        ];
+        
+        let dashboard = null;
+        for (const contenedor of posiblesContenedores) {
+            if (contenedor) {
+                dashboard = contenedor;
+                break;
+            }
+        }
+        
+        if (!dashboard) {
+            console.error('❌ No se encontró contenedor para mostrar info del núcleo');
+            // Reintentar
+            setTimeout(() => {
+                mostrarInfoNucleoActual(idNucleo);
+            }, 1000);
+            return;
+        }
+        
+        // Remover card anterior si existe
+        const cardAnterior = document.querySelector('.nucleo-info-card');
+        if (cardAnterior) {
+            cardAnterior.remove();
+        }
+        
+        const infoHTML = `
+            <div class="nucleo-info-card" style="
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                padding: 25px;
+                border-radius: 12px;
+                margin-bottom: 30px;
+                box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+                animation: slideInDown 0.5s ease-out;
+            ">
+                <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+                    <div style="
+                        background: rgba(255,255,255,0.2);
+                        width: 80px;
+                        height: 80px;
+                        border-radius: 50%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 40px;
+                        backdrop-filter: blur(10px);
+                    ">
+                        👨‍👩‍👧‍👦
+                    </div>
+                    <div style="flex: 1; min-width: 250px;">
+                        <p style="margin: 0 0 5px 0; opacity: 0.9; font-size: 14px; font-weight: 500;">
+                            Tu Núcleo Familiar
+                        </p>
+                        <h3 style="margin: 0 0 10px 0; font-size: 24px; font-weight: 700;">
+                            ${nucleo.nombre_nucleo || 'Sin nombre'}
+                        </h3>
+                        <div style="display: flex; gap: 20px; font-size: 14px; opacity: 0.95; flex-wrap: wrap;">
+                            ${nucleo.direccion ? `
+                                <span>
+                                    <i class="fas fa-map-marker-alt"></i> ${nucleo.direccion}
+                                </span>
+                            ` : ''}
+                            <span>
+                                <i class="fas fa-users"></i> ${nucleo.total_miembros} miembro${nucleo.total_miembros != 1 ? 's' : ''}
+                            </span>
+                        </div>
+                    </div>
+                    <button 
+                        onclick="verDetallesNucleoActual(${idNucleo})" 
+                        class="btn btn-light"
+                        style="
+                            padding: 10px 20px; 
+                            font-weight: 600; 
+                            background: rgba(255,255,255,0.95); 
+                            color: #667eea; 
+                            border: none; 
+                            border-radius: 8px; 
+                            cursor: pointer;
+                            transition: all 0.3s ease;
+                            white-space: nowrap;
+                        "
+                        onmouseover="this.style.background='white'; this.style.transform='scale(1.05)';"
+                        onmouseout="this.style.background='rgba(255,255,255,0.95)'; this.style.transform='scale(1)';">
+                        <i class="fas fa-info-circle"></i> Ver Detalles
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        console.log('✅ Insertando card del núcleo');
+        dashboard.insertAdjacentHTML('afterbegin', infoHTML);
+        console.log('✅ Card insertado correctamente');
+        
+    } catch (error) {
+        console.error('❌ Error al cargar info del núcleo:', error);
+        console.error('Stack:', error.stack);
+    }
+}
+
+/**
+ * Ver detalles completos del núcleo actual
+ */
+async function verDetallesNucleoActual(idNucleo) {
+    try {
+        const response = await fetch(`/api/nucleos/mi-nucleo-info`);
+        const data = await response.json();
+        
+        if (!data.success) {
+            alert('❌ Error al cargar detalles del núcleo');
+            return;
+        }
+        
+        const nucleo = data.nucleo;
+        const miembros = data.miembros || [];
+        const miId = data.mi_id;
+        
+        let miembrosHTML = '';
+        
+        if (miembros.length > 0) {
+            miembrosHTML = `
+                <div class="miembros-grid" style="display: grid; gap: 15px; margin-top: 20px;">
+                    ${miembros.map(miembro => `
+                        <div style="
+                            background: #f8f9fa;
+                            padding: 15px;
+                            border-radius: 8px;
+                            border-left: 4px solid ${miembro.id_usuario == miId ? '#667eea' : '#e0e0e0'};
+                        ">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <i class="fas fa-user-circle" style="font-size: 24px; color: #667eea;"></i>
+                                <div style="flex: 1;">
+                                    <strong style="color: #333; display: block;">
+                                        ${miembro.nombre_completo}
+                                        ${miembro.id_usuario == miId ? '<span style="color: #667eea; font-size: 12px;">(Tú)</span>' : ''}
+                                    </strong>
+                                    <small style="color: #666;">${miembro.email}</small>
+                                </div>
+                                ${miembro.nombre_rol ? `
+                                    <span style="
+                                        background: #e3f2fd;
+                                        color: #1976d2;
+                                        padding: 4px 10px;
+                                        border-radius: 12px;
+                                        font-size: 11px;
+                                        font-weight: 600;
+                                    ">
+                                        ${miembro.nombre_rol}
+                                    </span>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        } else {
+            miembrosHTML = '<p style="color: #999; text-align: center; margin-top: 20px;">No hay miembros en este núcleo</p>';
+        }
+        
+        const modal = `
+            <div id="detallesNucleoModal" class="modal-overlay" style="
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.5);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 9999;
+                backdrop-filter: blur(4px);
+            ">
+                <div class="modal-content-large" style="
+                    background: white;
+                    border-radius: 16px;
+                    max-width: 700px;
+                    width: 90%;
+                    max-height: 80vh;
+                    overflow-y: auto;
+                    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+                ">
+                    <button class="modal-close-btn" onclick="cerrarModalDetallesNucleo()" style="
+                        position: absolute;
+                        top: 15px;
+                        right: 15px;
+                        background: #f5f5f5;
+                        border: none;
+                        width: 35px;
+                        height: 35px;
+                        border-radius: 50%;
+                        font-size: 20px;
+                        cursor: pointer;
+                        color: #333;
+                    ">×</button>
+                    
+                    <div style="padding: 30px;">
+                        <h2 style="margin: 0 0 10px 0; color: #333; display: flex; align-items: center; gap: 10px;">
+                            <i class="fas fa-users" style="color: #667eea;"></i>
+                            ${nucleo.nombre_nucleo || 'Núcleo Familiar'}
+                        </h2>
+                        
+                        ${nucleo.direccion ? `
+                            <p style="margin: 0 0 20px 0; color: #666;">
+                                <i class="fas fa-map-marker-alt"></i> ${nucleo.direccion}
+                            </p>
+                        ` : ''}
+                        
+                        <div style="
+                            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                            color: white;
+                            padding: 20px;
+                            border-radius: 12px;
+                            margin-bottom: 25px;
+                        ">
+                            <h3 style="margin: 0 0 10px 0; font-size: 18px;">
+                                Información del Núcleo
+                            </h3>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
+                                <div>
+                                    <div style="opacity: 0.9; font-size: 13px;">Total de Miembros</div>
+                                    <div style="font-size: 28px; font-weight: 700;">${nucleo.total_miembros}</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <h3 style="margin: 0 0 15px 0; color: #333;">
+                            <i class="fas fa-users"></i> Miembros del Núcleo
+                        </h3>
+                        
+                        ${miembrosHTML}
+                        
+                        <div style="margin-top: 30px; text-align: right;">
+                            <button class="btn btn-secondary" onclick="cerrarModalDetallesNucleo()">
+                                Cerrar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.insertAdjacentHTML('beforeend', modal);
+        
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Error de conexión');
+    }
+}
+
+function cerrarModalDetallesNucleo() {
+    const modal = document.getElementById('detallesNucleoModal');
+    if (modal) modal.remove();
+}
+
+// Exportar funciones
+window.mostrarInfoNucleoActual = mostrarInfoNucleoActual;
+window.verDetallesNucleoActual = verDetallesNucleoActual;
+window.cerrarModalDetallesNucleo = cerrarModalDetallesNucleo;
+
+
+
+/**
+ * Mostrar banner invitando a unirse a un núcleo
+ */
+function mostrarBannerUnirseNucleo() {
+    console.log('🎨 Intentando mostrar banner de núcleos...');
+    
+    // ✅ BUSCAR MÚLTIPLES POSIBLES CONTENEDORES
+    const posiblesContenedores = [
+        document.querySelector('.dashboard-content'),
+        document.querySelector('.section-content.active'),
+        document.querySelector('main'),
+        document.querySelector('#inicio-section'), // Sección de inicio
+        document.querySelector('.container')
+    ];
+    
+    let dashboard = null;
+    for (const contenedor of posiblesContenedores) {
+        if (contenedor) {
+            dashboard = contenedor;
+            console.log('✅ Contenedor encontrado:', contenedor.className || contenedor.id);
+            break;
+        }
+    }
+    
+    if (!dashboard) {
+        console.error('❌ No se encontró ningún contenedor válido para el banner');
+        console.log('📋 Contenedores buscados:', [
+            '.dashboard-content',
+            '.section-content.active',
+            'main',
+            '#inicio-section',
+            '.container'
+        ]);
+        
+        // Reintentar después de 1 segundo
+        console.log('⏰ Reintentando en 1 segundo...');
+        setTimeout(() => {
+            mostrarBannerUnirseNucleo();
+        }, 1000);
+        return;
+    }
+    
+    // Remover banner anterior si existe
+    const bannerAnterior = document.querySelector('.banner-nucleo-invitation');
+    if (bannerAnterior) {
+        console.log('🗑️ Removiendo banner anterior');
+        bannerAnterior.remove();
+    }
+    
+    const banner = `
+        <div class="banner-nucleo-invitation" style="
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            animation: slideInDown 0.5s ease-out;
+        ">
+            <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+                <div style="font-size: 48px;">👨‍👩‍👧‍👦</div>
+                <div style="flex: 1; min-width: 250px;">
+                    <h3 style="margin: 0 0 10px 0; font-size: 20px;">¿Quieres unirte a un Núcleo Familiar?</h3>
+                    <p style="margin: 0; opacity: 0.9;">
+                        Los núcleos familiares permiten compartir viviendas y tareas. 
+                        Explora los núcleos disponibles y envía una solicitud.
+                    </p>
+                </div>
+                <button 
+                    onclick="abrirModalNucleosDisponibles()" 
+                    class="btn btn-light"
+                    style="
+                        padding: 12px 24px; 
+                        font-weight: 600; 
+                        background: white; 
+                        color: #667eea; 
+                        border: none; 
+                        border-radius: 8px; 
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                        white-space: nowrap;
+                    "
+                    onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.2)';"
+                    onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none';">
+                    <i class="fas fa-users"></i> Ver Núcleos
+                </button>
+            </div>
+        </div>
+    `;
+    
+    console.log('✅ Insertando banner en:', dashboard.className || dashboard.id);
+    dashboard.insertAdjacentHTML('afterbegin', banner);
+    console.log('✅ Banner insertado correctamente');
+}
+
+/**
+ * Abrir modal con núcleos disponibles
+ */
+async function abrirModalNucleosDisponibles() {
+    try {
+        const response = await fetch('/api/nucleos/disponibles');
+        const data = await response.json();
+        
+        if (!data.success) {
+            alert('❌ Error al cargar núcleos');
+            return;
+        }
+        
+        mostrarModalNucleosDisponibles(data.nucleos);
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Error de conexión');
+    }
+}
+
+/**
+ * Mostrar modal con lista de núcleos
+ */
+function mostrarModalNucleosDisponibles(nucleos) {
+    if (!nucleos || nucleos.length === 0) {
+        alert('ℹ️ No hay núcleos disponibles en este momento');
+        return;
+    }
+    
+    let nucleosHTML = '';
+    
+    nucleos.forEach(nucleo => {
+        nucleosHTML += `
+            <div class="nucleo-card-disponible" style="
+                background: white;
+                border: 2px solid #e0e0e0;
+                border-radius: 12px;
+                padding: 20px;
+                margin-bottom: 15px;
+                transition: all 0.3s ease;
+            ">
+                <div class="nucleo-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h4 style="margin: 0; color: #333;">
+                        👨‍👩‍👧‍👦 ${nucleo.nombre_nucleo || 'Sin nombre'}
+                    </h4>
+                    <span style="
+                        background: #667eea; 
+                        color: white; 
+                        padding: 5px 12px; 
+                        border-radius: 20px; 
+                        font-size: 12px; 
+                        font-weight: 600;">
+                        ${nucleo.total_miembros} miembro${nucleo.total_miembros != 1 ? 's' : ''}
+                    </span>
+                </div>
+                
+                <div class="nucleo-body">
+                    ${nucleo.direccion ? `
+                        <p style="margin: 10px 0; color: #666;">
+                            <i class="fas fa-map-marker-alt" style="color: #667eea; margin-right: 8px;"></i>
+                            <strong>Dirección:</strong> ${nucleo.direccion}
+                        </p>
+                    ` : ''}
+                    
+                    ${nucleo.miembros_nombres ? `
+                        <div class="miembros-preview" style="margin-top: 10px;">
+                            <strong style="color: #333;">Miembros:</strong>
+                            <p style="color: #666; font-size: 13px; margin: 5px 0 0 0;">
+                                ${truncarTexto(nucleo.miembros_nombres, 100)}
+                            </p>
+                        </div>
+                    ` : ''}
+                </div>
+                
+                <div class="nucleo-footer" style="margin-top: 15px; text-align: right;">
+                    <button 
+                        class="btn btn-primary btn-small" 
+                        onclick="solicitarUnirseNucleo(${nucleo.id_nucleo}, '${nucleo.nombre_nucleo.replace(/'/g, "\\'")}')"
+                        style="padding: 8px 16px;">
+                        <i class="fas fa-paper-plane"></i> Enviar Solicitud
+                    </button>
+                </div>
+            </div>
+        `;
+    });
+    
+    const modal = `
+        <div id="nucleosDisponiblesModal" class="modal-overlay" style="
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            backdrop-filter: blur(4px);
+        ">
+            <div class="modal-content-large" style="
+                background: white;
+                border-radius: 16px;
+                max-width: 700px;
+                width: 90%;
+                max-height: 80vh;
+                overflow-y: auto;
+                box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            ">
+                <button class="modal-close-btn" onclick="cerrarModalNucleosDisponibles()" style="
+                    position: absolute;
+                    top: 15px;
+                    right: 15px;
+                    background: #f5f5f5;
+                    border: none;
+                    width: 35px;
+                    height: 35px;
+                    border-radius: 50%;
+                    font-size: 20px;
+                    cursor: pointer;
+                    color: #333;
+                ">×</button>
+                
+                <div style="padding: 30px;">
+                    <h2 style="margin: 0 0 20px 0; color: #333; display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-users" style="color: #667eea;"></i> 
+                        Núcleos Familiares Disponibles
+                    </h2>
+                    
+                    <div class="alert-info" style="
+                        background: #e3f2fd;
+                        border-left: 4px solid #2196F3;
+                        padding: 15px;
+                        margin-bottom: 20px;
+                        border-radius: 4px;
+                    ">
+                        <strong style="color: #1976d2;">ℹ️ Información:</strong>
+                        <p style="margin: 5px 0 0 0; color: #333;">
+                            Selecciona un núcleo familiar y envía una solicitud. Un administrador revisará y aprobará tu solicitud.
+                        </p>
+                    </div>
+                    
+                    <div class="nucleos-grid">
+                        ${nucleosHTML}
+                    </div>
+                    
+                    <div style="margin-top: 30px; display: flex; gap: 10px; justify-content: flex-end;">
+                        <button class="btn btn-secondary" onclick="cerrarModalNucleosDisponibles()">
+                            Cerrar
+                        </button>
+                        <button class="btn btn-primary" onclick="verMisSolicitudesNucleo()">
+                            <i class="fas fa-list"></i> Mis Solicitudes
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modal);
+}
+
+function cerrarModalNucleosDisponibles() {
+    const modal = document.getElementById('nucleosDisponiblesModal');
+    if (modal) modal.remove();
+}
+
+/**
+ * Enviar solicitud para unirse a un núcleo
+ */
+async function solicitarUnirseNucleo(idNucleo, nombreNucleo) {
+    const mensaje = prompt(`Mensaje opcional para el administrador del núcleo "${nombreNucleo}":`);
+    
+    if (mensaje === null) {
+        // Usuario canceló
+        return;
+    }
+    
+    if (!confirm(`¿Enviar solicitud para unirte al núcleo "${nombreNucleo}"?`)) {
+        return;
+    }
+    
+    try {
+        const formData = new FormData();
+        formData.append('id_nucleo', idNucleo);
+        formData.append('mensaje', mensaje || '');
+        
+        const response = await fetch('/api/nucleos/solicitar-unirse', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert('✅ ' + data.message);
+            cerrarModalNucleosDisponibles();
+            
+            // Recargar para ocultar el banner si es necesario
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
+        } else {
+            alert('❌ ' + data.message);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Error de conexión');
+    }
+}
+
+/**
+ * Ver mis solicitudes enviadas
+ */
+async function verMisSolicitudesNucleo() {
+    try {
+        const response = await fetch('/api/nucleos/mis-solicitudes');
+        const data = await response.json();
+        
+        if (!data.success) {
+            alert('❌ Error al cargar solicitudes');
+            return;
+        }
+        
+        cerrarModalNucleosDisponibles();
+        mostrarModalMisSolicitudes(data.solicitudes);
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Error de conexión');
+    }
+}
+
+/**
+ * Modal con mis solicitudes
+ */
+function mostrarModalMisSolicitudes(solicitudes) {
+    if (!solicitudes || solicitudes.length === 0) {
+        alert('ℹ️ No tienes solicitudes enviadas');
+        return;
+    }
+    
+    let solicitudesHTML = '';
+    
+    solicitudes.forEach(sol => {
+        const fecha = new Date(sol.fecha_solicitud).toLocaleDateString('es-UY', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        
+        let estadoHTML = '';
+        let accionesHTML = '';
+        
+        if (sol.estado === 'pendiente') {
+            estadoHTML = '<span style="background: #ff9800; color: white; padding: 5px 12px; border-radius: 20px; font-size: 12px;">⏳ Pendiente</span>';
+            accionesHTML = `
+                <button class="btn btn-danger btn-small" onclick="cancelarMiSolicitud(${sol.id_solicitud_nucleo})">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+            `;
+        } else if (sol.estado === 'aprobada') {
+            estadoHTML = '<span style="background: #4caf50; color: white; padding: 5px 12px; border-radius: 20px; font-size: 12px;">✅ Aprobada</span>';
+        } else {
+            estadoHTML = '<span style="background: #f44336; color: white; padding: 5px 12px; border-radius: 20px; font-size: 12px;">❌ Rechazada</span>';
+        }
+        
+        solicitudesHTML += `
+            <div style="
+                background: white;
+                border: 2px solid #e0e0e0;
+                border-radius: 12px;
+                padding: 20px;
+                margin-bottom: 15px;
+            ">
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px;">
+                    <div>
+                        <h4 style="margin: 0 0 5px 0; color: #333;">
+                            👨‍👩‍👧‍👦 ${sol.nombre_nucleo}
+                        </h4>
+                        <p style="margin: 0; color: #999; font-size: 13px;">
+                            <i class="fas fa-calendar"></i> ${fecha}
+                        </p>
+                    </div>
+                    ${estadoHTML}
+                </div>
+                
+                ${sol.direccion_nucleo ? `
+                    <p style="margin: 10px 0; color: #666;">
+                        <i class="fas fa-map-marker-alt"></i> ${sol.direccion_nucleo}
+                    </p>
+                ` : ''}
+                
+                ${sol.mensaje ? `
+                    <div style="background: #f5f5f5; padding: 10px; border-radius: 8px; margin: 10px 0;">
+                        <strong style="color: #333;">Tu mensaje:</strong>
+                        <p style="margin: 5px 0 0 0; color: #666;">${sol.mensaje}</p>
+                    </div>
+                ` : ''}
+                
+                ${sol.observaciones_admin ? `
+                    <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 10px; margin: 10px 0;">
+                        <strong style="color: #333;">Respuesta del administrador:</strong>
+                        <p style="margin: 5px 0 0 0; color: #666;">${sol.observaciones_admin}</p>
+                    </div>
+                ` : ''}
+                
+                <div style="margin-top: 15px; text-align: right;">
+                    ${accionesHTML}
+                </div>
+            </div>
+        `;
+    });
+    
+    const modal = `
+        <div id="misSolicitudesModal" class="modal-overlay" style="
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        ">
+            <div class="modal-content-large" style="
+                background: white;
+                border-radius: 16px;
+                max-width: 700px;
+                width: 90%;
+                max-height: 80vh;
+                overflow-y: auto;
+                box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            ">
+                <button class="modal-close-btn" onclick="cerrarModalMisSolicitudes()" style="
+                    position: absolute;
+                    top: 15px;
+                    right: 15px;
+                    background: #f5f5f5;
+                    border: none;
+                    width: 35px;
+                    height: 35px;
+                    border-radius: 50%;
+                    font-size: 20px;
+                    cursor: pointer;
+                ">×</button>
+                
+                <div style="padding: 30px;">
+                    <h2 style="margin: 0 0 20px 0; color: #333;">
+                        <i class="fas fa-list"></i> Mis Solicitudes de Núcleo
+                    </h2>
+                    
+                    ${solicitudesHTML}
+                    
+                    <div style="margin-top: 30px; text-align: right;">
+                        <button class="btn btn-secondary" onclick="cerrarModalMisSolicitudes()">
+                            Cerrar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modal);
+}
+
+function cerrarModalMisSolicitudes() {
+    const modal = document.getElementById('misSolicitudesModal');
+    if (modal) modal.remove();
+}
+
+/**
+ * Cancelar solicitud
+ */
+async function cancelarMiSolicitud(idSolicitud) {
+    if (!confirm('¿Cancelar esta solicitud?')) {
+        return;
+    }
+    
+    try {
+        const formData = new FormData();
+        formData.append('id_solicitud', idSolicitud);
+        
+        const response = await fetch('/api/nucleos/cancelar-solicitud', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert('✅ Solicitud cancelada');
+            cerrarModalMisSolicitudes();
+            verMisSolicitudesNucleo();
+        } else {
+            alert('❌ ' + data.message);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Error de conexión');
+    }
+}
+
+// Función auxiliar (si no existe)
+function truncarTexto(texto, maxLength) {
+    if (!texto || texto.length <= maxLength) return texto;
+    return texto.substring(0, maxLength) + '...';
+}
+
+// Exportar funciones globales
+window.verificarEstadoNucleo = verificarEstadoNucleo;
+window.abrirModalNucleosDisponibles = abrirModalNucleosDisponibles;
+window.solicitarUnirseNucleo = solicitarUnirseNucleo;
+window.verMisSolicitudesNucleo = verMisSolicitudesNucleo;
+window.cancelarMiSolicitud = cancelarMiSolicitud;
+window.verDetallesNucleoDesdeInicio = verDetallesNucleoDesdeInicio;
+
+
+console.log('✅ Módulo de núcleos para usuario cargado completamente');

@@ -873,3 +873,57 @@ LEFT JOIN Justificaciones_Horas jh ON
     jh.estado = 'aprobada'
 LEFT JOIN Pagos_Cuotas pc ON cm.id_cuota = pc.id_cuota AND pc.estado_validacion != 'rechazado'
 GROUP BY cm.id_cuota;
+
+
+-- ==========================================
+-- TABLA DE SOLICITUDES PARA UNIRSE A NÚCLEOS
+-- ==========================================
+
+CREATE TABLE IF NOT EXISTS Solicitudes_Nucleo (
+    id_solicitud_nucleo INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT NOT NULL,
+    id_nucleo INT NOT NULL,
+    mensaje TEXT NULL COMMENT 'Mensaje opcional del usuario',
+    estado ENUM('pendiente', 'aprobada', 'rechazada') DEFAULT 'pendiente',
+    fecha_solicitud DATETIME DEFAULT CURRENT_TIMESTAMP,
+    fecha_respuesta DATETIME NULL,
+    id_admin_respuesta INT NULL COMMENT 'Admin que procesó la solicitud',
+    observaciones_admin TEXT NULL,
+    
+    FOREIGN KEY (id_usuario) REFERENCES Usuario(id_usuario) ON DELETE CASCADE,
+    FOREIGN KEY (id_nucleo) REFERENCES Nucleo_Familiar(id_nucleo) ON DELETE CASCADE,
+    FOREIGN KEY (id_admin_respuesta) REFERENCES Usuario(id_usuario),
+    
+    INDEX idx_estado (estado),
+    INDEX idx_fecha (fecha_solicitud DESC),
+    INDEX idx_nucleo (id_nucleo)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ==========================================
+-- VISTA COMPLETA DE SOLICITUDES DE NÚCLEOS
+-- ==========================================
+
+CREATE OR REPLACE VIEW Vista_Solicitudes_Nucleo AS
+SELECT 
+    sn.id_solicitud_nucleo,
+    sn.id_usuario,
+    u.nombre_completo,
+    u.email,
+    u.cedula,
+    sn.id_nucleo,
+    nf.nombre_nucleo,
+    nf.direccion as direccion_nucleo,
+    COUNT(DISTINCT u2.id_usuario) as miembros_actuales,
+    sn.mensaje,
+    sn.estado,
+    sn.fecha_solicitud,
+    sn.fecha_respuesta,
+    sn.observaciones_admin,
+    admin.nombre_completo as admin_respuesta
+FROM Solicitudes_Nucleo sn
+INNER JOIN Usuario u ON sn.id_usuario = u.id_usuario
+INNER JOIN Nucleo_Familiar nf ON sn.id_nucleo = nf.id_nucleo
+LEFT JOIN Usuario u2 ON u2.id_nucleo = nf.id_nucleo
+LEFT JOIN Usuario admin ON sn.id_admin_respuesta = admin.id_usuario
+GROUP BY sn.id_solicitud_nucleo
+ORDER BY sn.fecha_solicitud DESC;
