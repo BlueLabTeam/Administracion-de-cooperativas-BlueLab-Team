@@ -1,27 +1,28 @@
 /* ==========================================
-   REGISTRO DE HORAS - VERSIÓN OPTIMIZADA
-   Colores: Azul (#329cef, #320a95) y Blanco
+   REGISTRO DE HORAS - VERSIÓN ACTUALIZADA
    ========================================== */
 
-/* ========== CONTROLES DEL RELOJ ========== */
+/* ==========================================
+   CONTROLES DEL RELOJ
+   ========================================== */
 .clock-controls {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 20px;
-    padding: 30px;
-    background: linear-gradient(135deg, #329cef 0%, #320a95 100%);
-    border-radius: 12px;
-    color: white;
-    box-shadow: 0 8px 20px rgba(50, 156, 239, 0.3);
+    gap: var(--spacing-xl);
+    padding: var(--spacing-3xl);
+    background: var(--bg-gradient-primary);
+    border-radius: var(--border-radius-lg);
+    color: var(--color-white);
+    box-shadow: var(--shadow-lg);
 }
 
 .current-time {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: var(--spacing-lg);
     font-size: 2.5em;
-    font-weight: bold;
+    font-weight: 700;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
@@ -37,25 +38,25 @@
 
 .clock-buttons {
     display: flex;
-    gap: 15px;
+    gap: var(--spacing-lg);
     flex-wrap: wrap;
     justify-content: center;
 }
 
 .btn-clock {
-    padding: 15px 30px;
+    padding: var(--spacing-lg) var(--spacing-3xl);
     font-size: 1.1em;
-    font-weight: bold;
-    border-radius: 8px;
+    font-weight: 700;
+    border-radius: var(--border-radius-md);
     border: none;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all var(--transition-base);
     display: flex;
     align-items: center;
-    gap: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    background: white;
-    color: #320a95;
+    gap: var(--spacing-md);
+    box-shadow: var(--shadow-md);
+    background: var(--color-white);
+    color: var(--color-primary);
 }
 
 .btn-clock i {
@@ -64,8 +65,8 @@
 
 .btn-clock:hover:not(:disabled) {
     transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-    background: linear-gradient(135deg, #fff 0%, #f0f4ff 100%);
+    box-shadow: var(--shadow-lg);
+    background: var(--color-gray-50);
 }
 
 .btn-clock:active:not(:disabled) {
@@ -77,16 +78,18 @@
     cursor: not-allowed;
 }
 
-/* ========== INFORMACIÓN DE REGISTRO ACTIVO ========== */
+/* ==========================================
+   INFORMACIÓN DE REGISTRO ACTIVO
+   ========================================== */
 #registro-activo-info {
     width: 100%;
-    margin-top: 15px;
-    padding: 15px;
+    margin-top: var(--spacing-lg);
+    padding: var(--spacing-lg);
     background: rgba(255, 255, 255, 0.95);
-    border-radius: 8px;
+    border-radius: var(--border-radius-md);
     text-align: center;
     animation: slideDown 0.3s ease;
-    color: #320a95;
+    color: var(--color-primary);
     font-weight: 600;
 }
 
@@ -101,42 +104,44 @@
     }
 }
 
-/* ========== RESUMEN SEMANAL ========== */
+/* ==========================================
+   RESUMEN SEMANAL
+   ========================================== */
 .resumen-semana-header {
-    background: linear-gradient(135deg, #329cef 0%, #320a95 100%);
-    padding: 20px;
-    border-radius: 12px;
-    margin-bottom: 25px;
+    background: var(--bg-gradient-primary);
+    padding: var(--spacing-xl);
+    border-radius: var(--border-radius-lg);
+    margin-bottom: var(--spacing-2xl);
     text-align: center;
-    color: white;
-    box-shadow: 0 4px 15px rgba(50, 156, 239, 0.2);
+    color: var(--color-white);
+    box-shadow: var(--shadow-md);
 }
 
 .resumen-semana-header p {
-    margin: 8px 0;
+    margin: var(--spacing-sm) 0;
     font-size: 1.05em;
-    color: white;
+    color: var(--color-white);
 }
 
 .resumen-semana-header strong {
     font-size: 1.3em;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
-    color: white;
+    color: var(--color-white);
 }
 
 .resumen-dias-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 12px;
-    margin-top: 20px;
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-xl);
 }
 
 .dia-card {
-    background: white;
-    border-radius: 10px;
-    padding: 15px;
-    border: 2px solid #e0e0e0;
-    transition: all 0.3s ease;
+    background: var(--color-white);
+    border-radius: var(--border-radius-md);
+    padding: var(--spacing-lg);
+    border: 2px solid var(--border-color);
+    transition: all var(--transition-base);
     min-height: 180px;
     display: flex;
     flex-direction: column;
@@ -144,68 +149,68 @@
 
 .dia-card:hover {
     transform: translateY(-3px);
-    box-shadow: 0 6px 15px rgba(50, 156, 239, 0.15);
+    box-shadow: var(--shadow-md);
 }
 
 .dia-card.con-registro {
-    border-color: #4caf50;
+    border-color: var(--color-success-light);
     background: linear-gradient(135deg, #f0f9f4 0%, #e8f5e9 100%);
 }
 
 .dia-card.sin-registro {
-    border-color: #e0e0e0;
-    background: #fafafa;
+    border-color: var(--border-color);
+    background: var(--color-gray-50);
 }
 
 .dia-card.dia-hoy {
-    border-color: #329cef;
+    border-color: var(--color-secondary);
     border-width: 3px;
-    box-shadow: 0 0 0 3px rgba(50, 156, 239, 0.15);
+    box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.15);
     background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
 }
 
 .dia-card.fin-de-semana {
     background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
-    border-color: #ffb300;
+    border-color: var(--color-warning-light);
 }
 
 .dia-card.fin-de-semana.con-registro {
     background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
-    border-color: #4caf50;
+    border-color: var(--color-success-light);
 }
 
 .dia-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 12px;
-    padding-bottom: 10px;
-    border-bottom: 2px solid rgba(50, 156, 239, 0.1);
+    margin-bottom: var(--spacing-md);
+    padding-bottom: var(--spacing-md);
+    border-bottom: 2px solid rgba(0, 102, 204, 0.1);
     flex-wrap: wrap;
-    gap: 5px;
+    gap: var(--spacing-xs);
 }
 
 .dia-header strong {
     font-size: 1.1em;
-    color: #320a95;
+    color: var(--color-primary);
     font-weight: 700;
 }
 
 .dia-fecha {
     font-size: 0.8em;
-    color: #666;
+    color: var(--color-gray-600);
     font-weight: 500;
 }
 
 .badge-hoy {
-    background: linear-gradient(135deg, #329cef 0%, #320a95 100%);
-    color: white;
+    background: var(--bg-gradient-primary);
+    color: var(--color-white);
     padding: 3px 10px;
     border-radius: 12px;
     font-size: 0.7em;
-    font-weight: bold;
+    font-weight: 700;
     text-transform: uppercase;
-    box-shadow: 0 2px 5px rgba(50, 156, 239, 0.3);
+    box-shadow: var(--shadow-sm);
 }
 
 .badge-finde {
@@ -227,44 +232,46 @@
 }
 
 .registro-info p {
-    margin: 8px 0;
+    margin: var(--spacing-sm) 0;
     display: flex;
     align-items: center;
-    gap: 8px;
-    color: #555;
+    gap: var(--spacing-sm);
+    color: var(--color-gray-700);
 }
 
 .registro-info i {
-    color: #329cef;
+    color: var(--color-secondary);
     width: 18px;
     font-size: 1.1em;
 }
 
 .no-registro {
     text-align: center;
-    color: #999;
-    padding: 20px 0;
+    color: var(--color-gray-500);
+    padding: var(--spacing-xl) 0;
     font-style: italic;
 }
 
 .no-registro i {
     display: block;
     font-size: 2em;
-    margin-bottom: 8px;
+    margin-bottom: var(--spacing-sm);
     opacity: 0.5;
-    color: #999;
+    color: var(--color-gray-400);
 }
 
-/* ========== BADGES DE ESTADO ========== */
+/* ==========================================
+   BADGES DE ESTADO
+   ========================================== */
 .badge-estado {
     display: inline-flex;
     align-items: center;
-    gap: 5px;
+    gap: var(--spacing-xs);
     padding: 5px 12px;
     border-radius: 15px;
     font-size: 0.8em;
-    font-weight: bold;
-    margin-top: 10px;
+    font-weight: 700;
+    margin-top: var(--spacing-md);
 }
 
 .badge-estado i {
@@ -286,29 +293,31 @@
     color: #856404;
 }
 
-/* ========== TABLA DE REGISTROS ========== */
+/* ==========================================
+   TABLA DE REGISTROS
+   ========================================== */
 .registros-table-wrapper {
     overflow-x: auto;
-    margin-top: 15px;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    margin-top: var(--spacing-lg);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-md);
 }
 
 .registros-table {
     width: 100%;
     border-collapse: collapse;
-    background: white;
-    border-radius: 12px;
+    background: var(--color-white);
+    border-radius: var(--border-radius-lg);
     overflow: hidden;
 }
 
 .registros-table thead {
-    background: linear-gradient(135deg, #329cef 0%, #320a95 100%);
-    color: white;
+    background: var(--bg-gradient-primary);
+    color: var(--color-white);
 }
 
 .registros-table th {
-    padding: 15px 12px;
+    padding: var(--spacing-lg) var(--spacing-md);
     text-align: left;
     font-weight: 600;
     text-transform: uppercase;
@@ -317,66 +326,57 @@
 }
 
 .registros-table td {
-    padding: 12px;
-    border-bottom: 1px solid #e0e0e0;
-    color: #333;
+    padding: var(--spacing-md);
+    border-bottom: 1px solid var(--border-color);
+    color: var(--color-gray-800);
 }
 
 .registros-table tbody tr:hover {
-    background: #f8f9fa;
+    background: var(--color-gray-50);
 }
 
-
 .en-curso {
-    color: #ff9800;
-    font-weight: bold;
+    color: var(--color-warning);
+    font-weight: 700;
     animation: pulse 2s infinite;
 }
 
 .descripcion-cell {
-       max-width: 300px;  
+    max-width: 300px;  
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
-
-
-/* ========== INPUT DE FECHA ========== */
+/* ==========================================
+   INPUT DE FECHA
+   ========================================== */
 .date-input {
-    padding: 10px 12px;
-    border: 2px solid #e0e0e0;
-    border-radius: 6px;
+    padding: var(--spacing-md) var(--spacing-md);
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius-md);
     font-size: 0.9em;
-    transition: all 0.2s ease;
-    color: #333;
+    transition: all var(--transition-base);
+    color: var(--color-gray-800);
 }
 
 .date-input:focus {
     outline: none;
-    border-color: #329cef;
-    box-shadow: 0 0 0 3px rgba(50, 156, 239, 0.1);
+    border-color: var(--color-secondary);
+    box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
 }
 
-
-
-
-
-/* ========== LOADING ========== */
-.loading {
-    text-align: center;
-    padding: 40px;
-    color: #666;
-}
-
+/* ==========================================
+   LOADING
+   ========================================== */
 .loading::after {
     content: '';
     display: inline-block;
     width: 20px;
     height: 20px;
-    margin-left: 10px;
-    border: 3px solid #f3f3f3;
-    border-top: 3px solid #329cef;
+    margin-left: var(--spacing-md);
+    border: 3px solid var(--color-gray-200);
+    border-top: 3px solid var(--color-secondary);
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
@@ -386,21 +386,9 @@
     100% { transform: rotate(360deg); }
 }
 
-/* ========== NO DATA ========== */
-.no-data {
-    text-align: center;
-    padding: 40px;
-    color: #999;
-}
-
-.no-data i {
-    display: block;
-    font-size: 48px;
-    margin-bottom: 15px;
-    color: #ddd;
-}
-
-/* ========== RESPONSIVE ========== */
+/* ==========================================
+   RESPONSIVE
+   ========================================== */
 @media (max-width: 1200px) {
     .resumen-dias-grid {
         grid-template-columns: repeat(4, 1fr);
@@ -419,7 +407,7 @@
     }
     
     .btn-clock {
-        padding: 12px 20px;
+        padding: var(--spacing-md) var(--spacing-xl);
         font-size: 1em;
     }
     
@@ -433,7 +421,7 @@
     
     .registros-table th,
     .registros-table td {
-        padding: 8px;
+        padding: var(--spacing-sm);
     }
 }
 

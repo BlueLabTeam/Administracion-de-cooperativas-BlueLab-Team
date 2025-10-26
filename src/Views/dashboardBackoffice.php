@@ -5,6 +5,10 @@
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<title>Gestcoop – Panel de Administrador</title>
+
+	   <!-- ✅ PRIMERO: Variables globales -->
+    <link rel="stylesheet" href="/assets/css/dashboardVariables.css" />
+	
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 	<link rel="stylesheet" href="/assets/css/dashboardBase.css" />
 	<link rel="stylesheet" href="/assets/css/dashboardHeader.css" />
@@ -266,7 +270,7 @@
 </section>
 
 <!-- Modal para crear/editar vivienda -->
-<div id="viviendaModal" class="material-modal">
+<div id="viviendaModal" class="material-modal" style="display: none;">
 	<div class="material-modal-content">
 		<div class="material-modal-header">
 			<h3 id="viviendaModalTitle">Nueva Vivienda</h3>
@@ -326,7 +330,7 @@
 </div>
 
 <!-- Modal para asignar vivienda -->
-<div id="asignarViviendaModal" class="material-modal">
+<div id="asignarViviendaModal" class="material-modal" class="material-modal" style="display: none;">
 	<div class="material-modal-content">
 		<div class="material-modal-header">
 			<h3>Asignar Vivienda</h3>
@@ -377,7 +381,7 @@
 </div>
 
 		<!-- SECCIÓN FACTURACIÓN -->
-		<section id="cuotas-section" class="section-content">
+		<section id="cuotas-section" class="section-content" class="material-modal">
     <h2 class="section-title">💰 Gestión de Cuotas Mensuales</h2>
     
     <!-- Estadísticas generales -->
@@ -646,7 +650,8 @@
 </section>
 
 <!-- Modal para crear/editar material -->
-<div id="materialModal" class="material-modal">
+<div id="materialModal" class="material-modal" style="display: none;">
+
 	<div class="material-modal-content">
 		<div class="material-modal-header">
 			<h3 id="materialModalTitle">Nuevo Material</h3>
@@ -675,7 +680,8 @@
 </div>
 
 <!-- Modal para actualizar stock -->
-<div id="stockModal" class="material-modal">
+<div id="stockModal" class="material-modal" style="display: none;">
+
 	<div class="material-modal-content">
 		<div class="material-modal-header">
 			<h3>Actualizar Stock</h3>
@@ -833,59 +839,13 @@
 		<img class="modal-content" id="modalImage">
 	</div>
 
-<!-- SECCIÓN SOLICITUDES ADMIN - CORREGIDA -->
+<!-- SECCIÓN SOLICITUDES ADMIN - SIMPLIFICADA -->
 <section id="solicitudes-section" class="section-content">
-    <h2 class="section-title">📩 Gestión de Solicitudes</h2>
+    <h2 class="section-title">Gestión de Solicitudes</h2>
 
-    <!-- Estadísticas -->
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-icon">
-                <i class="fas fa-inbox"></i>
-            </div>
-            <div class="stat-info">
-                <span class="stat-label">Total</span>
-                <span class="stat-value" id="solicitudes-total-admin">0</span>
-            </div>
-        </div>
-
-        <div class="stat-card pendiente">
-            <div class="stat-icon">
-                <i class="fas fa-clock"></i>
-            </div>
-            <div class="stat-info">
-                <span class="stat-label">Pendientes</span>
-                <span class="stat-value" id="solicitudes-pendientes-admin">0</span>
-            </div>
-        </div>
-
-        <div class="stat-card revision">
-            <div class="stat-icon">
-                <i class="fas fa-eye"></i>
-            </div>
-            <div class="stat-info">
-                <span class="stat-label">En Revisión</span>
-                <span class="stat-value" id="solicitudes-revision-admin">0</span>
-            </div>
-        </div>
-
-        <div class="stat-card success">
-            <div class="stat-icon">
-                <i class="fas fa-check-circle"></i>
-            </div>
-            <div class="stat-info">
-                <span class="stat-label">Resueltas</span>
-                <span class="stat-value" id="solicitudes-resueltas-admin">0</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- Filtros -->
-    <div class="filters-container">
-        <div class="filter-group">
-            <label for="filtro-estado-solicitudes-admin">
-                <i class="fas fa-filter"></i> Estado:
-            </label>
+    <!-- Filtros simples -->
+    <div class="info-card">
+        <div class="filter-controls">
             <select id="filtro-estado-solicitudes-admin" onchange="loadAllSolicitudes()">
                 <option value="">Todos los estados</option>
                 <option value="pendiente">Pendiente</option>
@@ -893,12 +853,7 @@
                 <option value="resuelta">Resuelta</option>
                 <option value="rechazada">Rechazada</option>
             </select>
-        </div>
-
-        <div class="filter-group">
-            <label for="filtro-tipo-solicitudes-admin">
-                <i class="fas fa-tag"></i> Tipo:
-            </label>
+            
             <select id="filtro-tipo-solicitudes-admin" onchange="loadAllSolicitudes()">
                 <option value="">Todos los tipos</option>
                 <option value="horas">Registro de Horas</option>
@@ -907,12 +862,7 @@
                 <option value="general">Consulta General</option>
                 <option value="otro">Otro</option>
             </select>
-        </div>
-
-        <div class="filter-group">
-            <label for="filtro-prioridad-solicitudes-admin">
-                <i class="fas fa-exclamation-circle"></i> Prioridad:
-            </label>
+            
             <select id="filtro-prioridad-solicitudes-admin" onchange="loadAllSolicitudes()">
                 <option value="">Todas las prioridades</option>
                 <option value="alta">Alta</option>
@@ -922,9 +872,13 @@
         </div>
     </div>
 
-    <!-- Lista de Solicitudes - ESTRUCTURA CORRECTA -->
-    <div id="solicitudesAdminContainer">
-        <p class="loading">Cargando solicitudes...</p>
+    <!-- Tabla simple -->
+    <div class="info-card">
+        <h3>Todas las Solicitudes</h3>
+        
+        <div id="solicitudesAdminContainer">
+            <p class="loading">Cargando solicitudes...</p>
+        </div>
     </div>
 </section>
 

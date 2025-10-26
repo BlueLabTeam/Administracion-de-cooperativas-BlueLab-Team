@@ -14,6 +14,9 @@ if (!isset($_SESSION['user_id'])) {
 	<title>Gestcoop – Panel de Usuario</title>
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
+	   <!-- ✅ PRIMERO: Variables globales -->
+    <link rel="stylesheet" href="/assets/css/dashboardVariables.css" />
+	
 	<link rel="stylesheet" href="/assets/css/dashboardBase.css" />
 	<link rel="stylesheet" href="/assets/css/dashboardHeader.css" />
 	<link rel="stylesheet" href="/assets/css/justificacion.css" />

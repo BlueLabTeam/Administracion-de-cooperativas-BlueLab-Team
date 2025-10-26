@@ -64,6 +64,369 @@ document.addEventListener('DOMContentLoaded', function () {
 console.log('=== Definiendo funciones globales ===');
 
 
+
+// ==========================================
+// 🔧 FIX PARA MODALES EN ADMIN
+// Agregar ANTES de cualquier función que abra modales
+// ==========================================
+
+/**
+ * 🧹 Limpiar TODOS los modales anteriores antes de abrir uno nuevo
+ */
+function limpiarModalesAnteriores() {
+    console.log('🧹 [LIMPIEZA] Iniciando limpieza de modales...');
+    
+    // ✅ MODALES PERMANENTES DEL HTML (solo ocultar, NO eliminar)
+    const modalesPermanentes = [
+        '#viviendaModal',
+        '#asignarViviendaModal',
+        '#materialModal',
+        '#stockModal',
+        '#imageModal',
+        '#editarPrecioModal',
+        '#validarPagoModal',
+        '#generarCuotasModal',
+        '#pagarCuotaModal'
+    ];
+    
+    modalesPermanentes.forEach(selector => {
+        const modal = document.querySelector(selector);
+        if (modal) {
+            console.log('👁️ Ocultando modal permanente:', selector);
+            modal.style.display = 'none';
+        }
+    });
+    
+    // ❌ MODALES DINÁMICOS (sí eliminar)
+    const selectoresDinamicos = [
+        '.modal-overlay:not(#editarPrecioModal):not(#validarPagoModal):not(#generarCuotasModal)',
+        '.modal-detail',
+        '.user-detail-modal',
+        '#taskDetailModal',
+        '#materialesModalAdmin',
+        '#materialesModal',
+        '#responderSolicitudAdminModal',
+        '#justificarHorasModal',
+        '#detallesNucleoModal',
+        '#nucleosDisponiblesModal',
+        '#misSolicitudesModal'
+    ];
+    
+    selectoresDinamicos.forEach(selector => {
+        const modales = document.querySelectorAll(selector);
+        modales.forEach(modal => {
+            console.log('🗑️ Eliminando modal dinámico:', selector);
+            modal.remove();
+        });
+    });
+}
+
+// ==========================================
+// 🔧 FUNCIÓN MEJORADA: Ver Detalles de Usuario
+// ==========================================
+
+function viewUserDetails(userId) {
+    console.log('👁️ [DETAILS] Cargando detalles de usuario:', userId);
+
+    // 🧹 LIMPIAR MODALES ANTERIORES
+    limpiarModalesAnteriores();
+
+    fetch(`/api/users/details?id_usuario=${userId}`)
+        .then(response => response.json())
+        .then(data => {
+            console.log('👁️ [DETAILS] Response:', data);
+            if (data.success) {
+                showUserDetailModal(data.user);
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('👁️ [DETAILS ERROR]', error);
+            alert('Error de conexión');
+        });
+}
+
+function showUserDetailModal(user) {
+    console.log('👁️ [MODAL] Mostrando modal para:', user.nombre_completo);
+
+    // 🧹 LIMPIAR ANTES DE CREAR
+    limpiarModalesAnteriores();
+
+    const modalHTML = `
+        <div class="user-detail-modal" onclick="if(event.target.classList.contains('user-detail-modal')) { this.remove(); }">
+            <div class="user-detail-content">
+                <button class="user-detail-close" onclick="limpiarModalesAnteriores()">
+                    &times;
+                </button>
+                
+                <h2>${user.nombre_completo}</h2>
+                <span class="estado-badge estado-${user.estado}">
+                    ${formatEstadoUsuario(user.estado)}
+                </span>
+                
+                <div style="margin-top: 20px;">
+                    <p><strong>Cédula:</strong> ${user.cedula}</p>
+                    <p><strong>Email:</strong> ${user.email}</p>
+                    <p><strong>Dirección:</strong> ${user.direccion || '-'}</p>
+                    <p><strong>Fecha Nacimiento:</strong> ${user.fecha_nacimiento || '-'}</p>
+                    <p><strong>Fecha Ingreso:</strong> ${user.fecha_ingreso || '-'}</p>
+                    <p><strong>Rol:</strong> ${user.rol || 'Sin rol'}</p>
+                    <p><strong>Núcleo:</strong> ${user.id_nucleo ? `#${user.id_nucleo}` : 'Sin núcleo'}</p>
+                </div>
+                
+                <div style="margin-top: 20px; text-align: right;">
+                    <button class="btn btn-secondary" onclick="limpiarModalesAnteriores()">
+                        Cerrar
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+}
+
+// ==========================================
+// 🔧 FUNCIÓN MEJORADA: Crear/Editar Vivienda
+// ==========================================
+
+function showCreateViviendaModal() {
+    console.log('>>> showCreateViviendaModal() EJECUTADA');
+
+    // 🧹 LIMPIAR MODALES ANTERIORES
+    limpiarModalesAnteriores();
+
+    const modal = document.getElementById('viviendaModal');
+    
+    if (!modal) {
+        console.error('❌ Modal viviendaModal NO encontrado en el DOM');
+        alert('ERROR: Modal no encontrado. Recarga la página.');
+        return;
+    }
+
+    loadTiposVivienda().then(() => {
+        document.getElementById('viviendaModalTitle').textContent = 'Nueva Vivienda';
+        document.getElementById('vivienda-id').value = '';
+        document.getElementById('vivienda-numero').value = '';
+        document.getElementById('vivienda-direccion').value = '';
+        document.getElementById('vivienda-tipo').value = '';
+        document.getElementById('vivienda-metros').value = '';
+        document.getElementById('vivienda-fecha').value = '';
+        document.getElementById('vivienda-estado').value = 'disponible';
+        document.getElementById('vivienda-observaciones').value = '';
+        
+        // ✅ MOSTRAR EL MODAL
+        modal.style.display = 'flex';
+        console.log('✅ Modal mostrado');
+    }).catch(error => {
+        console.error('❌ Error al cargar tipos:', error);
+        alert('Error al cargar tipos de vivienda');
+    });
+}
+
+function editVivienda(id) {
+    console.log('>>> Editando vivienda ID:', id);
+
+    // 🧹 LIMPIAR MODALES ANTERIORES
+    limpiarModalesAnteriores();
+
+    const modal = document.getElementById('viviendaModal');
+    
+    if (!modal) {
+        console.error('❌ Modal viviendaModal NO encontrado');
+        alert('ERROR: Modal no encontrado. Recarga la página.');
+        return;
+    }
+
+    Promise.all([
+        fetch(`/api/viviendas/details?id=${id}`).then(r => r.json()),
+        loadTiposVivienda()
+    ]).then(([data]) => {
+        if (data.success && data.vivienda) {
+            const v = data.vivienda;
+            document.getElementById('viviendaModalTitle').textContent = 'Editar Vivienda';
+            document.getElementById('vivienda-id').value = v.id_vivienda;
+            document.getElementById('vivienda-numero').value = v.numero_vivienda;
+            document.getElementById('vivienda-direccion').value = v.direccion || '';
+            document.getElementById('vivienda-tipo').value = v.id_tipo;
+            document.getElementById('vivienda-metros').value = v.metros_cuadrados || '';
+            document.getElementById('vivienda-fecha').value = v.fecha_construccion || '';
+            document.getElementById('vivienda-estado').value = v.estado;
+            document.getElementById('vivienda-observaciones').value = v.observaciones || '';
+
+            // ✅ MOSTRAR EL MODAL
+            modal.style.display = 'flex';
+            console.log('✅ Modal de edición mostrado');
+        } else {
+            alert('Error al cargar vivienda');
+        }
+    }).catch(error => {
+        console.error('Error:', error);
+        alert('Error al cargar vivienda');
+    });
+}
+
+function closeViviendaModal() {
+    const modal = document.getElementById('viviendaModal');
+    if (modal) {
+        modal.style.display = 'none';
+        document.getElementById('viviendaForm').reset();
+    }
+    // 🧹 LIMPIAR POR SI ACASO
+    limpiarModalesAnteriores();
+}
+
+// ==========================================
+// 🔧 FUNCIÓN MEJORADA: Asignar Vivienda
+// ==========================================
+
+function showAsignarModal(viviendaId, numeroVivienda) {
+    console.log('>>> Abriendo modal asignar:', viviendaId);
+
+    // 🧹 LIMPIAR MODALES ANTERIORES
+    limpiarModalesAnteriores();
+
+    Promise.all([
+        fetch('/api/users/all').then(r => r.json()),
+        fetch('/api/nucleos/all').then(r => r.json())
+    ]).then(([usersData, nucleosData]) => {
+        if (usersData.success && nucleosData.success) {
+            const userSelect = document.getElementById('asignar-usuario');
+            userSelect.innerHTML = '<option value="">Seleccione un usuario...</option>';
+            usersData.users.forEach(user => {
+                userSelect.innerHTML += `<option value="${user.id_usuario}">${user.nombre_completo} (${user.email})</option>`;
+            });
+
+            const nucleoSelect = document.getElementById('asignar-nucleo');
+            nucleoSelect.innerHTML = '<option value="">Seleccione un núcleo...</option>';
+            nucleosData.nucleos.forEach(nucleo => {
+                nucleoSelect.innerHTML += `<option value="${nucleo.id_nucleo}">${nucleo.nombre_nucleo || 'Sin nombre'} (${nucleo.total_miembros} miembros)</option>`;
+            });
+
+            document.getElementById('asignar-vivienda-info').textContent = `Vivienda: ${numeroVivienda}`;
+            document.getElementById('asignar-vivienda-id').value = viviendaId;
+            document.getElementById('asignarViviendaModal').style.display = 'flex';
+        }
+    }).catch(error => {
+        console.error('Error:', error);
+        alert('Error al cargar datos');
+    });
+}
+
+function closeAsignarModal() {
+    const modal = document.getElementById('asignarViviendaModal');
+    if (modal) {
+        modal.style.display = 'none';
+        document.getElementById('asignarForm').reset();
+        document.getElementById('asignar-usuario-group').style.display = 'none';
+        document.getElementById('asignar-nucleo-group').style.display = 'none';
+    }
+    // 🧹 LIMPIAR POR SI ACASO
+    limpiarModalesAnteriores();
+}
+
+// ==========================================
+// 🔧 FUNCIÓN MEJORADA: Materiales
+// ==========================================
+
+function showCreateMaterialModal() {
+    console.log('>>> showCreateMaterialModal() EJECUTADA');
+
+    // 🧹 LIMPIAR MODALES ANTERIORES
+    limpiarModalesAnteriores();
+
+    const modal = document.getElementById('materialModal');
+
+    if (!modal) {
+        console.error('✗ Modal no encontrado');
+        alert('ERROR: Modal no encontrado en el DOM');
+        return;
+    }
+
+    document.getElementById('materialModalTitle').textContent = 'Nuevo Material';
+    document.getElementById('material-id').value = '';
+    document.getElementById('material-nombre').value = '';
+    document.getElementById('material-caracteristicas').value = '';
+    modal.style.display = 'flex';
+    console.log('✓ Modal mostrado');
+}
+
+function closeMaterialModal() {
+    const modal = document.getElementById('materialModal');
+    if (modal) {
+        modal.style.display = 'none';
+        document.getElementById('materialForm').reset();
+    }
+    // 🧹 LIMPIAR POR SI ACASO
+    limpiarModalesAnteriores();
+}
+
+function showStockModal(id, nombre, stockActual) {
+    console.log('>>> Abriendo modal stock para:', nombre);
+    
+    // 🧹 LIMPIAR MODALES ANTERIORES
+    limpiarModalesAnteriores();
+    
+    document.getElementById('stock-material-id').value = id;
+    document.getElementById('stock-material-name').textContent = 'Material: ' + nombre;
+    document.getElementById('stock-cantidad').value = stockActual;
+    document.getElementById('stockModal').style.display = 'flex';
+}
+
+function closeStockModal() {
+    const modal = document.getElementById('stockModal');
+    if (modal) {
+        modal.style.display = 'none';
+        document.getElementById('stockForm').reset();
+    }
+    // 🧹 LIMPIAR POR SI ACASO
+    limpiarModalesAnteriores();
+}
+
+// ==========================================
+// 🔧 AGREGAR EVENT LISTENER GLOBAL
+// ==========================================
+
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('✅ Inicializando limpieza automática de modales');
+    
+    // Limpiar cuando se hace clic fuera de cualquier modal
+    document.addEventListener('click', function(event) {
+        if (event.target.classList.contains('modal-overlay') || 
+            event.target.classList.contains('modal-detail') ||
+            event.target.classList.contains('material-modal') ||
+            event.target.classList.contains('user-detail-modal')) {
+            limpiarModalesAnteriores();
+        }
+    });
+    
+    // Limpiar con tecla ESC
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            limpiarModalesAnteriores();
+        }
+    });
+});
+
+// ==========================================
+// 🔧 EXPORTAR FUNCIONES GLOBALES
+// ==========================================
+
+window.limpiarModalesAnteriores = limpiarModalesAnteriores;
+window.viewUserDetails = viewUserDetails;
+window.showUserDetailModal = showUserDetailModal;
+window.showCreateViviendaModal = showCreateViviendaModal;
+window.closeViviendaModal = closeViviendaModal;
+window.showAsignarModal = showAsignarModal;
+window.closeAsignarModal = closeAsignarModal;
+window.showCreateMaterialModal = showCreateMaterialModal;
+window.closeMaterialModal = closeMaterialModal;
+window.showStockModal = showStockModal;
+window.closeStockModal = closeStockModal;
+
+console.log('✅ Fix de modales cargado completamente');
+
 // ========== NOTIFICACIONES ==========
 
 function loadUsersForNotifications() {
@@ -2504,13 +2867,33 @@ function showCreateViviendaModal() {
 // ========== EDITAR VIVIENDA ==========
 function editVivienda(id) {
     console.log('>>> Editando vivienda ID:', id);
+    console.log('🧹 Limpiando modales anteriores...');
+
+    // 🧹 LIMPIAR MODALES ANTERIORES
+    limpiarModalesAnteriores();
+
+    const modal = document.getElementById('viviendaModal');
+    console.log('🔍 Modal encontrado:', modal);
+    console.log('🔍 Modal display actual:', modal ? modal.style.display : 'NULL');
+    
+    if (!modal) {
+        console.error('❌ Modal viviendaModal NO encontrado');
+        alert('ERROR: Modal no encontrado. Recarga la página.');
+        return;
+    }
+
+    console.log('🌐 Cargando datos de vivienda...');
 
     Promise.all([
         fetch(`/api/viviendas/details?id=${id}`).then(r => r.json()),
         loadTiposVivienda()
     ]).then(([data]) => {
+        console.log('📦 Datos recibidos:', data);
+        
         if (data.success && data.vivienda) {
             const v = data.vivienda;
+            
+            console.log('📝 Llenando formulario...');
             document.getElementById('viviendaModalTitle').textContent = 'Editar Vivienda';
             document.getElementById('vivienda-id').value = v.id_vivienda;
             document.getElementById('vivienda-numero').value = v.numero_vivienda;
@@ -2521,13 +2904,18 @@ function editVivienda(id) {
             document.getElementById('vivienda-estado').value = v.estado;
             document.getElementById('vivienda-observaciones').value = v.observaciones || '';
 
-            document.getElementById('viviendaModal').style.display = 'flex';
+            console.log('👁️ Mostrando modal...');
+            modal.style.display = 'flex';
+            console.log('✅ Modal display después de mostrar:', modal.style.display);
+            console.log('✅ Modal de edición mostrado correctamente');
         } else {
+            console.error('❌ Error en data.success o data.vivienda');
             alert('Error al cargar vivienda');
         }
     }).catch(error => {
-        console.error('Error:', error);
-        alert('Error al cargar vivienda');
+        console.error('❌ Error completo:', error);
+        console.error('❌ Error stack:', error.stack);
+        alert('Error al cargar vivienda: ' + error.message);
     });
 }
 
@@ -3422,61 +3810,83 @@ function renderSolicitudesAdmin(solicitudes) {
         return;
     }
 
-    let html = '<div class="solicitudes-grid">';
+    // ✅ CAMBIAR A TABLA COMO OTRAS SECCIONES
+    let html = `
+        <div class="table-responsive">
+            <table class="solicitudes-admin-table">
+                <thead>
+                    <tr>
+                        <th>Usuario</th>
+                        <th>Asunto</th>
+                        <th>Tipo</th>
+                        <th>Estado</th>
+                        <th>Prioridad</th>
+                        <th>Fecha</th>
+                        <th>Respuestas</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
 
     solicitudes.forEach(sol => {
         const fecha = new Date(sol.fecha_creacion).toLocaleDateString('es-UY', {
             day: '2-digit',
             month: '2-digit',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
+            year: 'numeric'
         });
 
         html += `
-            <div class="solicitud-card estado-${sol.estado} prioridad-${sol.prioridad}">
-                <div class="solicitud-header">
-                    <div>
-                        <h4>${sol.asunto}</h4>
-                        <span class="solicitud-usuario">
-                            <i class="fas fa-user"></i> ${sol.nombre_completo}
-                        </span>
-                    </div>
-                    <div class="solicitud-badges">
-                        <span class="badge badge-${sol.estado}">${formatEstado(sol.estado)}</span>
-                        <span class="badge badge-prioridad-${sol.prioridad}">${formatPrioridad(sol.prioridad)}</span>
-                        <span class="badge" style="background: #e0e0e0; color: #555;">${formatTipoSolicitud(sol.tipo_solicitud)}</span>
-                    </div>
-                </div>
-
-                <div class="solicitud-body">
-                    <p class="solicitud-descripcion">${truncarTexto(sol.descripcion, 120)}</p>
-                    
-                    <div class="solicitud-meta">
-                        <span><i class="fas fa-envelope"></i> ${sol.email}</span>
-                        <span><i class="fas fa-calendar"></i> ${fecha}</span>
-                        <span><i class="fas fa-comments"></i> ${sol.total_respuestas || 0} resp.</span>
-                    </div>
-                </div>
-
-                <div class="solicitud-footer">
-                    <button class="btn btn-secondary btn-small" onclick="verDetalleSolicitudAdmin(${sol.id_solicitud})">
-                        <i class="fas fa-eye"></i> Ver Detalle
-                    </button>
-                    <button class="btn btn-primary btn-small" onclick="responderSolicitudAdmin(${sol.id_solicitud})">
-                        <i class="fas fa-reply"></i> Responder
-                    </button>
-                    ${sol.estado !== 'resuelta' && sol.estado !== 'rechazada' ? `
-                        <button class="btn btn-success btn-small" onclick="cambiarEstadoSolicitud(${sol.id_solicitud}, 'resuelta')">
-                            <i class="fas fa-check"></i> Resolver
+            <tr class="solicitud-row estado-${sol.estado}">
+                <td>
+                    <strong>${sol.nombre_completo}</strong><br>
+                    <small>${sol.email}</small>
+                </td>
+                <td><strong>${sol.asunto}</strong></td>
+                <td>${formatTipoSolicitud(sol.tipo_solicitud)}</td>
+                <td>
+                    <span class="badge badge-${sol.estado}">
+                        ${formatEstado(sol.estado)}
+                    </span>
+                </td>
+                <td>
+                    <span class="badge badge-prioridad-${sol.prioridad}">
+                        ${formatPrioridad(sol.prioridad)}
+                    </span>
+                </td>
+                <td>${fecha}</td>
+                <td class="text-center">${sol.total_respuestas || 0}</td>
+                <td>
+                    <div style="display: flex; gap: 5px;">
+                        <button class="btn-small btn-secondary" 
+                                onclick="verDetalleSolicitudAdmin(${sol.id_solicitud})"
+                                title="Ver detalle">
+                            <i class="fas fa-eye"></i>
                         </button>
-                    ` : ''}
-                </div>
-            </div>
+                        <button class="btn-small btn-primary" 
+                                onclick="responderSolicitudAdmin(${sol.id_solicitud})"
+                                title="Responder">
+                            <i class="fas fa-reply"></i>
+                        </button>
+                        ${sol.estado !== 'resuelta' && sol.estado !== 'rechazada' ? `
+                            <button class="btn-small btn-success" 
+                                    onclick="cambiarEstadoSolicitud(${sol.id_solicitud}, 'resuelta')"
+                                    title="Resolver">
+                                <i class="fas fa-check"></i>
+                            </button>
+                        ` : ''}
+                    </div>
+                </td>
+            </tr>
         `;
     });
 
-    html += '</div>';
+    html += `
+                </tbody>
+            </table>
+        </div>
+    `;
+
     container.innerHTML = html;
 }
 
