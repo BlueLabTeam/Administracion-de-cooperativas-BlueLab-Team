@@ -20,75 +20,82 @@
             <a href="/api/logout" class="logout-link">
                 <button class="btn-logout">Logout</button>
             </a>
-            
-           
+
+
             <?php if (isset($_SESSION['is_admin']) && $_SESSION['is_admin']): ?>
-                <a href="/dashboard-admin" style="text-decoration: none;">
-                    <button class="btn-admin" type="button">
-                        <i class="fas fa-user-shield"></i> Admin
-                    </button>
-                </a>
+            <a href="/dashboard-admin" style="text-decoration: none;">
+                <button class="btn-admin" type="button">
+                    <i class="fas fa-user-shield"></i> Admin
+                </button>
+            </a>
             <?php endif; ?>
-            
-            <span class="nombre"><?php echo htmlspecialchars($_SESSION['nombre_completo'] ?? 'Usuario'); ?></span>
+
+            <span class="nombre">
+                <?php echo htmlspecialchars($_SESSION['nombre_completo'] ?? 'Usuario'); ?>
+            </span>
             <div class="icono-usuario">
                 <img src="https://cdn-icons-png.flaticon.com/512/847/847969.png" alt="Usuario">
             </div>
         </div>
     </header>
+    <button class="mini-toggle-menu-btn" title="Mostrar Menú">
+        <i class="fa-solid fa-angle-down"></i>
+    </button>
+    <nav class="menu">
+        <ul>
+            <li data-section="inicio" class="activo">
+                <a href="#">
+                    <i class="fas fa-house-user"></i>
 
-   <nav class="menu">
-    <ul>
-        <li data-section="inicio" class="activo">
-            <a href="#">
-                <i class="fas fa-house-user"></i>
+                </a>
+            </li>
+            <li data-section="perfil">
+                <a href="#">
+                    <i class="fas fa-user"></i>
 
-            </a>
-        </li>
-        <li data-section="perfil">
-            <a href="#">
-                <i class="fas fa-user"></i>
+                </a>
+            </li>
+            <li data-section="solicitudes">
+                <a href="#">
+                    <i class="fas fa-file-alt"></i>
 
-            </a>
-        </li>
-        <li data-section="solicitudes">
-            <a href="#">
-                <i class="fas fa-file-alt"></i>
-  
-            </a>
-        </li>
-        <li data-section="vivienda">
-            <a href="#">
-                <i class="fas fa-home"></i>
-               
-            </a>
-        </li>
-        <li data-section="aportes">
-            <a href="#">
-                <i class="fas fa-hand-holding-usd"></i>
-             
-            </a>
-        </li>
-        <li data-section="horas">
-            <a href="#">
-                <i class="fas fa-clock"></i>
-              
-            </a>
-        </li>
-        <li data-section="tareas">
-            <a href="#">
-                <i class="fas fa-tasks"></i>
-               
-            </a>
-        </li>
-        <li data-section="documentos">
-            <a href="#">
-                <i class="fas fa-folder-open"></i>
-            
-            </a>
-        </li>
-    </ul>
-</nav>
+                </a>
+            </li>
+            <li data-section="vivienda">
+                <a href="#">
+                    <i class="fas fa-home"></i>
+
+                </a>
+            </li>
+            <li data-section="aportes">
+                <a href="#">
+                    <i class="fas fa-hand-holding-usd"></i>
+
+                </a>
+            </li>
+            <li data-section="horas">
+                <a href="#">
+                    <i class="fas fa-clock"></i>
+
+                </a>
+            </li>
+            <li data-section="tareas">
+                <a href="#">
+                    <i class="fas fa-tasks"></i>
+
+                </a>
+            </li>
+            <li data-section="documentos">
+                <a href="#">
+                    <i class="fas fa-folder-open"></i>
+
+                </a>
+            </li>
+        </ul>
+        <button class="toggle-menu-btn" title="Minimizar menú">
+            <i class="fas fa-chevron-up"></i>
+        </button>
+    </nav>
 
     <!-- Contenido de cada sección -->
     <main>
@@ -104,4 +111,5 @@
     <script src="/assets/js/dashboardHeaderUsuario.js?v=2"></script>
 
 </body>
+
 </html>
