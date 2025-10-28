@@ -58,35 +58,33 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     });
-
-
-    // ========== BOTÓN MINIMIZAR/EXPANDIR MENÚ ==========
+}); // ← CIERRE CORRECTO DEL DOMContentLoaded
+document.addEventListener('DOMContentLoaded', () => {
     const toggleMenuBtn = document.querySelector('.toggle-menu-btn');
     const menu = document.querySelector('nav.menu');
-    const allSections = document.querySelectorAll('.section-content');
-    const headerMenu = document.querySelector('.header-menu');
+    const miniToggleBtn = document.querySelector('.mini-toggle-menu-btn');
 
+    // Función al minimizar/expandir
     toggleMenuBtn.addEventListener('click', () => {
-        console.log('>>> Botón minimizar/expandir clickeado');
-
-        // Alternamos la clase para minimizar/expandir
         menu.classList.toggle('menu-minimized');
 
-        // Alternamos visualmente el main (sube cuando el menú se minimiza)
-        allSections.forEach(sec => sec.classList.toggle('menu-minimized'));
-
-        // Cambiamos la flecha como feedback visual
-        const icon = toggleMenuBtn.querySelector('i');
-        if (icon.classList.contains('fa-chevron-up')) {
-            icon.classList.remove('fa-chevron-up');
-            icon.classList.add('fa-chevron-down');
+        // Si el menú se minimiza, mostramos el botón mini
+        if (menu.classList.contains('menu-minimized')) {
+            miniToggleBtn.style.display = 'block';
+            menu.style.display = 'none'; // opcional: ocultar menú al minimizar
         } else {
-            icon.classList.remove('fa-chevron-down');
-            icon.classList.add('fa-chevron-up');
+            miniToggleBtn.style.display = 'none';
+            menu.style.display = 'block';
         }
     });
-}); // ← CIERRE CORRECTO DEL DOMContentLoaded
 
+    // Función del botón mini para mostrar el menú de nuevo
+    miniToggleBtn.addEventListener('click', () => {
+        menu.classList.remove('menu-minimized');
+        menu.style.display = 'block';
+        miniToggleBtn.style.display = 'none';
+    });
+});
 
 console.log('=== Definiendo funciones globales ===');
 
