@@ -1,3 +1,54 @@
+// ==========================================
+// 🧪 TESTING: Simular último día del mes
+// ==========================================
+
+/**
+ * Función para testing - Simula que estamos en el último día
+ * AGREGAR AL INICIO DE dashboardUsuario.js
+ */
+
+// ⚙️ MODO TESTING - Cambiar a true para simular último día del mes
+
+
+/**
+ * Obtener último día del mes actual (con opción de testing)
+
+
+/**
+ * Verificar si es el último día del mes (con opción de testing)
+ */
+function esUltimoDiaMes() {
+    // 🧪 MODO TESTING: Simular que siempre es último día
+    if (MODO_TESTING_ULTIMO_DIA) {
+        console.log('🧪 [TESTING] Simulando último día del mes');
+        return true; // 👈 Siempre devuelve true en modo testing
+    }
+    
+    // Lógica normal
+    const hoy = new Date();
+    const diaActual = hoy.getDate();
+    const ultimoDia = obtenerUltimoDiaMes();
+    
+    return diaActual === ultimoDia;
+}
+
+/**
+ * Días restantes hasta poder pagar (con opción de testing)
+ */
+function diasHastaPago() {
+    // 🧪 MODO TESTING: Ya es último día
+    if (MODO_TESTING_ULTIMO_DIA) {
+        console.log('🧪 [TESTING] Días hasta pago: 0 (último día simulado)');
+        return 0;
+    }
+    
+    // Lógica normal
+    const hoy = new Date();
+    const diaActual = hoy.getDate();
+    const ultimoDia = obtenerUltimoDiaMes();
+    
+    return ultimoDia - diaActual;
+}
 document.addEventListener('DOMContentLoaded', function () {
     const menuItems = document.querySelectorAll('.menu li');
 
@@ -366,9 +417,9 @@ function renderUserTasks(tareas, containerId, esNucleo = false) {
                 <p class="user-task-description">${tarea.descripcion}</p>
                 
                 <div class="user-task-meta">
-                    <div>📅 <strong>Inicio:</strong> ${fechaInicio}</div>
-                    <div>⏰ <strong>Fin:</strong> ${fechaFin}</div>
-                    <div>👤 <strong>Creado por:</strong> ${tarea.creador}</div>
+                    <div> <strong>Inicio:</strong> ${fechaInicio}</div>
+                    <div> <strong>Fin:</strong> ${fechaFin}</div>
+                    <div> <strong>Creado por:</strong> ${tarea.creador}</div>
                 </div>
                 
                 <div class="progress-bar-container">
@@ -837,15 +888,66 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 // ========== RELOJ EN TIEMPO REAL ==========
+// ========== RELOJ EN TIEMPO REAL (CORREGIDO) ==========
 function updateClock() {
+    // Obtener hora actual del navegador
     const now = new Date();
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    const seconds = String(now.getSeconds()).padStart(2, '0');
-
+    
+    // Crear opciones para formato Uruguay
+    const options = {
+        timeZone: 'America/Montevideo',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+    };
+    
+    // Formatear hora en zona horaria de Uruguay
+    const timeString = now.toLocaleTimeString('es-UY', options);
+    
     const clockElement = document.getElementById('current-time-display');
     if (clockElement) {
-        clockElement.textContent = `${hours}:${minutes}:${seconds}`;
+        clockElement.textContent = timeString;
+    }
+}
+
+// ALTERNATIVA: Si quieres también mostrar la fecha completa
+function updateClockWithDate() {
+    const now = new Date();
+    
+    // Opciones para fecha y hora en Uruguay
+    const dateOptions = {
+        timeZone: 'America/Montevideo',
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    };
+    
+    const timeOptions = {
+        timeZone: 'America/Montevideo',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+    };
+    
+    const dateString = now.toLocaleDateString('es-UY', dateOptions);
+    const timeString = now.toLocaleTimeString('es-UY', timeOptions);
+    
+    // Capitalizar primera letra del día
+    const dateCapitalized = dateString.charAt(0).toUpperCase() + dateString.slice(1);
+    
+    // Actualizar elementos si existen
+    const clockElement = document.getElementById('current-time-display');
+    const dateElement = document.getElementById('current-date-display');
+    
+    if (clockElement) {
+        clockElement.textContent = timeString;
+    }
+    
+    if (dateElement) {
+        dateElement.textContent = dateCapitalized;
     }
 }
 
@@ -4300,7 +4402,7 @@ async function mostrarInfoNucleoEnInicio(idNucleo, inicioSection) {
                         backdrop-filter: blur(10px);
                         flex-shrink: 0;
                     ">
-                        👨‍👩‍👧‍👦
+                        👨‍👩‍👧
                     </div>
                     <div style="flex: 1;">
                         <p style="margin: 0 0 5px 0; opacity: 0.9; font-size: 13px; font-weight: 500;">

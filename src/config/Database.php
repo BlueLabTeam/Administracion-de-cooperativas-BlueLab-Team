@@ -28,6 +28,10 @@ class Database
 
             try {
                 self::$instance = new PDO($dsn, $user, $pass, $options);
+               
+                self::$instance->exec("SET time_zone = '-03:00'");
+                date_default_timezone_set('America/Montevideo');
+                
             } catch (PDOException $e) {
                 throw new PDOException($e->getMessage(), (int)$e->getCode());
             }

@@ -321,10 +321,7 @@ if (!isset($_SESSION['user_id'])) {
         </div>
     </div>
 
-    <!-- Información de Vivienda -->
-    <div id="info-vivienda-cuota" class="info-section">
-        <p class="loading">Cargando información...</p>
-    </div>
+
 
     <!-- Filtros -->
     <div class="filters-container">

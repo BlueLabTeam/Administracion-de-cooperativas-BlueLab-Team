@@ -3796,99 +3796,7 @@ async function loadAllSolicitudes() {
     }
 }
 
-// ========== RENDERIZAR SOLICITUDES ADMIN ==========
-function renderSolicitudesAdmin(solicitudes) {
-    const container = document.getElementById('solicitudesAdminContainer');
 
-    if (!solicitudes || solicitudes.length === 0) {
-        container.innerHTML = `
-            <div class="no-data">
-                <i class="fas fa-inbox" style="font-size: 48px; color: #ddd; margin-bottom: 10px;"></i>
-                <p>No hay solicitudes con los filtros seleccionados</p>
-            </div>
-        `;
-        return;
-    }
-
-    // ✅ CAMBIAR A TABLA COMO OTRAS SECCIONES
-    let html = `
-        <div class="table-responsive">
-            <table class="solicitudes-admin-table">
-                <thead>
-                    <tr>
-                        <th>Usuario</th>
-                        <th>Asunto</th>
-                        <th>Tipo</th>
-                        <th>Estado</th>
-                        <th>Prioridad</th>
-                        <th>Fecha</th>
-                        <th>Respuestas</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-    `;
-
-    solicitudes.forEach(sol => {
-        const fecha = new Date(sol.fecha_creacion).toLocaleDateString('es-UY', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric'
-        });
-
-        html += `
-            <tr class="solicitud-row estado-${sol.estado}">
-                <td>
-                    <strong>${sol.nombre_completo}</strong><br>
-                    <small>${sol.email}</small>
-                </td>
-                <td><strong>${sol.asunto}</strong></td>
-                <td>${formatTipoSolicitud(sol.tipo_solicitud)}</td>
-                <td>
-                    <span class="badge badge-${sol.estado}">
-                        ${formatEstado(sol.estado)}
-                    </span>
-                </td>
-                <td>
-                    <span class="badge badge-prioridad-${sol.prioridad}">
-                        ${formatPrioridad(sol.prioridad)}
-                    </span>
-                </td>
-                <td>${fecha}</td>
-                <td class="text-center">${sol.total_respuestas || 0}</td>
-                <td>
-                    <div style="display: flex; gap: 5px;">
-                        <button class="btn-small btn-secondary" 
-                                onclick="verDetalleSolicitudAdmin(${sol.id_solicitud})"
-                                title="Ver detalle">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                        <button class="btn-small btn-primary" 
-                                onclick="responderSolicitudAdmin(${sol.id_solicitud})"
-                                title="Responder">
-                            <i class="fas fa-reply"></i>
-                        </button>
-                        ${sol.estado !== 'resuelta' && sol.estado !== 'rechazada' ? `
-                            <button class="btn-small btn-success" 
-                                    onclick="cambiarEstadoSolicitud(${sol.id_solicitud}, 'resuelta')"
-                                    title="Resolver">
-                                <i class="fas fa-check"></i>
-                            </button>
-                        ` : ''}
-                    </div>
-                </td>
-            </tr>
-        `;
-    });
-
-    html += `
-                </tbody>
-            </table>
-        </div>
-    `;
-
-    container.innerHTML = html;
-}
 
 // ========== CARGAR ESTADÍSTICAS ==========
 async function loadEstadisticasSolicitudes() {
@@ -4787,337 +4695,485 @@ window.exportarReporteCSV = exportarReporteCSV;
 console.log('✅ Módulo de Reportes con CSS INLINE cargado');
 
 // ==========================================
-// SISTEMA DE SOLICITUDES DE NÚCLEOS - ADMIN
+// SISTEMA DE SOLICITUDES - ADMINISTRADOR
 // ==========================================
 
-console.log('🟢 Cargando módulo de solicitudes de núcleos (Admin)');
+console.log('🟢 Cargando módulo de solicitudes ADMIN');
 
 // ========== INICIALIZACIÓN ==========
 document.addEventListener('DOMContentLoaded', function() {
-    // Listener para la sección de núcleos
-    const nucleoMenuItem = document.querySelector('.menu li[data-section="nucleo"]');
-    if (nucleoMenuItem) {
-        nucleoMenuItem.addEventListener('click', function() {
-            console.log('>>> Sección núcleos abierta');
-            loadNucleosFamiliares();
-            
-            // Cargar solicitudes pendientes después de un momento
-            setTimeout(() => {
-                cargarSolicitudesPendientesNucleo();
-            }, 500);
+    const solicitudesMenuItem = document.querySelector('.menu li[data-section="solicitudes"]');
+    if (solicitudesMenuItem) {
+        solicitudesMenuItem.addEventListener('click', function() {
+            console.log('>>> Sección solicitudes ADMIN abierta');
+            loadAllSolicitudes();
+            loadEstadisticasSolicitudes();
         });
     }
 });
 
-/**
- * Cargar solicitudes pendientes de núcleos
- */
-async function cargarSolicitudesPendientesNucleo() {
-    const container = document.getElementById('solicitudesNucleoContainer');
-    
-    // Si no existe el container, crearlo
+// ========== CARGAR TODAS LAS SOLICITUDES ==========
+async function loadAllSolicitudes() {
+    const container = document.getElementById('solicitudesAdminContainer');
     if (!container) {
-        console.log('📌 Container de solicitudes no existe, creándolo...');
-        insertarContainerSolicitudes();
-    }
-    
-    const containerFinal = document.getElementById('solicitudesNucleoContainer');
-    if (!containerFinal) {
-        console.warn('⚠️ No se pudo crear el container de solicitudes');
+        console.warn('⚠️ Container no encontrado');
         return;
     }
-    
-    containerFinal.innerHTML = '<p class="loading">Cargando solicitudes...</p>';
-    
+
+    container.innerHTML = '<p class="loading">Cargando solicitudes...</p>';
+
     try {
-        const response = await fetch('/api/nucleos/solicitudes-pendientes');
+        const estado = document.getElementById('filtro-estado-solicitudes-admin')?.value || '';
+        const tipo = document.getElementById('filtro-tipo-solicitudes-admin')?.value || '';
+        const prioridad = document.getElementById('filtro-prioridad-solicitudes-admin')?.value || '';
+
+        let url = '/api/solicitudes/all?';
+        if (estado) url += `estado=${estado}&`;
+        if (tipo) url += `tipo=${tipo}&`;
+        if (prioridad) url += `prioridad=${prioridad}&`;
+
+        const response = await fetch(url);
         const data = await response.json();
-        
-        console.log('📋 Solicitudes recibidas:', data);
-        
+
         if (data.success) {
-            renderSolicitudesNucleoAdmin(data.solicitudes);
+            renderSolicitudesAdmin(data.solicitudes);
         } else {
-            containerFinal.innerHTML = '<p class="error">Error al cargar solicitudes</p>';
+            container.innerHTML = '<p class="error">Error al cargar solicitudes</p>';
         }
+
     } catch (error) {
-        console.error('❌ Error:', error);
-        containerFinal.innerHTML = '<p class="error">Error de conexión</p>';
+        console.error('✗ Error:', error);
+        container.innerHTML = '<p class="error">Error de conexión</p>';
     }
 }
 
-/**
- * Insertar container de solicitudes si no existe
- */
-function insertarContainerSolicitudes() {
-    const nucleoSection = document.getElementById('nucleo-section');
-    if (!nucleoSection) {
-        console.warn('⚠️ Sección de núcleos no encontrada');
-        return;
-    }
-    
-    // Buscar el botón "Crear Nuevo Núcleo"
-    const crearBtn = nucleoSection.querySelector('button[onclick*="showCreateNucleoForm"]');
-    
-    if (crearBtn) {
-        // Insertar después del botón
-        const containerHTML = `
-            <div style="margin-top: 30px;">
-                <h3 style="color: #333; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
-                    <i class="fas fa-inbox" style="color: #667eea;"></i>
-                    Solicitudes Pendientes
-                </h3>
-                <div id="solicitudesNucleoContainer"></div>
-            </div>
-        `;
-        
-        crearBtn.insertAdjacentHTML('afterend', containerHTML);
-    } else {
-        // Si no encuentra el botón, insertar al inicio de la sección
-        const containerHTML = `
-            <div style="margin-bottom: 30px;">
-                <h3 style="color: #333; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
-                    <i class="fas fa-inbox" style="color: #667eea;"></i>
-                    Solicitudes Pendientes
-                </h3>
-                <div id="solicitudesNucleoContainer"></div>
-            </div>
-        `;
-        
-        nucleoSection.insertAdjacentHTML('afterbegin', containerHTML);
-    }
-}
+// ========== RENDERIZAR SOLICITUDES ADMIN (TABLA) ==========
+function renderSolicitudesAdmin(solicitudes) {
+    const container = document.getElementById('solicitudesAdminContainer');
 
-/**
- * Renderizar solicitudes pendientes
- */
-function renderSolicitudesNucleoAdmin(solicitudes) {
-    const container = document.getElementById('solicitudesNucleoContainer');
-    
     if (!solicitudes || solicitudes.length === 0) {
         container.innerHTML = `
-            <div style="
-                background: #f8f9fa;
-                border: 2px dashed #ddd;
-                border-radius: 12px;
-                padding: 40px;
-                text-align: center;
-                color: #999;
-            ">
-                <i class="fas fa-inbox" style="font-size: 48px; margin-bottom: 15px; display: block;"></i>
-                <p style="margin: 0; font-size: 16px;">No hay solicitudes pendientes</p>
+            <div class="no-data-admin">
+                <i class="fas fa-inbox" style="font-size: 48px; color: #ddd; margin-bottom: 10px;"></i>
+                <p>No hay solicitudes con los filtros seleccionados</p>
             </div>
         `;
         return;
     }
-    
-    let html = '<div style="display: grid; gap: 15px;">';
-    
+
+    let html = `
+        <div class="table-responsive-admin">
+            <table class="solicitudes-admin-table">
+                <thead>
+                    <tr>
+                        <th style="width: 200px;">Usuario</th>
+                        <th style="width: 250px;">Asunto</th>
+                        <th style="width: 120px;">Tipo</th>
+                        <th style="width: 100px;">Estado</th>
+                        <th style="width: 100px;">Prioridad</th>
+                        <th style="width: 100px;">Fecha</th>
+                        <th style="width: 80px; text-align: center;">Respuestas</th>
+                        <th style="width: 180px; text-align: center;">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+
     solicitudes.forEach(sol => {
-        const fecha = new Date(sol.fecha_solicitud).toLocaleDateString('es-UY', {
+        const fecha = new Date(sol.fecha_creacion).toLocaleDateString('es-UY', {
             day: '2-digit',
             month: '2-digit',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
+            year: 'numeric'
         });
-        
+
         html += `
-            <div class="solicitud-nucleo-card" style="
-                background: white;
-                border: 2px solid #e0e0e0;
-                border-left: 5px solid #667eea;
-                border-radius: 12px;
-                padding: 20px;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-                transition: all 0.3s ease;
-            ">
-                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px;">
-                    <div style="flex: 1;">
-                        <h4 style="margin: 0 0 5px 0; color: #333; font-size: 18px;">
-                            👤 ${sol.nombre_completo}
-                        </h4>
-                        <p style="margin: 0; color: #999; font-size: 13px;">
-                            <i class="fas fa-envelope"></i> ${sol.email} · 
-                            <i class="fas fa-id-card"></i> ${sol.cedula}
-                        </p>
+            <tr class="solicitud-row-admin">
+                <td>
+                    <div class="usuario-cell">
+                        <strong>${sol.nombre_completo}</strong>
+                        <small>${sol.email}</small>
                     </div>
-                    <span style="
-                        background: #fff3cd;
-                        color: #856404;
-                        padding: 5px 12px;
-                        border-radius: 20px;
-                        font-size: 12px;
-                        font-weight: 600;
-                        white-space: nowrap;
-                    ">
-                        ⏳ Pendiente
+                </td>
+                <td>
+                    <strong>${sol.asunto}</strong>
+                </td>
+                <td>
+                    <span class="tipo-badge">${formatTipoSolicitud(sol.tipo_solicitud)}</span>
+                </td>
+                <td>
+                    <span class="badge badge-${sol.estado}">
+                        ${formatEstado(sol.estado)}
                     </span>
-                </div>
-                
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
-                    <p style="margin: 0 0 10px 0; color: #666; font-size: 14px;">
-                        <i class="fas fa-arrow-right" style="color: #667eea;"></i>
-                        <strong>Solicita unirse a:</strong> 
-                        <span style="color: #667eea; font-weight: 600;">👨‍👩‍👧‍👦 ${sol.nombre_nucleo}</span>
-                    </p>
-                    
-                    ${sol.direccion_nucleo ? `
-                        <p style="margin: 0 0 10px 0; color: #666; font-size: 13px;">
-                            <i class="fas fa-map-marker-alt" style="color: #999;"></i> ${sol.direccion_nucleo}
-                        </p>
-                    ` : ''}
-                    
-                    <p style="margin: 0; color: #999; font-size: 13px;">
-                        <i class="fas fa-users"></i> 
-                        Miembros actuales: <strong>${sol.miembros_actuales}</strong>
-                    </p>
-                </div>
-                
-                ${sol.mensaje ? `
-                    <div style="background: #e3f2fd; border-left: 4px solid #2196F3; padding: 12px; margin-bottom: 15px; border-radius: 4px;">
-                        <strong style="color: #1976d2; font-size: 13px;">💬 Mensaje del usuario:</strong>
-                        <p style="margin: 8px 0 0 0; color: #333; font-size: 14px;">${sol.mensaje}</p>
-                    </div>
-                ` : ''}
-                
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 15px; padding-top: 15px; border-top: 1px solid #e0e0e0;">
-                    <span style="color: #999; font-size: 13px;">
-                        <i class="fas fa-calendar"></i> ${fecha}
+                </td>
+                <td>
+                    <span class="badge badge-prioridad-${sol.prioridad}">
+                        ${formatPrioridad(sol.prioridad)}
                     </span>
-                    
-                    <div style="display: flex; gap: 10px;">
-                        <button 
-                            class="btn btn-success btn-small" 
-                            onclick="aprobarSolicitudNucleoAdmin(${sol.id_solicitud_nucleo}, '${sol.nombre_completo.replace(/'/g, "\\'")}', '${sol.nombre_nucleo.replace(/'/g, "\\'")}')"
-                            style="padding: 8px 16px;">
-                            <i class="fas fa-check"></i> Aprobar
+                </td>
+                <td>${fecha}</td>
+                <td style="text-align: center;">
+                    <span class="respuestas-count">${sol.total_respuestas || 0}</span>
+                </td>
+                <td>
+                    <div class="action-buttons-admin">
+                        <button class="btn-icon btn-secondary" 
+                                onclick="verDetalleSolicitudAdmin(${sol.id_solicitud})"
+                                title="Ver detalle">
+                            <i class="fas fa-eye"></i>
                         </button>
-                        <button 
-                            class="btn btn-danger btn-small" 
-                            onclick="rechazarSolicitudNucleoAdmin(${sol.id_solicitud_nucleo}, '${sol.nombre_completo.replace(/'/g, "\\'")}')"
-                            style="padding: 8px 16px;">
-                            <i class="fas fa-times"></i> Rechazar
+                        <button class="btn-icon btn-primary" 
+                                onclick="responderSolicitudAdmin(${sol.id_solicitud})"
+                                title="Responder">
+                            <i class="fas fa-reply"></i>
                         </button>
+                        ${sol.estado !== 'resuelta' && sol.estado !== 'rechazada' ? `
+                            <button class="btn-icon btn-success" 
+                                    onclick="cambiarEstadoSolicitud(${sol.id_solicitud}, 'resuelta')"
+                                    title="Resolver">
+                                <i class="fas fa-check"></i>
+                            </button>
+                        ` : ''}
                     </div>
-                </div>
-            </div>
+                </td>
+            </tr>
         `;
     });
-    
-    html += '</div>';
+
+    html += `
+                </tbody>
+            </table>
+        </div>
+    `;
+
     container.innerHTML = html;
 }
 
-/**
- * Aprobar solicitud de núcleo
- */
-async function aprobarSolicitudNucleoAdmin(idSolicitud, nombreUsuario, nombreNucleo) {
-    const observaciones = prompt(`Aprobar solicitud de "${nombreUsuario}" para unirse a "${nombreNucleo}".\n\nObservaciones (opcional):`);
-    
-    if (observaciones === null) {
-        // Usuario canceló
-        return;
-    }
-    
-    if (!confirm(`¿Aprobar la solicitud de "${nombreUsuario}" para unirse al núcleo "${nombreNucleo}"?`)) {
-        return;
-    }
-    
+// ========== CARGAR ESTADÍSTICAS ==========
+async function loadEstadisticasSolicitudes() {
     try {
-        const formData = new FormData();
-        formData.append('id_solicitud', idSolicitud);
-        formData.append('observaciones', observaciones || '');
-        
-        const response = await fetch('/api/nucleos/aprobar-solicitud', {
-            method: 'POST',
-            body: formData
-        });
-        
+        const response = await fetch('/api/solicitudes/estadisticas');
         const data = await response.json();
-        
+
         if (data.success) {
-            alert('✅ ' + data.message);
-            
-            // Recargar núcleos y solicitudes
-            loadNucleosFamiliares();
-            cargarSolicitudesPendientesNucleo();
-        } else {
-            alert('❌ ' + data.message);
+            const stats = data.estadisticas;
+
+            document.getElementById('solicitudes-total-admin').textContent = stats.total || 0;
+            document.getElementById('solicitudes-pendientes-admin').textContent = stats.pendientes || 0;
+            document.getElementById('solicitudes-revision-admin').textContent = stats.en_revision || 0;
+            document.getElementById('solicitudes-resueltas-admin').textContent = stats.resueltas || 0;
+            document.getElementById('solicitudes-altas-admin').textContent = stats.prioridad_alta || 0;
         }
+
     } catch (error) {
-        console.error('Error:', error);
-        alert('❌ Error de conexión');
+        console.error('Error al cargar estadísticas:', error);
     }
 }
 
-/**
- * Rechazar solicitud de núcleo
- */
-async function rechazarSolicitudNucleoAdmin(idSolicitud, nombreUsuario) {
-    const motivo = prompt(`Rechazar solicitud de "${nombreUsuario}".\n\nMotivo del rechazo (recomendado):`);
-    
-    if (motivo === null) {
-        // Usuario canceló
-        return;
-    }
-    
-    if (!confirm(`¿Rechazar la solicitud de "${nombreUsuario}"?`)) {
-        return;
-    }
-    
+// ========== VER DETALLE ADMIN ==========
+async function verDetalleSolicitudAdmin(solicitudId) {
     try {
-        const formData = new FormData();
-        formData.append('id_solicitud', idSolicitud);
-        formData.append('motivo', motivo || 'Solicitud rechazada');
-        
-        const response = await fetch('/api/nucleos/rechazar-solicitud', {
-            method: 'POST',
-            body: formData
-        });
-        
+        const response = await fetch(`/api/solicitudes/detalle?id_solicitud=${solicitudId}`);
         const data = await response.json();
-        
-        if (data.success) {
-            alert('✅ Solicitud rechazada');
-            
-            // Recargar solicitudes
-            cargarSolicitudesPendientesNucleo();
-        } else {
-            alert('❌ ' + data.message);
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        alert('❌ Error de conexión');
-    }
-}
 
-/**
- * Ver todas las solicitudes (historial completo)
- */
-async function verTodasSolicitudesNucleo() {
-    try {
-        const response = await fetch('/api/nucleos/solicitudes-pendientes');
-        const data = await response.json();
-        
         if (!data.success) {
-            alert('❌ Error al cargar solicitudes');
+            alert('Error al cargar detalle');
             return;
         }
-        
-        // Aquí podrías crear un modal más completo con historial
-        // Por ahora solo muestra las pendientes
-        alert(`Tienes ${data.solicitudes.length} solicitud(es) pendiente(s)`);
+
+        const solicitud = data.solicitud;
+        const respuestas = data.respuestas || [];
+        const fecha = new Date(solicitud.fecha_creacion).toLocaleString('es-UY');
+
+        const modal = `
+            <div class="modal-detail-admin" onclick="if(event.target.classList.contains('modal-detail-admin')) this.remove()">
+                <div class="modal-detail-content-admin">
+                    <button onclick="this.closest('.modal-detail-admin').remove()" class="modal-close-button-admin">×</button>
+                    
+                    <h2 class="modal-detail-header-admin">
+                        <i class="fas fa-file-alt"></i> ${solicitud.asunto}
+                    </h2>
+
+                    <!-- Información del Usuario -->
+                    <div class="modal-detail-section-admin">
+                        <h3>👤 Información del Usuario</h3>
+                        <div class="detalle-grid-admin">
+                            <div><strong>Nombre:</strong> ${solicitud.nombre_completo}</div>
+                            <div><strong>Email:</strong> ${solicitud.email}</div>
+                            <div><strong>Cédula:</strong> ${solicitud.cedula}</div>
+                            <div><strong>Fecha:</strong> ${fecha}</div>
+                        </div>
+                    </div>
+
+                    <!-- Detalles de la Solicitud -->
+                    <div class="modal-detail-section-admin">
+                        <h3>📋 Detalles de la Solicitud</h3>
+                        <div class="detalle-grid-admin">
+                            <div><strong>Tipo:</strong> ${formatTipoSolicitud(solicitud.tipo_solicitud)}</div>
+                            <div><strong>Estado:</strong> <span class="badge badge-${solicitud.estado}">${formatEstado(solicitud.estado)}</span></div>
+                            <div><strong>Prioridad:</strong> <span class="badge badge-prioridad-${solicitud.prioridad}">${formatPrioridad(solicitud.prioridad)}</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Descripción -->
+                    <div class="modal-detail-section-admin">
+                        <h3>📝 Descripción</h3>
+                        <p style="white-space: pre-wrap; background: #f8f9fa; padding: 15px; border-radius: 8px;">${solicitud.descripcion}</p>
+                        ${solicitud.archivo_adjunto ? `
+                            <a href="/files/?path=${solicitud.archivo_adjunto}" target="_blank" class="btn-small btn-secondary">
+                                <i class="fas fa-paperclip"></i> Ver Archivo Adjunto
+                            </a>
+                        ` : ''}
+                    </div>
+
+                    <!-- Conversación -->
+                    ${respuestas.length > 0 ? `
+                        <div class="modal-detail-section-admin">
+                            <h3><i class="fas fa-comments"></i> Conversación (${respuestas.length})</h3>
+                            <div class="respuestas-thread-admin">
+                                ${respuestas.map(resp => {
+                                    const fechaResp = new Date(resp.fecha_respuesta).toLocaleString('es-UY');
+                                    return `
+                                        <div class="respuesta-item-admin ${resp.es_admin ? 'respuesta-admin-item' : 'respuesta-usuario-item'}">
+                                            <div class="respuesta-header-admin">
+                                                <strong>
+                                                    ${resp.es_admin ? '👨‍💼 Administrador' : '👤 ' + resp.nombre_completo}
+                                                </strong>
+                                                <span class="respuesta-fecha-admin">${fechaResp}</span>
+                                            </div>
+                                            <div class="respuesta-body-admin">
+                                                <p style="white-space: pre-wrap;">${resp.mensaje}</p>
+                                                ${resp.archivo_adjunto ? `
+                                                    <a href="/files/?path=${resp.archivo_adjunto}" target="_blank" class="file-link-admin">
+                                                        <i class="fas fa-paperclip"></i> Ver Archivo
+                                                    </a>
+                                                ` : ''}
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
+                    ` : '<p style="text-align: center; color: #999; padding: 20px;">Sin respuestas aún</p>'}
+
+                    <!-- Acciones Rápidas -->
+                    <div class="modal-detail-section-admin">
+                        <h3>⚙️ Acciones Rápidas</h3>
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            ${solicitud.estado !== 'en_revision' ? `
+                                <button onclick="cambiarEstadoSolicitud(${solicitudId}, 'en_revision'); this.closest('.modal-detail-admin').remove();" class="btn-small btn-warning">
+                                    <i class="fas fa-eye"></i> Marcar En Revisión
+                                </button>
+                            ` : ''}
+                            ${solicitud.estado !== 'resuelta' ? `
+                                <button onclick="cambiarEstadoSolicitud(${solicitudId}, 'resuelta'); this.closest('.modal-detail-admin').remove();" class="btn-small btn-success">
+                                    <i class="fas fa-check-circle"></i> Marcar como Resuelta
+                                </button>
+                            ` : ''}
+                            ${solicitud.estado !== 'rechazada' ? `
+                                <button onclick="cambiarEstadoSolicitud(${solicitudId}, 'rechazada'); this.closest('.modal-detail-admin').remove();" class="btn-small btn-danger">
+                                    <i class="fas fa-times-circle"></i> Rechazar
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="modal-detail-footer-admin">
+                        <button onclick="this.closest('.modal-detail-admin').remove()" class="btn-small btn-secondary">Cerrar</button>
+                        <button onclick="this.closest('.modal-detail-admin').remove(); responderSolicitudAdmin(${solicitudId})" class="btn-small btn-primary">
+                            <i class="fas fa-reply"></i> Responder
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        document.body.insertAdjacentHTML('beforeend', modal);
+
     } catch (error) {
         console.error('Error:', error);
-        alert('❌ Error de conexión');
+        alert('Error al cargar detalle');
     }
 }
 
-// Exportar funciones globales
-window.cargarSolicitudesPendientesNucleo = cargarSolicitudesPendientesNucleo;
-window.aprobarSolicitudNucleoAdmin = aprobarSolicitudNucleoAdmin;
-window.rechazarSolicitudNucleoAdmin = rechazarSolicitudNucleoAdmin;
-window.verTodasSolicitudesNucleo = verTodasSolicitudesNucleo;
+// ========== RESPONDER SOLICITUD ADMIN ==========
+function responderSolicitudAdmin(solicitudId) {
+    const modal = `
+        <div id="responderSolicitudAdminModal" class="modal-overlay-admin">
+            <div class="modal-content-admin">
+                <button class="modal-close-btn-admin" onclick="cerrarModalResponderAdmin()">×</button>
+                
+                <h2 class="modal-title-admin">
+                    <i class="fas fa-reply"></i> Responder como Administrador
+                </h2>
 
-console.log('✅ Módulo de solicitudes de núcleos (Admin) cargado completamente');
+                <form id="responderSolicitudAdminForm" onsubmit="submitRespuestaAdmin(event, ${solicitudId})" enctype="multipart/form-data">
+                    <div class="form-group-admin">
+                        <label for="mensaje-respuesta-admin">
+                            <i class="fas fa-comment"></i> Mensaje *
+                        </label>
+                        <textarea 
+                            id="mensaje-respuesta-admin" 
+                            name="mensaje"
+                            rows="6"
+                            placeholder="Escribe tu respuesta al usuario..."
+                            required></textarea>
+                    </div>
+
+                    <div class="form-group-admin">
+                        <label for="archivo-respuesta-admin">
+                            <i class="fas fa-paperclip"></i> Archivo Adjunto (Opcional)
+                        </label>
+                        <input 
+                            type="file" 
+                            id="archivo-respuesta-admin" 
+                            name="archivo"
+                            accept="image/*,.pdf">
+                        <small class="form-help-admin">Puedes adjuntar documentos de respaldo</small>
+                    </div>
+
+                    <div class="alert-info-admin">
+                        <strong>ℹ️ Nota:</strong>
+                        <p>El usuario recibirá una notificación sobre tu respuesta.</p>
+                    </div>
+
+                    <div class="form-actions-admin">
+                        <button type="button" class="btn-small btn-secondary" onclick="cerrarModalResponderAdmin()">
+                            <i class="fas fa-times"></i> Cancelar
+                        </button>
+                        <button type="submit" class="btn-small btn-primary">
+                            <i class="fas fa-paper-plane"></i> Enviar Respuesta
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', modal);
+}
+
+function cerrarModalResponderAdmin() {
+    const modal = document.getElementById('responderSolicitudAdminModal');
+    if (modal) modal.remove();
+}
+
+async function submitRespuestaAdmin(event, solicitudId) {
+    event.preventDefault();
+
+    const form = document.getElementById('responderSolicitudAdminForm');
+    const formData = new FormData(form);
+    formData.append('id_solicitud', solicitudId);
+
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const btnHTML = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+
+    try {
+        const response = await fetch('/api/solicitudes/responder', {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            alert('✅ ' + data.message);
+            cerrarModalResponderAdmin();
+            loadAllSolicitudes();
+            loadEstadisticasSolicitudes();
+        } else {
+            alert('✗ ' + data.message);
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = btnHTML;
+        }
+
+    } catch (error) {
+        console.error('Error:', error);
+        alert('✗ Error de conexión');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = btnHTML;
+    }
+}
+
+// ========== CAMBIAR ESTADO ==========
+async function cambiarEstadoSolicitud(solicitudId, nuevoEstado) {
+    const estadoTexto = {
+        'pendiente': 'Pendiente',
+        'en_revision': 'En Revisión',
+        'resuelta': 'Resuelta',
+        'rechazada': 'Rechazada'
+    };
+
+    if (!confirm(`¿Cambiar estado a "${estadoTexto[nuevoEstado]}"?`)) {
+        return;
+    }
+
+    try {
+        const formData = new FormData();
+        formData.append('id_solicitud', solicitudId);
+        formData.append('estado', nuevoEstado);
+
+        const response = await fetch('/api/solicitudes/update-estado', {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            alert('✅ ' + data.message);
+            loadAllSolicitudes();
+            loadEstadisticasSolicitudes();
+        } else {
+            alert('✗ ' + data.message);
+        }
+
+    } catch (error) {
+        console.error('Error:', error);
+        alert('✗ Error de conexión');
+    }
+}
+
+// ========== FUNCIONES AUXILIARES ==========
+function formatTipoSolicitud(tipo) {
+    const tipos = {
+        'horas': 'Registro de Horas',
+        'pago': 'Pagos/Cuotas',
+        'vivienda': 'Vivienda',
+        'general': 'Consulta General',
+        'otro': 'Otro'
+    };
+    return tipos[tipo] || tipo;
+}
+
+function formatEstado(estado) {
+    const estados = {
+        'pendiente': 'Pendiente',
+        'en_revision': 'En Revisión',
+        'resuelta': 'Resuelta',
+        'rechazada': 'Rechazada'
+    };
+    return estados[estado] || estado;
+}
+
+function formatPrioridad(prioridad) {
+    const prioridades = {
+        'baja': 'Baja',
+        'media': 'Media',
+        'alta': 'Alta'
+    };
+    return prioridades[prioridad] || prioridad;
+}
+
+// ========== EXPORTAR FUNCIONES GLOBALES ==========
+window.loadAllSolicitudes = loadAllSolicitudes;
+window.loadEstadisticasSolicitudes = loadEstadisticasSolicitudes;
+window.verDetalleSolicitudAdmin = verDetalleSolicitudAdmin;
+window.responderSolicitudAdmin = responderSolicitudAdmin;
+window.cerrarModalResponderAdmin = cerrarModalResponderAdmin;
+window.submitRespuestaAdmin = submitRespuestaAdmin;
+window.cambiarEstadoSolicitud = cambiarEstadoSolicitud;
+
+console.log('✅ Módulo de solicitudes ADMIN cargado completamente');

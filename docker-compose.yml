@@ -24,6 +24,8 @@ services:
       dockerfile: dockerfile
     container_name: gestcoop_php
     restart: unless-stopped
+    environment:
+      - TZ=America/Montevideo
     volumes:
       - ./public:/var/www/public
       - ./src:/var/www/src
@@ -47,6 +49,8 @@ services:
       MYSQL_DATABASE: ${DB_NAME}
       MYSQL_USER: ${DB_USER}
       MYSQL_PASSWORD: ${DB_PASSWORD}
+      TZ: America/Montevideo  # ✅ Zona horaria de Uruguay
+    command: --default-time-zone='-03:00'  # ✅ Configurar MySQL en UTC-3
     expose:
       - "3306"
     ports:

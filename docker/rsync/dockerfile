@@ -7,3 +7,5 @@ RUN chmod +x /usr/local/bin/backup.sh
 
 RUN echo "0 2 * * * /usr/local/bin/backup.sh >> /var/log/backup.log 2>&1" > /etc/crontabs/root
 CMD ["crond", "-f", "-l", "2"]
+
+
