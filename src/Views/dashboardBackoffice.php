@@ -12,6 +12,7 @@
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 	<link rel="stylesheet" href="/assets/css/dashboardBase.css" />
 	<link rel="stylesheet" href="/assets/css/dashboardHeader.css" />
+	<link rel="stylesheet" href="/assets/css/dashboardTablasUnificadas.css" />
 	<link rel="stylesheet" href="/assets/css/dashboardCuotasAdmin.css" />
 	<link rel="stylesheet" href="/assets/css/dashboardNotificaciones.css" />
 	<link rel="stylesheet" href="/assets/css/dashboardViviendas.css" />
@@ -817,9 +818,9 @@
             <select id="filtro-estado" onchange="loadAllTasks()">
                 <option value="">Todas</option>
                 <option value="pendiente">Pendientes</option>
-                <option value="en_progreso">En Progreso</option>
                 <option value="completada">Completadas</option>
                 <option value="cancelada">Canceladas</option>
+				<option value="vencida">Vencidas</option>
             </select>
         </div>
     </div>

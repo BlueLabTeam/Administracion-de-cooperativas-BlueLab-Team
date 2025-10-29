@@ -772,13 +772,20 @@ function createTask(event) {
 function loadAllTasks() {
     const container = document.getElementById('tasksList');
     const filtro = document.getElementById('filtro-estado')?.value || '';
-    const url = filtro ? `/api/tasks/all?estado=${filtro}` : '/api/tasks/all';
+    
+    // ✅ Solo enviar al backend si NO es "vencida" (ese estado lo calculamos localmente)
+    let url = '/api/tasks/all';
+    if (filtro && filtro !== 'vencida') {
+        url += `?estado=${filtro}`;
+    }
+
+    container.innerHTML = '<p class="loading">Cargando tareas...</p>';
 
     fetch(url)
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                renderTasksList(data.tareas);
+                renderTasksList(data.tareas, filtro); // ✅ Pasar filtro a renderizar
             } else {
                 container.innerHTML = '<p class="error">Error al cargar tareas</p>';
             }
@@ -789,7 +796,11 @@ function loadAllTasks() {
         });
 }
 
-function renderTasksList(tareas) {
+function renderTasksList(tareas, filtroActivo = '') {
+    console.log('═══════════════════════════════════════');
+    console.log('🚀 [RENDER] renderTasksList INICIANDO');
+    console.log('═══════════════════════════════════════');
+    
     const container = document.getElementById('tasksList');
 
     if (!tareas || tareas.length === 0) {
@@ -797,36 +808,89 @@ function renderTasksList(tareas) {
         return;
     }
 
-    container.innerHTML = tareas.map(tarea => {
-        const fechaInicio = new Date(tarea.fecha_inicio).toLocaleDateString('es-UY');
-        const fechaFin = new Date(tarea.fecha_fin).toLocaleDateString('es-UY');
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+    console.log('📅 Fecha HOY:', hoy);
+
+    // ✅ PASO 1: Analizar cada tarea
+    const tareasConEstado = tareas.map(tarea => {
+        const fechaFinObj = new Date(tarea.fecha_fin + 'T00:00:00');
+        const esCompletada = tarea.estado === 'completada';
+        const esCancelada = tarea.estado === 'cancelada';
+        const esVencida = !esCompletada && !esCancelada && fechaFinObj < hoy;
+
+        if (esVencida) {
+            console.log('🔴 TAREA VENCIDA DETECTADA:');
+            console.log(`   ID: ${tarea.id_tarea}`);
+            console.log(`   Título: ${tarea.titulo}`);
+            console.log(`   Fecha fin: ${tarea.fecha_fin}`);
+            console.log(`   Estado: ${tarea.estado}`);
+        }
+
+        return { ...tarea, esVencida, esCompletada, esCancelada };
+    });
+
+    const vencidasCount = tareasConEstado.filter(t => t.esVencida).length;
+    console.log(`🔴 Total tareas vencidas: ${vencidasCount}`);
+
+    // ✅ PASO 2: Filtrar
+    const tareasFiltradas = tareasConEstado.filter(tarea => {
+        if (filtroActivo === 'vencida') return tarea.esVencida;
+        if (filtroActivo) return tarea.estado === filtroActivo;
+        return true;
+    });
+
+    if (tareasFiltradas.length === 0) {
+        container.innerHTML = '<p class="no-tasks">No hay tareas que coincidan con el filtro</p>';
+        return;
+    }
+
+    // ✅ PASO 3: Renderizar
+    const htmlArray = tareasFiltradas.map(tarea => {
+        const fechaInicio = formatearFechaUY(tarea.fecha_inicio);
+        const fechaFin = formatearFechaUY(tarea.fecha_fin);
         const asignados = tarea.tipo_asignacion === 'usuario' ?
             `${tarea.total_usuarios} usuario(s)` :
             `${tarea.total_nucleos} núcleo(s)`;
-
-        //  Calcular progreso y completados
         const progresoPromedio = Math.round(parseFloat(tarea.progreso_promedio || 0));
         const totalAsignados = tarea.tipo_asignacion === 'usuario' ?
-            parseInt(tarea.total_usuarios) :
-            parseInt(tarea.total_nucleos);
+            parseInt(tarea.total_usuarios) : parseInt(tarea.total_nucleos);
         const completados = parseInt(tarea.asignaciones_completadas || 0);
 
-        // Determinar estado visual
-        const estadoFinal = tarea.estado;
-        const esCompletada = estadoFinal === 'completada';
-        const esCancelada = estadoFinal === 'cancelada';
+        // ✅ LÓGICA DE BADGE - TRIPLE VERIFICACIÓN
+        let estadoTexto = '';
+        let estadoBadgeClass = '';
+        let claseVencida = '';
 
-        return `
-            <div class="task-item prioridad-${tarea.prioridad} ${esCompletada ? 'tarea-completada' : ''}">
+        if (tarea.esVencida === true) {
+            estadoTexto = '⏰ Vencida';
+            estadoBadgeClass = 'vencida';
+            claseVencida = 'tarea-vencida';
+            console.log(`✅ Aplicando badge VENCIDA a tarea ${tarea.id_tarea}: "${tarea.titulo}"`);
+        } else if (tarea.esCompletada) {
+            estadoTexto = 'Completada';
+            estadoBadgeClass = 'completada';
+        } else if (tarea.esCancelada) {
+            estadoTexto = 'Cancelada';
+            estadoBadgeClass = 'cancelada';
+        } else {
+            estadoTexto = formatEstado(tarea.estado);
+        }
+
+        const html = `
+            <div class="task-item prioridad-${tarea.prioridad} ${tarea.esCompletada ? 'tarea-completada' : ''} ${claseVencida}">
                 <div class="task-header">
                     <h4 class="task-title">${tarea.titulo}</h4>
                     <div class="task-badges">
-                        <span class="task-badge badge-estado ${esCompletada ? 'completada' : ''} ${esCancelada ? 'cancelada' : ''}">
-                            ${formatEstado(tarea.estado)}
+                        <span class="task-badge badge-estado ${estadoBadgeClass}">
+                            ${estadoTexto}
                         </span>
-                        <span class="task-badge badge-prioridad ${tarea.prioridad}">${formatPrioridad(tarea.prioridad)}</span>
+                        <span class="task-badge badge-prioridad ${tarea.prioridad}">
+                            ${formatPrioridad(tarea.prioridad)}
+                        </span>
                     </div>
                 </div>
+                
                 <p class="task-description">${tarea.descripcion}</p>
                 
                 <div class="task-meta">
@@ -836,7 +900,7 @@ function renderTasksList(tareas) {
                     <div class="task-meta-item"><strong>Asignado a:</strong> ${asignados}</div>
                 </div>
                 
-                ${!esCancelada ? `
+                ${!tarea.esCancelada ? `
                     <div class="task-progress-section">
                         <div class="progress-info">
                             <span class="progress-label">Progreso general:</span>
@@ -844,30 +908,41 @@ function renderTasksList(tareas) {
                             <span class="progress-completed">${completados}/${totalAsignados} completados</span>
                         </div>
                         <div class="progress-bar-container">
-                            <div class="progress-bar" style="width: ${progresoPromedio}%; background: ${esCompletada ? '#28a745' : '#667eea'};">
+                            <div class="progress-bar" style="width: ${progresoPromedio}%; background: ${tarea.esVencida ? '#dc3545' : tarea.esCompletada ? '#28a745' : '#667eea'};">
                             </div>
                         </div>
                     </div>
                 ` : ''}
                 
-                ${!esCancelada ? `
+                ${tarea.esVencida ? `
+                    <div class="alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>Esta tarea está vencida.</strong> La fecha límite ya ha pasado.
+                    </div>
+                ` : ''}
+                
+                ${!tarea.esCancelada ? `
                     <div class="task-actions">
                         <button class="btn btn-small btn-view" onclick="viewTaskDetails(${tarea.id_tarea})">Ver Detalles</button>
                         <button class="btn btn-small btn-materiales" onclick="viewTaskMaterialsAdmin(${tarea.id_tarea})">
                             <i class="fas fa-boxes"></i> Materiales
                         </button>
-                        ${!esCompletada ? `
+                        ${!tarea.esCompletada ? `
                             <button class="btn btn-small btn-cancel" onclick="cancelTask(${tarea.id_tarea})">Cancelar Tarea</button>
                         ` : `
-                            <span style="color: #28a745; font-weight: bold; padding: 5px 10px;">
-                                ✓ Tarea Completada
-                            </span>
+                            <span style="color: #28a745; font-weight: bold;">✓ Completada</span>
                         `}
                     </div>
-                ` : '<p style="color: #dc3545; margin-top: 10px;"><strong>Esta tarea ha sido cancelada</strong></p>'}
+                ` : '<p style="color: #dc3545; margin-top: 10px;"><strong>Tarea cancelada</strong></p>'}
             </div>
         `;
-    }).join('');
+
+        return html;
+    });
+
+    container.innerHTML = htmlArray.join('');
+    console.log('✅ [RENDER] HTML insertado en DOM');
+    console.log('═══════════════════════════════════════\n');
 }
 
 // Agregar función para ver materiales de tarea (Admin)
@@ -5539,3 +5614,535 @@ setTimeout(function() {
 
 console.log('✅ [FIX FECHAS] Módulo cargado - Zona horaria: America/Montevideo');
 
+// ==========================================
+// 🔧 OVERRIDE PERMANENTE - EJECUTAR SIEMPRE
+// ==========================================
+
+(function() {
+    console.log('🔄 [OVERRIDE] Forzando renderTasksList correcto...');
+
+    // Guardar referencia a loadAllTasks original
+    const loadAllTasks_ORIGINAL = window.loadAllTasks;
+
+    // Sobrescribir loadAllTasks para usar SIEMPRE la versión correcta
+    window.loadAllTasks = function() {
+        console.log('🔄 [OVERRIDE] loadAllTasks interceptado');
+        
+        const container = document.getElementById('tasksList');
+        const filtro = document.getElementById('filtro-estado')?.value || '';
+        
+        let url = '/api/tasks/all';
+        if (filtro && filtro !== 'vencida') {
+            url += `?estado=${filtro}`;
+        }
+
+        container.innerHTML = '<p class="loading">Cargando tareas...</p>';
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // ✅ USAR VERSIÓN CORRECTA SIEMPRE
+                    renderTasksListCorrecto(data.tareas, filtro);
+                } else {
+                    container.innerHTML = '<p class="error">Error al cargar tareas</p>';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                container.innerHTML = '<p class="error">Error de conexión</p>';
+            });
+    };
+
+    // Definir función correcta que SIEMPRE se usará
+    function renderTasksListCorrecto(tareas, filtroActivo = '') {
+        console.log('═══════════════════════════════════════');
+        console.log('🚀 [RENDER CORRECTO] Iniciando');
+        console.log('═══════════════════════════════════════');
+        
+        const container = document.getElementById('tasksList');
+
+        if (!tareas || tareas.length === 0) {
+            container.innerHTML = '<p class="no-tasks">No hay tareas creadas</p>';
+            return;
+        }
+
+        const hoy = new Date();
+        hoy.setHours(0, 0, 0, 0);
+
+        // ✅ Analizar tareas
+        const tareasConEstado = tareas.map(tarea => {
+            const fechaFinObj = new Date(tarea.fecha_fin + 'T00:00:00');
+            const esCompletada = tarea.estado === 'completada';
+            const esCancelada = tarea.estado === 'cancelada';
+            const esVencida = !esCompletada && !esCancelada && fechaFinObj < hoy;
+
+            if (esVencida) {
+                console.log(`🔴 VENCIDA: ${tarea.titulo}`);
+            }
+
+            return { ...tarea, esVencida, esCompletada, esCancelada };
+        });
+
+        // ✅ Filtrar
+        const tareasFiltradas = tareasConEstado.filter(tarea => {
+            if (filtroActivo === 'vencida') return tarea.esVencida;
+            if (filtroActivo && filtroActivo !== '') return tarea.estado === filtroActivo;
+            return true;
+        });
+
+        if (tareasFiltradas.length === 0) {
+            const mensajes = {
+                'vencida': 'No hay tareas vencidas 🎉',
+                'pendiente': 'No hay tareas pendientes',
+                'completada': 'No hay tareas completadas',
+                'cancelada': 'No hay tareas canceladas'
+            };
+            container.innerHTML = `<p class="no-tasks">${mensajes[filtroActivo] || 'No hay tareas'}</p>`;
+            return;
+        }
+
+        // ✅ Renderizar
+        container.innerHTML = tareasFiltradas.map(tarea => {
+            const fechaInicio = formatearFechaUY(tarea.fecha_inicio);
+            const fechaFin = formatearFechaUY(tarea.fecha_fin);
+            const asignados = tarea.tipo_asignacion === 'usuario' ?
+                `${tarea.total_usuarios} usuario(s)` : `${tarea.total_nucleos} núcleo(s)`;
+            const progresoPromedio = Math.round(parseFloat(tarea.progreso_promedio || 0));
+            const totalAsignados = tarea.tipo_asignacion === 'usuario' ?
+                parseInt(tarea.total_usuarios) : parseInt(tarea.total_nucleos);
+            const completados = parseInt(tarea.asignaciones_completadas || 0);
+
+            let estadoTexto = '', estadoBadgeClass = '', claseVencida = '';
+
+            if (tarea.esVencida === true) {
+                estadoTexto = '⏰ Vencida';
+                estadoBadgeClass = 'vencida';
+                claseVencida = 'tarea-vencida';
+                console.log(`✅ Badge VENCIDA: ${tarea.titulo}`);
+            } else if (tarea.esCompletada) {
+                estadoTexto = 'Completada';
+                estadoBadgeClass = 'completada';
+            } else if (tarea.esCancelada) {
+                estadoTexto = 'Cancelada';
+                estadoBadgeClass = 'cancelada';
+            } else {
+                estadoTexto = formatEstado(tarea.estado);
+            }
+
+            return `
+                <div class="task-item prioridad-${tarea.prioridad} ${claseVencida}">
+                    <div class="task-header">
+                        <h4 class="task-title">${tarea.titulo}</h4>
+                        <div class="task-badges">
+                            <span class="task-badge badge-estado ${estadoBadgeClass}">${estadoTexto}</span>
+                            <span class="task-badge badge-prioridad ${tarea.prioridad}">${formatPrioridad(tarea.prioridad)}</span>
+                        </div>
+                    </div>
+                    <p class="task-description">${tarea.descripcion}</p>
+                    <div class="task-meta">
+                        <div class="task-meta-item"><strong>Inicio:</strong> ${fechaInicio}</div>
+                        <div class="task-meta-item"><strong>Fin:</strong> ${fechaFin}</div>
+                        <div class="task-meta-item"><strong>Creado por:</strong> ${tarea.creador}</div>
+                        <div class="task-meta-item"><strong>Asignado a:</strong> ${asignados}</div>
+                    </div>
+                    ${!tarea.esCancelada ? `
+                        <div class="task-progress-section">
+                            <div class="progress-info">
+                                <span class="progress-label">Progreso general:</span>
+                                <span class="progress-percentage">${progresoPromedio}%</span>
+                                <span class="progress-completed">${completados}/${totalAsignados} completados</span>
+                            </div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" style="width:${progresoPromedio}%;background:${tarea.esVencida?'#dc3545':tarea.esCompletada?'#28a745':'#667eea'}"></div>
+                            </div>
+                        </div>
+                    ` : ''}
+                    ${tarea.esVencida ? `
+                        <div class="alert-warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <strong>Esta tarea está vencida.</strong> La fecha límite ya ha pasado.
+                        </div>
+                    ` : ''}
+                    ${!tarea.esCancelada ? `
+                        <div class="task-actions">
+                            <button class="btn btn-small btn-view" onclick="viewTaskDetails(${tarea.id_tarea})">Ver Detalles</button>
+                            <button class="btn btn-small btn-materiales" onclick="viewTaskMaterialsAdmin(${tarea.id_tarea})">
+                                <i class="fas fa-boxes"></i> Materiales
+                            </button>
+                            ${!tarea.esCompletada ? `
+                                <button class="btn btn-small btn-cancel" onclick="cancelTask(${tarea.id_tarea})">Cancelar Tarea</button>
+                            ` : `
+                                <span style="color:#28a745;font-weight:bold;padding:5px 10px">✓ Tarea Completada</span>
+                            `}
+                        </div>
+                    ` : '<p style="color:#dc3545;margin-top:10px"><strong>Esta tarea ha sido cancelada</strong></p>'}
+                </div>
+            `;
+        }).join('');
+
+        console.log('✅ [RENDER CORRECTO] Completado\n');
+    }
+
+    console.log('✅ [OVERRIDE] loadAllTasks sobrescrito permanentemente');
+})();
+
+
+// ==========================================
+// 🔧 FIX: MODAL DE USUARIOS SE ABRE ABAJO DE LA TABLA
+// Agregar al FINAL de dashboardAdmin.js
+// ==========================================
+
+console.log('🔧 [FIX MODAL] Aplicando corrección de modal de usuarios...');
+
+/**
+ * ✅ PROBLEMA IDENTIFICADO:
+ * - El modal se crea con onclick en el mismo div que contiene event.target
+ * - Esto causa que el modal se inserte dentro de la tabla
+ * - SOLUCIÓN: Limpiar modales antes de crear + insertar en body correctamente
+ */
+
+// ========== SOBRESCRIBIR viewUserDetails ==========
+(function() {
+    console.log('🔄 [OVERRIDE] Sobrescribiendo viewUserDetails...');
+
+    window.viewUserDetails = function(userId) {
+        console.log('👁️ [DETAILS] Cargando detalles de usuario:', userId);
+
+        // 🧹 PASO 1: LIMPIAR TODOS LOS MODALES ANTERIORES
+        limpiarModalesUsuarios();
+
+        fetch(`/api/users/details?id_usuario=${userId}`)
+            .then(response => response.json())
+            .then(data => {
+                console.log('👁️ [DETAILS] Response:', data);
+                if (data.success) {
+                    mostrarModalUsuarioCorrecto(data.user);
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('👁️ [DETAILS ERROR]', error);
+                alert('Error de conexión');
+            });
+    };
+
+    console.log('✅ [OVERRIDE] viewUserDetails reemplazado correctamente');
+})();
+
+// ========== FUNCIÓN PARA LIMPIAR MODALES ==========
+function limpiarModalesUsuarios() {
+    console.log('🧹 [LIMPIEZA] Limpiando modales de usuarios...');
+    
+    // Eliminar modales específicos de usuarios
+    const selectores = [
+        '.user-detail-modal',
+        '#userDetailModal',
+        '.modal-detail',
+        '.modal-overlay'
+    ];
+    
+    selectores.forEach(selector => {
+        const modales = document.querySelectorAll(selector);
+        modales.forEach(modal => {
+            console.log('🗑️ Eliminando modal:', selector);
+            modal.remove();
+        });
+    });
+}
+
+// ========== FUNCIÓN MEJORADA PARA MOSTRAR MODAL ==========
+function mostrarModalUsuarioCorrecto(user) {
+    console.log('📋 [MODAL] Mostrando modal para:', user.nombre_completo);
+
+    // 🧹 Limpiar por si acaso
+    limpiarModalesUsuarios();
+
+    // ✅ CREAR MODAL CON Z-INDEX ALTO Y POSITION FIXED
+    const modalHTML = `
+        <div class="user-detail-modal" 
+             style="
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                bottom: 0 !important;
+                background: rgba(0, 0, 0, 0.5) !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                z-index: 10000 !important;
+                padding: 20px !important;
+                overflow-y: auto !important;
+             "
+             onclick="if(event.target.classList.contains('user-detail-modal')) { limpiarModalesUsuarios(); }">
+            
+            <div class="user-detail-content" 
+                 style="
+                    background: white !important;
+                    border-radius: 12px !important;
+                    box-shadow: 0 10px 40px rgba(0,0,0,0.3) !important;
+                    max-width: 600px !important;
+                    width: 100% !important;
+                    padding: 30px !important;
+                    position: relative !important;
+                    max-height: 90vh !important;
+                    overflow-y: auto !important;
+                 "
+                 onclick="event.stopPropagation()">
+                
+                <button class="user-detail-close" 
+                        onclick="limpiarModalesUsuarios()"
+                        style="
+                            position: absolute !important;
+                            top: 15px !important;
+                            right: 15px !important;
+                            background: #f5f5f5 !important;
+                            border: none !important;
+                            width: 35px !important;
+                            height: 35px !important;
+                            border-radius: 50% !important;
+                            font-size: 20px !important;
+                            cursor: pointer !important;
+                            display: flex !important;
+                            align-items: center !important;
+                            justify-content: center !important;
+                            transition: all 0.3s ease !important;
+                        "
+                        onmouseover="this.style.background='#e0e0e0'"
+                        onmouseout="this.style.background='#f5f5f5'">
+                    &times;
+                </button>
+                
+                <h2 style="
+                    margin: 0 0 10px 0;
+                    color: #333;
+                    font-size: 24px;
+                    padding-right: 40px;
+                ">
+                    ${user.nombre_completo}
+                </h2>
+                
+                <span class="estado-badge estado-${user.estado}" 
+                      style="
+                        display: inline-block;
+                        padding: 5px 12px;
+                        border-radius: 20px;
+                        font-size: 12px;
+                        font-weight: 600;
+                        text-transform: uppercase;
+                        margin-bottom: 20px;
+                      ">
+                    ${formatEstadoUsuario(user.estado)}
+                </span>
+                
+                <div style="
+                    margin-top: 20px;
+                    padding: 20px;
+                    background: #f8f9fa;
+                    border-radius: 8px;
+                ">
+                    <p style="margin: 10px 0; display: flex; align-items: center; gap: 10px;">
+                        <strong style="min-width: 150px; color: #005CB9;">
+                            <i class="fas fa-id-card"></i> Cédula:
+                        </strong>
+                        <span>${user.cedula}</span>
+                    </p>
+                    <p style="margin: 10px 0; display: flex; align-items: center; gap: 10px;">
+                        <strong style="min-width: 150px; color: #005CB9;">
+                            <i class="fas fa-envelope"></i> Email:
+                        </strong>
+                        <span>${user.email}</span>
+                    </p>
+                    <p style="margin: 10px 0; display: flex; align-items: center; gap: 10px;">
+                        <strong style="min-width: 150px; color: #005CB9;">
+                            <i class="fas fa-map-marker-alt"></i> Dirección:
+                        </strong>
+                        <span>${user.direccion || '-'}</span>
+                    </p>
+                    <p style="margin: 10px 0; display: flex; align-items: center; gap: 10px;">
+                        <strong style="min-width: 150px; color: #005CB9;">
+                            <i class="fas fa-birthday-cake"></i> Fecha Nacimiento:
+                        </strong>
+                        <span>${user.fecha_nacimiento || '-'}</span>
+                    </p>
+                    <p style="margin: 10px 0; display: flex; align-items: center; gap: 10px;">
+                        <strong style="min-width: 150px; color: #005CB9;">
+                            <i class="fas fa-calendar-plus"></i> Fecha Ingreso:
+                        </strong>
+                        <span>${user.fecha_ingreso || '-'}</span>
+                    </p>
+                    <p style="margin: 10px 0; display: flex; align-items: center; gap: 10px;">
+                        <strong style="min-width: 150px; color: #005CB9;">
+                            <i class="fas fa-user-tag"></i> Rol:
+                        </strong>
+                        <span>${user.rol || 'Sin rol'}</span>
+                    </p>
+                    <p style="margin: 10px 0; display: flex; align-items: center; gap: 10px;">
+                        <strong style="min-width: 150px; color: #005CB9;">
+                            <i class="fas fa-users"></i> Núcleo:
+                        </strong>
+                        <span>${user.id_nucleo ? `#${user.id_nucleo}` : 'Sin núcleo'}</span>
+                    </p>
+                </div>
+                
+                <div style="
+                    margin-top: 20px;
+                    text-align: right;
+                ">
+                    <button class="btn btn-secondary" 
+                            onclick="limpiarModalesUsuarios()"
+                            style="
+                                padding: 10px 20px;
+                                border: none;
+                                border-radius: 6px;
+                                cursor: pointer;
+                                font-weight: 600;
+                                transition: all 0.3s ease;
+                            ">
+                        Cerrar
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // ✅ INSERTAR DIRECTAMENTE EN BODY (no en la tabla)
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    
+    // 🔒 PREVENIR SCROLL DEL BODY
+    document.body.style.overflow = 'hidden';
+    
+    console.log('✅ [MODAL] Modal insertado correctamente en body');
+}
+
+// ========== FUNCIÓN AUXILIAR ==========
+function formatEstadoUsuario(estado) {
+    const estados = {
+        'pendiente': 'Pendiente',
+        'enviado': 'Enviado',
+        'aceptado': 'Aceptado',
+        'rechazado': 'Rechazado'
+    };
+    return estados[estado] || estado;
+}
+
+// ========== LISTENER PARA CERRAR CON ESC ==========
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        const modal = document.querySelector('.user-detail-modal');
+        if (modal) {
+            limpiarModalesUsuarios();
+        }
+    }
+});
+
+// ========== RESTAURAR SCROLL AL CERRAR ==========
+const limpiarModalesUsuarios_ORIGINAL = limpiarModalesUsuarios;
+limpiarModalesUsuarios = function() {
+    limpiarModalesUsuarios_ORIGINAL();
+    // Restaurar scroll del body
+    document.body.style.overflow = '';
+};
+
+// ========== SOBRESCRIBIR renderUserRow PARA QUITAR COLUMNA DE PAGO ==========
+(function() {
+    console.log('🔄 [OVERRIDE] Sobrescribiendo renderUserRow para quitar columna Pago...');
+
+    window.renderUserRow = function(user) {
+        const hasPayment = user.comprobante_archivo && user.estado === 'enviado';
+
+        return `
+            <tr class="user-row estado-${user.estado}" data-estado="${user.estado}">
+                <td>${user.id_usuario}</td>
+                <td>${user.nombre_completo}</td>
+                <td>${user.cedula}</td>
+                <td>${user.email}</td>
+                <td>
+                    <span class="estado-badge estado-${user.estado}">
+                        ${formatEstadoUsuario(user.estado)}
+                    </span>
+                </td>
+                <td>${user.nombre_rol || 'Sin rol'}</td>
+                <td>${user.nombre_nucleo || 'Sin núcleo'}</td>
+                <td>
+                    <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+                        <button class="btn-small btn-view" 
+                                onclick="viewUserDetails(${user.id_usuario})"
+                                title="Ver detalles">
+                            <i class="fas fa-eye"></i> Ver
+                        </button>
+                        ${hasPayment ? `
+                            <button class="btn-small btn-approve-small" 
+                                    onclick="approvePaymentFromTable(${user.id_usuario})"
+                                    id="approve-btn-${user.id_usuario}"
+                                    title="Aprobar pago">
+                                <i class="fas fa-check"></i>
+                            </button>
+                            <button class="btn-small btn-reject-small" 
+                                    onclick="rejectPaymentFromTable(${user.id_usuario})"
+                                    id="reject-btn-${user.id_usuario}"
+                                    title="Rechazar pago">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        ` : ''}
+                    </div>
+                </td>
+            </tr>
+        `;
+    };
+
+    console.log('✅ [OVERRIDE] renderUserRow actualizado sin columna Pago');
+})();
+
+// ========== SOBRESCRIBIR renderUsersTable PARA QUITAR HEADER DE PAGO ==========
+(function() {
+    console.log('🔄 [OVERRIDE] Sobrescribiendo renderUsersTable para quitar header Pago...');
+
+    window.renderUsersTable = function(users) {
+        console.log('🎨 [RENDER] renderUsersTable INICIADA (sin columna Pago)');
+        
+        const container = document.getElementById('usersTableContainer');
+
+        if (!users || users.length === 0) {
+            container.innerHTML = '<p class="no-users">No hay usuarios disponibles</p>';
+            return;
+        }
+
+        const tableHTML = `
+            <div class="users-table-wrapper">
+                <table class="users-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Cédula</th>
+                            <th>Email</th>
+                            <th>Estado</th>
+                            <th>Rol</th>
+                            <th>Núcleo</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${users.map((user) => renderUserRow(user)).join('')}
+                    </tbody>
+                </table>
+            </div>
+        `;
+
+        container.innerHTML = tableHTML;
+        console.log('✅ [RENDER] Tabla renderizada sin columna Pago');
+    };
+
+    console.log('✅ [OVERRIDE] renderUsersTable actualizado');
+})();
+
+// ========== EXPORTAR FUNCIONES GLOBALES ==========
+window.limpiarModalesUsuarios = limpiarModalesUsuarios;
+window.mostrarModalUsuarioCorrecto = mostrarModalUsuarioCorrecto;
+
+console.log('✅ [FIX MODAL] Fix aplicado completamente');
+console.log('✅ [FIX MODAL] Ahora el modal se abre sobre la tabla correctamente');
+console.log('✅ [FIX TABLA] Columna "Pago" eliminada de la tabla de usuarios');

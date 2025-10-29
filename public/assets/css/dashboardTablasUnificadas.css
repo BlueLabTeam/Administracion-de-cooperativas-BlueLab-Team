@@ -1,0 +1,763 @@
+/* ==========================================
+   SISTEMA DE TABLAS UNIFICADO
+   Estilo consistente para TODAS las tablas
+   Basado en el diseño de Gestión de Viviendas
+   ========================================== */
+
+/* ==========================================
+   CONTENEDOR DE TABLA (Wrapper)
+   ========================================== */
+.table-wrapper,
+.viviendas-table-wrapper,
+.users-table-wrapper,
+.nucleos-table-wrapper,
+.materiales-table-wrapper,
+.registros-table-wrapper,
+.cuotas-admin-table-wrapper,
+.solicitudes-admin-table-wrapper,
+.table-responsive-admin {
+    overflow-x: auto;
+    border-radius: var(--border-radius-xl);
+    box-shadow: var(--shadow-md);
+    background: var(--color-white);
+    margin-top: var(--spacing-xl);
+    border: 1px solid var(--border-color);
+}
+
+/* ==========================================
+   TABLA BASE
+   ========================================== */
+.table,
+.viviendas-table,
+.users-table,
+.nucleos-table,
+.materiales-table,
+.registros-table,
+.cuotas-admin-table,
+.solicitudes-admin-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: var(--color-white);
+    min-width: 1000px;
+}
+
+/* ==========================================
+   THEAD (Encabezado)
+   ========================================== */
+.table thead,
+.viviendas-table thead,
+.users-table thead,
+.nucleos-table thead,
+.materiales-table thead,
+.registros-table thead,
+.cuotas-admin-table thead,
+.solicitudes-admin-table thead {
+    background: var(--bg-gradient-primary);
+    color: var(--color-white);
+}
+
+.table thead tr,
+.viviendas-table thead tr,
+.users-table thead tr,
+.nucleos-table thead tr,
+.materiales-table thead tr,
+.registros-table thead tr,
+.cuotas-admin-table thead tr,
+.solicitudes-admin-table thead tr {
+    box-shadow: var(--shadow-sm);
+}
+
+/* ==========================================
+   TH (Celdas de encabezado)
+   ========================================== */
+.table th,
+.viviendas-table th,
+.users-table th,
+.nucleos-table th,
+.materiales-table th,
+.registros-table th,
+.cuotas-admin-table th,
+.solicitudes-admin-table th {
+    padding: var(--spacing-lg) var(--spacing-lg);
+    text-align: left;
+    font-weight: 700;
+    font-size: var(--font-size-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    white-space: nowrap;
+    border-bottom: 3px solid var(--color-primary-light);
+    color: var(--color-white);
+}
+
+/* Primera y última celda del encabezado */
+.table th:first-child,
+.viviendas-table th:first-child,
+.users-table th:first-child,
+.nucleos-table th:first-child,
+.materiales-table th:first-child,
+.registros-table th:first-child,
+.cuotas-admin-table th:first-child,
+.solicitudes-admin-table th:first-child {
+    border-radius: var(--border-radius-xl) 0 0 0;
+    padding-left: var(--spacing-2xl);
+}
+
+.table th:last-child,
+.viviendas-table th:last-child,
+.users-table th:last-child,
+.nucleos-table th:last-child,
+.materiales-table th:last-child,
+.registros-table th:last-child,
+.cuotas-admin-table th:last-child,
+.solicitudes-admin-table th:last-child {
+    border-radius: 0 var(--border-radius-xl) 0 0;
+    padding-right: var(--spacing-2xl);
+}
+
+/* ==========================================
+   TBODY TR (Filas del cuerpo)
+   ========================================== */
+.table tbody tr,
+.viviendas-table tbody tr,
+.users-table tbody tr,
+.nucleos-table tbody tr,
+.materiales-table tbody tr,
+.registros-table tbody tr,
+.cuotas-admin-table tbody tr,
+.solicitudes-admin-table tbody tr {
+    border-bottom: 1px solid var(--border-color);
+    transition: all var(--transition-base);
+    background: var(--color-white);
+}
+
+.table tbody tr:hover,
+.viviendas-table tbody tr:hover,
+.users-table tbody tr:hover,
+.nucleos-table tbody tr:hover,
+.materiales-table tbody tr:hover,
+.registros-table tbody tr:hover,
+.cuotas-admin-table tbody tr:hover,
+.solicitudes-admin-table tbody tr:hover {
+    background: linear-gradient(90deg, var(--color-gray-50) 0%, #e8f0ff 100%);
+    transform: translateX(4px);
+    box-shadow: var(--shadow-sm);
+}
+
+.table tbody tr:last-child,
+.viviendas-table tbody tr:last-child,
+.users-table tbody tr:last-child,
+.nucleos-table tbody tr:last-child,
+.materiales-table tbody tr:last-child,
+.registros-table tbody tr:last-child,
+.cuotas-admin-table tbody tr:last-child,
+.solicitudes-admin-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+/* ==========================================
+   TD (Celdas del cuerpo)
+   ========================================== */
+.table td,
+.viviendas-table td,
+.users-table td,
+.nucleos-table td,
+.materiales-table td,
+.registros-table td,
+.cuotas-admin-table td,
+.solicitudes-admin-table td {
+    padding: var(--spacing-lg);
+    font-size: var(--font-size-base);
+    color: var(--color-gray-800);
+    vertical-align: middle;
+}
+
+/* Primera columna con padding especial */
+.table td:first-child,
+.viviendas-table td:first-child,
+.users-table td:first-child,
+.nucleos-table td:first-child,
+.materiales-table td:first-child,
+.registros-table td:first-child,
+.cuotas-admin-table td:first-child,
+.solicitudes-admin-table td:first-child {
+    padding-left: var(--spacing-2xl);
+    font-weight: 600;
+}
+
+.table td:last-child,
+.viviendas-table td:last-child,
+.users-table td:last-child,
+.nucleos-table td:last-child,
+.materiales-table td:last-child,
+.registros-table td:last-child,
+.cuotas-admin-table td:last-child,
+.solicitudes-admin-table td:last-child {
+    padding-right: var(--spacing-2xl);
+}
+
+/* Resaltar texto importante en primera columna */
+.table td:first-child strong,
+.viviendas-table td:first-child strong,
+.users-table td:first-child strong,
+.nucleos-table td:first-child strong,
+.materiales-table td:first-child strong,
+.registros-table td:first-child strong,
+.cuotas-admin-table td:first-child strong,
+.solicitudes-admin-table td:first-child strong {
+    color: var(--color-secondary);
+    font-weight: 700;
+    font-size: var(--font-size-md);
+}
+
+/* Bordes redondeados en última fila */
+.table tbody tr:last-child td:first-child,
+.viviendas-table tbody tr:last-child td:first-child,
+.users-table tbody tr:last-child td:first-child,
+.nucleos-table tbody tr:last-child td:first-child,
+.materiales-table tbody tr:last-child td:first-child,
+.registros-table tbody tr:last-child td:first-child,
+.cuotas-admin-table tbody tr:last-child td:first-child,
+.solicitudes-admin-table tbody tr:last-child td:first-child {
+    border-radius: 0 0 0 var(--border-radius-xl);
+}
+
+.table tbody tr:last-child td:last-child,
+.viviendas-table tbody tr:last-child td:last-child,
+.users-table tbody tr:last-child td:last-child,
+.nucleos-table tbody tr:last-child td:last-child,
+.materiales-table tbody tr:last-child td:last-child,
+.registros-table tbody tr:last-child td:last-child,
+.cuotas-admin-table tbody tr:last-child td:last-child,
+.solicitudes-admin-table tbody tr:last-child td:last-child {
+    border-radius: 0 0 var(--border-radius-xl) 0;
+}
+
+/* ==========================================
+   BADGES Y ESTADOS UNIFICADOS
+   ========================================== */
+
+/* Badges generales en tablas */
+.table .badge,
+.viviendas-table .badge,
+.users-table .badge,
+.nucleos-table .badge,
+.materiales-table .badge,
+.registros-table .badge,
+.cuotas-admin-table .badge,
+.solicitudes-admin-table .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-sm) var(--spacing-lg);
+    border-radius: 25px;
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    white-space: nowrap;
+    box-shadow: var(--shadow-sm);
+}
+
+/* Estado: Disponible / Activo / Pagada */
+.badge-disponible,
+.badge-activo,
+.badge-pagada,
+.badge-aprobado,
+.estado-badge-vivienda.disponible {
+    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+    color: var(--color-success);
+    border: 2px solid var(--color-success);
+}
+
+/* Estado: Ocupada / En Proceso / Pendiente */
+.badge-ocupada,
+.badge-en-proceso,
+.badge-pendiente,
+.estado-badge-vivienda.ocupada {
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    color: var(--color-secondary);
+    border: 2px solid var(--color-secondary);
+}
+
+/* Estado: Mantenimiento / Inactivo / Vencida */
+.badge-mantenimiento,
+.badge-inactivo,
+.badge-vencida,
+.estado-badge-vivienda.mantenimiento {
+    background: linear-gradient(135deg, var(--color-gray-100) 0%, var(--color-gray-200) 100%);
+    color: var(--color-gray-600);
+    border: 2px solid var(--color-gray-400);
+}
+
+/* Estado: Rechazada / Error / Exonerada */
+.badge-rechazada,
+.badge-error,
+.badge-exonerada {
+    background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+    color: var(--color-danger);
+    border: 2px solid var(--color-danger);
+}
+
+/* ==========================================
+   BOTONES DE ACCIÓN EN TABLAS
+   ========================================== */
+
+/* Contenedor de botones */
+.table-actions,
+.vivienda-actions,
+.user-actions,
+.action-buttons,
+.action-buttons-compact,
+.material-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+    justify-content: flex-start;
+}
+
+/* Botones base en tablas */
+.btn-table-action,
+.btn-view-vivienda,
+.btn-edit-vivienda,
+.btn-delete-vivienda,
+.btn-assign-vivienda,
+.btn-unassign-vivienda,
+.btn-stock-material,
+.btn-edit-material,
+.btn-delete-material,
+.btn-small {
+    background: var(--color-white);
+    border: 2px solid var(--color-secondary);
+    color: var(--color-secondary);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--border-radius-md);
+    cursor: pointer;
+    font-size: var(--font-size-lg);
+    transition: all var(--transition-base);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 42px;
+    height: 42px;
+    box-shadow: var(--shadow-sm);
+}
+
+/* Hover principal (azul) */
+.btn-table-action:hover,
+.btn-view-vivienda:hover,
+.btn-edit-vivienda:hover,
+.btn-stock-material:hover,
+.btn-edit-material:hover {
+    background: var(--bg-gradient-primary);
+    color: var(--color-white);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--color-primary);
+}
+
+/* Botón eliminar */
+.btn-delete-vivienda,
+.btn-delete-material,
+.btn-danger {
+    border-color: var(--color-gray-300);
+    color: var(--color-gray-500);
+}
+
+.btn-delete-vivienda:hover,
+.btn-delete-material:hover,
+.btn-danger:hover {
+    background: var(--color-danger);
+    color: var(--color-white);
+    border-color: var(--color-danger);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+}
+
+/* Botón asignar */
+.btn-assign-vivienda {
+    border-color: var(--color-secondary);
+    color: var(--color-secondary);
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 50%);
+}
+
+.btn-assign-vivienda:hover {
+    background: var(--bg-gradient-primary);
+    color: var(--color-white);
+    border-color: var(--color-primary);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+}
+
+/* Botón desasignar */
+.btn-unassign-vivienda {
+    border-color: var(--color-gray-400);
+    color: var(--color-gray-600);
+    background: linear-gradient(135deg, var(--color-gray-100) 0%, var(--color-gray-200) 50%);
+}
+
+.btn-unassign-vivienda:hover {
+    background: var(--color-gray-500);
+    color: var(--color-white);
+    border-color: var(--color-gray-600);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+}
+
+/* ==========================================
+   HEADER DE TABLA (encima de la tabla)
+   ========================================== */
+.table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-2xl);
+    flex-wrap: wrap;
+    gap: var(--spacing-lg);
+    padding: var(--spacing-xl);
+    background: var(--color-primary);
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-lg);
+}
+
+.table-header h3 {
+    margin: 0;
+    color: var(--color-white) !important;
+    font-size: var(--font-size-2xl);
+    font-weight: 600;
+}
+
+/* ==========================================
+   FILTROS SOBRE TABLA
+   ========================================== */
+.table-filters,
+.filter-controls,
+.filters-container,
+.cuotas-admin-filters {
+    display: flex;
+    gap: var(--spacing-lg);
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: var(--spacing-2xl);
+    padding: var(--spacing-xl);
+    background: var(--color-white);
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-sm);
+}
+
+.table-filters select,
+.table-filters input,
+.filter-controls select,
+.filter-controls input,
+.filters-container select,
+.filters-container input,
+.cuotas-admin-filters select {
+    padding: var(--spacing-lg) var(--spacing-lg);
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius-lg);
+    font-size: var(--font-size-base);
+    color: var(--color-gray-800);
+    background: var(--color-white);
+    transition: all var(--transition-base);
+    font-weight: 600;
+}
+
+.table-filters select:focus,
+.table-filters input:focus,
+.filter-controls select:focus,
+.filter-controls input:focus,
+.filters-container select:focus,
+.filters-container input:focus,
+.cuotas-admin-filters select:focus {
+    outline: none;
+    border-color: var(--color-secondary);
+    box-shadow: 0 0 0 5px rgba(0, 102, 204, 0.12);
+    background: var(--color-gray-50);
+    transform: scale(1.02);
+}
+
+.table-filters input::placeholder,
+.filter-controls input::placeholder,
+.filters-container input::placeholder {
+    color: var(--color-gray-400);
+    font-weight: 500;
+}
+
+/* ==========================================
+   FILAS CON ESTADOS ESPECIALES
+   ========================================== */
+
+/* Fila destacada (pago pendiente, etc) */
+.table tbody tr.row-highlighted,
+.users-table tbody tr.estado-enviado,
+.cuotas-admin-table tbody tr.estado-pendiente {
+    background: linear-gradient(90deg, #fff9c4 0%, #fff59d 100%);
+    border-left: 5px solid var(--color-warning-light);
+    font-weight: 500;
+}
+
+.table tbody tr.row-highlighted:hover,
+.users-table tbody tr.estado-enviado:hover,
+.cuotas-admin-table tbody tr.estado-pendiente:hover {
+    background: linear-gradient(90deg, #fff59d 0%, #ffee58 100%);
+    transform: translateX(8px);
+    box-shadow: var(--shadow-md);
+}
+
+/* Fila de éxito */
+.table tbody tr.row-success,
+.cuotas-admin-table tbody tr.estado-pagada {
+    background: #f1f8f4;
+}
+
+/* Fila de error/vencida */
+.table tbody tr.row-error,
+.cuotas-admin-table tbody tr.estado-vencida {
+    background: #fff5f5;
+}
+
+/* ==========================================
+   ANIMACIÓN PARA FILAS DESTACADAS
+   ========================================== */
+@keyframes pulse-payment {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(255, 167, 38, 0.4);
+    }
+    50% {
+        box-shadow: 0 0 0 10px rgba(255, 167, 38, 0);
+    }
+}
+
+.table tbody tr.row-highlighted .badge,
+.users-table tbody tr.estado-enviado .estado-badge {
+    animation: pulse-payment 2s infinite;
+}
+
+/* ==========================================
+   TABLA VACÍA / SIN DATOS
+   ========================================== */
+.table-empty,
+.no-users,
+.no-data,
+.no-viviendas,
+.no-materiales {
+    text-align: center;
+    padding: var(--spacing-4xl) var(--spacing-xl);
+    color: var(--color-secondary);
+    font-size: var(--font-size-lg);
+    background: #e3f2fd;
+    border-radius: var(--border-radius-md);
+    border: 2px dashed #90caf9;
+}
+
+/* ==========================================
+   RESPONSIVE
+   ========================================== */
+@media (max-width: 1200px) {
+    .table,
+    .viviendas-table,
+    .users-table,
+    .nucleos-table,
+    .materiales-table,
+    .registros-table,
+    .cuotas-admin-table,
+    .solicitudes-admin-table {
+        min-width: 900px;
+    }
+}
+
+@media (max-width: 768px) {
+    .table,
+    .viviendas-table,
+    .users-table,
+    .nucleos-table,
+    .materiales-table,
+    .registros-table,
+    .cuotas-admin-table,
+    .solicitudes-admin-table {
+        font-size: var(--font-size-sm);
+        min-width: 800px;
+    }
+    
+    .table th,
+    .table td,
+    .viviendas-table th,
+    .viviendas-table td,
+    .users-table th,
+    .users-table td,
+    .nucleos-table th,
+    .nucleos-table td,
+    .materiales-table th,
+    .materiales-table td,
+    .registros-table th,
+    .registros-table td,
+    .cuotas-admin-table th,
+    .cuotas-admin-table td,
+    .solicitudes-admin-table th,
+    .solicitudes-admin-table td {
+        padding: var(--spacing-md) var(--spacing-md);
+    }
+    
+    .table-actions,
+    .vivienda-actions,
+    .action-buttons,
+    .material-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .table-actions button,
+    .vivienda-actions button,
+    .action-buttons button,
+    .material-actions button {
+        width: 100%;
+    }
+    
+    .table-filters,
+    .filter-controls,
+    .filters-container,
+    .cuotas-admin-filters {
+        flex-direction: column;
+    }
+    
+    .table-filters select,
+    .table-filters input,
+    .filter-controls select,
+    .filter-controls input,
+    .filters-container select,
+    .filters-container input,
+    .cuotas-admin-filters select {
+        width: 100%;
+        min-width: 100%;
+    }
+    
+    .table-header {
+        flex-direction: column;
+        align-items: stretch;
+        padding: var(--spacing-lg);
+    }
+}
+
+@media (max-width: 480px) {
+    .table-wrapper,
+    .viviendas-table-wrapper,
+    .users-table-wrapper,
+    .nucleos-table-wrapper,
+    .materiales-table-wrapper,
+    .registros-table-wrapper,
+    .cuotas-admin-table-wrapper,
+    .solicitudes-admin-table-wrapper,
+    .table-responsive-admin {
+        border-radius: var(--border-radius-lg);
+    }
+}
+
+/* ==========================================
+   SCROLLBAR PERSONALIZADO PARA TABLAS
+   ========================================== */
+.table-wrapper::-webkit-scrollbar,
+.viviendas-table-wrapper::-webkit-scrollbar,
+.users-table-wrapper::-webkit-scrollbar,
+.nucleos-table-wrapper::-webkit-scrollbar,
+.materiales-table-wrapper::-webkit-scrollbar,
+.registros-table-wrapper::-webkit-scrollbar,
+.cuotas-admin-table-wrapper::-webkit-scrollbar,
+.solicitudes-admin-table-wrapper::-webkit-scrollbar,
+.table-responsive-admin::-webkit-scrollbar {
+    height: 10px;
+    width: 10px;
+}
+
+.table-wrapper::-webkit-scrollbar-track,
+.viviendas-table-wrapper::-webkit-scrollbar-track,
+.users-table-wrapper::-webkit-scrollbar-track,
+.nucleos-table-wrapper::-webkit-scrollbar-track,
+.materiales-table-wrapper::-webkit-scrollbar-track,
+.registros-table-wrapper::-webkit-scrollbar-track,
+.cuotas-admin-table-wrapper::-webkit-scrollbar-track,
+.solicitudes-admin-table-wrapper::-webkit-scrollbar-track,
+.table-responsive-admin::-webkit-scrollbar-track {
+    background: var(--color-gray-100);
+    border-radius: 5px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb,
+.viviendas-table-wrapper::-webkit-scrollbar-thumb,
+.users-table-wrapper::-webkit-scrollbar-thumb,
+.nucleos-table-wrapper::-webkit-scrollbar-thumb,
+.materiales-table-wrapper::-webkit-scrollbar-thumb,
+.registros-table-wrapper::-webkit-scrollbar-thumb,
+.cuotas-admin-table-wrapper::-webkit-scrollbar-thumb,
+.solicitudes-admin-table-wrapper::-webkit-scrollbar-thumb,
+.table-responsive-admin::-webkit-scrollbar-thumb {
+    background: var(--color-secondary);
+    border-radius: 5px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb:hover,
+.viviendas-table-wrapper::-webkit-scrollbar-thumb:hover,
+.users-table-wrapper::-webkit-scrollbar-thumb:hover,
+.nucleos-table-wrapper::-webkit-scrollbar-thumb:hover,
+.materiales-table-wrapper::-webkit-scrollbar-thumb:hover,
+.registros-table-wrapper::-webkit-scrollbar-thumb:hover,
+.cuotas-admin-table-wrapper::-webkit-scrollbar-thumb:hover,
+.solicitudes-admin-table-wrapper::-webkit-scrollbar-thumb:hover,
+.table-responsive-admin::-webkit-scrollbar-thumb:hover {
+    background: var(--color-primary);
+}
+
+/* ==========================================
+   UTILIDADES PARA TABLAS
+   ========================================== */
+
+/* Texto centrado en celda */
+.table td.text-center,
+.viviendas-table td.text-center,
+.users-table td.text-center {
+    text-align: center;
+}
+
+/* Texto a la derecha en celda */
+.table td.text-right,
+.viviendas-table td.text-right,
+.users-table td.text-right {
+    text-align: right;
+}
+
+/* Celda con ícono */
+.table td.cell-icon,
+.viviendas-table td.cell-icon,
+.users-table td.cell-icon {
+    font-size: var(--font-size-xl);
+    color: var(--color-secondary);
+}
+
+/* Celda de cantidad/número */
+.table td.cell-number,
+.viviendas-table td.cell-number,
+.users-table td.cell-number {
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+    color: var(--color-secondary);
+}
+
+/* ==========================================
+   ICONOS EN PRIMERA CELDA
+   ========================================== */
+.table tbody tr td:first-child::before,
+.users-table tbody tr.estado-enviado td:first-child::before {
+    content: '';
+    display: inline-block;
+    margin-right: var(--spacing-sm);
+    font-size: var(--font-size-lg);
+}
+
+.users-table tbody tr.estado-enviado td:first-child::before {
+    content: '⚠️';
+    animation: bounce 1s infinite;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+}

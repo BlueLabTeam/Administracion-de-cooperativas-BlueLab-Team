@@ -339,7 +339,13 @@ async function loadUserTasks() {
     }
 }
 
+// ==========================================
+// 🔧 FUNCIÓN MEJORADA: renderUserTasks con VENCIDAS
+// ==========================================
+
 function renderUserTasks(tareas, containerId, esNucleo = false) {
+    console.log('🎨 [RENDER USER TASKS] Iniciando con detección de vencidas');
+    
     const container = document.getElementById(containerId);
 
     if (!tareas || tareas.length === 0) {
@@ -347,19 +353,61 @@ function renderUserTasks(tareas, containerId, esNucleo = false) {
         return;
     }
 
-    container.innerHTML = tareas.map(tarea => {
-        const fechaInicio = new Date(tarea.fecha_inicio).toLocaleDateString('es-UY');
-        const fechaFin = new Date(tarea.fecha_fin).toLocaleDateString('es-UY');
-        const progreso = tarea.progreso || 0;
+    // ✅ PASO 1: Detectar tareas vencidas
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+
+    const tareasConEstado = tareas.map(tarea => {
+        const fechaFinObj = new Date(tarea.fecha_fin + 'T00:00:00');
         const esCompletada = tarea.estado_usuario === 'completada';
+        const esVencida = !esCompletada && fechaFinObj < hoy;
+
+        if (esVencida) {
+            console.log(`🔴 TAREA VENCIDA (Usuario): ${tarea.titulo} - Fin: ${tarea.fecha_fin}`);
+        }
+
+        return {
+            ...tarea,
+            esVencida,
+            esCompletada
+        };
+    });
+
+    // ✅ PASO 2: Renderizar
+    container.innerHTML = tareasConEstado.map(tarea => {
+        const fechaInicio = formatearFechaUY(tarea.fecha_inicio);
+        const fechaFin = formatearFechaUY(tarea.fecha_fin);
+        const progreso = tarea.progreso || 0;
+
+        // ✅ DETERMINAR ESTADO VISUAL
+        let estadoTexto, estadoBadgeClass, tareaClass;
+
+        if (tarea.esVencida) {
+            estadoTexto = '⏰ Vencida';
+            estadoBadgeClass = 'vencida';
+            tareaClass = 'tarea-vencida';
+            console.log(`✅ Badge VENCIDA aplicado: ${tarea.titulo}`);
+        } else if (tarea.esCompletada) {
+            estadoTexto = formatEstadoUsuario(tarea.estado_usuario);
+            estadoBadgeClass = 'completada';
+            tareaClass = 'completada';
+        } else {
+            estadoTexto = formatEstadoUsuario(tarea.estado_usuario);
+            estadoBadgeClass = '';
+            tareaClass = '';
+        }
 
         return `
-            <div class="user-task-item prioridad-${tarea.prioridad} ${esCompletada ? 'completada' : ''}">
+            <div class="user-task-item prioridad-${tarea.prioridad} ${tareaClass}">
                 <div class="user-task-header">
                     <h4 class="user-task-title">${tarea.titulo}</h4>
                     <div class="user-task-badges">
-                        <span class="task-badge badge-estado">${formatEstadoUsuario(tarea.estado_usuario)}</span>
-                        <span class="task-badge badge-prioridad ${tarea.prioridad}">${formatPrioridad(tarea.prioridad)}</span>
+                        <span class="task-badge badge-estado ${estadoBadgeClass}">
+                            ${estadoTexto}
+                        </span>
+                        <span class="task-badge badge-prioridad ${tarea.prioridad}">
+                            ${formatPrioridad(tarea.prioridad)}
+                        </span>
                         ${esNucleo ? '<span class="task-badge" style="background: #6f42c1; color: white;">Núcleo</span>' : ''}
                     </div>
                 </div>
@@ -367,18 +415,25 @@ function renderUserTasks(tareas, containerId, esNucleo = false) {
                 <p class="user-task-description">${tarea.descripcion}</p>
                 
                 <div class="user-task-meta">
-                    <div> <strong>Inicio:</strong> ${fechaInicio}</div>
-                    <div> <strong>Fin:</strong> ${fechaFin}</div>
-                    <div> <strong>Creado por:</strong> ${tarea.creador}</div>
+                    <div><strong>Inicio:</strong> ${fechaInicio}</div>
+                    <div><strong>Fin:</strong> ${fechaFin}</div>
+                    <div><strong>Creado por:</strong> ${tarea.creador}</div>
                 </div>
                 
                 <div class="progress-bar-container">
-                    <div class="progress-bar" style="width: ${progreso}%">
+                    <div class="progress-bar" style="width: ${progreso}%; background: ${tarea.esVencida ? '#dc3545' : tarea.esCompletada ? '#28a745' : '#667eea'};">
                         ${progreso}%
                     </div>
                 </div>
                 
-                ${!esCompletada ? `
+                ${tarea.esVencida ? `
+                    <div class="alert-warning" style="margin-top: 15px;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>Esta tarea está vencida.</strong> La fecha límite ya ha pasado.
+                    </div>
+                ` : ''}
+                
+                ${!tarea.esCompletada ? `
                     <div class="user-task-actions">
                         <button class="btn-small btn-update" onclick="updateTaskProgress(${tarea.id_asignacion}, '${esNucleo ? 'nucleo' : 'usuario'}', ${tarea.id_tarea})">
                             Actualizar Progreso
@@ -397,6 +452,8 @@ function renderUserTasks(tareas, containerId, esNucleo = false) {
             </div>
         `;
     }).join('');
+
+    console.log('✅ [RENDER USER TASKS] Completado');
 }
 
 function updateTasksSummary(tareasUsuario, tareasNucleo) {
@@ -5405,3 +5462,332 @@ setTimeout(function() {
 
 console.log('✅ [FIX FECHAS] Módulo cargado - Zona horaria: America/Montevideo');
 
+// ==========================================
+// 🔧 FIX: TAREAS VENCIDAS - DASHBOARD USUARIO
+// Agregar al FINAL de dashboardUsuario.js
+// ==========================================
+
+console.log('🟢 [VENCIDAS] Aplicando fix de tareas vencidas en usuario...');
+
+/**
+ * 🔧 OVERRIDE: renderUserTasks con detección de VENCIDAS
+ */
+(function() {
+    console.log('🔄 [OVERRIDE USER] Sobrescribiendo renderUserTasks...');
+
+    // Guardar versión original si existe
+    if (window.renderUserTasks) {
+        window.renderUserTasks_BACKUP = window.renderUserTasks;
+    }
+
+    /**
+     * ✅ VERSIÓN CORRECTA con detección de VENCIDAS
+     */
+    window.renderUserTasks = function(tareas, containerId, esNucleo = false) {
+        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+        console.log('🎨 [RENDER USER TASKS] Iniciando con detección de vencidas');
+        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+        
+        const container = document.getElementById(containerId);
+
+        if (!tareas || tareas.length === 0) {
+            container.innerHTML = '<div class="no-tasks">No tienes tareas asignadas</div>';
+            return;
+        }
+
+        // ✅ PASO 1: Detectar tareas vencidas
+        const hoy = new Date();
+        hoy.setHours(0, 0, 0, 0);
+        console.log('📅 Fecha HOY:', hoy.toISOString().split('T')[0]);
+
+        const tareasConEstado = tareas.map(tarea => {
+            const fechaFinObj = new Date(tarea.fecha_fin + 'T00:00:00');
+            const esCompletada = tarea.estado_usuario === 'completada';
+            const esVencida = !esCompletada && fechaFinObj < hoy;
+
+            if (esVencida) {
+                console.log(`🔴 TAREA VENCIDA (Usuario): ${tarea.titulo}`);
+                console.log(`   - Fecha fin: ${tarea.fecha_fin}`);
+                console.log(`   - Estado: ${tarea.estado_usuario}`);
+            }
+
+            return {
+                ...tarea,
+                esVencida,
+                esCompletada
+            };
+        });
+
+        // ✅ PASO 2: Renderizar
+        container.innerHTML = tareasConEstado.map(tarea => {
+            const fechaInicio = formatearFechaUY(tarea.fecha_inicio);
+            const fechaFin = formatearFechaUY(tarea.fecha_fin);
+            const progreso = tarea.progreso || 0;
+
+            // ✅ DETERMINAR ESTADO VISUAL
+            let estadoTexto, estadoBadgeClass, tareaClass;
+
+            if (tarea.esVencida) {
+                estadoTexto = '⏰ Vencida';
+                estadoBadgeClass = 'vencida';
+                tareaClass = 'tarea-vencida';
+                console.log(`✅ Badge VENCIDA aplicado: ${tarea.titulo}`);
+            } else if (tarea.esCompletada) {
+                estadoTexto = formatEstadoUsuario(tarea.estado_usuario);
+                estadoBadgeClass = 'completada';
+                tareaClass = 'completada';
+            } else {
+                estadoTexto = formatEstadoUsuario(tarea.estado_usuario);
+                estadoBadgeClass = '';
+                tareaClass = '';
+            }
+
+            return `
+                <div class="user-task-item prioridad-${tarea.prioridad} ${tareaClass}">
+                    <div class="user-task-header">
+                        <h4 class="user-task-title">${tarea.titulo}</h4>
+                        <div class="user-task-badges">
+                            <span class="task-badge badge-estado ${estadoBadgeClass}">
+                                ${estadoTexto}
+                            </span>
+                            <span class="task-badge badge-prioridad ${tarea.prioridad}">
+                                ${formatPrioridad(tarea.prioridad)}
+                            </span>
+                            ${esNucleo ? '<span class="task-badge" style="background: #6f42c1; color: white;">Núcleo</span>' : ''}
+                        </div>
+                    </div>
+                    
+                    <p class="user-task-description">${tarea.descripcion}</p>
+                    
+                    <div class="user-task-meta">
+                        <div><strong>Inicio:</strong> ${fechaInicio}</div>
+                        <div><strong>Fin:</strong> ${fechaFin}</div>
+                        <div><strong>Creado por:</strong> ${tarea.creador}</div>
+                    </div>
+                    
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" style="width: ${progreso}%; background: ${tarea.esVencida ? '#dc3545' : tarea.esCompletada ? '#28a745' : '#667eea'};">
+                            ${progreso}%
+                        </div>
+                    </div>
+                    
+                    ${tarea.esVencida ? `
+                        <div class="alert-warning" style="margin-top: 15px;">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <strong>Esta tarea está vencida.</strong> La fecha límite ya ha pasado.
+                        </div>
+                    ` : ''}
+                    
+                    ${!tarea.esCompletada ? `
+                        <div class="user-task-actions">
+                            <button class="btn-small btn-update" onclick="updateTaskProgress(${tarea.id_asignacion}, '${esNucleo ? 'nucleo' : 'usuario'}', ${tarea.id_tarea})">
+                                Actualizar Progreso
+                            </button>
+                            <button class="btn-small btn-avance" onclick="addTaskAvance(${tarea.id_tarea})">
+                                Reportar Avance
+                            </button>
+                            <button class="btn-small btn-materiales" onclick="viewTaskMaterials(${tarea.id_tarea})" title="Ver materiales necesarios">
+                                <i class="fas fa-boxes"></i> Materiales
+                            </button>
+                            <button class="btn-small btn-detalles" onclick="viewUserTaskDetails(${tarea.id_tarea})">
+                                Ver Detalles Completos
+                            </button>
+                        </div>
+                    ` : '<p style="color: #28a745; margin-top: 10px;"><strong>✓ Tarea completada</strong></p>'}
+                </div>
+            `;
+        }).join('');
+
+        console.log('✅ [RENDER USER TASKS] Completado');
+        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+    };
+
+    console.log('✅ [OVERRIDE USER] renderUserTasks sobrescrito correctamente');
+})();
+
+/**
+ * 🔧 FUNCIONES AUXILIARES (si no existen)
+ */
+if (typeof formatEstadoUsuario !== 'function') {
+    window.formatEstadoUsuario = function(estado) {
+        const estados = {
+            'pendiente': 'Pendiente',
+            'en_progreso': 'En Progreso',
+            'completada': 'Completada'
+        };
+        return estados[estado] || estado;
+    };
+}
+
+if (typeof formatPrioridad !== 'function') {
+    window.formatPrioridad = function(prioridad) {
+        const prioridades = {
+            'baja': 'Baja',
+            'media': 'Media',
+            'alta': 'Alta'
+        };
+        return prioridades[prioridad] || prioridad;
+    };
+}
+
+/**
+ * 🔧 ASEGURAR formatearFechaUY existe
+ */
+if (typeof formatearFechaUY !== 'function') {
+    window.formatearFechaUY = function(fecha) {
+        if (!fecha) return '-';
+        const f = new Date(fecha + 'T00:00:00');
+        return f.toLocaleDateString('es-UY', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            timeZone: 'America/Montevideo'
+        });
+    };
+}
+
+/**
+ * 🔧 FORZAR RECARGA AL ENTRAR A SECCIÓN TAREAS
+ */
+document.addEventListener('DOMContentLoaded', function() {
+    const tareasMenuItem = document.querySelector('.menu li[data-section="tareas"]');
+    if (tareasMenuItem) {
+        console.log('✅ Listener de tareas usuario agregado');
+        tareasMenuItem.addEventListener('click', function() {
+            console.log('>>> Click en sección tareas USUARIO');
+            
+            // Esperar un momento para que la sección se active
+            setTimeout(() => {
+                console.log('🔄 Cargando tareas de usuario...');
+                
+                // Verificar si los contenedores existen
+                const tareasUsuarioList = document.getElementById('tareasUsuarioList');
+                const tareasNucleoList = document.getElementById('tareasNucleoList');
+                
+                if (tareasUsuarioList) {
+                    console.log('✅ Container tareasUsuarioList encontrado');
+                }
+                if (tareasNucleoList) {
+                    console.log('✅ Container tareasNucleoList encontrado');
+                }
+                
+                // Cargar tareas
+                if (typeof loadUserTasks === 'function') {
+                    loadUserTasks();
+                } else {
+                    console.error('❌ loadUserTasks no está definida');
+                }
+            }, 100);
+        });
+    } else {
+        console.warn('⚠️ No se encontró el menu item de tareas');
+    }
+});
+
+/**
+ * 🎨 CSS PARA TAREAS VENCIDAS (Usuario)
+ */
+const cssVencidas = `
+<style>
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+/* 🔴 TAREAS VENCIDAS - USUARIO */
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+/* Contenedor de tarea vencida */
+.user-task-item.tarea-vencida {
+    border-left: 4px solid #dc3545 !important;
+    background: linear-gradient(to right, rgba(220, 53, 69, 0.05), transparent) !important;
+}
+
+/* Badge de estado VENCIDA */
+.task-badge.badge-estado.vencida {
+    background: linear-gradient(135deg, #dc3545, #c82333) !important;
+    color: white !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    padding: 6px 12px !important;
+    border-radius: 4px !important;
+    font-size: 11px !important;
+    letter-spacing: 0.5px !important;
+    box-shadow: 0 2px 4px rgba(220, 53, 69, 0.3) !important;
+}
+
+/* Animación pulsante para vencidas */
+@keyframes pulse-vencida {
+    0%, 100% { 
+        box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.4);
+    }
+    50% { 
+        box-shadow: 0 0 0 8px rgba(220, 53, 69, 0);
+    }
+}
+
+.user-task-item.tarea-vencida {
+    animation: pulse-vencida 2s infinite;
+}
+
+/* Barra de progreso vencida */
+.user-task-item.tarea-vencida .progress-bar {
+    background: linear-gradient(90deg, #dc3545, #c82333) !important;
+}
+
+/* Alert warning para vencidas */
+.alert-warning {
+    background: linear-gradient(135deg, #fff3cd, #ffe8a1);
+    border-left: 4px solid #ffc107;
+    padding: 15px;
+    border-radius: 8px;
+    display: flex;
+    align-items: start;
+    gap: 12px;
+}
+
+.alert-warning i {
+    color: #ff9800;
+    font-size: 20px;
+    margin-top: 2px;
+}
+
+.alert-warning strong {
+    color: #856404;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.alert-warning p {
+    margin: 0;
+    color: #856404;
+    font-size: 13px;
+}
+
+/* Hover effect */
+.user-task-item.tarea-vencida:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.2);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .user-task-item.tarea-vencida {
+        border-left-width: 3px !important;
+    }
+    
+    .alert-warning {
+        flex-direction: column;
+        gap: 8px;
+    }
+}
+</style>
+`;
+
+// Inyectar CSS
+if (!document.getElementById('css-vencidas-usuario')) {
+    const style = document.createElement('div');
+    style.id = 'css-vencidas-usuario';
+    style.innerHTML = cssVencidas;
+    document.head.appendChild(style);
+    console.log('✅ CSS de tareas vencidas inyectado');
+}
+
+console.log('✅ [VENCIDAS] Fix de tareas vencidas aplicado completamente en usuario');
+console.log('✅ [VENCIDAS] Sistema listo para detectar tareas vencidas');
