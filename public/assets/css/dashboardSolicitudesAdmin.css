@@ -32,11 +32,18 @@
     font-size: 20px;
 }
 
+/* ========== ✅ FIX: TABLA OCUPA 100% DEL ANCHO ========== */
 .table-responsive-admin {
     background: white;
     border-radius: 12px;
     overflow-x: auto;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    /* ✅ IGUAL QUE LOS FILTROS */
+    width: 100%;
+    max-width: 100%;
+    margin: 20px 0; /* ← Mismo margin que filtros */
+    padding: 0; /* ← Sin padding porque la tabla lo ocupa todo */
+    box-sizing: border-box;
 }
 
 .solicitudes-admin-table {
@@ -287,9 +294,10 @@
     background: #fb8c00;
 }
 
-/* ========== FILTROS (CON PREFIJO ÚNICO) ========== */
+/* ========== ✅ FIX PRINCIPAL: FILTROS Y TABLA MISMO ANCHO ========== */
 .filters-container-solicitudes-admin {
     background: white;
+    /* ✅ SOLUCIÓN: Usar padding interno que no afecte el ancho */
     padding: 20px;
     border-radius: 12px;
     margin: 20px 0;
@@ -298,6 +306,10 @@
     gap: 20px;
     flex-wrap: wrap;
     align-items: center;
+    /* ✅ CRÍTICO: box-sizing: border-box hace que el padding NO aumente el ancho */
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box; /* ← ESTO ES LA CLAVE */
 }
 
 .filter-group-solicitudes-admin {
@@ -343,6 +355,57 @@
     outline: none;
     border-color: #667eea;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* ========== ✅ FIX ADICIONAL: ASEGURAR MISMO ANCHO ========== */
+/* Ambos elementos deben tener el mismo ancho */
+.filters-container-solicitudes-admin,
+.table-responsive-admin {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    box-sizing: border-box !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+/* Eliminar cualquier padding que pueda causar diferencias */
+#solicitudesAdminContainer {
+    width: 100%;
+    padding: 0;
+}
+
+/* ========== ✅ FIX CRÍTICO: PADDING DE FILTROS ========== */
+/* El problema es que los filtros tienen padding: 20px que agranda el contenedor */
+.filters-container-solicitudes-admin {
+    padding: 20px 20px !important; /* Mantener padding interno */
+    /* Pero compensar con margin negativo si es necesario */
+}
+
+/* La tabla debe tener el MISMO padding horizontal */
+.table-responsive-admin {
+    /* Quitar padding interno para que la tabla ocupe 100% */
+    padding: 0 !important;
+}
+
+/* Agregar padding a la tabla interna en su lugar */
+.solicitudes-admin-table {
+    margin: 0;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+/* ========== ✅ ALTERNATIVA: WRAPPER COMÚN ========== */
+/* Si ambos elementos están dentro de un contenedor común */
+.solicitudes-admin-section {
+    width: 100%;
+    padding: 0;
+}
+
+.solicitudes-admin-section > * {
+    width: 100%;
+    box-sizing: border-box;
 }
 
 /* ========== ESTADÍSTICAS ========== */
@@ -649,6 +712,25 @@
     margin-top: 25px;
 }
 
+/* ========== ✅ SCROLL HORIZONTAL PERSONALIZADO ========== */
+.table-responsive-admin::-webkit-scrollbar {
+    height: 10px;
+}
+
+.table-responsive-admin::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.table-responsive-admin::-webkit-scrollbar-thumb {
+    background: #667eea;
+    border-radius: 10px;
+}
+
+.table-responsive-admin::-webkit-scrollbar-thumb:hover {
+    background: #5568d3;
+}
+
 /* ========== RESPONSIVE ========== */
 @media (max-width: 1400px) {
     .solicitudes-admin-table {
@@ -696,3 +778,5 @@
         flex-wrap: wrap;
     }
 }
+
+

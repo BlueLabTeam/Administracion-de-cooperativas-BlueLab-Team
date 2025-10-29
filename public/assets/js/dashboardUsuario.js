@@ -1,54 +1,4 @@
-// ==========================================
-// 🧪 TESTING: Simular último día del mes
-// ==========================================
 
-/**
- * Función para testing - Simula que estamos en el último día
- * AGREGAR AL INICIO DE dashboardUsuario.js
- */
-
-// ⚙️ MODO TESTING - Cambiar a true para simular último día del mes
-
-
-/**
- * Obtener último día del mes actual (con opción de testing)
-
-
-/**
- * Verificar si es el último día del mes (con opción de testing)
- */
-function esUltimoDiaMes() {
-    // 🧪 MODO TESTING: Simular que siempre es último día
-    if (MODO_TESTING_ULTIMO_DIA) {
-        console.log('🧪 [TESTING] Simulando último día del mes');
-        return true; // 👈 Siempre devuelve true en modo testing
-    }
-    
-    // Lógica normal
-    const hoy = new Date();
-    const diaActual = hoy.getDate();
-    const ultimoDia = obtenerUltimoDiaMes();
-    
-    return diaActual === ultimoDia;
-}
-
-/**
- * Días restantes hasta poder pagar (con opción de testing)
- */
-function diasHastaPago() {
-    // 🧪 MODO TESTING: Ya es último día
-    if (MODO_TESTING_ULTIMO_DIA) {
-        console.log('🧪 [TESTING] Días hasta pago: 0 (último día simulado)');
-        return 0;
-    }
-    
-    // Lógica normal
-    const hoy = new Date();
-    const diaActual = hoy.getDate();
-    const ultimoDia = obtenerUltimoDiaMes();
-    
-    return ultimoDia - diaActual;
-}
 document.addEventListener('DOMContentLoaded', function () {
     const menuItems = document.querySelectorAll('.menu li');
 
@@ -4228,53 +4178,63 @@ window.verArchivoJustificacion = verArchivoJustificacion;
 console.log('✅ Módulo de justificaciones para usuario cargado');
 
 // ==========================================
-// SISTEMA DE NÚCLEOS FAMILIARES - USUARIO
+// 🔧 FIX: NÚCLEO FAMILIAR SIN DUPLICADOS
 // ==========================================
+// Reemplazar en dashboardUsuario.js desde la línea del módulo de núcleos
 
-console.log('🟢 Cargando módulo de núcleos para usuario');
+console.log('🟢 Cargando módulo de núcleos para usuario (FIXED)');
 
-// ========== INICIALIZACIÓN OPTIMIZADA ==========
+// ========== VARIABLE GLOBAL PARA EVITAR MÚLTIPLES CARGAS ==========
+let nucleoYaCargado = false;
+let verificacionEnCurso = false;
+
+// ========== INICIALIZACIÓN OPTIMIZADA (SIN DUPLICADOS) ==========
 document.addEventListener('DOMContentLoaded', function() {
-    // ✅ Ejecutar inmediatamente cuando el DOM esté listo
-    verificarEstadoNucleo();
+    console.log('📋 DOM Ready - Preparando verificación de núcleo');
     
-    // ✅ También ejecutar cuando se active la sección de inicio
+    // ✅ SOLO ejecutar UNA VEZ cuando la página carga
+    setTimeout(() => {
+        if (!nucleoYaCargado && !verificacionEnCurso) {
+            verificarEstadoNucleo();
+        }
+    }, 500);
+    
+    // ✅ Listener para cuando se hace click en "Inicio"
     const inicioMenuItem = document.querySelector('.menu li[data-section="inicio"]');
     if (inicioMenuItem) {
         inicioMenuItem.addEventListener('click', function() {
-            // Pequeño delay para que la sección se active primero
-            setTimeout(() => {
-                verificarEstadoNucleo();
-            }, 100);
+            console.log('🏠 Click en sección Inicio');
+            
+            // Solo recargar si no se ha mostrado aún
+            if (!nucleoYaCargado) {
+                setTimeout(() => {
+                    verificarEstadoNucleo();
+                }, 100);
+            }
         });
     }
 });
 
-// Agregar animación CSS
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes slideInDown {
-        from {
-            opacity: 0;
-            transform: translateY(-20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-`;
-document.head.appendChild(style);
-
-console.log('✅ Módulo de núcleos cargado');
-
 /**
  * Verificar si el usuario tiene núcleo o debe solicitar uno
+ * ✅ CON PROTECCIÓN CONTRA DUPLICADOS
  */
 async function verificarEstadoNucleo() {
+    // 🛡️ PROTECCIÓN: Evitar múltiples ejecuciones simultáneas
+    if (verificacionEnCurso) {
+        console.log('⏳ Verificación ya en curso, saltando...');
+        return;
+    }
+    
+    if (nucleoYaCargado) {
+        console.log('✅ Núcleo ya cargado previamente, saltando...');
+        return;
+    }
+    
+    verificacionEnCurso = true;
+    console.log('🔍 Verificando estado de núcleo...');
+    
     try {
-        console.log('🔍 Verificando estado de núcleo...');
-        
         const response = await fetch('/api/users/my-profile');
         const data = await response.json();
         
@@ -4286,12 +4246,17 @@ async function verificarEstadoNucleo() {
             
             if (!inicioSection) {
                 console.error('❌ No se encontró la sección de inicio');
+                verificacionEnCurso = false;
                 return;
             }
             
-            // Remover cualquier card/banner anterior
+            // 🧹 LIMPIAR CUALQUIER CARD/BANNER ANTERIOR
             const elementosAnteriores = inicioSection.querySelectorAll('.nucleo-info-card, .banner-nucleo-invitation');
-            elementosAnteriores.forEach(el => el.remove());
+            
+            if (elementosAnteriores.length > 0) {
+                console.log('🗑️ Removiendo', elementosAnteriores.length, 'elementos anteriores');
+                elementosAnteriores.forEach(el => el.remove());
+            }
             
             const idNucleo = data.user.id_nucleo;
             console.log('🔍 id_nucleo del usuario:', idNucleo);
@@ -4305,14 +4270,21 @@ async function verificarEstadoNucleo() {
                 console.log('⚠️ Usuario sin núcleo, mostrando banner');
                 mostrarBannerNucleoEnInicio(inicioSection);
             }
+            
+            // ✅ Marcar como cargado
+            nucleoYaCargado = true;
+            console.log('✅ Núcleo cargado correctamente');
         }
     } catch (error) {
         console.error('❌ Error al verificar núcleo:', error);
+    } finally {
+        verificacionEnCurso = false;
     }
 }
 
 /**
  * Mostrar información del núcleo en la sección de inicio
+ * ✅ SIN DUPLICADOS
  */
 async function mostrarInfoNucleoEnInicio(idNucleo, inicioSection) {
     try {
@@ -4329,6 +4301,8 @@ async function mostrarInfoNucleoEnInicio(idNucleo, inicioSection) {
         const nucleo = data.nucleo;
         const miembros = data.miembros || [];
         const miId = data.mi_id;
+        
+        console.log('📋 Núcleo:', nucleo.nombre_nucleo, '- Miembros:', miembros.length);
         
         let miembrosHTML = '';
         
@@ -4381,7 +4355,7 @@ async function mostrarInfoNucleoEnInicio(idNucleo, inicioSection) {
         
         const infoHTML = `
             <div class="nucleo-info-card" style="
-                background: linear-gradient(135deg, #329cef 0%, #320a95 100%);
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
                 color: white;
                 padding: 25px;
                 border-radius: 12px;
@@ -4449,8 +4423,8 @@ async function mostrarInfoNucleoEnInicio(idNucleo, inicioSection) {
             </div>
         `;
         
-        // Insertar al principio de la sección de inicio (después del título)
-        const tituloInicio = inicioSection.querySelector('.section-title');
+        // ✅ INSERTAR AL PRINCIPIO DE LA SECCIÓN (DESPUÉS DEL TÍTULO)
+        const tituloInicio = inicioSection.querySelector('.section-title, h2');
         if (tituloInicio) {
             tituloInicio.insertAdjacentHTML('afterend', infoHTML);
         } else {
@@ -4466,6 +4440,7 @@ async function mostrarInfoNucleoEnInicio(idNucleo, inicioSection) {
 
 /**
  * Mostrar banner para unirse a un núcleo en la sección de inicio
+ * ✅ SIN DUPLICADOS
  */
 function mostrarBannerNucleoEnInicio(inicioSection) {
     const banner = `
@@ -4510,7 +4485,7 @@ function mostrarBannerNucleoEnInicio(inicioSection) {
     `;
     
     // Insertar al principio (después del título)
-    const tituloInicio = inicioSection.querySelector('.section-title');
+    const tituloInicio = inicioSection.querySelector('.section-title, h2');
     if (tituloInicio) {
         tituloInicio.insertAdjacentHTML('afterend', banner);
     } else {
@@ -4524,145 +4499,6 @@ function mostrarBannerNucleoEnInicio(inicioSection) {
  * Ver detalles del núcleo desde el inicio
  */
 async function verDetallesNucleoDesdeInicio(idNucleo) {
-    // Reutilizar la función existente
-    await verDetallesNucleoActual(idNucleo);
-}
-
-/**
- * Mostrar información del núcleo familiar actual del usuario
- */
-async function mostrarInfoNucleoActual(idNucleo) {
-    try {
-        console.log('📡 Cargando info del núcleo:', idNucleo);
-        
-        // Obtener detalles del núcleo
-        const response = await fetch(`/api/nucleos/mi-nucleo-info`);
-        const data = await response.json();
-        
-        console.log('📊 Respuesta de mi-nucleo-info:', data);
-        
-        if (!data.success) {
-            console.error('❌ Error al cargar núcleo:', data.message);
-            return;
-        }
-        
-        if (!data.nucleo) {
-            console.warn('⚠️ No se encontró información del núcleo');
-            return;
-        }
-        
-        const nucleo = data.nucleo;
-        
-        // ✅ BUSCAR CONTENEDOR
-        const posiblesContenedores = [
-            document.querySelector('.dashboard-content'),
-            document.querySelector('.section-content.active'),
-            document.querySelector('main'),
-            document.querySelector('#inicio-section'),
-            document.querySelector('.container')
-        ];
-        
-        let dashboard = null;
-        for (const contenedor of posiblesContenedores) {
-            if (contenedor) {
-                dashboard = contenedor;
-                break;
-            }
-        }
-        
-        if (!dashboard) {
-            console.error('❌ No se encontró contenedor para mostrar info del núcleo');
-            // Reintentar
-            setTimeout(() => {
-                mostrarInfoNucleoActual(idNucleo);
-            }, 1000);
-            return;
-        }
-        
-        // Remover card anterior si existe
-        const cardAnterior = document.querySelector('.nucleo-info-card');
-        if (cardAnterior) {
-            cardAnterior.remove();
-        }
-        
-        const infoHTML = `
-            <div class="nucleo-info-card" style="
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                color: white;
-                padding: 25px;
-                border-radius: 12px;
-                margin-bottom: 30px;
-                box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-                animation: slideInDown 0.5s ease-out;
-            ">
-                <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
-                    <div style="
-                        background: rgba(255,255,255,0.2);
-                        width: 80px;
-                        height: 80px;
-                        border-radius: 50%;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        font-size: 40px;
-                        backdrop-filter: blur(10px);
-                    ">
-                        👨‍👩‍👧‍👦
-                    </div>
-                    <div style="flex: 1; min-width: 250px;">
-                        <p style="margin: 0 0 5px 0; opacity: 0.9; font-size: 14px; font-weight: 500;">
-                            Tu Núcleo Familiar
-                        </p>
-                        <h3 style="margin: 0 0 10px 0; font-size: 24px; font-weight: 700;">
-                            ${nucleo.nombre_nucleo || 'Sin nombre'}
-                        </h3>
-                        <div style="display: flex; gap: 20px; font-size: 14px; opacity: 0.95; flex-wrap: wrap;">
-                            ${nucleo.direccion ? `
-                                <span>
-                                    <i class="fas fa-map-marker-alt"></i> ${nucleo.direccion}
-                                </span>
-                            ` : ''}
-                            <span>
-                                <i class="fas fa-users"></i> ${nucleo.total_miembros} miembro${nucleo.total_miembros != 1 ? 's' : ''}
-                            </span>
-                        </div>
-                    </div>
-                    <button 
-                        onclick="verDetallesNucleoActual(${idNucleo})" 
-                        class="btn btn-light"
-                        style="
-                            padding: 10px 20px; 
-                            font-weight: 600; 
-                            background: rgba(255,255,255,0.95); 
-                            color: #667eea; 
-                            border: none; 
-                            border-radius: 8px; 
-                            cursor: pointer;
-                            transition: all 0.3s ease;
-                            white-space: nowrap;
-                        "
-                        onmouseover="this.style.background='white'; this.style.transform='scale(1.05)';"
-                        onmouseout="this.style.background='rgba(255,255,255,0.95)'; this.style.transform='scale(1)';">
-                        <i class="fas fa-info-circle"></i> Ver Detalles
-                    </button>
-                </div>
-            </div>
-        `;
-        
-        console.log('✅ Insertando card del núcleo');
-        dashboard.insertAdjacentHTML('afterbegin', infoHTML);
-        console.log('✅ Card insertado correctamente');
-        
-    } catch (error) {
-        console.error('❌ Error al cargar info del núcleo:', error);
-        console.error('Stack:', error.stack);
-    }
-}
-
-/**
- * Ver detalles completos del núcleo actual
- */
-async function verDetallesNucleoActual(idNucleo) {
     try {
         const response = await fetch(`/api/nucleos/mi-nucleo-info`);
         const data = await response.json();
@@ -4719,41 +4555,9 @@ async function verDetallesNucleoActual(idNucleo) {
         }
         
         const modal = `
-            <div id="detallesNucleoModal" class="modal-overlay" style="
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: rgba(0,0,0,0.5);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                z-index: 9999;
-                backdrop-filter: blur(4px);
-            ">
-                <div class="modal-content-large" style="
-                    background: white;
-                    border-radius: 16px;
-                    max-width: 700px;
-                    width: 90%;
-                    max-height: 80vh;
-                    overflow-y: auto;
-                    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-                ">
-                    <button class="modal-close-btn" onclick="cerrarModalDetallesNucleo()" style="
-                        position: absolute;
-                        top: 15px;
-                        right: 15px;
-                        background: #f5f5f5;
-                        border: none;
-                        width: 35px;
-                        height: 35px;
-                        border-radius: 50%;
-                        font-size: 20px;
-                        cursor: pointer;
-                        color: #333;
-                    ">×</button>
+            <div id="detallesNucleoModal" class="modal-overlay" onclick="if(event.target.classList.contains('modal-overlay')) this.remove()">
+                <div class="modal-content-large" style="max-width: 700px;">
+                    <button class="modal-close-btn" onclick="document.getElementById('detallesNucleoModal').remove()">×</button>
                     
                     <div style="padding: 30px;">
                         <h2 style="margin: 0 0 10px 0; color: #333; display: flex; align-items: center; gap: 10px;">
@@ -4792,7 +4596,7 @@ async function verDetallesNucleoActual(idNucleo) {
                         ${miembrosHTML}
                         
                         <div style="margin-top: 30px; text-align: right;">
-                            <button class="btn btn-secondary" onclick="cerrarModalDetallesNucleo()">
+                            <button class="btn btn-secondary" onclick="document.getElementById('detallesNucleoModal').remove()">
                                 Cerrar
                             </button>
                         </div>
@@ -4809,116 +4613,8 @@ async function verDetallesNucleoActual(idNucleo) {
     }
 }
 
-function cerrarModalDetallesNucleo() {
-    const modal = document.getElementById('detallesNucleoModal');
-    if (modal) modal.remove();
-}
+// ========== RESTO DE FUNCIONES (Sin cambios) ==========
 
-// Exportar funciones
-window.mostrarInfoNucleoActual = mostrarInfoNucleoActual;
-window.verDetallesNucleoActual = verDetallesNucleoActual;
-window.cerrarModalDetallesNucleo = cerrarModalDetallesNucleo;
-
-
-
-/**
- * Mostrar banner invitando a unirse a un núcleo
- */
-function mostrarBannerUnirseNucleo() {
-    console.log('🎨 Intentando mostrar banner de núcleos...');
-    
-    // ✅ BUSCAR MÚLTIPLES POSIBLES CONTENEDORES
-    const posiblesContenedores = [
-        document.querySelector('.dashboard-content'),
-        document.querySelector('.section-content.active'),
-        document.querySelector('main'),
-        document.querySelector('#inicio-section'), // Sección de inicio
-        document.querySelector('.container')
-    ];
-    
-    let dashboard = null;
-    for (const contenedor of posiblesContenedores) {
-        if (contenedor) {
-            dashboard = contenedor;
-            console.log('✅ Contenedor encontrado:', contenedor.className || contenedor.id);
-            break;
-        }
-    }
-    
-    if (!dashboard) {
-        console.error('❌ No se encontró ningún contenedor válido para el banner');
-        console.log('📋 Contenedores buscados:', [
-            '.dashboard-content',
-            '.section-content.active',
-            'main',
-            '#inicio-section',
-            '.container'
-        ]);
-        
-        // Reintentar después de 1 segundo
-        console.log('⏰ Reintentando en 1 segundo...');
-        setTimeout(() => {
-            mostrarBannerUnirseNucleo();
-        }, 1000);
-        return;
-    }
-    
-    // Remover banner anterior si existe
-    const bannerAnterior = document.querySelector('.banner-nucleo-invitation');
-    if (bannerAnterior) {
-        console.log('🗑️ Removiendo banner anterior');
-        bannerAnterior.remove();
-    }
-    
-    const banner = `
-        <div class="banner-nucleo-invitation" style="
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            animation: slideInDown 0.5s ease-out;
-        ">
-            <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
-                <div style="font-size: 48px;">👨‍👩‍👧‍👦</div>
-                <div style="flex: 1; min-width: 250px;">
-                    <h3 style="margin: 0 0 10px 0; font-size: 20px;">¿Quieres unirte a un Núcleo Familiar?</h3>
-                    <p style="margin: 0; opacity: 0.9;">
-                        Los núcleos familiares permiten compartir viviendas y tareas. 
-                        Explora los núcleos disponibles y envía una solicitud.
-                    </p>
-                </div>
-                <button 
-                    onclick="abrirModalNucleosDisponibles()" 
-                    class="btn btn-light"
-                    style="
-                        padding: 12px 24px; 
-                        font-weight: 600; 
-                        background: white; 
-                        color: #667eea; 
-                        border: none; 
-                        border-radius: 8px; 
-                        cursor: pointer;
-                        transition: all 0.3s ease;
-                        white-space: nowrap;
-                    "
-                    onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.2)';"
-                    onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none';">
-                    <i class="fas fa-users"></i> Ver Núcleos
-                </button>
-            </div>
-        </div>
-    `;
-    
-    console.log('✅ Insertando banner en:', dashboard.className || dashboard.id);
-    dashboard.insertAdjacentHTML('afterbegin', banner);
-    console.log('✅ Banner insertado correctamente');
-}
-
-/**
- * Abrir modal con núcleos disponibles
- */
 async function abrirModalNucleosDisponibles() {
     try {
         const response = await fetch('/api/nucleos/disponibles');
@@ -4936,9 +4632,6 @@ async function abrirModalNucleosDisponibles() {
     }
 }
 
-/**
- * Mostrar modal con lista de núcleos
- */
 function mostrarModalNucleosDisponibles(nucleos) {
     if (!nucleos || nucleos.length === 0) {
         alert('ℹ️ No hay núcleos disponibles en este momento');
@@ -5003,41 +4696,9 @@ function mostrarModalNucleosDisponibles(nucleos) {
     });
     
     const modal = `
-        <div id="nucleosDisponiblesModal" class="modal-overlay" style="
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            backdrop-filter: blur(4px);
-        ">
-            <div class="modal-content-large" style="
-                background: white;
-                border-radius: 16px;
-                max-width: 700px;
-                width: 90%;
-                max-height: 80vh;
-                overflow-y: auto;
-                box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-            ">
-                <button class="modal-close-btn" onclick="cerrarModalNucleosDisponibles()" style="
-                    position: absolute;
-                    top: 15px;
-                    right: 15px;
-                    background: #f5f5f5;
-                    border: none;
-                    width: 35px;
-                    height: 35px;
-                    border-radius: 50%;
-                    font-size: 20px;
-                    cursor: pointer;
-                    color: #333;
-                ">×</button>
+        <div id="nucleosDisponiblesModal" class="modal-overlay" onclick="if(event.target.classList.contains('modal-overlay')) this.remove()">
+            <div class="modal-content-large" style="max-width: 700px;">
+                <button class="modal-close-btn" onclick="document.getElementById('nucleosDisponiblesModal').remove()">×</button>
                 
                 <div style="padding: 30px;">
                     <h2 style="margin: 0 0 20px 0; color: #333; display: flex; align-items: center; gap: 10px;">
@@ -5062,12 +4723,9 @@ function mostrarModalNucleosDisponibles(nucleos) {
                         ${nucleosHTML}
                     </div>
                     
-                    <div style="margin-top: 30px; display: flex; gap: 10px; justify-content: flex-end;">
-                        <button class="btn btn-secondary" onclick="cerrarModalNucleosDisponibles()">
+                    <div style="margin-top: 30px; text-align: right;">
+                        <button class="btn btn-secondary" onclick="document.getElementById('nucleosDisponiblesModal').remove()">
                             Cerrar
-                        </button>
-                        <button class="btn btn-primary" onclick="verMisSolicitudesNucleo()">
-                            <i class="fas fa-list"></i> Mis Solicitudes
                         </button>
                     </div>
                 </div>
@@ -5078,10 +4736,57 @@ function mostrarModalNucleosDisponibles(nucleos) {
     document.body.insertAdjacentHTML('beforeend', modal);
 }
 
-function cerrarModalNucleosDisponibles() {
-    const modal = document.getElementById('nucleosDisponiblesModal');
-    if (modal) modal.remove();
+async function solicitarUnirseNucleo(idNucleo, nombreNucleo) {
+    const mensaje = prompt(`Mensaje opcional para el administrador del núcleo "${nombreNucleo}":`);
+    
+    if (mensaje === null) return;
+    
+    if (!confirm(`¿Enviar solicitud para unirte al núcleo "${nombreNucleo}"?`)) {
+        return;
+    }
+    
+    try {
+        const formData = new FormData();
+        formData.append('id_nucleo', idNucleo);
+        formData.append('mensaje', mensaje || '');
+        
+        const response = await fetch('/api/nucleos/solicitar-unirse', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert('✅ ' + data.message);
+            document.getElementById('nucleosDisponiblesModal').remove();
+            
+            // Recargar
+            nucleoYaCargado = false;
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
+        } else {
+            alert('❌ ' + data.message);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Error de conexión');
+    }
 }
+
+function truncarTexto(texto, maxLength) {
+    if (!texto || texto.length <= maxLength) return texto;
+    return texto.substring(0, maxLength) + '...';
+}
+
+// Exportar funciones
+window.verificarEstadoNucleo = verificarEstadoNucleo;
+window.abrirModalNucleosDisponibles = abrirModalNucleosDisponibles;
+window.solicitarUnirseNucleo = solicitarUnirseNucleo;
+window.verDetallesNucleoDesdeInicio = verDetallesNucleoDesdeInicio;
+
+console.log('✅ Módulo de núcleos para usuario cargado (FIXED - Sin duplicados)');
 
 /**
  * Enviar solicitud para unirse a un núcleo
@@ -5339,3 +5044,364 @@ window.verDetallesNucleoDesdeInicio = verDetallesNucleoDesdeInicio;
 
 
 console.log('✅ Módulo de núcleos para usuario cargado completamente');
+
+// ==========================================
+// 🔧 FIX GLOBAL DE FECHAS - ZONA HORARIA URUGUAY
+// ==========================================
+// 📝 AGREGAR AL FINAL DE dashboardUsuario.js Y dashboardAdmin.js
+// ==========================================
+
+console.log('🌍 [FIX FECHAS] Iniciando configuración para Uruguay...');
+
+/**
+ * PROBLEMA IDENTIFICADO:
+ * - new Date('2025-01-15') → se interpreta como UTC medianoche
+ * - Si estás en UTC-3 (Uruguay), muestra 14 de enero 21:00
+ * - new Date('2025-01-15T00:00:00') → TAMBIÉN se interpreta como UTC
+ * - Solución: Agregar EXPLÍCITAMENTE la zona horaria local
+ */
+
+// ========== FUNCIONES GLOBALES DE FORMATO DE FECHAS ==========
+
+/**
+ * Parsear fecha SQL (YYYY-MM-DD) en zona horaria local de Uruguay
+ * ✅ SOLUCIÓN: Agregar 'T00:00:00' para forzar medianoche local
+ */
+function parseFechaLocal(fechaSQL) {
+    if (!fechaSQL) return null;
+    
+    // ✅ CORRECTO: Agregar T00:00:00 para interpretación local
+    return new Date(fechaSQL + 'T00:00:00');
+}
+
+/**
+ * Formatear fecha en formato DD/MM/YYYY (Uruguay)
+ */
+function formatearFechaUY(fecha) {
+    if (!fecha) return '-';
+    
+    const f = parseFechaLocal(fecha);
+    
+    return f.toLocaleDateString('es-UY', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        timeZone: 'America/Montevideo'
+    });
+}
+
+/**
+ * Formatear fecha y hora completa
+ */
+function formatearFechaHoraUY(fechaHora) {
+    if (!fechaHora) return '-';
+    
+    const f = new Date(fechaHora);
+    
+    return f.toLocaleString('es-UY', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        timeZone: 'America/Montevideo'
+    });
+}
+
+/**
+ * Formatear fecha en formato largo (ej: "15 de enero de 2025")
+ */
+function formatearFechaLargaUY(fecha) {
+    if (!fecha) return '-';
+    
+    const f = parseFechaLocal(fecha);
+    
+    return f.toLocaleDateString('es-UY', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+        timeZone: 'America/Montevideo'
+    });
+}
+
+/**
+ * Obtener fecha actual en formato SQL (YYYY-MM-DD) - Uruguay
+ */
+function getFechaActualSQL() {
+    const ahora = new Date();
+    
+    // Formatear en zona horaria de Uruguay
+    const opciones = {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        timeZone: 'America/Montevideo'
+    };
+    
+    const partes = ahora.toLocaleDateString('es-UY', opciones).split('/');
+    return `${partes[2]}-${partes[1]}-${partes[0]}`; // YYYY-MM-DD
+}
+
+/**
+ * Obtener hora actual en formato HH:MM:SS - Uruguay
+ */
+function getHoraActualSQL() {
+    const ahora = new Date();
+    
+    return ahora.toLocaleTimeString('es-UY', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false,
+        timeZone: 'America/Montevideo'
+    });
+}
+
+// ========== APLICAR FIXES EN TODO EL SISTEMA ==========
+
+/**
+ * Fix para dashboardUsuario.js - Tareas
+ */
+function fixFechasTareas() {
+    console.log('🔧 Aplicando fix de fechas en tareas...');
+    
+    // Reemplazar en renderUserTasks
+    window.renderUserTasks_ORIGINAL = window.renderUserTasks;
+    
+    window.renderUserTasks = function(tareas, containerId, esNucleo = false) {
+        const container = document.getElementById(containerId);
+
+        if (!tareas || tareas.length === 0) {
+            container.innerHTML = '<div class="no-tasks">No tienes tareas asignadas</div>';
+            return;
+        }
+
+        container.innerHTML = tareas.map(tarea => {
+            // ✅ FIX: Usar parseFechaLocal
+            const fechaInicio = formatearFechaUY(tarea.fecha_inicio);
+            const fechaFin = formatearFechaUY(tarea.fecha_fin);
+            
+            const progreso = tarea.progreso || 0;
+            const esCompletada = tarea.estado_usuario === 'completada';
+
+            return `
+                <div class="user-task-item prioridad-${tarea.prioridad} ${esCompletada ? 'completada' : ''}">
+                    <div class="user-task-header">
+                        <h4 class="user-task-title">${tarea.titulo}</h4>
+                        <div class="user-task-badges">
+                            <span class="task-badge badge-estado">${formatEstadoUsuario(tarea.estado_usuario)}</span>
+                            <span class="task-badge badge-prioridad ${tarea.prioridad}">${formatPrioridad(tarea.prioridad)}</span>
+                            ${esNucleo ? '<span class="task-badge" style="background: #6f42c1; color: white;">Núcleo</span>' : ''}
+                        </div>
+                    </div>
+                    
+                    <p class="user-task-description">${tarea.descripcion}</p>
+                    
+                    <div class="user-task-meta">
+                        <div><strong>Inicio:</strong> ${fechaInicio}</div>
+                        <div><strong>Fin:</strong> ${fechaFin}</div>
+                        <div><strong>Creado por:</strong> ${tarea.creador}</div>
+                    </div>
+                    
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" style="width: ${progreso}%">
+                            ${progreso}%
+                        </div>
+                    </div>
+                    
+                    ${!esCompletada ? `
+                        <div class="user-task-actions">
+                            <button class="btn-small btn-update" onclick="updateTaskProgress(${tarea.id_asignacion}, '${esNucleo ? 'nucleo' : 'usuario'}', ${tarea.id_tarea})">
+                                Actualizar Progreso
+                            </button>
+                            <button class="btn-small btn-avance" onclick="addTaskAvance(${tarea.id_tarea})">
+                                Reportar Avance
+                            </button>
+                            <button class="btn-small btn-materiales" onclick="viewTaskMaterials(${tarea.id_tarea})" title="Ver materiales necesarios">
+                                <i class="fas fa-boxes"></i> Materiales
+                            </button>
+                            <button class="btn-small btn-detalles" onclick="viewUserTaskDetails(${tarea.id_tarea})">
+                                Ver Detalles Completos
+                            </button>
+                        </div>
+                    ` : '<p style="color: #28a745; margin-top: 10px;"><strong>✓ Tarea completada</strong></p>'}
+                </div>
+            `;
+        }).join('');
+    };
+    
+    console.log('✅ Fix de fechas en tareas aplicado');
+}
+
+/**
+ * Fix para dashboardAdmin.js - Tareas Admin
+ */
+function fixFechasTareasAdmin() {
+    console.log('🔧 Aplicando fix de fechas en tareas admin...');
+    
+    // Reemplazar en renderTasksList
+    window.renderTasksList_ORIGINAL = window.renderTasksList;
+    
+    window.renderTasksList = function(tareas) {
+        const container = document.getElementById('tasksList');
+
+        if (!tareas || tareas.length === 0) {
+            container.innerHTML = '<p class="no-tasks">No hay tareas creadas</p>';
+            return;
+        }
+
+        container.innerHTML = tareas.map(tarea => {
+            // ✅ FIX: Usar formatearFechaUY
+            const fechaInicio = formatearFechaUY(tarea.fecha_inicio);
+            const fechaFin = formatearFechaUY(tarea.fecha_fin);
+            
+            const asignados = tarea.tipo_asignacion === 'usuario' ?
+                `${tarea.total_usuarios} usuario(s)` :
+                `${tarea.total_nucleos} núcleo(s)`;
+
+            const progresoPromedio = Math.round(parseFloat(tarea.progreso_promedio || 0));
+            const totalAsignados = tarea.tipo_asignacion === 'usuario' ?
+                parseInt(tarea.total_usuarios) :
+                parseInt(tarea.total_nucleos);
+            const completados = parseInt(tarea.asignaciones_completadas || 0);
+
+            const estadoFinal = tarea.estado;
+            const esCompletada = estadoFinal === 'completada';
+            const esCancelada = estadoFinal === 'cancelada';
+
+            return `
+                <div class="task-item prioridad-${tarea.prioridad} ${esCompletada ? 'tarea-completada' : ''}">
+                    <div class="task-header">
+                        <h4 class="task-title">${tarea.titulo}</h4>
+                        <div class="task-badges">
+                            <span class="task-badge badge-estado ${esCompletada ? 'completada' : ''} ${esCancelada ? 'cancelada' : ''}">
+                                ${formatEstado(tarea.estado)}
+                            </span>
+                            <span class="task-badge badge-prioridad ${tarea.prioridad}">${formatPrioridad(tarea.prioridad)}</span>
+                        </div>
+                    </div>
+                    <p class="task-description">${tarea.descripcion}</p>
+                    
+                    <div class="task-meta">
+                        <div class="task-meta-item"><strong>Inicio:</strong> ${fechaInicio}</div>
+                        <div class="task-meta-item"><strong>Fin:</strong> ${fechaFin}</div>
+                        <div class="task-meta-item"><strong>Creado por:</strong> ${tarea.creador}</div>
+                        <div class="task-meta-item"><strong>Asignado a:</strong> ${asignados}</div>
+                    </div>
+                    
+                    ${!esCancelada ? `
+                        <div class="task-progress-section">
+                            <div class="progress-info">
+                                <span class="progress-label">Progreso general:</span>
+                                <span class="progress-percentage">${progresoPromedio}%</span>
+                                <span class="progress-completed">${completados}/${totalAsignados} completados</span>
+                            </div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" style="width: ${progresoPromedio}%; background: ${esCompletada ? '#28a745' : '#667eea'};">
+                                </div>
+                            </div>
+                        </div>
+                    ` : ''}
+                    
+                    ${!esCancelada ? `
+                        <div class="task-actions">
+                            <button class="btn btn-small btn-view" onclick="viewTaskDetails(${tarea.id_tarea})">Ver Detalles</button>
+                            <button class="btn btn-small btn-materiales" onclick="viewTaskMaterialsAdmin(${tarea.id_tarea})">
+                                <i class="fas fa-boxes"></i> Materiales
+                            </button>
+                            ${!esCompletada ? `
+                                <button class="btn btn-small btn-cancel" onclick="cancelTask(${tarea.id_tarea})">Cancelar Tarea</button>
+                            ` : `
+                                <span style="color: #28a745; font-weight: bold; padding: 5px 10px;">
+                                    ✓ Tarea Completada
+                                </span>
+                            `}
+                        </div>
+                    ` : '<p style="color: #dc3545; margin-top: 10px;"><strong>Esta tarea ha sido cancelada</strong></p>'}
+                </div>
+            `;
+        }).join('');
+    };
+    
+    console.log('✅ Fix de fechas en tareas admin aplicado');
+}
+
+/**
+ * Fix para Registro de Horas
+ */
+function fixFechasRegistroHoras() {
+    console.log('🔧 Aplicando fix de fechas en registro de horas...');
+    
+    // Reemplazar formatearFechaSimple si existe
+    window.formatearFechaSimple = formatearFechaUY;
+    
+    console.log('✅ Fix de fechas en registro de horas aplicado');
+}
+
+/**
+ * Fix para Solicitudes
+ */
+function fixFechasSolicitudes() {
+    console.log('🔧 Aplicando fix de fechas en solicitudes...');
+    
+    // La función de renderizado de solicitudes ya usa toLocaleDateString
+    // pero podemos asegurarnos que use la zona horaria correcta
+    
+    console.log('✅ Fix de fechas en solicitudes aplicado');
+}
+
+// ========== INICIALIZACIÓN AUTOMÁTICA ==========
+
+// NO usar DOMContentLoaded porque el script se ejecuta al final
+// Ejecutar inmediatamente
+console.log('🌍 [FIX FECHAS] Inicializando sistema de fechas para Uruguay...');
+console.log('📅 [FIX FECHAS] Zona horaria detectada:', Intl.DateTimeFormat().resolvedOptions().timeZone);
+
+try {
+    console.log('📅 [FIX FECHAS] Fecha actual SQL:', getFechaActualSQL());
+    console.log('⏰ [FIX FECHAS] Hora actual SQL:', getHoraActualSQL());
+} catch (e) {
+    console.warn('⚠️ [FIX FECHAS] Funciones aún no definidas, se definirán a continuación');
+}
+
+// ========== EXPORTAR FUNCIONES GLOBALES ==========
+
+window.parseFechaLocal = parseFechaLocal;
+window.formatearFechaUY = formatearFechaUY;
+window.formatearFechaHoraUY = formatearFechaHoraUY;
+window.formatearFechaLargaUY = formatearFechaLargaUY;
+window.getFechaActualSQL = getFechaActualSQL;
+window.getHoraActualSQL = getHoraActualSQL;
+
+console.log('✅ [FIX FECHAS] Funciones exportadas:', {
+    parseFechaLocal: typeof window.parseFechaLocal,
+    formatearFechaUY: typeof window.formatearFechaUY,
+    getFechaActualSQL: typeof window.getFechaActualSQL
+});
+
+// ========== APLICAR FIXES AUTOMÁTICAMENTE ==========
+
+// Esperar un momento para que otras funciones se carguen
+setTimeout(function() {
+    console.log('🔧 [FIX FECHAS] Aplicando fixes automáticos...');
+    
+    try {
+        fixFechasTareas();
+        fixFechasTareasAdmin();
+        fixFechasRegistroHoras();
+        console.log('✅ [FIX FECHAS] Sistema de fechas configurado correctamente');
+        console.log('📅 [FIX FECHAS] Zona horaria:', Intl.DateTimeFormat().resolvedOptions().timeZone);
+        console.log('📅 [FIX FECHAS] Fecha actual SQL:', getFechaActualSQL());
+        console.log('⏰ [FIX FECHAS] Hora actual SQL:', getHoraActualSQL());
+        
+        // Prueba
+        console.log('🧪 [FIX FECHAS] Prueba: formatearFechaUY("2025-01-15") =', formatearFechaUY('2025-01-15'));
+    } catch (error) {
+        console.warn('⚠️ [FIX FECHAS] Error al aplicar fixes:', error);
+    }
+}, 1000);
+
+
+
+console.log('✅ [FIX FECHAS] Módulo cargado - Zona horaria: America/Montevideo');
+

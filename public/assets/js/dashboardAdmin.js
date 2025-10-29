@@ -5177,3 +5177,365 @@ window.submitRespuestaAdmin = submitRespuestaAdmin;
 window.cambiarEstadoSolicitud = cambiarEstadoSolicitud;
 
 console.log('✅ Módulo de solicitudes ADMIN cargado completamente');
+
+// ==========================================
+// 🔧 FIX GLOBAL DE FECHAS - ZONA HORARIA URUGUAY
+// ==========================================
+// 📝 AGREGAR AL FINAL DE dashboardUsuario.js Y dashboardAdmin.js
+// ==========================================
+
+console.log('🌍 [FIX FECHAS] Iniciando configuración para Uruguay...');
+
+/**
+ * PROBLEMA IDENTIFICADO:
+ * - new Date('2025-01-15') → se interpreta como UTC medianoche
+ * - Si estás en UTC-3 (Uruguay), muestra 14 de enero 21:00
+ * - new Date('2025-01-15T00:00:00') → TAMBIÉN se interpreta como UTC
+ * - Solución: Agregar EXPLÍCITAMENTE la zona horaria local
+ */
+
+// ========== FUNCIONES GLOBALES DE FORMATO DE FECHAS ==========
+
+/**
+ * Parsear fecha SQL (YYYY-MM-DD) en zona horaria local de Uruguay
+ * ✅ SOLUCIÓN: Agregar 'T00:00:00' para forzar medianoche local
+ */
+function parseFechaLocal(fechaSQL) {
+    if (!fechaSQL) return null;
+    
+    // ✅ CORRECTO: Agregar T00:00:00 para interpretación local
+    return new Date(fechaSQL + 'T00:00:00');
+}
+
+/**
+ * Formatear fecha en formato DD/MM/YYYY (Uruguay)
+ */
+function formatearFechaUY(fecha) {
+    if (!fecha) return '-';
+    
+    const f = parseFechaLocal(fecha);
+    
+    return f.toLocaleDateString('es-UY', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        timeZone: 'America/Montevideo'
+    });
+}
+
+/**
+ * Formatear fecha y hora completa
+ */
+function formatearFechaHoraUY(fechaHora) {
+    if (!fechaHora) return '-';
+    
+    const f = new Date(fechaHora);
+    
+    return f.toLocaleString('es-UY', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        timeZone: 'America/Montevideo'
+    });
+}
+
+/**
+ * Formatear fecha en formato largo (ej: "15 de enero de 2025")
+ */
+function formatearFechaLargaUY(fecha) {
+    if (!fecha) return '-';
+    
+    const f = parseFechaLocal(fecha);
+    
+    return f.toLocaleDateString('es-UY', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+        timeZone: 'America/Montevideo'
+    });
+}
+
+/**
+ * Obtener fecha actual en formato SQL (YYYY-MM-DD) - Uruguay
+ */
+function getFechaActualSQL() {
+    const ahora = new Date();
+    
+    // Formatear en zona horaria de Uruguay
+    const opciones = {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        timeZone: 'America/Montevideo'
+    };
+    
+    const partes = ahora.toLocaleDateString('es-UY', opciones).split('/');
+    return `${partes[2]}-${partes[1]}-${partes[0]}`; // YYYY-MM-DD
+}
+
+/**
+ * Obtener hora actual en formato HH:MM:SS - Uruguay
+ */
+function getHoraActualSQL() {
+    const ahora = new Date();
+    
+    return ahora.toLocaleTimeString('es-UY', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false,
+        timeZone: 'America/Montevideo'
+    });
+}
+
+// ========== APLICAR FIXES EN TODO EL SISTEMA ==========
+
+/**
+ * Fix para dashboardUsuario.js - Tareas
+ */
+function fixFechasTareas() {
+    console.log('🔧 Aplicando fix de fechas en tareas...');
+    
+    // Reemplazar en renderUserTasks
+    window.renderUserTasks_ORIGINAL = window.renderUserTasks;
+    
+    window.renderUserTasks = function(tareas, containerId, esNucleo = false) {
+        const container = document.getElementById(containerId);
+
+        if (!tareas || tareas.length === 0) {
+            container.innerHTML = '<div class="no-tasks">No tienes tareas asignadas</div>';
+            return;
+        }
+
+        container.innerHTML = tareas.map(tarea => {
+            // ✅ FIX: Usar parseFechaLocal
+            const fechaInicio = formatearFechaUY(tarea.fecha_inicio);
+            const fechaFin = formatearFechaUY(tarea.fecha_fin);
+            
+            const progreso = tarea.progreso || 0;
+            const esCompletada = tarea.estado_usuario === 'completada';
+
+            return `
+                <div class="user-task-item prioridad-${tarea.prioridad} ${esCompletada ? 'completada' : ''}">
+                    <div class="user-task-header">
+                        <h4 class="user-task-title">${tarea.titulo}</h4>
+                        <div class="user-task-badges">
+                            <span class="task-badge badge-estado">${formatEstadoUsuario(tarea.estado_usuario)}</span>
+                            <span class="task-badge badge-prioridad ${tarea.prioridad}">${formatPrioridad(tarea.prioridad)}</span>
+                            ${esNucleo ? '<span class="task-badge" style="background: #6f42c1; color: white;">Núcleo</span>' : ''}
+                        </div>
+                    </div>
+                    
+                    <p class="user-task-description">${tarea.descripcion}</p>
+                    
+                    <div class="user-task-meta">
+                        <div><strong>Inicio:</strong> ${fechaInicio}</div>
+                        <div><strong>Fin:</strong> ${fechaFin}</div>
+                        <div><strong>Creado por:</strong> ${tarea.creador}</div>
+                    </div>
+                    
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" style="width: ${progreso}%">
+                            ${progreso}%
+                        </div>
+                    </div>
+                    
+                    ${!esCompletada ? `
+                        <div class="user-task-actions">
+                            <button class="btn-small btn-update" onclick="updateTaskProgress(${tarea.id_asignacion}, '${esNucleo ? 'nucleo' : 'usuario'}', ${tarea.id_tarea})">
+                                Actualizar Progreso
+                            </button>
+                            <button class="btn-small btn-avance" onclick="addTaskAvance(${tarea.id_tarea})">
+                                Reportar Avance
+                            </button>
+                            <button class="btn-small btn-materiales" onclick="viewTaskMaterials(${tarea.id_tarea})" title="Ver materiales necesarios">
+                                <i class="fas fa-boxes"></i> Materiales
+                            </button>
+                            <button class="btn-small btn-detalles" onclick="viewUserTaskDetails(${tarea.id_tarea})">
+                                Ver Detalles Completos
+                            </button>
+                        </div>
+                    ` : '<p style="color: #28a745; margin-top: 10px;"><strong>✓ Tarea completada</strong></p>'}
+                </div>
+            `;
+        }).join('');
+    };
+    
+    console.log('✅ Fix de fechas en tareas aplicado');
+}
+
+/**
+ * Fix para dashboardAdmin.js - Tareas Admin
+ */
+function fixFechasTareasAdmin() {
+    console.log('🔧 Aplicando fix de fechas en tareas admin...');
+    
+    // Reemplazar en renderTasksList
+    window.renderTasksList_ORIGINAL = window.renderTasksList;
+    
+    window.renderTasksList = function(tareas) {
+        const container = document.getElementById('tasksList');
+
+        if (!tareas || tareas.length === 0) {
+            container.innerHTML = '<p class="no-tasks">No hay tareas creadas</p>';
+            return;
+        }
+
+        container.innerHTML = tareas.map(tarea => {
+            // ✅ FIX: Usar formatearFechaUY
+            const fechaInicio = formatearFechaUY(tarea.fecha_inicio);
+            const fechaFin = formatearFechaUY(tarea.fecha_fin);
+            
+            const asignados = tarea.tipo_asignacion === 'usuario' ?
+                `${tarea.total_usuarios} usuario(s)` :
+                `${tarea.total_nucleos} núcleo(s)`;
+
+            const progresoPromedio = Math.round(parseFloat(tarea.progreso_promedio || 0));
+            const totalAsignados = tarea.tipo_asignacion === 'usuario' ?
+                parseInt(tarea.total_usuarios) :
+                parseInt(tarea.total_nucleos);
+            const completados = parseInt(tarea.asignaciones_completadas || 0);
+
+            const estadoFinal = tarea.estado;
+            const esCompletada = estadoFinal === 'completada';
+            const esCancelada = estadoFinal === 'cancelada';
+
+            return `
+                <div class="task-item prioridad-${tarea.prioridad} ${esCompletada ? 'tarea-completada' : ''}">
+                    <div class="task-header">
+                        <h4 class="task-title">${tarea.titulo}</h4>
+                        <div class="task-badges">
+                            <span class="task-badge badge-estado ${esCompletada ? 'completada' : ''} ${esCancelada ? 'cancelada' : ''}">
+                                ${formatEstado(tarea.estado)}
+                            </span>
+                            <span class="task-badge badge-prioridad ${tarea.prioridad}">${formatPrioridad(tarea.prioridad)}</span>
+                        </div>
+                    </div>
+                    <p class="task-description">${tarea.descripcion}</p>
+                    
+                    <div class="task-meta">
+                        <div class="task-meta-item"><strong>Inicio:</strong> ${fechaInicio}</div>
+                        <div class="task-meta-item"><strong>Fin:</strong> ${fechaFin}</div>
+                        <div class="task-meta-item"><strong>Creado por:</strong> ${tarea.creador}</div>
+                        <div class="task-meta-item"><strong>Asignado a:</strong> ${asignados}</div>
+                    </div>
+                    
+                    ${!esCancelada ? `
+                        <div class="task-progress-section">
+                            <div class="progress-info">
+                                <span class="progress-label">Progreso general:</span>
+                                <span class="progress-percentage">${progresoPromedio}%</span>
+                                <span class="progress-completed">${completados}/${totalAsignados} completados</span>
+                            </div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" style="width: ${progresoPromedio}%; background: ${esCompletada ? '#28a745' : '#667eea'};">
+                                </div>
+                            </div>
+                        </div>
+                    ` : ''}
+                    
+                    ${!esCancelada ? `
+                        <div class="task-actions">
+                            <button class="btn btn-small btn-view" onclick="viewTaskDetails(${tarea.id_tarea})">Ver Detalles</button>
+                            <button class="btn btn-small btn-materiales" onclick="viewTaskMaterialsAdmin(${tarea.id_tarea})">
+                                <i class="fas fa-boxes"></i> Materiales
+                            </button>
+                            ${!esCompletada ? `
+                                <button class="btn btn-small btn-cancel" onclick="cancelTask(${tarea.id_tarea})">Cancelar Tarea</button>
+                            ` : `
+                                <span style="color: #28a745; font-weight: bold; padding: 5px 10px;">
+                                    ✓ Tarea Completada
+                                </span>
+                            `}
+                        </div>
+                    ` : '<p style="color: #dc3545; margin-top: 10px;"><strong>Esta tarea ha sido cancelada</strong></p>'}
+                </div>
+            `;
+        }).join('');
+    };
+    
+    console.log('✅ Fix de fechas en tareas admin aplicado');
+}
+
+/**
+ * Fix para Registro de Horas
+ */
+function fixFechasRegistroHoras() {
+    console.log('🔧 Aplicando fix de fechas en registro de horas...');
+    
+    // Reemplazar formatearFechaSimple si existe
+    window.formatearFechaSimple = formatearFechaUY;
+    
+    console.log('✅ Fix de fechas en registro de horas aplicado');
+}
+
+/**
+ * Fix para Solicitudes
+ */
+function fixFechasSolicitudes() {
+    console.log('🔧 Aplicando fix de fechas en solicitudes...');
+    
+    // La función de renderizado de solicitudes ya usa toLocaleDateString
+    // pero podemos asegurarnos que use la zona horaria correcta
+    
+    console.log('✅ Fix de fechas en solicitudes aplicado');
+}
+
+// ========== INICIALIZACIÓN AUTOMÁTICA ==========
+
+// NO usar DOMContentLoaded porque el script se ejecuta al final
+// Ejecutar inmediatamente
+console.log('🌍 [FIX FECHAS] Inicializando sistema de fechas para Uruguay...');
+console.log('📅 [FIX FECHAS] Zona horaria detectada:', Intl.DateTimeFormat().resolvedOptions().timeZone);
+
+try {
+    console.log('📅 [FIX FECHAS] Fecha actual SQL:', getFechaActualSQL());
+    console.log('⏰ [FIX FECHAS] Hora actual SQL:', getHoraActualSQL());
+} catch (e) {
+    console.warn('⚠️ [FIX FECHAS] Funciones aún no definidas, se definirán a continuación');
+}
+
+// ========== EXPORTAR FUNCIONES GLOBALES ==========
+
+window.parseFechaLocal = parseFechaLocal;
+window.formatearFechaUY = formatearFechaUY;
+window.formatearFechaHoraUY = formatearFechaHoraUY;
+window.formatearFechaLargaUY = formatearFechaLargaUY;
+window.getFechaActualSQL = getFechaActualSQL;
+window.getHoraActualSQL = getHoraActualSQL;
+
+console.log('✅ [FIX FECHAS] Funciones exportadas:', {
+    parseFechaLocal: typeof window.parseFechaLocal,
+    formatearFechaUY: typeof window.formatearFechaUY,
+    getFechaActualSQL: typeof window.getFechaActualSQL
+});
+
+// ========== APLICAR FIXES AUTOMÁTICAMENTE ==========
+
+// Esperar un momento para que otras funciones se carguen
+setTimeout(function() {
+    console.log('🔧 [FIX FECHAS] Aplicando fixes automáticos...');
+    
+    try {
+        fixFechasTareas();
+        fixFechasTareasAdmin();
+        fixFechasRegistroHoras();
+        console.log('✅ [FIX FECHAS] Sistema de fechas configurado correctamente');
+        console.log('📅 [FIX FECHAS] Zona horaria:', Intl.DateTimeFormat().resolvedOptions().timeZone);
+        console.log('📅 [FIX FECHAS] Fecha actual SQL:', getFechaActualSQL());
+        console.log('⏰ [FIX FECHAS] Hora actual SQL:', getHoraActualSQL());
+        
+        // Prueba
+        console.log('🧪 [FIX FECHAS] Prueba: formatearFechaUY("2025-01-15") =', formatearFechaUY('2025-01-15'));
+    } catch (error) {
+        console.warn('⚠️ [FIX FECHAS] Error al aplicar fixes:', error);
+    }
+}, 1000);
+
+// ========== HELPER: REEMPLAZAR FUNCIONES EXISTENTES ==========
+
+
+console.log('✅ [FIX FECHAS] Módulo cargado - Zona horaria: America/Montevideo');
+
