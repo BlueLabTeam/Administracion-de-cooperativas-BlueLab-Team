@@ -311,7 +311,7 @@
 /* ========== BOTONES ESPECIALES ========== */
 .btn-edit,
 .btn-small.btn-edit {
-    background: var(--color-warning);
+    background: #3263d5;
     color: var(--color-gray-800);
     border: none;
 }
