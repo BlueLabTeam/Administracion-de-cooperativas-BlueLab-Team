@@ -185,12 +185,12 @@
 }
 
 .btn-small.btn-primary {
-    background: #667eea;
+    background: R#0927af;
     color: white;
 }
 
 .btn-small.btn-primary:hover {
-    background: #5568d3;
+    background: #102186;
 }
 
 /* Mensaje de sin datos */

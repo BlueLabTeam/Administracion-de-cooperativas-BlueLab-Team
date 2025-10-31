@@ -2181,7 +2181,7 @@ function mostrarNotificacionCambio() {
         position: fixed;
         top: 20px;
         right: 20px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #69b2d5 0%, #1b1397 100%);
         color: white;
         padding: 15px 20px;
         border-radius: 8px;
@@ -2385,7 +2385,7 @@ html += `
                         <div style="margin-top: 10px;">
                             <div class="progress-bar-container" style="background: rgba(0,0,0,0.3); height: 25px; border-radius: 12px; overflow: hidden;">
                                 <div class="progress-bar" style="width: ${Math.min((cuotaMasReciente.horas_cumplidas / cuotaMasReciente.horas_requeridas) * 100, 100)}%; 
-                                     background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); 
+                                     background: linear-gradient(135deg, #69b2d5 0%, #1b1397 100%); 
                                      height: 100%; 
                                      display: flex; 
                                      align-items: center; 
@@ -3031,7 +3031,7 @@ function renderMisCuotasOrganizadas(cuotas) {
                         <div style="margin-top: 10px;">
                             <div class="progress-bar-container" style="background: rgba(0,0,0,0.3); height: 25px; border-radius: 12px; overflow: hidden;">
                                 <div class="progress-bar" style="width: ${Math.min((cuotaMasReciente.horas_cumplidas / cuotaMasReciente.horas_requeridas) * 100, 100)}%; 
-                                     background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); 
+                                     background: linear-gradient(135deg, #69b2d5 0%, #1b1397 100%); 
                                      height: 100%; 
                                      display: flex; 
                                      align-items: center; 
@@ -4412,7 +4412,7 @@ async function mostrarInfoNucleoEnInicio(idNucleo, inicioSection) {
         
         const infoHTML = `
             <div class="nucleo-info-card" style="
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                background: linear-gradient(135deg, #69b2d5 0%, #1b1397 100%); 
                 color: white;
                 padding: 25px;
                 border-radius: 12px;
@@ -4502,7 +4502,7 @@ async function mostrarInfoNucleoEnInicio(idNucleo, inicioSection) {
 function mostrarBannerNucleoEnInicio(inicioSection) {
     const banner = `
         <div class="banner-nucleo-invitation" style="
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #69b2d5 0%, #1b1397 100%); 
             color: white;
             padding: 20px;
             border-radius: 12px;
@@ -4629,7 +4629,7 @@ async function verDetallesNucleoDesdeInicio(idNucleo) {
                         ` : ''}
                         
                         <div style="
-                            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                            background: linear-gradient(135deg, #69b2d5 0%, #1b1397 100%); 
                             color: white;
                             padding: 20px;
                             border-radius: 12px;

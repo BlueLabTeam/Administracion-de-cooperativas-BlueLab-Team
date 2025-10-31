@@ -63,7 +63,20 @@ document.addEventListener('DOMContentLoaded', function () {
 
 console.log('=== Definiendo funciones globales ===');
 
-
+const COLORS = {
+    primary: '#005CB9',
+    primaryDark: '#004494',
+    primaryLight: '#E3F2FD',
+    white: '#FFFFFF',
+    gray50: '#F5F7FA',
+    gray100: '#E8EBF0',
+    gray500: '#6C757D',
+    gray700: '#495057',
+    success: '#4CAF50',
+    warning: '#FF9800',
+    danger: '#F44336',
+    shadow: '0 4px 12px rgba(0, 92, 185, 0.12)'
+};
 
 // ==========================================
 // 🔧 FIX PARA MODALES EN ADMIN
@@ -149,34 +162,137 @@ function viewUserDetails(userId) {
 
 function showUserDetailModal(user) {
     console.log('👁️ [MODAL] Mostrando modal para:', user.nombre_completo);
-
-    // 🧹 LIMPIAR ANTES DE CREAR
     limpiarModalesAnteriores();
 
     const modalHTML = `
-        <div class="user-detail-modal" onclick="if(event.target.classList.contains('user-detail-modal')) { this.remove(); }">
-            <div class="user-detail-content">
-                <button class="user-detail-close" onclick="limpiarModalesAnteriores()">
+        <div class="user-detail-modal" 
+             style="
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                bottom: 0 !important;
+                background: rgba(0, 68, 148, 0.5) !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                z-index: 10000 !important;
+                padding: 20px !important;
+                overflow-y: auto !important;
+             "
+             onclick="if(event.target.classList.contains('user-detail-modal')) { limpiarModalesAnteriores(); }">
+            
+            <div class="user-detail-content" 
+                 style="
+                    background: ${COLORS.white} !important;
+                    border-radius: 12px !important;
+                    box-shadow: ${COLORS.shadow} !important;
+                    max-width: 600px !important;
+                    width: 100% !important;
+                    padding: 30px !important;
+                    position: relative !important;
+                    max-height: 90vh !important;
+                    overflow-y: auto !important;
+                 "
+                 onclick="event.stopPropagation()">
+                
+                <button class="user-detail-close" 
+                        onclick="limpiarModalesAnteriores()"
+                        style="
+                            position: absolute !important;
+                            top: 15px !important;
+                            right: 15px !important;
+                            background: ${COLORS.gray100} !important;
+                            border: none !important;
+                            width: 35px !important;
+                            height: 35px !important;
+                            border-radius: 50% !important;
+                            font-size: 20px !important;
+                            color: ${COLORS.gray500} !important;
+                            cursor: pointer !important;
+                            transition: all 0.3s ease !important;
+                        "
+                        onmouseover="this.style.background='${COLORS.primary}'; this.style.color='${COLORS.white}'"
+                        onmouseout="this.style.background='${COLORS.gray100}'; this.style.color='${COLORS.gray500}'">
                     &times;
                 </button>
                 
-                <h2>${user.nombre_completo}</h2>
-                <span class="estado-badge estado-${user.estado}">
+                <h2 style="
+                    margin: 0 0 10px 0;
+                    color: ${COLORS.primary};
+                    font-size: 24px;
+                    padding-right: 40px;
+                ">
+                    ${user.nombre_completo}
+                </h2>
+                
+                <span class="estado-badge estado-${user.estado}" 
+                      style="
+                        display: inline-block;
+                        padding: 5px 12px;
+                        border-radius: 20px;
+                        font-size: 12px;
+                        font-weight: 600;
+                        text-transform: uppercase;
+                        margin-bottom: 20px;
+                      ">
                     ${formatEstadoUsuario(user.estado)}
                 </span>
                 
-                <div style="margin-top: 20px;">
-                    <p><strong>Cédula:</strong> ${user.cedula}</p>
-                    <p><strong>Email:</strong> ${user.email}</p>
-                    <p><strong>Dirección:</strong> ${user.direccion || '-'}</p>
-                    <p><strong>Fecha Nacimiento:</strong> ${user.fecha_nacimiento || '-'}</p>
-                    <p><strong>Fecha Ingreso:</strong> ${user.fecha_ingreso || '-'}</p>
-                    <p><strong>Rol:</strong> ${user.rol || 'Sin rol'}</p>
-                    <p><strong>Núcleo:</strong> ${user.id_nucleo ? `#${user.id_nucleo}` : 'Sin núcleo'}</p>
+                <div style="
+                    margin-top: 20px;
+                    padding: 20px;
+                    background: ${COLORS.primaryLight};
+                    border-radius: 8px;
+                    border-left: 4px solid ${COLORS.primary};
+                ">
+                    <p style="margin: 10px 0; display: flex; align-items: center; gap: 10px; color: ${COLORS.gray700};">
+                        <strong style="min-width: 150px; color: ${COLORS.primary};">
+                            <i class="fas fa-id-card"></i> Cédula:
+                        </strong>
+                        <span>${user.cedula}</span>
+                    </p>
+                    <p style="margin: 10px 0; display: flex; align-items: center; gap: 10px; color: ${COLORS.gray700};">
+                        <strong style="min-width: 150px; color: ${COLORS.primary};">
+                            <i class="fas fa-envelope"></i> Email:
+                        </strong>
+                        <span>${user.email}</span>
+                    </p>
+                    <p style="margin: 10px 0; display: flex; align-items: center; gap: 10px; color: ${COLORS.gray700};">
+                        <strong style="min-width: 150px; color: ${COLORS.primary};">
+                            <i class="fas fa-map-marker-alt"></i> Dirección:
+                        </strong>
+                        <span>${user.direccion || '-'}</span>
+                    </p>
+                    <p style="margin: 10px 0; display: flex; align-items: center; gap: 10px; color: ${COLORS.gray700};">
+                        <strong style="min-width: 150px; color: ${COLORS.primary};">
+                            <i class="fas fa-birthday-cake"></i> Fecha Nacimiento:
+                        </strong>
+                        <span>${user.fecha_nacimiento || '-'}</span>
+                    </p>
+                    <p style="margin: 10px 0; display: flex; align-items: center; gap: 10px; color: ${COLORS.gray700};">
+                        <strong style="min-width: 150px; color: ${COLORS.primary};">
+                            <i class="fas fa-calendar-plus"></i> Fecha Ingreso:
+                        </strong>
+                        <span>${user.fecha_ingreso || '-'}</span>
+                    </p>
+                    <p style="margin: 10px 0; display: flex; align-items: center; gap: 10px; color: ${COLORS.gray700};">
+                        <strong style="min-width: 150px; color: ${COLORS.primary};">
+                            <i class="fas fa-user-tag"></i> Rol:
+                        </strong>
+                        <span>${user.rol || 'Sin rol'}</span>
+                    </p>
+                    <p style="margin: 10px 0; display: flex; align-items: center; gap: 10px; color: ${COLORS.gray700};">
+                        <strong style="min-width: 150px; color: ${COLORS.primary};">
+                            <i class="fas fa-users"></i> Núcleo:
+                        </strong>
+                        <span>${user.id_nucleo ? `#${user.id_nucleo}` : 'Sin núcleo'}</span>
+                    </p>
                 </div>
                 
                 <div style="margin-top: 20px; text-align: right;">
-                    <button class="btn btn-secondary" onclick="limpiarModalesAnteriores()">
+                    <button class="btn btn-secondary" 
+                            onclick="limpiarModalesAnteriores()">
                         Cerrar
                     </button>
                 </div>
@@ -185,6 +301,7 @@ function showUserDetailModal(user) {
     `;
 
     document.body.insertAdjacentHTML('beforeend', modalHTML);
+    document.body.style.overflow = 'hidden';
 }
 
 // ==========================================
@@ -1624,31 +1741,137 @@ function viewUserDetails(userId) {
 
 function showUserDetailModal(user) {
     console.log('👁️ [MODAL] Mostrando modal para:', user.nombre_completo);
+    limpiarModalesAnteriores();
 
     const modalHTML = `
-        <div class="user-detail-modal" onclick="if(event.target.classList.contains('user-detail-modal')) this.remove()">
-            <div class="user-detail-content">
-                <button class="user-detail-close" onclick="this.closest('.user-detail-modal').remove()">
+        <div class="user-detail-modal" 
+             style="
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                bottom: 0 !important;
+                background: rgba(0, 68, 148, 0.5) !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                z-index: 10000 !important;
+                padding: 20px !important;
+                overflow-y: auto !important;
+             "
+             onclick="if(event.target.classList.contains('user-detail-modal')) { limpiarModalesAnteriores(); }">
+            
+            <div class="user-detail-content" 
+                 style="
+                    background: ${COLORS.white} !important;
+                    border-radius: 12px !important;
+                    box-shadow: ${COLORS.shadow} !important;
+                    max-width: 600px !important;
+                    width: 100% !important;
+                    padding: 30px !important;
+                    position: relative !important;
+                    max-height: 90vh !important;
+                    overflow-y: auto !important;
+                 "
+                 onclick="event.stopPropagation()">
+                
+                <button class="user-detail-close" 
+                        onclick="limpiarModalesAnteriores()"
+                        style="
+                            position: absolute !important;
+                            top: 15px !important;
+                            right: 15px !important;
+                            background: ${COLORS.gray100} !important;
+                            border: none !important;
+                            width: 35px !important;
+                            height: 35px !important;
+                            border-radius: 50% !important;
+                            font-size: 20px !important;
+                            color: ${COLORS.gray500} !important;
+                            cursor: pointer !important;
+                            transition: all 0.3s ease !important;
+                        "
+                        onmouseover="this.style.background='${COLORS.primary}'; this.style.color='${COLORS.white}'"
+                        onmouseout="this.style.background='${COLORS.gray100}'; this.style.color='${COLORS.gray500}'">
                     &times;
                 </button>
                 
-                <h2>${user.nombre_completo}</h2>
-                <span class="estado-badge estado-${user.estado}">
+                <h2 style="
+                    margin: 0 0 10px 0;
+                    color: ${COLORS.primary};
+                    font-size: 24px;
+                    padding-right: 40px;
+                ">
+                    ${user.nombre_completo}
+                </h2>
+                
+                <span class="estado-badge estado-${user.estado}" 
+                      style="
+                        display: inline-block;
+                        padding: 5px 12px;
+                        border-radius: 20px;
+                        font-size: 12px;
+                        font-weight: 600;
+                        text-transform: uppercase;
+                        margin-bottom: 20px;
+                      ">
                     ${formatEstadoUsuario(user.estado)}
                 </span>
                 
-                <div style="margin-top: 20px;">
-                    <p><strong>Cédula:</strong> ${user.cedula}</p>
-                    <p><strong>Email:</strong> ${user.email}</p>
-                    <p><strong>Dirección:</strong> ${user.direccion || '-'}</p>
-                    <p><strong>Fecha Nacimiento:</strong> ${user.fecha_nacimiento || '-'}</p>
-                    <p><strong>Fecha Ingreso:</strong> ${user.fecha_ingreso || '-'}</p>
-                    <p><strong>Rol:</strong> ${user.rol || 'Sin rol'}</p>
-                    <p><strong>Núcleo:</strong> ${user.id_nucleo ? `#${user.id_nucleo}` : 'Sin núcleo'}</p>
+                <div style="
+                    margin-top: 20px;
+                    padding: 20px;
+                    background: ${COLORS.primaryLight};
+                    border-radius: 8px;
+                    border-left: 4px solid ${COLORS.primary};
+                ">
+                    <p style="margin: 10px 0; display: flex; align-items: center; gap: 10px; color: ${COLORS.gray700};">
+                        <strong style="min-width: 150px; color: ${COLORS.primary};">
+                            <i class="fas fa-id-card"></i> Cédula:
+                        </strong>
+                        <span>${user.cedula}</span>
+                    </p>
+                    <p style="margin: 10px 0; display: flex; align-items: center; gap: 10px; color: ${COLORS.gray700};">
+                        <strong style="min-width: 150px; color: ${COLORS.primary};">
+                            <i class="fas fa-envelope"></i> Email:
+                        </strong>
+                        <span>${user.email}</span>
+                    </p>
+                    <p style="margin: 10px 0; display: flex; align-items: center; gap: 10px; color: ${COLORS.gray700};">
+                        <strong style="min-width: 150px; color: ${COLORS.primary};">
+                            <i class="fas fa-map-marker-alt"></i> Dirección:
+                        </strong>
+                        <span>${user.direccion || '-'}</span>
+                    </p>
+                    <p style="margin: 10px 0; display: flex; align-items: center; gap: 10px; color: ${COLORS.gray700};">
+                        <strong style="min-width: 150px; color: ${COLORS.primary};">
+                            <i class="fas fa-birthday-cake"></i> Fecha Nacimiento:
+                        </strong>
+                        <span>${user.fecha_nacimiento || '-'}</span>
+                    </p>
+                    <p style="margin: 10px 0; display: flex; align-items: center; gap: 10px; color: ${COLORS.gray700};">
+                        <strong style="min-width: 150px; color: ${COLORS.primary};">
+                            <i class="fas fa-calendar-plus"></i> Fecha Ingreso:
+                        </strong>
+                        <span>${user.fecha_ingreso || '-'}</span>
+                    </p>
+                    <p style="margin: 10px 0; display: flex; align-items: center; gap: 10px; color: ${COLORS.gray700};">
+                        <strong style="min-width: 150px; color: ${COLORS.primary};">
+                            <i class="fas fa-user-tag"></i> Rol:
+                        </strong>
+                        <span>${user.rol || 'Sin rol'}</span>
+                    </p>
+                    <p style="margin: 10px 0; display: flex; align-items: center; gap: 10px; color: ${COLORS.gray700};">
+                        <strong style="min-width: 150px; color: ${COLORS.primary};">
+                            <i class="fas fa-users"></i> Núcleo:
+                        </strong>
+                        <span>${user.id_nucleo ? `#${user.id_nucleo}` : 'Sin núcleo'}</span>
+                    </p>
                 </div>
                 
                 <div style="margin-top: 20px; text-align: right;">
-                    <button class="btn btn-secondary" onclick="this.closest('.user-detail-modal').remove()">
+                    <button class="btn btn-secondary" 
+                            onclick="limpiarModalesAnteriores()">
                         Cerrar
                     </button>
                 </div>
@@ -1657,6 +1880,7 @@ function showUserDetailModal(user) {
     `;
 
     document.body.insertAdjacentHTML('beforeend', modalHTML);
+    document.body.style.overflow = 'hidden';
 }
 
 console.log('🔵 [INIT] Todas las funciones de usuarios cargadas');
@@ -3341,37 +3565,58 @@ function renderPreciosCuotas(precios) {
         return;
     }
 
-    // Ordenar precios por número de habitaciones (1, 2, 3)
     precios.sort((a, b) => a.habitaciones - b.habitaciones);
     
     let html = '<div class="precios-grid">';
     
     precios.forEach(precio => {
-        const iconos = {
-            1: '🏠',
-            2: '🏡',
-            3: '👨‍👩‍👧‍👦'
-        };
+        const iconos = { 1: '🏠', 2: '🏡', 3: '👨‍👩‍👧‍👦' };
 
         html += `
-            <div class="precio-card">
-                <div class="precio-header">
+            <div style="
+                background: ${COLORS.white};
+                border-radius: 12px;
+                padding: 24px;
+                box-shadow: ${COLORS.shadow};
+                transition: all 0.3s ease;
+                border-top: 4px solid ${COLORS.primary};
+            " onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 8px 24px rgba(0, 92, 185, 0.16)'" 
+               onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='${COLORS.shadow}'">
+                
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
                     <div>
-                        <span style="font-size: 32px; display: block; margin-bottom: 10px;">
+                        <span style="font-size: 40px; display: block; margin-bottom: 10px;">
                             ${iconos[precio.habitaciones] || '🏠'}
                         </span>
-                        <h4>${precio.tipo_vivienda}</h4>
+                        <h4 style="color: ${COLORS.primary}; font-size: 18px; margin: 0;">${precio.tipo_vivienda}</h4>
                     </div>
-                    <span class="precio-badge">${precio.habitaciones} hab.</span>
+                    <span style="
+                        background: ${COLORS.primaryLight};
+                        color: ${COLORS.primary};
+                        padding: 6px 12px;
+                        border-radius: 20px;
+                        font-size: 12px;
+                        font-weight: 600;
+                    ">${precio.habitaciones} hab.</span>
                 </div>
 
-                <div class="precio-monto">
-                    <span class="precio-label">Cuota Mensual:</span>
-                    <span class="precio-valor">$${parseFloat(precio.monto_mensual).toLocaleString('es-UY', {minimumFractionDigits: 2})}</span>
+                <div style="margin: 20px 0;">
+                    <span style="color: ${COLORS.gray500}; font-size: 13px; display: block; margin-bottom: 5px;">Cuota Mensual:</span>
+                    <span style="color: ${COLORS.primary}; font-size: 32px; font-weight: 700;">
+                        $${parseFloat(precio.monto_mensual).toLocaleString('es-UY', {minimumFractionDigits: 2})}
+                    </span>
                 </div>
 
-                <div class="precio-footer">
-                    <small>Vigente desde: ${new Date(precio.fecha_vigencia_desde + 'T00:00:00').toLocaleDateString('es-UY')}</small>
+                <div style="
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    padding-top: 15px;
+                    border-top: 1px solid ${COLORS.gray100};
+                ">
+                    <small style="color: ${COLORS.gray500};">
+                        Vigente desde: ${new Date(precio.fecha_vigencia_desde + 'T00:00:00').toLocaleDateString('es-UY')}
+                    </small>
                     <button class="btn-small btn-edit" onclick="editarPrecioCuota(${precio.id_tipo}, '${precio.tipo_vivienda}', ${precio.monto_mensual})">
                         <i class="fas fa-edit"></i> Editar
                     </button>
@@ -3584,23 +3829,28 @@ function renderAllCuotasAdmin(cuotas) {
     const container = document.getElementById('allCuotasAdminContainer');
     
     if (!cuotas || cuotas.length === 0) {
-        container.innerHTML = '<div class="no-data"><p>No se encontraron cuotas</p></div>';
+        container.innerHTML = `
+            <div style="text-align: center; padding: 60px 20px;">
+                <i class="fas fa-inbox" style="font-size: 48px; color: ${COLORS.gray100}; display: block; margin-bottom: 15px;"></i>
+                <p style="color: ${COLORS.gray500};">No se encontraron cuotas</p>
+            </div>
+        `;
         return;
     }
     
     let html = `
-        <div class="table-responsive">
-            <table class="cuotas-admin-table">
+        <div style="overflow-x: auto; border-radius: 12px; box-shadow: ${COLORS.shadow};">
+            <table style="width: 100%; border-collapse: collapse; background: ${COLORS.white}; min-width: 1200px;">
                 <thead>
-                    <tr>
-                        <th>Usuario</th>
-                        <th>Vivienda</th>
-                        <th>Período</th>
-                        <th>Monto</th>
-                        <th>Estado</th>
-                        <th>Horas</th>
-                        <th>Vencimiento</th>
-                        <th>Acciones</th>
+                    <tr style="background: linear-gradient(135deg, ${COLORS.primary} 0%, ${COLORS.primaryDark} 100%); color: ${COLORS.white};">
+                        <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;">Usuario</th>
+                        <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;">Vivienda</th>
+                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Período</th>
+                        <th style="padding: 15px 12px; text-align: right; font-weight: 600; font-size: 13px;">Monto</th>
+                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Estado</th>
+                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Horas</th>
+                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Vencimiento</th>
+                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -3614,58 +3864,101 @@ function renderAllCuotasAdmin(cuotas) {
         const nombreUsuario = cuota.nombre_completo || 'Usuario';
         const emailUsuario = cuota.email || '';
         
-       html += `
-    <tr class="cuota-row estado-${estadoFinal}">
-        <td>
-            <strong>${nombreUsuario}</strong><br>
-            <small>${emailUsuario}</small>
-        </td>
-        <td>${cuota.numero_vivienda}<br><small>${cuota.tipo_vivienda}</small></td>
-        <td>${mes} ${cuota.anio}</td>
-        <td><strong>$${parseFloat(cuota.monto_total || cuota.monto_base || cuota.monto || 0).toLocaleString('es-UY', {minimumFractionDigits: 2})}</strong></td>
-                <td><span class="cuota-badge badge-${estadoFinal}">${formatEstadoCuota(estadoFinal)}</span></td>
-                <td>
-                    <div class="horas-info">
-                        ${cuota.horas_cumplidas || 0}h / ${cuota.horas_requeridas}h
-                        ${cuota.horas_validadas ? '<br><small style="color: #ffffffff;">✓ Validadas</small>' : ''}
+        let estadoColor = '';
+        let estadoText = '';
+        if (estadoFinal === 'pagada') {
+            estadoColor = COLORS.success;
+            estadoText = 'Pagada';
+        } else if (estadoFinal === 'pendiente') {
+            estadoColor = COLORS.warning;
+            estadoText = 'Pendiente';
+        } else if (estadoFinal === 'vencida') {
+            estadoColor = COLORS.danger;
+            estadoText = 'Vencida';
+        } else if (estadoFinal === 'exonerada') {
+            estadoColor = COLORS.primary;
+            estadoText = 'Exonerada';
+        }
+        
+        html += `
+            <tr style="border-bottom: 1px solid ${COLORS.gray100}; transition: all 0.2s ease;" 
+                onmouseover="this.style.background='${COLORS.primaryLight}'" 
+                onmouseout="this.style.background='${COLORS.white}'">
+                
+                <td style="padding: 14px 12px; font-size: 13px;">
+                    <div style="font-weight: 600; color: ${COLORS.primary};">${nombreUsuario}</div>
+                    <div style="font-size: 11px; color: ${COLORS.gray500}; margin-top: 3px;">${emailUsuario}</div>
+                </td>
+                
+                <td style="padding: 14px 12px; font-size: 13px; color: ${COLORS.gray700};">
+                    ${cuota.numero_vivienda}<br>
+                    <small style="color: ${COLORS.gray500};">${cuota.tipo_vivienda}</small>
+                </td>
+                
+                <td style="padding: 14px 12px; text-align: center; font-weight: 600; color: ${COLORS.gray700};">
+                    ${mes} ${cuota.anio}
+                </td>
+                
+                <td style="padding: 14px 12px; text-align: right; font-weight: 600; font-size: 14px; color: ${COLORS.primary};">
+                    $${parseFloat(cuota.monto_total || cuota.monto_base || cuota.monto || 0).toLocaleString('es-UY', {minimumFractionDigits: 2})}
+                </td>
+                
+                <td style="padding: 14px 12px; text-align: center;">
+                    <span style="
+                        display: inline-block;
+                        padding: 6px 12px;
+                        border-radius: 20px;
+                        font-size: 11px;
+                        font-weight: 600;
+                        text-transform: uppercase;
+                        background: ${estadoColor};
+                        color: ${COLORS.white};
+                    ">${estadoText}</span>
+                </td>
+                
+                <td style="padding: 14px 12px; text-align: center; font-size: 13px; color: ${COLORS.gray700};">
+                    <div style="font-weight: 600;">${cuota.horas_cumplidas || 0}h / ${cuota.horas_requeridas}h</div>
+                    ${cuota.horas_validadas ? `<small style="color: ${COLORS.success};">✓ Validadas</small>` : ''}
+                </td>
+                
+                <td style="padding: 14px 12px; text-align: center; font-size: 13px; color: ${COLORS.gray700};">
+                    ${new Date(cuota.fecha_vencimiento + 'T00:00:00').toLocaleDateString('es-UY')}
+                </td>
+                
+                <td style="padding: 14px 12px;">
+                    <div style="display: flex; gap: 5px; justify-content: center; flex-wrap: wrap;">
+                        ${tienePagoPendiente ? `
+                            <button class="btn-small btn-primary" 
+                                    onclick="abrirValidarPagoModal(${cuota.id_pago}, ${cuota.id_cuota})" 
+                                    title="Validar pago">
+                                <i class="fas fa-check-circle"></i>
+                            </button>
+                        ` : ''}
+                        
+                        ${cuota.comprobante_archivo ? `
+                            <button class="btn-small btn-secondary" 
+                                    onclick="verComprobanteAdmin('${cuota.comprobante_archivo}')" 
+                                    title="Ver comprobante">
+                                <i class="fas fa-image"></i>
+                            </button>
+                        ` : ''}
+                        
+                        ${cuota.horas_cumplidas < cuota.horas_requeridas ? `
+                            <button class="btn-small btn-success" 
+                                    onclick="abrirModalJustificarHoras(
+                                        ${cuota.id_cuota}, 
+                                        ${cuota.id_usuario}, 
+                                        '${(cuota.nombre_completo || 'Usuario').replace(/'/g, "\\'")}',
+                                        ${cuota.mes},
+                                        ${cuota.anio},
+                                        ${cuota.horas_requeridas - (cuota.horas_cumplidas || 0)}
+                                    )" 
+                                    title="Justificar horas faltantes">
+                                <i class="fas fa-check-circle"></i> Justificar
+                            </button>
+                        ` : ''}
                     </div>
                 </td>
-                <td>${new Date(cuota.fecha_vencimiento + 'T00:00:00').toLocaleDateString('es-UY')}</td>
-              <td>
-    <div class="action-buttons-compact">
-        ${tienePagoPendiente ? `
-            <button class="btn-small btn-primary" 
-                    onclick="abrirValidarPagoModal(${cuota.id_pago}, ${cuota.id_cuota})" 
-                    title="Validar pago">
-                <i class="fas fa-check-circle"></i>
-            </button>
-        ` : ''}
-        
-        ${cuota.comprobante_archivo ? `
-            <button class="btn-small btn-secondary" 
-                    onclick="verComprobanteAdmin('${cuota.comprobante_archivo}')" 
-                    title="Ver comprobante">
-                <i class="fas fa-image"></i>
-            </button>
-        ` : ''}
-        
-        <!-- ✅ BOTÓN JUSTIFICAR HORAS -->
-        ${cuota.horas_cumplidas < cuota.horas_requeridas ? `
-            <button class="btn-small btn-success" 
-                    onclick="abrirModalJustificarHoras(
-                        ${cuota.id_cuota}, 
-                        ${cuota.id_usuario}, 
-                        '${(cuota.nombre_completo || 'Usuario').replace(/'/g, "\\'")}',
-                        ${cuota.mes},
-                        ${cuota.anio},
-                        ${cuota.horas_requeridas - (cuota.horas_cumplidas || 0)}
-                    )" 
-                    title="Justificar horas faltantes">
-                <i class="fas fa-check-circle"></i> Justificar
-            </button>
-        ` : ''}
-    </div>
-</td>
             </tr>
         `;
     });
@@ -4225,16 +4518,8 @@ console.log('🟢 Cargando módulo de justificación de horas');
  * @param {number} horasFaltantes - Horas faltantes del usuario
  */
 async function abrirModalJustificarHoras(cuotaId, idUsuario, nombreUsuario, mes, anio, horasFaltantes) {
-    console.log('📝 Abriendo modal justificar horas:', {
-        cuotaId,
-        idUsuario,
-        nombreUsuario,
-        mes,
-        anio,
-        horasFaltantes
-    });
+    console.log('📝 Abriendo modal justificar horas');
 
-    // Cargar justificaciones existentes
     let justificacionesHTML = '';
     try {
         const response = await fetch(`/api/justificaciones/usuario?id_usuario=${idUsuario}&mes=${mes}&anio=${anio}`);
@@ -4244,14 +4529,20 @@ async function abrirModalJustificarHoras(cuotaId, idUsuario, nombreUsuario, mes,
             const totalJustificado = data.justificaciones.reduce((sum, j) => sum + parseFloat(j.horas_justificadas), 0);
             
             justificacionesHTML = `
-                <div class="alert-info" style="margin-bottom: 20px;">
-                    <strong>ℹ️ Justificaciones Existentes:</strong>
-                    <p>Total ya justificado: <strong>${totalJustificado}h</strong></p>
+                <div style="
+                    background: ${COLORS.primaryLight};
+                    padding: 15px;
+                    border-radius: 8px;
+                    margin-bottom: 20px;
+                    border-left: 4px solid ${COLORS.primary};
+                ">
+                    <strong style="color: ${COLORS.primary};">ℹ️ Justificaciones Existentes:</strong>
+                    <p style="color: ${COLORS.gray700}; margin: 10px 0;">Total ya justificado: <strong>${totalJustificado}h</strong></p>
                     <ul style="margin: 10px 0 0 20px; padding: 0;">
                         ${data.justificaciones.map(j => `
-                            <li>
+                            <li style="color: ${COLORS.gray700}; margin: 5px 0;">
                                 ${j.horas_justificadas}h - ${j.motivo} 
-                                <small style="color: #666;">(${new Date(j.fecha_justificacion).toLocaleDateString('es-UY')})</small>
+                                <small style="color: ${COLORS.gray500};">(${new Date(j.fecha_justificacion).toLocaleDateString('es-UY')})</small>
                                 <button class="btn-small btn-danger" onclick="eliminarJustificacion(${j.id_justificacion}, ${cuotaId}, ${idUsuario}, ${mes}, ${anio})" title="Eliminar">
                                     <i class="fas fa-trash"></i>
                                 </button>
@@ -4270,14 +4561,14 @@ async function abrirModalJustificarHoras(cuotaId, idUsuario, nombreUsuario, mes,
             <div class="modal-content-large">
                 <button class="modal-close-btn" onclick="cerrarModalJustificarHoras()">×</button>
                 
-                <h2 class="modal-title">
+                <h2 class="modal-title" style="color: ${COLORS.primary};">
                     <i class="fas fa-check-circle"></i> Justificar Horas
                 </h2>
 
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-                    <strong>👤 Usuario:</strong> ${nombreUsuario}<br>
-                    <strong>📅 Período:</strong> ${obtenerNombreMes(mes)} ${anio}<br>
-                    <strong>⏰ Horas Faltantes:</strong> <span style="color: ${horasFaltantes > 0 ? '#f44336' : '#4caf50'}; font-weight: bold;">${horasFaltantes}h</span>
+                <div style="background: ${COLORS.gray50}; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <strong style="color: ${COLORS.primary};">👤 Usuario:</strong> ${nombreUsuario}<br>
+                    <strong style="color: ${COLORS.primary};">📅 Período:</strong> ${obtenerNombreMes(mes)} ${anio}<br>
+                    <strong style="color: ${COLORS.primary};">⏰ Horas Faltantes:</strong> <span style="color: ${horasFaltantes > 0 ? COLORS.danger : COLORS.success}; font-weight: bold;">${horasFaltantes}h</span>
                 </div>
 
                 ${justificacionesHTML}
@@ -4288,7 +4579,7 @@ async function abrirModalJustificarHoras(cuotaId, idUsuario, nombreUsuario, mes,
                     <input type="hidden" name="anio" value="${anio}">
 
                     <div class="form-group">
-                        <label for="horas-justificadas">
+                        <label for="horas-justificadas" style="color: ${COLORS.primary};">
                             <i class="fas fa-clock"></i> Horas a Justificar *
                         </label>
                         <input 
@@ -4300,11 +4591,11 @@ async function abrirModalJustificarHoras(cuotaId, idUsuario, nombreUsuario, mes,
                             step="0.5"
                             placeholder="Ej: 8"
                             required>
-                        <small class="form-help">Máximo: ${horasFaltantes}h (Descuento: $160 por hora)</small>
+                        <small style="color: ${COLORS.gray500}; font-size: 12px;">Máximo: ${horasFaltantes}h (Descuento: $160 por hora)</small>
                     </div>
 
                     <div class="form-group">
-                        <label for="motivo-justificacion">
+                        <label for="motivo-justificacion" style="color: ${COLORS.primary};">
                             <i class="fas fa-file-alt"></i> Motivo de la Justificación *
                         </label>
                         <select id="motivo-justificacion" name="motivo" required onchange="toggleOtroMotivo(this)">
@@ -4319,7 +4610,7 @@ async function abrirModalJustificarHoras(cuotaId, idUsuario, nombreUsuario, mes,
                     </div>
 
                     <div class="form-group" id="otro-motivo-group" style="display: none;">
-                        <label for="otro-motivo">
+                        <label for="otro-motivo" style="color: ${COLORS.primary};">
                             <i class="fas fa-edit"></i> Especifique el motivo *
                         </label>
                         <input 
@@ -4330,7 +4621,7 @@ async function abrirModalJustificarHoras(cuotaId, idUsuario, nombreUsuario, mes,
                     </div>
 
                     <div class="form-group">
-                        <label for="observaciones-justificacion">
+                        <label for="observaciones-justificacion" style="color: ${COLORS.primary};">
                             <i class="fas fa-comment"></i> Observaciones Adicionales
                         </label>
                         <textarea 
@@ -4341,7 +4632,7 @@ async function abrirModalJustificarHoras(cuotaId, idUsuario, nombreUsuario, mes,
                     </div>
 
                     <div class="form-group">
-                        <label for="archivo-justificacion">
+                        <label for="archivo-justificacion" style="color: ${COLORS.primary};">
                             <i class="fas fa-paperclip"></i> Archivo de Respaldo (Opcional)
                         </label>
                         <input 
@@ -4349,13 +4640,19 @@ async function abrirModalJustificarHoras(cuotaId, idUsuario, nombreUsuario, mes,
                             id="archivo-justificacion" 
                             name="archivo"
                             accept="image/*,.pdf">
-                        <small class="form-help">Certificado médico, documentación legal, etc. (máx. 5MB)</small>
+                        <small style="color: ${COLORS.gray500}; font-size: 12px;">Certificado médico, documentación legal, etc. (máx. 5MB)</small>
                     </div>
 
-                    <div class="alert-warning">
-                        <strong>⚠️ Confirmación:</strong>
-                        <p>Al justificar horas, se descontará $160 por cada hora de la deuda del usuario.</p>
-                        <p>Esta acción quedará registrada en el sistema.</p>
+                    <div style="
+                        background: #FFF3E0;
+                        border-left: 4px solid ${COLORS.warning};
+                        padding: 15px;
+                        border-radius: 8px;
+                        margin-bottom: 20px;
+                    ">
+                        <strong style="color: ${COLORS.warning};">⚠️ Confirmación:</strong>
+                        <p style="color: ${COLORS.gray700}; margin: 5px 0;">Al justificar horas, se descontará $160 por cada hora de la deuda del usuario.</p>
+                        <p style="color: ${COLORS.gray700}; margin: 5px 0;">Esta acción quedará registrada en el sistema.</p>
                     </div>
 
                     <div class="form-actions">
@@ -4624,121 +4921,121 @@ function renderTablaReporte(usuarios) {
     const container = document.getElementById('reporteTableContainer');
     
     if (!usuarios || usuarios.length === 0) {
-        container.innerHTML = '<p style="text-align: center; padding: 40px; color: #999;">No hay usuarios para este período</p>';
+        container.innerHTML = `<p style="text-align: center; padding: 40px; color: ${COLORS.gray500};">No hay usuarios para este período</p>`;
         return;
     }
     
     let html = `
-        <div style="overflow-x: auto; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
-            <table style="width: 100%; border-collapse: collapse; background: white; min-width: 1000px;">
+        <div style="overflow-x: auto; border-radius: 8px; box-shadow: ${COLORS.shadow};">
+            <table style="width: 100%; border-collapse: collapse; background: ${COLORS.white}; min-width: 1000px;">
                 <thead>
-                    <tr style="background: linear-gradient(135deg, #005CB9 0%, #004a94 100%); color: white;">
-                        <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px; text-transform: uppercase;">Usuario</th>
-                        <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px; text-transform: uppercase;">Vivienda</th>
-                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px; text-transform: uppercase;">Horas</th>
-                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px; text-transform: uppercase;">Cumplimiento</th>
-                        <th style="padding: 15px 12px; text-align: right; font-weight: 600; font-size: 13px; text-transform: uppercase;">Deuda ($)</th>
-                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px; text-transform: uppercase;">Tareas</th>
-                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px; text-transform: uppercase;">Cuota</th>
-                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px; text-transform: uppercase;">Estado</th>
+                    <tr style="background: linear-gradient(135deg, ${COLORS.primary} 0%, ${COLORS.primaryDark} 100%); color: ${COLORS.white};">
+                        <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;">Usuario</th>
+                        <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;">Vivienda</th>
+                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Horas</th>
+                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Cumplimiento</th>
+                        <th style="padding: 15px 12px; text-align: right; font-weight: 600; font-size: 13px;">Deuda ($)</th>
+                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Tareas</th>
+                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Cuota</th>
+                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Estado</th>
                     </tr>
                 </thead>
                 <tbody>
     `;
     
-    usuarios.forEach((usuario, index) => {
+    usuarios.forEach((usuario) => {
         const cumplimiento = usuario.porcentaje_cumplimiento || 0;
         
-        let cumplimientoColor = '#dc3545';
-        if (cumplimiento >= 90) cumplimientoColor = '#28a745';
-        else if (cumplimiento >= 70) cumplimientoColor = '#17a2b8';
-        else if (cumplimiento >= 50) cumplimientoColor = '#ffc107';
+        let cumplimientoColor = COLORS.danger;
+        if (cumplimiento >= 90) cumplimientoColor = COLORS.success;
+        else if (cumplimiento >= 70) cumplimientoColor = COLORS.primary;
+        else if (cumplimiento >= 50) cumplimientoColor = COLORS.warning;
         
-        let estadoColor = '#dc3545';
+        let estadoColor = COLORS.danger;
         let estadoText = 'Crítico';
         if (usuario.estado_general === 'excelente') {
-            estadoColor = '#28a745';
+            estadoColor = COLORS.success;
             estadoText = 'Excelente';
         } else if (usuario.estado_general === 'bueno') {
-            estadoColor = '#17a2b8';
+            estadoColor = COLORS.primary;
             estadoText = 'Bueno';
         } else if (usuario.estado_general === 'regular') {
-            estadoColor = '#ffc107';
+            estadoColor = COLORS.warning;
             estadoText = 'Regular';
         }
         
-        let cuotaColor = '#999';
+        let cuotaColor = COLORS.gray500;
         let cuotaText = 'Sin cuota';
         if (usuario.estado_cuota === 'pagada') {
-            cuotaColor = '#28a745';
+            cuotaColor = COLORS.success;
             cuotaText = 'Pagada';
         } else if (usuario.estado_cuota === 'pendiente') {
-            cuotaColor = '#ffc107';
+            cuotaColor = COLORS.warning;
             cuotaText = 'Pendiente';
         } else if (usuario.estado_cuota === 'vencida') {
-            cuotaColor = '#dc3545';
+            cuotaColor = COLORS.danger;
             cuotaText = 'Vencida';
         }
         
         html += `
-            <tr style="border-bottom: 1px solid #e9ecef; transition: all 0.2s ease;" 
-                onmouseover="this.style.background='#f1f3f5'" 
-                onmouseout="this.style.background='white'">
+            <tr style="border-bottom: 1px solid ${COLORS.gray100}; transition: all 0.2s ease;" 
+                onmouseover="this.style.background='${COLORS.primaryLight}'" 
+                onmouseout="this.style.background='${COLORS.white}'">
                 
-                <td style="padding: 14px 12px; font-size: 13px; color: #333;">
-                    <div style="font-weight: 600; color: #005CB9;">${usuario.nombre_completo}</div>
-                    <div style="font-size: 11px; color: #6c757d; margin-top: 3px;">${usuario.email}</div>
+                <td style="padding: 14px 12px; font-size: 13px;">
+                    <div style="font-weight: 600; color: ${COLORS.primary};">${usuario.nombre_completo}</div>
+                    <div style="font-size: 11px; color: ${COLORS.gray500}; margin-top: 3px;">${usuario.email}</div>
                 </td>
                 
-                <td style="padding: 14px 12px; font-size: 13px; color: #333;">
+                <td style="padding: 14px 12px; font-size: 13px; color: ${COLORS.gray700};">
                     <div style="font-weight: 600;">${usuario.vivienda || 'Sin asignar'}</div>
-                    ${usuario.tipo_vivienda ? `<div style="font-size: 11px; color: #6c757d; margin-top: 3px;">${usuario.tipo_vivienda}</div>` : ''}
+                    ${usuario.tipo_vivienda ? `<div style="font-size: 11px; color: ${COLORS.gray500}; margin-top: 3px;">${usuario.tipo_vivienda}</div>` : ''}
                 </td>
                 
-                <td style="padding: 14px 12px; font-size: 13px; text-align: center; font-weight: 600;">
+                <td style="padding: 14px 12px; font-size: 13px; text-align: center; font-weight: 600; color: ${COLORS.gray700};">
                     <div>${usuario.horas_aprobadas || 0}h / ${usuario.horas_requeridas || 0}h</div>
                     ${(usuario.horas_pendientes || 0) > 0 ? 
-                        `<div style="font-size: 11px; color: #ff9800; margin-top: 3px;">⏳ ${usuario.horas_pendientes}h pend.</div>` : 
+                        `<div style="font-size: 11px; color: ${COLORS.warning}; margin-top: 3px;">⏳ ${usuario.horas_pendientes}h pend.</div>` : 
                         ''
                     }
                 </td>
                 
                 <td style="padding: 14px 12px; text-align: center;">
                     <div style="display: flex; align-items: center; gap: 10px; justify-content: center;">
-                        <div style="flex: 0 0 80px; height: 8px; background: #e9ecef; border-radius: 10px; overflow: hidden;">
+                        <div style="flex: 0 0 80px; height: 8px; background: ${COLORS.gray100}; border-radius: 10px; overflow: hidden;">
                             <div style="height: 100%; background: ${cumplimientoColor}; border-radius: 10px; width: ${cumplimiento}%; transition: width 0.5s ease;"></div>
                         </div>
-                        <span style="font-weight: 600; font-size: 12px; color: #333; white-space: nowrap;">${cumplimiento}%</span>
+                        <span style="font-weight: 600; font-size: 12px; color: ${COLORS.gray700};">${cumplimiento}%</span>
                     </div>
                 </td>
                 
-                <td style="padding: 14px 12px; text-align: right; font-weight: 600; font-size: 13px; color: ${(usuario.deuda_horas || 0) > 0 ? '#dc3545' : '#005CB9'};">
+                <td style="padding: 14px 12px; text-align: right; font-weight: 600; font-size: 13px; color: ${(usuario.deuda_horas || 0) > 0 ? COLORS.danger : COLORS.primary};">
                     ${(usuario.deuda_horas || 0) > 0 ? 
                         `$${(usuario.deuda_horas || 0).toLocaleString('es-UY', {minimumFractionDigits: 2})}` : 
                         '✓ Sin deuda'
                     }
                 </td>
                 
-                <td style="padding: 14px 12px; text-align: center; font-weight: 600;">
+                <td style="padding: 14px 12px; text-align: center; font-weight: 600; color: ${COLORS.gray700};">
                     <div>${usuario.tareas_completadas || 0}/${usuario.tareas_asignadas || 0}</div>
                     ${(usuario.tareas_asignadas || 0) > 0 ? 
-                        `<div style="font-size: 11px; color: #6c757d; margin-top: 3px;">${usuario.progreso_tareas || 0}% completado</div>` : 
-                        '<div style="font-size: 11px; color: #6c757d; margin-top: 3px;">Sin tareas</div>'
+                        `<div style="font-size: 11px; color: ${COLORS.gray500}; margin-top: 3px;">${usuario.progreso_tareas || 0}% completado</div>` : 
+                        `<div style="font-size: 11px; color: ${COLORS.gray500}; margin-top: 3px;">Sin tareas</div>`
                     }
                 </td>
                 
                 <td style="padding: 14px 12px; text-align: center;">
-                    <div style="display: inline-block; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; text-transform: uppercase; background: ${cuotaColor}; color: ${cuotaColor === '#ffc107' ? '#333' : 'white'};">
+                    <div style="display: inline-block; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; text-transform: uppercase; background: ${cuotaColor}; color: ${cuotaColor === COLORS.warning ? COLORS.gray700 : COLORS.white};">
                         ${cuotaText}
                     </div>
                     ${(usuario.monto_cuota || 0) > 0 ? 
-                        `<div style="font-size: 11px; color: #6c757d; margin-top: 5px;">$${(usuario.monto_cuota || 0).toLocaleString('es-UY', {minimumFractionDigits: 2})}</div>` : 
+                        `<div style="font-size: 11px; color: ${COLORS.gray500}; margin-top: 5px;">$${(usuario.monto_cuota || 0).toLocaleString('es-UY', {minimumFractionDigits: 2})}</div>` : 
                         ''
                     }
                 </td>
                 
                 <td style="padding: 14px 12px; text-align: center;">
-                    <div style="display: inline-block; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; text-transform: uppercase; background: ${estadoColor}; color: ${estadoColor === '#ffc107' ? '#333' : 'white'};">
+                    <div style="display: inline-block; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; text-transform: uppercase; background: ${estadoColor}; color: ${estadoColor === COLORS.warning ? COLORS.gray700 : COLORS.white};">
                         ${estadoText}
                     </div>
                 </td>
@@ -4828,27 +5125,27 @@ function renderSolicitudesAdmin(solicitudes) {
 
     if (!solicitudes || solicitudes.length === 0) {
         container.innerHTML = `
-            <div class="no-data-admin">
-                <i class="fas fa-inbox" style="font-size: 48px; color: #ddd; margin-bottom: 10px;"></i>
-                <p>No hay solicitudes con los filtros seleccionados</p>
+            <div style="text-align: center; padding: 60px 20px;">
+                <i class="fas fa-inbox" style="font-size: 48px; color: ${COLORS.gray100}; display: block; margin-bottom: 15px;"></i>
+                <p style="color: ${COLORS.gray500};">No hay solicitudes con los filtros seleccionados</p>
             </div>
         `;
         return;
     }
 
     let html = `
-        <div class="table-responsive-admin">
-            <table class="solicitudes-admin-table">
+        <div style="overflow-x: auto; border-radius: 12px; box-shadow: ${COLORS.shadow};">
+            <table style="width: 100%; border-collapse: collapse; background: ${COLORS.white}; min-width: 1200px;">
                 <thead>
-                    <tr>
-                        <th style="width: 200px;">Usuario</th>
-                        <th style="width: 250px;">Asunto</th>
-                        <th style="width: 120px;">Tipo</th>
-                        <th style="width: 100px;">Estado</th>
-                        <th style="width: 100px;">Prioridad</th>
-                        <th style="width: 100px;">Fecha</th>
-                        <th style="width: 80px; text-align: center;">Respuestas</th>
-                        <th style="width: 180px; text-align: center;">Acciones</th>
+                    <tr style="background: linear-gradient(135deg, ${COLORS.primary} 0%, ${COLORS.primaryDark} 100%); color: ${COLORS.white};">
+                        <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px; width: 200px;">Usuario</th>
+                        <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px; width: 250px;">Asunto</th>
+                        <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px; width: 120px;">Tipo</th>
+                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px; width: 100px;">Estado</th>
+                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px; width: 100px;">Prioridad</th>
+                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px; width: 100px;">Fecha</th>
+                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px; width: 80px;">Respuestas</th>
+                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px; width: 180px;">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -4862,35 +5159,55 @@ function renderSolicitudesAdmin(solicitudes) {
         });
 
         html += `
-            <tr class="solicitud-row-admin">
-                <td>
-                    <div class="usuario-cell">
-                        <strong>${sol.nombre_completo}</strong>
-                        <small>${sol.email}</small>
-                    </div>
+            <tr style="border-bottom: 1px solid ${COLORS.gray100}; transition: all 0.2s ease;" 
+                onmouseover="this.style.background='${COLORS.primaryLight}'" 
+                onmouseout="this.style.background='${COLORS.white}'">
+                
+                <td style="padding: 14px 12px; font-size: 13px;">
+                    <div style="font-weight: 600; color: ${COLORS.primary};">${sol.nombre_completo}</div>
+                    <div style="font-size: 11px; color: ${COLORS.gray500}; margin-top: 3px;">${sol.email}</div>
                 </td>
-                <td>
-                    <strong>${sol.asunto}</strong>
+                
+                <td style="padding: 14px 12px; font-size: 13px; font-weight: 600; color: ${COLORS.gray700};">
+                    ${sol.asunto}
                 </td>
-                <td>
-                    <span class="tipo-badge">${formatTipoSolicitud(sol.tipo_solicitud)}</span>
+                
+                <td style="padding: 14px 12px; font-size: 12px;">
+                    <span style="
+                        background: ${COLORS.primaryLight};
+                        color: ${COLORS.primary};
+                        padding: 4px 10px;
+                        border-radius: 15px;
+                        font-weight: 600;
+                        font-size: 11px;
+                    ">${formatTipoSolicitud(sol.tipo_solicitud)}</span>
                 </td>
-                <td>
-                    <span class="badge badge-${sol.estado}">
-                        ${formatEstado(sol.estado)}
-                    </span>
+                
+                <td style="padding: 14px 12px; text-align: center;">
+                    <span class="badge badge-${sol.estado}">${formatEstado(sol.estado)}</span>
                 </td>
-                <td>
-                    <span class="badge badge-prioridad-${sol.prioridad}">
-                        ${formatPrioridad(sol.prioridad)}
-                    </span>
+                
+                <td style="padding: 14px 12px; text-align: center;">
+                    <span class="badge badge-prioridad-${sol.prioridad}">${formatPrioridad(sol.prioridad)}</span>
                 </td>
-                <td>${fecha}</td>
-                <td style="text-align: center;">
-                    <span class="respuestas-count">${sol.total_respuestas || 0}</span>
+                
+                <td style="padding: 14px 12px; text-align: center; font-size: 12px; color: ${COLORS.gray700};">
+                    ${fecha}
                 </td>
-                <td>
-                    <div class="action-buttons-admin">
+                
+                <td style="padding: 14px 12px; text-align: center;">
+                    <span style="
+                        background: ${COLORS.primaryLight};
+                        color: ${COLORS.primary};
+                        padding: 6px 12px;
+                        border-radius: 20px;
+                        font-weight: 600;
+                        font-size: 12px;
+                    ">${sol.total_respuestas || 0}</span>
+                </td>
+                
+                <td style="padding: 14px 12px;">
+                    <div style="display: flex; gap: 5px; justify-content: center; flex-wrap: wrap;">
                         <button class="btn-icon btn-secondary" 
                                 onclick="verDetalleSolicitudAdmin(${sol.id_solicitud})"
                                 title="Ver detalle">
@@ -4914,12 +5231,7 @@ function renderSolicitudesAdmin(solicitudes) {
         `;
     });
 
-    html += `
-                </tbody>
-            </table>
-        </div>
-    `;
-
+    html += '</tbody></table></div>';
     container.innerHTML = html;
 }
 
@@ -4945,6 +5257,7 @@ async function loadEstadisticasSolicitudes() {
 }
 
 // ========== VER DETALLE ADMIN ==========
+
 async function verDetalleSolicitudAdmin(solicitudId) {
     try {
         const response = await fetch(`/api/solicitudes/detalle?id_solicitud=${solicitudId}`);
@@ -4960,79 +5273,119 @@ async function verDetalleSolicitudAdmin(solicitudId) {
         const fecha = new Date(solicitud.fecha_creacion).toLocaleString('es-UY');
 
         const modal = `
-            <div class="modal-detail-admin" onclick="if(event.target.classList.contains('modal-detail-admin')) this.remove()">
-                <div class="modal-detail-content-admin">
-                    <button onclick="this.closest('.modal-detail-admin').remove()" class="modal-close-button-admin">×</button>
+            <div class="modal-detail-admin" 
+                 style="
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: rgba(0, 68, 148, 0.5);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 10000;
+                    padding: 20px;
+                 "
+                 onclick="if(event.target.classList.contains('modal-detail-admin')) this.remove()">
+                <div class="modal-detail-content-admin" 
+                     style="
+                        background: ${COLORS.white};
+                        border-radius: 12px;
+                        box-shadow: ${COLORS.shadow};
+                        max-width: 900px;
+                        width: 100%;
+                        max-height: 90vh;
+                        overflow-y: auto;
+                        padding: 30px;
+                        position: relative;
+                     ">
+                    <button onclick="this.closest('.modal-detail-admin').remove()" 
+                            style="
+                                position: absolute;
+                                top: 20px;
+                                right: 20px;
+                                background: ${COLORS.gray100};
+                                border: none;
+                                width: 36px;
+                                height: 36px;
+                                border-radius: 50%;
+                                cursor: pointer;
+                                font-size: 20px;
+                                color: ${COLORS.gray500};
+                                transition: all 0.3s ease;
+                            "
+                            onmouseover="this.style.background='${COLORS.primary}'; this.style.color='${COLORS.white}'"
+                            onmouseout="this.style.background='${COLORS.gray100}'; this.style.color='${COLORS.gray500}'">×</button>
                     
-                    <h2 class="modal-detail-header-admin">
+                    <h2 style="color: ${COLORS.primary}; font-size: 24px; margin-bottom: 20px; padding-right: 40px;">
                         <i class="fas fa-file-alt"></i> ${solicitud.asunto}
                     </h2>
 
-                    <!-- Información del Usuario -->
-                    <div class="modal-detail-section-admin">
-                        <h3>👤 Información del Usuario</h3>
-                        <div class="detalle-grid-admin">
-                            <div><strong>Nombre:</strong> ${solicitud.nombre_completo}</div>
-                            <div><strong>Email:</strong> ${solicitud.email}</div>
-                            <div><strong>Cédula:</strong> ${solicitud.cedula}</div>
-                            <div><strong>Fecha:</strong> ${fecha}</div>
+                    <div style="background: ${COLORS.primaryLight}; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid ${COLORS.primary};">
+                        <h3 style="color: ${COLORS.primary}; margin-bottom: 15px; font-size: 16px;">👤 Información del Usuario</h3>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                            <div style="color: ${COLORS.gray700};"><strong style="color: ${COLORS.primary};">Nombre:</strong> ${solicitud.nombre_completo}</div>
+                            <div style="color: ${COLORS.gray700};"><strong style="color: ${COLORS.primary};">Email:</strong> ${solicitud.email}</div>
+                            <div style="color: ${COLORS.gray700};"><strong style="color: ${COLORS.primary};">Cédula:</strong> ${solicitud.cedula}</div>
+                            <div style="color: ${COLORS.gray700};"><strong style="color: ${COLORS.primary};">Fecha:</strong> ${fecha}</div>
                         </div>
                     </div>
 
-                    <!-- Detalles de la Solicitud -->
-                    <div class="modal-detail-section-admin">
-                        <h3>📋 Detalles de la Solicitud</h3>
-                        <div class="detalle-grid-admin">
-                            <div><strong>Tipo:</strong> ${formatTipoSolicitud(solicitud.tipo_solicitud)}</div>
-                            <div><strong>Estado:</strong> <span class="badge badge-${solicitud.estado}">${formatEstado(solicitud.estado)}</span></div>
-                            <div><strong>Prioridad:</strong> <span class="badge badge-prioridad-${solicitud.prioridad}">${formatPrioridad(solicitud.prioridad)}</span></div>
+                    <div style="background: ${COLORS.gray50}; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                        <h3 style="color: ${COLORS.primary}; margin-bottom: 15px; font-size: 16px;">📋 Detalles de la Solicitud</h3>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+                            <div style="color: ${COLORS.gray700};"><strong style="color: ${COLORS.primary};">Tipo:</strong> ${formatTipoSolicitud(solicitud.tipo_solicitud)}</div>
+                            <div><strong style="color: ${COLORS.primary};">Estado:</strong> <span class="badge badge-${solicitud.estado}">${formatEstado(solicitud.estado)}</span></div>
+                            <div><strong style="color: ${COLORS.primary};">Prioridad:</strong> <span class="badge badge-prioridad-${solicitud.prioridad}">${formatPrioridad(solicitud.prioridad)}</span></div>
                         </div>
                     </div>
 
-                    <!-- Descripción -->
-                    <div class="modal-detail-section-admin">
-                        <h3>📝 Descripción</h3>
-                        <p style="white-space: pre-wrap; background: #f8f9fa; padding: 15px; border-radius: 8px;">${solicitud.descripcion}</p>
+                    <div style="background: ${COLORS.white}; padding: 20px; border-radius: 8px; border: 2px solid ${COLORS.gray100}; margin-bottom: 20px;">
+                        <h3 style="color: ${COLORS.primary}; margin-bottom: 10px; font-size: 16px;">📝 Descripción</h3>
+                        <p style="white-space: pre-wrap; color: ${COLORS.gray700}; line-height: 1.6;">${solicitud.descripcion}</p>
                         ${solicitud.archivo_adjunto ? `
-                            <a href="/files/?path=${solicitud.archivo_adjunto}" target="_blank" class="btn-small btn-secondary">
+                            <a href="/files/?path=${solicitud.archivo_adjunto}" target="_blank" class="btn-small btn-secondary" style="margin-top: 15px; display: inline-block;">
                                 <i class="fas fa-paperclip"></i> Ver Archivo Adjunto
                             </a>
                         ` : ''}
                     </div>
 
-                    <!-- Conversación -->
                     ${respuestas.length > 0 ? `
-                        <div class="modal-detail-section-admin">
-                            <h3><i class="fas fa-comments"></i> Conversación (${respuestas.length})</h3>
-                            <div class="respuestas-thread-admin">
+                        <div style="margin-bottom: 20px;">
+                            <h3 style="color: ${COLORS.primary}; margin-bottom: 15px; font-size: 16px;"><i class="fas fa-comments"></i> Conversación (${respuestas.length})</h3>
+                            <div style="max-height: 400px; overflow-y: auto;">
                                 ${respuestas.map(resp => {
                                     const fechaResp = new Date(resp.fecha_respuesta).toLocaleString('es-UY');
                                     return `
-                                        <div class="respuesta-item-admin ${resp.es_admin ? 'respuesta-admin-item' : 'respuesta-usuario-item'}">
-                                            <div class="respuesta-header-admin">
-                                                <strong>
+                                        <div style="
+                                            background: ${resp.es_admin ? COLORS.primaryLight : COLORS.gray50};
+                                            padding: 15px;
+                                            border-radius: 8px;
+                                            margin-bottom: 10px;
+                                            border-left: 4px solid ${resp.es_admin ? COLORS.primary : COLORS.gray500};
+                                        ">
+                                            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                                                <strong style="color: ${COLORS.primary}; font-size: 14px;">
                                                     ${resp.es_admin ? '👨‍💼 Administrador' : '👤 ' + resp.nombre_completo}
                                                 </strong>
-                                                <span class="respuesta-fecha-admin">${fechaResp}</span>
+                                                <span style="color: ${COLORS.gray500}; font-size: 12px;">${fechaResp}</span>
                                             </div>
-                                            <div class="respuesta-body-admin">
-                                                <p style="white-space: pre-wrap;">${resp.mensaje}</p>
-                                                ${resp.archivo_adjunto ? `
-                                                    <a href="/files/?path=${resp.archivo_adjunto}" target="_blank" class="file-link-admin">
-                                                        <i class="fas fa-paperclip"></i> Ver Archivo
-                                                    </a>
-                                                ` : ''}
-                                            </div>
+                                            <p style="white-space: pre-wrap; color: ${COLORS.gray700}; line-height: 1.5; margin: 0;">${resp.mensaje}</p>
+                                            ${resp.archivo_adjunto ? `
+                                                <a href="/files/?path=${resp.archivo_adjunto}" target="_blank" style="color: ${COLORS.primary}; text-decoration: none; font-size: 13px; display: inline-block; margin-top: 10px;">
+                                                    <i class="fas fa-paperclip"></i> Ver Archivo
+                                                </a>
+                                            ` : ''}
                                         </div>
                                     `;
                                 }).join('')}
                             </div>
                         </div>
-                    ` : '<p style="text-align: center; color: #999; padding: 20px;">Sin respuestas aún</p>'}
+                    ` : `<p style="text-align: center; color: ${COLORS.gray500}; padding: 20px; background: ${COLORS.gray50}; border-radius: 8px;">Sin respuestas aún</p>`}
 
-                    <!-- Acciones Rápidas -->
-                    <div class="modal-detail-section-admin">
-                        <h3>⚙️ Acciones Rápidas</h3>
+                    <div style="background: ${COLORS.gray50}; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                        <h3 style="color: ${COLORS.primary}; margin-bottom: 15px; font-size: 16px;">⚙️ Acciones Rápidas</h3>
                         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                             ${solicitud.estado !== 'en_revision' ? `
                                 <button onclick="cambiarEstadoSolicitud(${solicitudId}, 'en_revision'); this.closest('.modal-detail-admin').remove();" class="btn-small btn-warning">
@@ -5052,10 +5405,9 @@ async function verDetalleSolicitudAdmin(solicitudId) {
                         </div>
                     </div>
 
-                    <!-- Footer -->
-                    <div class="modal-detail-footer-admin">
-                        <button onclick="this.closest('.modal-detail-admin').remove()" class="btn-small btn-secondary">Cerrar</button>
-                        <button onclick="this.closest('.modal-detail-admin').remove(); responderSolicitudAdmin(${solicitudId})" class="btn-small btn-primary">
+                    <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                        <button onclick="this.closest('.modal-detail-admin').remove()" class="btn btn-secondary">Cerrar</button>
+                        <button onclick="this.closest('.modal-detail-admin').remove(); responderSolicitudAdmin(${solicitudId})" class="btn btn-primary">
                             <i class="fas fa-reply"></i> Responder
                         </button>
                     </div>
