@@ -5,10 +5,13 @@ namespace App\Controllers;
 use App\Models\Vivienda;
 use App\Models\User;
 use App\Models\Nucleo;
+use App\config\Database;
+use PDO;
 
 class ViviendaController
 {
     private $viviendaModel;
+    private $conn;
 
     public function __construct()
     {
@@ -16,6 +19,7 @@ class ViviendaController
             session_start();
         }
         $this->viviendaModel = new Vivienda();
+        $this->conn = Database::getConnection();
     }
 
     // Obtener todas las viviendas (Admin)
@@ -32,7 +36,6 @@ class ViviendaController
         try {
             $viviendas = $this->viviendaModel->getAll();
             
-            // Log para debugging
             error_log("Viviendas obtenidas: " . count($viviendas));
             
             echo json_encode([
@@ -47,7 +50,7 @@ class ViviendaController
             echo json_encode([
                 'success' => false, 
                 'message' => 'Error al obtener viviendas',
-                'error' => $e->getMessage() // Solo en desarrollo
+                'error' => $e->getMessage()
             ]);
         }
         exit();
@@ -192,41 +195,292 @@ class ViviendaController
         exit();
     }
 
-    // Asignar vivienda
-    public function asignar()
-    {
-        header('Content-Type: application/json');
+/**
+ * 🆕 Asignar vivienda - VERSIÓN CORREGIDA FINAL
+ * FIX: Maneja correctamente NULL para id_usuario o id_nucleo
+ */
+  public function asignar()
+{
+    // Limpiar output buffer
+    while (ob_get_level()) {
+        ob_end_clean();
+    }
+    
+    header('Content-Type: application/json; charset=utf-8');
 
-        if (!isset($_SESSION['user_id']) || !$_SESSION['is_admin']) {
-            http_response_code(403);
-            echo json_encode(['success' => false, 'message' => 'No autorizado']);
+    if (!isset($_SESSION['user_id']) || !$_SESSION['is_admin']) {
+        http_response_code(403);
+        echo json_encode(['success' => false, 'message' => 'No autorizado']);
+        exit();
+    }
+
+    try {
+        // Obtener datos
+        $idVivienda = $_POST['vivienda_id'] ?? null;
+        $idUsuario = !empty($_POST['usuario_id']) ? intval($_POST['usuario_id']) : null;
+        $idNucleo = !empty($_POST['nucleo_id']) ? intval($_POST['nucleo_id']) : null;
+        $observaciones = $_POST['observaciones'] ?? '';
+
+        error_log("🏠 [ASIGNAR] Vivienda: $idVivienda | Usuario: " . var_export($idUsuario, true) . " | Núcleo: " . var_export($idNucleo, true));
+
+        // Validar
+        if (!$idVivienda) {
+            echo json_encode(['success' => false, 'message' => 'ID de vivienda requerido']);
             exit();
         }
 
-        try {
-            $viviendaId = $_POST['vivienda_id'] ?? null;
-            $usuarioId = $_POST['usuario_id'] ?? null;
-            $nucleoId = $_POST['nucleo_id'] ?? null;
-            $observaciones = $_POST['observaciones'] ?? '';
-
-            if (!$viviendaId) {
-                echo json_encode(['success' => false, 'message' => 'ID de vivienda requerido']);
-                exit();
-            }
-
-            $id = $this->viviendaModel->asignar($viviendaId, $usuarioId, $nucleoId, $observaciones);
-            echo json_encode([
-                'success' => true,
-                'message' => 'Vivienda asignada exitosamente',
-                'id' => $id
-            ]);
-        } catch (\Exception $e) {
-            error_log("Error en asignar: " . $e->getMessage());
-            http_response_code(500);
-            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+        if (!$idUsuario && !$idNucleo) {
+            echo json_encode(['success' => false, 'message' => 'Debe especificar usuario O núcleo']);
+            exit();
         }
-        exit();
+
+        if ($idUsuario && $idNucleo) {
+            echo json_encode(['success' => false, 'message' => 'No puede asignar a ambos']);
+            exit();
+        }
+
+        $this->conn->beginTransaction();
+
+        // Verificar vivienda
+        $stmtVivienda = $this->conn->prepare("
+            SELECT v.*, tv.nombre as tipo_vivienda, tv.habitaciones, cc.monto_mensual
+            FROM Viviendas v
+            INNER JOIN Tipo_Vivienda tv ON v.id_tipo = tv.id_tipo
+            LEFT JOIN Config_Cuotas cc ON cc.id_tipo = v.id_tipo AND cc.activo = 1
+            WHERE v.id_vivienda = ?
+        ");
+        $stmtVivienda->execute([$idVivienda]);
+        $vivienda = $stmtVivienda->fetch(PDO::FETCH_ASSOC);
+
+        if (!$vivienda) {
+            $this->conn->rollBack();
+            echo json_encode(['success' => false, 'message' => 'Vivienda no encontrada']);
+            exit();
+        }
+
+        error_log("✅ [ASIGNAR] Vivienda: {$vivienda['numero_vivienda']} | Tipo: {$vivienda['tipo_vivienda']} | Monto: \${$vivienda['monto_mensual']}");
+
+        // Verificar si está asignada
+        $stmtCheck = $this->conn->prepare("
+            SELECT COUNT(*) FROM Asignacion_Vivienda 
+            WHERE id_vivienda = ? AND activa = 1
+        ");
+        $stmtCheck->execute([$idVivienda]);
+        
+        if ($stmtCheck->fetchColumn() > 0) {
+            $this->conn->rollBack();
+            echo json_encode(['success' => false, 'message' => 'Vivienda ya asignada']);
+            exit();
+        }
+
+        // 🔧 SOLUCIÓN: SQL condicional según el tipo de asignación
+        if ($idUsuario) {
+            // ✅ Asignar a USUARIO - Solo insertar columnas necesarias
+            error_log("👤 [ASIGNAR] Insertando asignación a USUARIO $idUsuario");
+            
+            $sql = "INSERT INTO Asignacion_Vivienda 
+                    (id_vivienda, id_usuario, activa, observaciones, fecha_asignacion)
+                    VALUES (?, ?, 1, ?, NOW())";
+            
+            $stmtAsignar = $this->conn->prepare($sql);
+            $stmtAsignar->execute([$idVivienda, $idUsuario, $observaciones]);
+            
+        } else {
+            // ✅ Asignar a NÚCLEO - Solo insertar columnas necesarias
+            error_log("👨‍👩‍👧‍👦 [ASIGNAR] Insertando asignación a NÚCLEO $idNucleo");
+            
+            $sql = "INSERT INTO Asignacion_Vivienda 
+                    (id_vivienda, id_nucleo, activa, observaciones, fecha_asignacion)
+                    VALUES (?, ?, 1, ?, NOW())";
+            
+            $stmtAsignar = $this->conn->prepare($sql);
+            $stmtAsignar->execute([$idVivienda, $idNucleo, $observaciones]);
+        }
+
+        $idAsignacion = $this->conn->lastInsertId();
+        error_log("✅ [ASIGNAR] INSERT exitoso! ID asignación: $idAsignacion");
+
+        // Actualizar estado vivienda
+        $stmtUpdate = $this->conn->prepare("UPDATE Viviendas SET estado = 'ocupada' WHERE id_vivienda = ?");
+        $stmtUpdate->execute([$idVivienda]);
+
+        $cuotasActualizadas = 0;
+
+        // 👤 ACTUALIZAR CUOTAS DEL USUARIO
+        if ($idUsuario) {
+            error_log("📊 [ASIGNAR] Actualizando cuotas para usuario $idUsuario");
+            
+            $stmtUpdateCuotas = $this->conn->prepare("
+                UPDATE Cuotas_Mensuales cm
+                SET 
+                    cm.id_vivienda = ?,
+                    cm.monto = ?,
+                    cm.pendiente_asignacion = 0,
+                    cm.observaciones = CONCAT(
+                        COALESCE(cm.observaciones, ''),
+                        IF(cm.observaciones IS NOT NULL AND cm.observaciones != '', '\n', ''),
+                        '✅ Vivienda ', ?, ' asignada el ', NOW()
+                    )
+                WHERE cm.id_usuario = ?
+                AND cm.pendiente_asignacion = 1
+                AND (
+                    (cm.anio = YEAR(CURDATE()) AND cm.mes >= MONTH(CURDATE())) OR
+                    cm.anio > YEAR(CURDATE())
+                )
+            ");
+
+            $stmtUpdateCuotas->execute([
+                $idVivienda,
+                $vivienda['monto_mensual'] ?? 0,
+                $vivienda['numero_vivienda'],
+                $idUsuario
+            ]);
+
+            $cuotasActualizadas = $stmtUpdateCuotas->rowCount();
+            error_log("📊 [ASIGNAR] Cuotas actualizadas: $cuotasActualizadas");
+
+            // Notificar
+            if ($cuotasActualizadas > 0) {
+                $stmtNotif = $this->conn->prepare("
+                    INSERT INTO notificaciones (titulo, mensaje, tipo)
+                    VALUES ('🏠 Vivienda Asignada', ?, 'exito')
+                ");
+                
+                $mensaje = sprintf(
+                    'Se te ha asignado la vivienda %s (%s). %d cuota(s) actualizada(s) con $%s.',
+                    $vivienda['numero_vivienda'],
+                    $vivienda['tipo_vivienda'],
+                    $cuotasActualizadas,
+                    number_format($vivienda['monto_mensual'] ?? 0, 2)
+                );
+                
+                $stmtNotif->execute([$mensaje]);
+                $idNotificacion = $this->conn->lastInsertId();
+
+                $stmtUserNotif = $this->conn->prepare("
+                    INSERT INTO usuario_notificaciones (id_usuario, id_notificacion)
+                    VALUES (?, ?)
+                ");
+                $stmtUserNotif->execute([$idUsuario, $idNotificacion]);
+            }
+        }
+
+        // 👨‍👩‍👧‍👦 ACTUALIZAR CUOTAS DEL NÚCLEO
+        if ($idNucleo) {
+            error_log("👨‍👩‍👧‍👦 [ASIGNAR] Obteniendo miembros del núcleo $idNucleo");
+            
+            $stmtMiembros = $this->conn->prepare("
+                SELECT id_usuario, nombre_completo 
+                FROM Usuario 
+                WHERE id_nucleo = ?
+            ");
+            $stmtMiembros->execute([$idNucleo]);
+            $miembros = $stmtMiembros->fetchAll(PDO::FETCH_ASSOC);
+
+            error_log("👨‍👩‍👧‍👦 [ASIGNAR] Miembros encontrados: " . count($miembros));
+
+            foreach ($miembros as $miembro) {
+                error_log("   → Procesando: {$miembro['nombre_completo']} (ID: {$miembro['id_usuario']})");
+                
+                $stmtUpdateCuotas = $this->conn->prepare("
+                    UPDATE Cuotas_Mensuales cm
+                    SET 
+                        cm.id_vivienda = ?,
+                        cm.monto = ?,
+                        cm.pendiente_asignacion = 0,
+                        cm.observaciones = CONCAT(
+                            COALESCE(cm.observaciones, ''),
+                            IF(cm.observaciones IS NOT NULL AND cm.observaciones != '', '\n', ''),
+                            '✅ Vivienda asignada a núcleo el ', NOW()
+                        )
+                    WHERE cm.id_usuario = ?
+                    AND cm.pendiente_asignacion = 1
+                    AND (
+                        (cm.anio = YEAR(CURDATE()) AND cm.mes >= MONTH(CURDATE())) OR
+                        cm.anio > YEAR(CURDATE())
+                    )
+                ");
+
+                $stmtUpdateCuotas->execute([
+                    $idVivienda,
+                    $vivienda['monto_mensual'] ?? 0,
+                    $miembro['id_usuario']
+                ]);
+
+                $cuotasMiembro = $stmtUpdateCuotas->rowCount();
+                $cuotasActualizadas += $cuotasMiembro;
+
+                error_log("   → Cuotas actualizadas: $cuotasMiembro");
+
+                // Notificar a cada miembro
+                if ($cuotasMiembro > 0) {
+                    $stmtNotif = $this->conn->prepare("
+                        INSERT INTO notificaciones (titulo, mensaje, tipo)
+                        VALUES ('🏠 Vivienda Asignada a tu Núcleo', ?, 'exito')
+                    ");
+                    
+                    $mensaje = sprintf(
+                        'Se asignó la vivienda %s a tu núcleo. %d cuota(s) actualizada(s) con $%s.',
+                        $vivienda['numero_vivienda'],
+                        $cuotasMiembro,
+                        number_format($vivienda['monto_mensual'] ?? 0, 2)
+                    );
+                    
+                    $stmtNotif->execute([$mensaje]);
+                    $idNotificacion = $this->conn->lastInsertId();
+
+                    $stmtUserNotif = $this->conn->prepare("
+                        INSERT INTO usuario_notificaciones (id_usuario, id_notificacion)
+                        VALUES (?, ?)
+                    ");
+                    $stmtUserNotif->execute([$miembro['id_usuario'], $idNotificacion]);
+                }
+            }
+        }
+
+        $this->conn->commit();
+        error_log("✅ [ASIGNAR] COMPLETADO - Cuotas actualizadas: $cuotasActualizadas");
+
+        echo json_encode([
+            'success' => true,
+            'message' => 'Vivienda asignada correctamente' . 
+                        ($cuotasActualizadas > 0 
+                            ? " y {$cuotasActualizadas} cuota(s) actualizada(s)" 
+                            : ''),
+            'cuotas_actualizadas' => $cuotasActualizadas,
+            'id_asignacion' => $idAsignacion
+        ], JSON_UNESCAPED_UNICODE);
+
+    } catch (\PDOException $e) {
+        if (isset($this->conn) && $this->conn->inTransaction()) {
+            $this->conn->rollBack();
+        }
+        
+        error_log("❌ [ASIGNAR] ERROR PDO: " . $e->getMessage());
+        error_log("   Código: " . $e->getCode());
+        error_log("   Stack: " . $e->getTraceAsString());
+        
+        http_response_code(500);
+        echo json_encode([
+            'success' => false, 
+            'message' => 'Error al asignar vivienda: ' . $e->getMessage()
+        ], JSON_UNESCAPED_UNICODE);
+        
+    } catch (\Exception $e) {
+        if (isset($this->conn) && $this->conn->inTransaction()) {
+            $this->conn->rollBack();
+        }
+        
+        error_log("❌ [ASIGNAR] ERROR: " . $e->getMessage());
+        
+        http_response_code(500);
+        echo json_encode([
+            'success' => false, 
+            'message' => 'Error inesperado: ' . $e->getMessage()
+        ], JSON_UNESCAPED_UNICODE);
     }
+    exit();
+}
 
     // Desasignar vivienda
     public function desasignar()
@@ -318,3 +572,5 @@ class ViviendaController
         exit();
     }
 }
+
+

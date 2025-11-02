@@ -182,7 +182,7 @@ class Nucleo
         }
     }
 
-    // Obtener usuarios disponibles (sin núcleo o del núcleo actual)
+    // Obtener usuarios disponibles
     public function getAvailableUsers($nucleoIdExclude = null)
     {
         try {
@@ -225,7 +225,7 @@ class Nucleo
     // ========== NUEVOS MÉTODOS PARA SOLICITUDES ==========
 
     /**
-     * Obtener núcleos disponibles (sin filtrar por usuario)
+     * Obtener núcleos disponibles
      */
     public function getNucleosDisponibles()
     {
@@ -295,7 +295,7 @@ class Nucleo
     }
 
     /**
-     * Obtener solicitudes del usuario actual
+     * Obtener solicitudes del usuario - ✅ USAR VISTA
      */
     public function getSolicitudesUsuario($idUsuario)
     {
@@ -314,7 +314,7 @@ class Nucleo
     }
 
     /**
-     * Obtener todas las solicitudes pendientes (Admin)
+     * Obtener solicitudes pendientes (Admin) - ✅ USAR VISTA
      */
     public function getSolicitudesPendientes()
     {
@@ -422,7 +422,6 @@ class Nucleo
     public function cancelarSolicitud($solicitudId, $idUsuario)
     {
         try {
-            // Verificar que la solicitud pertenezca al usuario
             $sql = "DELETE FROM Solicitudes_Nucleo 
                     WHERE id_solicitud_nucleo = :id 
                     AND id_usuario = :usuario 
@@ -440,51 +439,51 @@ class Nucleo
     }
 
     /**
- * Obtener información completa del núcleo de un usuario
- */
-public function getMiNucleoCompleto($idUsuario)
-{
-    try {
-        // Obtener id_nucleo del usuario
-        $sql = "SELECT id_nucleo FROM Usuario WHERE id_usuario = :user_id";
-        $stmt = $this->conn->prepare($sql);
-        $stmt->execute([':user_id' => $idUsuario]);
-        $userData = $stmt->fetch(PDO::FETCH_ASSOC);
+     * Obtener información completa del núcleo de un usuario
+     */
+    public function getMiNucleoCompleto($idUsuario)
+    {
+        try {
+            // Obtener id_nucleo del usuario
+            $sql = "SELECT id_nucleo FROM Usuario WHERE id_usuario = :user_id";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute([':user_id' => $idUsuario]);
+            $userData = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if (!$userData || !$userData['id_nucleo']) {
-            return null;
+            if (!$userData || !$userData['id_nucleo']) {
+                return null;
+            }
+
+            $nucleoId = $userData['id_nucleo'];
+
+            // Obtener datos del núcleo con total de miembros
+            $sql = "SELECT 
+                        nf.*,
+                        COUNT(u.id_usuario) as total_miembros
+                    FROM Nucleo_Familiar nf
+                    LEFT JOIN Usuario u ON nf.id_nucleo = u.id_nucleo
+                    WHERE nf.id_nucleo = :nucleo_id
+                    GROUP BY nf.id_nucleo";
+            
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute([':nucleo_id' => $nucleoId]);
+            $nucleo = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$nucleo) {
+                return null;
+            }
+
+            // Obtener miembros
+            $miembros = $this->getMembers($nucleoId);
+
+            return [
+                'nucleo' => $nucleo,
+                'miembros' => $miembros
+            ];
+            
+        } catch (PDOException $e) {
+            error_log("Error en getMiNucleoCompleto: " . $e->getMessage());
+            throw $e;
         }
-
-        $nucleoId = $userData['id_nucleo'];
-
-        // Obtener datos del núcleo con total de miembros
-        $sql = "SELECT 
-                    nf.*,
-                    COUNT(u.id_usuario) as total_miembros
-                FROM Nucleo_Familiar nf
-                LEFT JOIN Usuario u ON nf.id_nucleo = u.id_nucleo
-                WHERE nf.id_nucleo = :nucleo_id
-                GROUP BY nf.id_nucleo";
-        
-        $stmt = $this->conn->prepare($sql);
-        $stmt->execute([':nucleo_id' => $nucleoId]);
-        $nucleo = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if (!$nucleo) {
-            return null;
-        }
-
-        // Obtener miembros
-        $miembros = $this->getMembers($nucleoId);
-
-        return [
-            'nucleo' => $nucleo,
-            'miembros' => $miembros
-        ];
-        
-    } catch (PDOException $e) {
-        error_log("Error en getMiNucleoCompleto: " . $e->getMessage());
-        throw $e;
     }
-}
 }

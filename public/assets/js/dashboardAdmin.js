@@ -3398,8 +3398,13 @@ function toggleAsignarTipo() {
     }
 }
 
+// ==========================================
+// ✅ FIX FINAL: submitAsignacion() - CON RECARGA AUTOMÁTICA
+// ==========================================
+
 function submitAsignacion(event) {
     event.preventDefault();
+    console.log('📤 [ASIGNAR] Iniciando asignación de vivienda...');
 
     const viviendaId = document.getElementById('asignar-vivienda-id').value;
     const tipo = document.getElementById('asignar-tipo').value;
@@ -3407,19 +3412,24 @@ function submitAsignacion(event) {
     const nucleoId = document.getElementById('asignar-nucleo').value;
     const observaciones = document.getElementById('asignar-observaciones').value;
 
+    // ✅ VALIDACIÓN
     if (!tipo || (tipo === 'usuario' && !usuarioId) || (tipo === 'nucleo' && !nucleoId)) {
-        alert('Debe seleccionar un usuario o núcleo');
+        alert('⚠️ Debe seleccionar un usuario o núcleo');
         return;
     }
 
     const formData = new FormData();
     formData.append('vivienda_id', viviendaId);
+    
     if (tipo === 'usuario') {
         formData.append('usuario_id', usuarioId);
-    } else {
+    } else if (tipo === 'nucleo') {
         formData.append('nucleo_id', nucleoId);
     }
+    
     formData.append('observaciones', observaciones);
+
+    console.log('📤 [ASIGNAR] Enviando asignación...');
 
     fetch('/api/viviendas/asignar', {
         method: 'POST',
@@ -3428,18 +3438,29 @@ function submitAsignacion(event) {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert(data.message);
+                alert('✅ ' + data.message);
+                
+                // ✅ CERRAR MODAL
                 closeAsignarModal();
-                loadViviendas();
+                
+                // ✅ RECARGAR PÁGINA COMPLETA
+                console.log('🔄 [ASIGNAR] Recargando página...');
+                window.location.reload();
+                
             } else {
-                alert('Error: ' + data.message);
+                alert('❌ Error: ' + data.message);
             }
         })
         .catch(error => {
-            console.error('Error:', error);
-            alert('Error de conexión');
+            console.error('❌ [ASIGNAR] Error:', error);
+            alert('❌ Error de conexión');
         });
 }
+
+// ✅ EXPORTAR
+window.submitAsignacion = submitAsignacion;
+
+console.log('✅ submitAsignacion con recarga automática aplicado');
 
 function closeAsignarModal() {
     document.getElementById('asignarViviendaModal').style.display = 'none';
@@ -3558,7 +3579,13 @@ async function loadPreciosCuotas() {
 
 // ========== RENDERIZAR 3 PRECIOS FIJOS ==========
 function renderPreciosCuotas(precios) {
+     console.log('🔍 [DEBUG] renderPreciosCuotas llamada');
+    console.log('🔍 [DEBUG] Stack trace:', new Error().stack);
+    console.log('🔍 [DEBUG] Precios recibidos:', precios.length);
     const container = document.getElementById('preciosCuotasContainer');
+    
+    // ✅ LIMPIAR CONTENEDOR ANTES DE RENDERIZAR
+    container.innerHTML = '';
     
     if (!precios || precios.length === 0) {
         container.innerHTML = '<p>No hay precios configurados</p>';
@@ -6498,3 +6525,1043 @@ window.mostrarModalUsuarioCorrecto = mostrarModalUsuarioCorrecto;
 console.log('✅ [FIX MODAL] Fix aplicado completamente');
 console.log('✅ [FIX MODAL] Ahora el modal se abre sobre la tabla correctamente');
 console.log('✅ [FIX TABLA] Columna "Pago" eliminada de la tabla de usuarios');
+
+// ==========================================
+// 🔧 PARCHE COMPLETO: TABLA DE USUARIOS CON TODOS LOS BOTONES
+// Agregar al FINAL de dashboardAdmin.js
+// ==========================================
+
+console.log('🔧 [PARCHE] Aplicando corrección completa de tabla de usuarios...');
+
+// ========== 1. DEFINIR FUNCIONES FALTANTES ==========
+
+/**
+ * ✅ Aprobar usuario (cambiar estado de pendiente a aceptado)
+ */
+window.aprobarUsuario = async function(userId, nombreUsuario) {
+    console.log('✅ [APROBAR] Aprobando usuario:', userId);
+    
+    if (!confirm(`¿Aprobar el registro de ${nombreUsuario}?\n\nEl usuario podrá acceder al sistema.`)) {
+        return;
+    }
+    
+    try {
+        const formData = new FormData();
+        formData.append('id_usuario', userId);
+        formData.append('estado', 'aceptado');
+        
+        const response = await fetch('/api/users/update-estado', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert('✅ Usuario aprobado correctamente');
+            loadUsersForTable();
+        } else {
+            alert('❌ Error: ' + data.message);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Error de conexión');
+    }
+};
+
+/**
+ * ✅ Rechazar usuario
+ */
+window.rechazarUsuario = async function(userId, nombreUsuario) {
+    console.log('❌ [RECHAZAR] Rechazando usuario:', userId);
+    
+    const motivo = prompt(`¿Por qué rechazas el registro de ${nombreUsuario}?\n\nMotivo (opcional):`);
+    
+    if (motivo === null) return; // Canceló
+    
+    if (!confirm(`¿Confirmas el rechazo de ${nombreUsuario}?`)) {
+        return;
+    }
+    
+    try {
+        const formData = new FormData();
+        formData.append('id_usuario', userId);
+        formData.append('estado', 'rechazado');
+        formData.append('motivo', motivo || 'Sin motivo especificado');
+        
+        const response = await fetch('/api/users/update-estado', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert('✅ Usuario rechazado');
+            loadUsersForTable();
+        } else {
+            alert('❌ Error: ' + data.message);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Error de conexión');
+    }
+};
+
+/**
+ * ✅ Ver detalles de pago (modal con información completa)
+ */
+window.verDetallesPago = async function(userId) {
+    console.log('💵 [PAGO] Cargando detalles de pago:', userId);
+    
+    try {
+        const response = await fetch(`/api/users/payment-details?id_usuario=${userId}`);
+        const data = await response.json();
+        
+        if (data.success) {
+            mostrarModalDetallesPago(data.pago, data.usuario);
+        } else {
+            alert('❌ Error: ' + data.message);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Error de conexión');
+    }
+};
+
+/**
+ * ✅ Mostrar modal con detalles de pago
+ */
+function mostrarModalDetallesPago(pago, usuario) {
+    const modal = `
+        <div id="detallesPagoModal" 
+             class="modal-overlay"
+             onclick="if(event.target.id === 'detallesPagoModal') this.remove()">
+            
+            <div class="modal-content-large" onclick="event.stopPropagation()">
+                <button class="modal-close-btn" onclick="document.getElementById('detallesPagoModal').remove()">×</button>
+                
+                <h2 class="modal-title">
+                    <i class="fas fa-file-invoice-dollar"></i> Detalles de Pago
+                </h2>
+                
+                <div style="background: ${COLORS.primaryLight}; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <h3 style="color: ${COLORS.primary}; margin-bottom: 15px;">👤 Información del Usuario</h3>
+                    <div class="detalle-grid">
+                        <div><strong>Nombre:</strong> ${usuario.nombre_completo}</div>
+                        <div><strong>Cédula:</strong> ${usuario.cedula}</div>
+                        <div><strong>Email:</strong> ${usuario.email}</div>
+                        <div><strong>Estado:</strong> <span class="estado-badge estado-${usuario.estado}">${formatEstadoUsuario(usuario.estado)}</span></div>
+                    </div>
+                </div>
+                
+                ${pago ? `
+                    <div style="background: ${COLORS.gray50}; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                        <h3 style="color: ${COLORS.primary}; margin-bottom: 15px;">💰 Información del Pago</h3>
+                        <div class="detalle-grid">
+                            <div><strong>Fecha:</strong> ${formatearFechaUY(pago.fecha_pago)}</div>
+                            <div><strong>Monto:</strong> $${parseFloat(pago.monto).toLocaleString('es-UY', {minimumFractionDigits: 2})}</div>
+                            <div><strong>Estado:</strong> <span class="badge badge-${pago.estado_validacion}">${pago.estado_validacion}</span></div>
+                        </div>
+                        
+                        ${pago.comprobante_archivo ? `
+                            <div style="margin-top: 20px; text-align: center;">
+                                <img src="/files/?path=${pago.comprobante_archivo}" 
+                                     style="max-width: 100%; max-height: 400px; border-radius: 8px; box-shadow: ${COLORS.shadow};"
+                                     onclick="window.open('/files/?path=${pago.comprobante_archivo}', '_blank')">
+                                <p style="margin-top: 10px; color: ${COLORS.gray500}; font-size: 12px;">
+                                    <i class="fas fa-info-circle"></i> Haz clic en la imagen para ampliar
+                                </p>
+                            </div>
+                        ` : '<p style="color: #999;">Sin comprobante adjunto</p>'}
+                    </div>
+                    
+                    ${pago.estado_validacion === 'pendiente' ? `
+                        <div class="form-actions">
+                            <button class="btn btn-success" onclick="aprobarPagoDesdeModal(${pago.id_pago}, ${usuario.id_usuario})">
+                                <i class="fas fa-check"></i> Aprobar Pago
+                            </button>
+                            <button class="btn btn-danger" onclick="rechazarPagoDesdeModal(${pago.id_pago}, ${usuario.id_usuario})">
+                                <i class="fas fa-times"></i> Rechazar Pago
+                            </button>
+                        </div>
+                    ` : ''}
+                ` : `
+                    <div style="text-align: center; padding: 40px;">
+                        <i class="fas fa-inbox" style="font-size: 48px; color: ${COLORS.gray100}; display: block; margin-bottom: 15px;"></i>
+                        <p style="color: ${COLORS.gray500};">No hay información de pago disponible</p>
+                    </div>
+                `}
+                
+                <div class="form-actions" style="margin-top: 20px;">
+                    <button class="btn btn-secondary" onclick="document.getElementById('detallesPagoModal').remove()">
+                        Cerrar
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modal);
+}
+
+/**
+ * ✅ Aprobar pago desde el modal
+ */
+window.aprobarPagoDesdeModal = async function(pagoId, userId) {
+    document.getElementById('detallesPagoModal').remove();
+    await approvePaymentFromTable(userId);
+};
+
+/**
+ * ✅ Rechazar pago desde el modal
+ */
+window.rechazarPagoDesdeModal = async function(pagoId, userId) {
+    document.getElementById('detallesPagoModal').remove();
+    await rejectPaymentFromTable(userId);
+};
+
+// ========== 2. SOBRESCRIBIR renderUserRow CON TODOS LOS BOTONES ==========
+
+window.renderUserRow = function(user) {
+    const hasPayment = user.comprobante_archivo && user.comprobante_archivo !== '';
+    const isPending = user.estado === 'pendiente';
+    const hasPaymentPending = hasPayment && user.estado_validacion === 'pendiente';
+    
+    return `
+        <tr class="user-row estado-${user.estado}" data-estado="${user.estado}">
+            <td>${user.id_usuario}</td>
+            <td>${user.nombre_completo}</td>
+            <td>${user.cedula}</td>
+            <td>${user.email}</td>
+            <td>
+                <span class="estado-badge estado-${user.estado}">
+                    ${formatEstadoUsuario(user.estado)}
+                </span>
+            </td>
+            <td>${user.nombre_rol || 'Sin rol'}</td>
+            <td>${user.nombre_nucleo || 'Sin núcleo'}</td>
+            <td>
+                <div style="display: flex; gap: 5px; flex-wrap: wrap; justify-content: center;">
+                    
+                    ${/* ✅ BOTÓN VER DETALLES DE USUARIO */ ''}
+                    <button class="btn-icon btn-primary" 
+                            onclick="viewUserDetails(${user.id_usuario})"
+                            title="Ver detalles del usuario">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    
+                    ${/* ✅ BOTÓN VER PAGO (siempre visible si hay comprobante) */ ''}
+                    ${hasPayment ? `
+                        <button class="btn-icon btn-info" 
+                                onclick="verDetallesPago(${user.id_usuario})"
+                                title="Ver detalles de pago"
+                                style="background: #17a2b8;">
+                            <i class="fas fa-file-invoice-dollar"></i>
+                        </button>
+                    ` : ''}
+                    
+                    ${/* ✅ BOTONES DE APROBACIÓN/RECHAZO DE USUARIO */ ''}
+                    ${isPending ? `
+                        <button class="btn-icon btn-success" 
+                                onclick="aprobarUsuario(${user.id_usuario}, '${user.nombre_completo.replace(/'/g, "\\'")}')"
+                                id="aprobar-btn-${user.id_usuario}"
+                                title="Aprobar registro de usuario">
+                            <i class="fas fa-user-check"></i>
+                        </button>
+                        <button class="btn-icon btn-danger" 
+                                onclick="rechazarUsuario(${user.id_usuario}, '${user.nombre_completo.replace(/'/g, "\\'")}')"
+                                id="rechazar-btn-${user.id_usuario}"
+                                title="Rechazar registro">
+                            <i class="fas fa-user-times"></i>
+                        </button>
+                    ` : ''}
+                    
+                    ${/* ✅ BOTONES DE APROBACIÓN/RECHAZO DE PAGO */ ''}
+                    ${hasPaymentPending ? `
+                        <button class="btn-icon btn-success" 
+                                onclick="approvePaymentFromTable(${user.id_usuario})"
+                                id="approve-payment-btn-${user.id_usuario}"
+                                title="Aprobar pago">
+                            <i class="fas fa-check-circle"></i>
+                        </button>
+                        <button class="btn-icon btn-warning" 
+                                onclick="rejectPaymentFromTable(${user.id_usuario})"
+                                id="reject-payment-btn-${user.id_usuario}"
+                                title="Rechazar pago">
+                            <i class="fas fa-times-circle"></i>
+                        </button>
+                    ` : ''}
+                </div>
+            </td>
+        </tr>
+    `;
+};
+
+// ========== 3. EXPORTAR FUNCIONES ==========
+
+console.log('✅ [PARCHE] Todas las funciones definidas:');
+console.log('  - aprobarUsuario:', typeof window.aprobarUsuario);
+console.log('  - rechazarUsuario:', typeof window.rechazarUsuario);
+console.log('  - verDetallesPago:', typeof window.verDetallesPago);
+console.log('  - approvePaymentFromTable:', typeof window.approvePaymentFromTable);
+console.log('  - rejectPaymentFromTable:', typeof window.rejectPaymentFromTable);
+console.log('✅ [PARCHE] Tabla de usuarios completamente funcional');
+
+// ==========================================
+// 🔧 FIX FINAL: GESTIÓN DE USUARIOS ADMIN
+// Agregar AL FINAL de dashboardAdmin.js
+// ==========================================
+
+console.log('🔧 [FIX USUARIOS] Aplicando corrección final...');
+
+// ========== 1. LIMPIAR FUNCIONES ANTERIORES ==========
+(function() {
+    // Guardar referencias necesarias
+    const COLORS_BACKUP = window.COLORS || {
+        primary: '#005CB9',
+        primaryDark: '#004494',
+        primaryLight: '#E3F2FD',
+        white: '#FFFFFF',
+        gray50: '#F5F7FA',
+        gray100: '#E8EBF0',
+        gray500: '#6C757D',
+        gray700: '#495057',
+        success: '#4CAF50',
+        warning: '#FF9800',
+        danger: '#F44336',
+        shadow: '0 4px 12px rgba(0, 92, 185, 0.12)'
+    };
+
+    // ========== 2. DEFINIR FUNCIONES PRINCIPALES ==========
+
+    /**
+     * ✅ Ver detalles de pago
+     */
+    window.verDetallesPago = async function(userId) {
+        console.log('💵 [PAGO] Cargando detalles de pago:', userId);
+        
+        try {
+            const response = await fetch(`/api/users/payment-details?id_usuario=${userId}`);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                mostrarModalDetallesPago(data.pago, data.usuario);
+            } else {
+                alert('❌ Error: ' + data.message);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('❌ Error al cargar detalles de pago: ' + error.message);
+        }
+    };
+
+    /**
+     * ✅ Mostrar modal con detalles de pago
+     */
+    function mostrarModalDetallesPago(pago, usuario) {
+        // Limpiar modales anteriores
+        const modalAnterior = document.getElementById('detallesPagoModal');
+        if (modalAnterior) modalAnterior.remove();
+
+        const modal = `
+            <div id="detallesPagoModal" 
+                 class="modal-overlay"
+                 style="
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: rgba(0, 0, 0, 0.5);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 10000;
+                    padding: 20px;
+                 "
+                 onclick="if(event.target.id === 'detallesPagoModal') this.remove()">
+                
+                <div class="modal-content-large" 
+                     style="
+                        background: white;
+                        border-radius: 12px;
+                        max-width: 800px;
+                        width: 100%;
+                        max-height: 90vh;
+                        overflow-y: auto;
+                        padding: 30px;
+                        position: relative;
+                     "
+                     onclick="event.stopPropagation()">
+                    
+                    <button class="modal-close-btn" 
+                            style="
+                                position: absolute;
+                                top: 15px;
+                                right: 15px;
+                                background: #f5f5f5;
+                                border: none;
+                                width: 35px;
+                                height: 35px;
+                                border-radius: 50%;
+                                cursor: pointer;
+                                font-size: 20px;
+                            "
+                            onclick="document.getElementById('detallesPagoModal').remove()">×</button>
+                    
+                    <h2 style="color: ${COLORS_BACKUP.primary}; margin-bottom: 20px;">
+                        <i class="fas fa-file-invoice-dollar"></i> Detalles de Pago
+                    </h2>
+                    
+                    <div style="background: ${COLORS_BACKUP.primaryLight}; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                        <h3 style="color: ${COLORS_BACKUP.primary}; margin-bottom: 15px;">👤 Información del Usuario</h3>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                            <div><strong>Nombre:</strong> ${usuario.nombre_completo}</div>
+                            <div><strong>Cédula:</strong> ${usuario.cedula}</div>
+                            <div><strong>Email:</strong> ${usuario.email}</div>
+                            <div><strong>Estado:</strong> <span class="estado-badge estado-${usuario.estado}">${formatEstadoUsuario(usuario.estado)}</span></div>
+                        </div>
+                    </div>
+                    
+                    ${pago ? `
+                        <div style="background: ${COLORS_BACKUP.gray50}; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                            <h3 style="color: ${COLORS_BACKUP.primary}; margin-bottom: 15px;">💰 Información del Pago</h3>
+                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px;">
+                                <div><strong>Fecha:</strong> ${formatearFechaUY(pago.fecha_pago)}</div>
+                                <div><strong>Monto:</strong> $${parseFloat(pago.monto).toLocaleString('es-UY', {minimumFractionDigits: 2})}</div>
+                                <div><strong>Estado:</strong> <span class="badge badge-${pago.estado_validacion}">${pago.estado_validacion}</span></div>
+                                <div><strong>Tipo:</strong> ${pago.tipo_pago}</div>
+                            </div>
+                            
+                            ${pago.comprobante_archivo ? `
+                                <div style="text-align: center;">
+                                    <img src="/files/?path=${pago.comprobante_archivo}" 
+                                         style="max-width: 100%; max-height: 400px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); cursor: pointer;"
+                                         onclick="window.open('/files/?path=${pago.comprobante_archivo}', '_blank')">
+                                    <p style="margin-top: 10px; color: ${COLORS_BACKUP.gray500}; font-size: 12px;">
+                                        <i class="fas fa-info-circle"></i> Haz clic en la imagen para ampliar
+                                    </p>
+                                </div>
+                            ` : '<p style="color: #999; text-align: center; padding: 20px;">Sin comprobante adjunto</p>'}
+                        </div>
+                        
+                        ${pago.estado_validacion === 'pendiente' ? `
+                            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                                <button class="btn btn-danger" onclick="rechazarPagoDesdeModal(${pago.id_pago}, ${usuario.id_usuario})">
+                                    <i class="fas fa-times"></i> Rechazar Pago
+                                </button>
+                                <button class="btn btn-success" onclick="aprobarPagoDesdeModal(${pago.id_pago}, ${usuario.id_usuario})">
+                                    <i class="fas fa-check"></i> Aprobar Pago
+                                </button>
+                            </div>
+                        ` : ''}
+                    ` : `
+                        <div style="text-align: center; padding: 40px;">
+                            <i class="fas fa-inbox" style="font-size: 48px; color: #ddd; display: block; margin-bottom: 15px;"></i>
+                            <p style="color: ${COLORS_BACKUP.gray500};">No hay información de pago disponible</p>
+                        </div>
+                    `}
+                    
+                    <div style="text-align: right; margin-top: 20px;">
+                        <button class="btn btn-secondary" onclick="document.getElementById('detallesPagoModal').remove()">
+                            Cerrar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.insertAdjacentHTML('beforeend', modal);
+    }
+
+    /**
+     * ✅ Aprobar pago desde modal
+     */
+    window.aprobarPagoDesdeModal = async function(pagoId, userId) {
+        document.getElementById('detallesPagoModal').remove();
+        
+        if (!confirm('¿Aprobar este pago?\n\nEl usuario será notificado.')) {
+            return;
+        }
+
+        try {
+            const formData = new FormData();
+            formData.append('id_usuario', userId);
+
+            const response = await fetch('/api/payment/approve', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                alert('✅ Pago aprobado correctamente');
+                if (typeof loadUsersForTable === 'function') {
+                    loadUsersForTable();
+                }
+            } else {
+                alert('❌ Error: ' + data.message);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('❌ Error de conexión');
+        }
+    };
+
+    /**
+     * ✅ Rechazar pago desde modal
+     */
+    window.rechazarPagoDesdeModal = async function(pagoId, userId) {
+        document.getElementById('detallesPagoModal').remove();
+
+        const motivo = prompt('¿Por qué rechazas este pago? (opcional)');
+        if (motivo === null) return;
+
+        if (!confirm('¿Confirmas el rechazo del pago?')) {
+            return;
+        }
+
+        try {
+            const formData = new FormData();
+            formData.append('id_usuario', userId);
+            formData.append('motivo', motivo || 'Sin motivo especificado');
+
+            const response = await fetch('/api/payment/reject', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                alert('✅ Pago rechazado');
+                if (typeof loadUsersForTable === 'function') {
+                    loadUsersForTable();
+                }
+            } else {
+                alert('❌ Error: ' + data.message);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('❌ Error de conexión');
+        }
+    };
+
+    /**
+     * ✅ Sobrescribir renderUserRow para manejar estados correctamente
+     */
+    window.renderUserRow = function(user) {
+        const hasPayment = user.comprobante_archivo && user.comprobante_archivo !== '';
+        const isPending = user.estado === 'pendiente' || user.estado === 'enviado';
+        const isApproved = user.estado === 'aceptado';
+        const isRejected = user.estado === 'rechazado';
+        const hasPaymentPending = hasPayment && user.estado_pago === 'pendiente';
+        
+        return `
+            <tr class="user-row estado-${user.estado}" data-estado="${user.estado}">
+                <td>${user.id_usuario}</td>
+                <td>${user.nombre_completo}</td>
+                <td>${user.cedula}</td>
+                <td>${user.email}</td>
+                <td>
+                    <span class="estado-badge estado-${user.estado}">
+                        ${formatEstadoUsuario(user.estado)}
+                    </span>
+                </td>
+                <td>${user.nombre_rol || 'Sin rol'}</td>
+                <td>${user.nombre_nucleo || 'Sin núcleo'}</td>
+                <td>
+                    <div style="display: flex; gap: 5px; flex-wrap: wrap; justify-content: center;">
+                        
+                        ${/* ✅ BOTÓN VER DETALLES DE USUARIO */ ''}
+                        <button class="btn-icon btn-primary" 
+                                onclick="viewUserDetails(${user.id_usuario})"
+                                title="Ver detalles del usuario">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        
+                        ${/* ✅ BOTÓN VER PAGO - Solo visible si está pendiente */ ''}
+                        ${hasPayment && isPending ? `
+                            <button class="btn-icon btn-info" 
+                                    onclick="verDetallesPago(${user.id_usuario})"
+                                    title="Ver detalles de pago"
+                                    style="background: #17a2b8;">
+                                <i class="fas fa-file-invoice-dollar"></i>
+                            </button>
+                        ` : ''}
+                        
+                        ${/* ✅ BOTONES DE APROBACIÓN/RECHAZO DE USUARIO */ ''}
+                        ${isPending ? `
+                            <button class="btn-icon btn-success" 
+                                    onclick="aprobarUsuario(${user.id_usuario}, '${user.nombre_completo.replace(/'/g, "\\'")}')"
+                                    id="aprobar-btn-${user.id_usuario}"
+                                    title="Aprobar registro de usuario"
+                                    ${!hasPayment ? 'disabled' : ''}>
+                                <i class="fas fa-user-check"></i>
+                            </button>
+                            <button class="btn-icon btn-danger" 
+                                    onclick="rechazarUsuario(${user.id_usuario}, '${user.nombre_completo.replace(/'/g, "\\'")}')"
+                                    id="rechazar-btn-${user.id_usuario}"
+                                    title="Rechazar registro">
+                                <i class="fas fa-user-times"></i>
+                            </button>
+                        ` : ''}
+                        
+                        ${/* ✅ BADGE DE APROBADO */ ''}
+                        ${isApproved ? `
+                            <span class="badge badge-success" style="padding: 6px 12px;">
+                                <i class="fas fa-check-circle"></i> Aprobado
+                            </span>
+                        ` : ''}
+                        
+                        ${/* ✅ BADGE DE RECHAZADO */ ''}
+                        ${isRejected ? `
+                            <span class="badge badge-danger" style="padding: 6px 12px;">
+                                <i class="fas fa-times-circle"></i> Rechazado
+                            </span>
+                        ` : ''}
+                    </div>
+                </td>
+            </tr>
+        `;
+    };
+
+    /**
+     * ✅ Aprobar usuario
+     */
+    window.aprobarUsuario = async function(userId, nombreUsuario) {
+        console.log('✅ [APROBAR] Aprobando usuario:', userId);
+        
+        if (!confirm(`¿Aprobar el registro de ${nombreUsuario}?\n\nEl usuario podrá acceder al sistema y su pago será validado automáticamente.`)) {
+            return;
+        }
+        
+        try {
+            const formData = new FormData();
+            formData.append('id_usuario', userId);
+            formData.append('accion', 'aprobar');
+            
+            const response = await fetch('/api/users/aprobar-rechazar', {
+                method: 'POST',
+                body: formData
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                alert('✅ Usuario aprobado correctamente');
+                if (typeof loadUsersForTable === 'function') {
+                    loadUsersForTable();
+                }
+            } else {
+                alert('❌ Error: ' + data.message);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('❌ Error de conexión');
+        }
+    };
+
+    /**
+     * ✅ Rechazar usuario
+     */
+    window.rechazarUsuario = async function(userId, nombreUsuario) {
+        console.log('❌ [RECHAZAR] Rechazando usuario:', userId);
+        
+        const motivo = prompt(`¿Por qué rechazas el registro de ${nombreUsuario}?\n\nMotivo (opcional):`);
+        
+        if (motivo === null) return;
+        
+        if (!confirm(`¿Confirmas el rechazo de ${nombreUsuario}?`)) {
+            return;
+        }
+        
+        try {
+            const formData = new FormData();
+            formData.append('id_usuario', userId);
+            formData.append('accion', 'rechazar');
+            formData.append('motivo', motivo || 'Sin motivo especificado');
+            
+            const response = await fetch('/api/users/aprobar-rechazar', {
+                method: 'POST',
+                body: formData
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                alert('✅ Usuario rechazado');
+                if (typeof loadUsersForTable === 'function') {
+                    loadUsersForTable();
+                }
+            } else {
+                alert('❌ Error: ' + data.message);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('❌ Error de conexión');
+        }
+    };
+
+    // ========== FUNCIÓN AUXILIAR ==========
+    function formatEstadoUsuario(estado) {
+        const estados = {
+            'pendiente': 'Pendiente',
+            'enviado': 'Enviado',
+            'aceptado': 'Aceptado',
+            'rechazado': 'Rechazado'
+        };
+        return estados[estado] || estado;
+    }
+
+    console.log('✅ [FIX USUARIOS] Todas las funciones definidas correctamente');
+    console.log('  - verDetallesPago:', typeof window.verDetallesPago);
+    console.log('  - aprobarUsuario:', typeof window.aprobarUsuario);
+    console.log('  - rechazarUsuario:', typeof window.rechazarUsuario);
+})();
+
+console.log('✅ [FIX USUARIOS] Módulo cargado completamente');
+
+
+// ==========================================
+// 🔧 FIX: ASIGNACIÓN DE VIVIENDA A NÚCLEO
+// Reemplazar la función submitAsignacion en dashboardAdmin.js
+// ==========================================
+
+// ==========================================
+// ✅ FIX FINAL: submitAsignacion() - CON RECARGA AUTOMÁTICA
+// ==========================================
+
+function submitAsignacion(event) {
+    event.preventDefault();
+    console.log('📤 [ASIGNAR] Iniciando asignación de vivienda...');
+
+    const viviendaId = document.getElementById('asignar-vivienda-id').value;
+    const tipo = document.getElementById('asignar-tipo').value;
+    const usuarioId = document.getElementById('asignar-usuario').value;
+    const nucleoId = document.getElementById('asignar-nucleo').value;
+    const observaciones = document.getElementById('asignar-observaciones').value;
+
+    // ✅ VALIDACIÓN
+    if (!tipo || (tipo === 'usuario' && !usuarioId) || (tipo === 'nucleo' && !nucleoId)) {
+        alert('⚠️ Debe seleccionar un usuario o núcleo');
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('vivienda_id', viviendaId);
+    
+    if (tipo === 'usuario') {
+        formData.append('usuario_id', usuarioId);
+    } else if (tipo === 'nucleo') {
+        formData.append('nucleo_id', nucleoId);
+    }
+    
+    formData.append('observaciones', observaciones);
+
+    console.log('📤 [ASIGNAR] Enviando asignación...');
+
+    fetch('/api/viviendas/asignar', {
+        method: 'POST',
+        body: formData
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('✅ ' + data.message);
+                
+                // ✅ CERRAR MODAL
+                closeAsignarModal();
+                
+                // ✅ RECARGAR PÁGINA COMPLETA
+                console.log('🔄 [ASIGNAR] Recargando página...');
+                window.location.reload();
+                
+            } else {
+                alert('❌ Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('❌ [ASIGNAR] Error:', error);
+            alert('❌ Error de conexión');
+        });
+}
+
+// ✅ EXPORTAR
+window.submitAsignacion = submitAsignacion;
+
+console.log('✅ submitAsignacion con recarga automática aplicado');
+
+// ==========================================
+// 🔧 FIX: FUNCIÓN MEJORADA PARA MOSTRAR MODAL
+// También reemplazar showAsignarModal
+// ==========================================
+
+function showAsignarModal(viviendaId, numeroVivienda) {
+    console.log('>>> Abriendo modal asignar:', viviendaId);
+
+    // 🧹 LIMPIAR MODALES ANTERIORES
+    limpiarModalesAnteriores();
+
+    Promise.all([
+        fetch('/api/users/all').then(r => r.json()),
+        fetch('/api/nucleos/all').then(r => r.json())
+    ]).then(([usersData, nucleosData]) => {
+        if (usersData.success && nucleosData.success) {
+            // Filtrar solo usuarios sin núcleo asignado (opcional)
+            const usuariosDisponibles = usersData.users.filter(u => u.estado === 'aceptado');
+            
+            const userSelect = document.getElementById('asignar-usuario');
+            userSelect.innerHTML = '<option value="">Seleccione un usuario...</option>';
+            usuariosDisponibles.forEach(user => {
+                userSelect.innerHTML += `<option value="${user.id_usuario}">${user.nombre_completo} (${user.email})</option>`;
+            });
+
+            const nucleoSelect = document.getElementById('asignar-nucleo');
+            nucleoSelect.innerHTML = '<option value="">Seleccione un núcleo...</option>';
+            nucleosData.nucleos.forEach(nucleo => {
+                nucleoSelect.innerHTML += `<option value="${nucleo.id_nucleo}">${nucleo.nombre_nucleo || 'Sin nombre'} (${nucleo.total_miembros} miembros)</option>`;
+            });
+
+            document.getElementById('asignar-vivienda-info').textContent = `Vivienda: ${numeroVivienda}`;
+            document.getElementById('asignar-vivienda-id').value = viviendaId;
+            
+            // ✅ Resetear selects
+            document.getElementById('asignar-tipo').value = '';
+            document.getElementById('asignar-usuario').value = '';
+            document.getElementById('asignar-nucleo').value = '';
+            document.getElementById('asignar-observaciones').value = '';
+            
+            // Ocultar grupos
+            document.getElementById('asignar-usuario-group').style.display = 'none';
+            document.getElementById('asignar-nucleo-group').style.display = 'none';
+            
+            document.getElementById('asignarViviendaModal').style.display = 'flex';
+            
+            console.log('✅ Modal abierto correctamente');
+        }
+    }).catch(error => {
+        console.error('Error:', error);
+        alert('Error al cargar datos');
+    });
+}
+
+// ==========================================
+// 🔧 FUNCIÓN AUXILIAR: toggleAsignarTipo
+// ==========================================
+
+function toggleAsignarTipo() {
+    const tipo = document.getElementById('asignar-tipo').value;
+    const usuarioGroup = document.getElementById('asignar-usuario-group');
+    const nucleoGroup = document.getElementById('asignar-nucleo-group');
+
+    console.log('🔄 [TOGGLE] Tipo seleccionado:', tipo);
+
+    if (tipo === 'usuario') {
+        usuarioGroup.style.display = 'block';
+        nucleoGroup.style.display = 'none';
+        document.getElementById('asignar-nucleo').value = ''; // Limpiar núcleo
+        console.log('✅ [TOGGLE] Mostrando selector de usuario');
+    } else if (tipo === 'nucleo') {
+        usuarioGroup.style.display = 'none';
+        nucleoGroup.style.display = 'block';
+        document.getElementById('asignar-usuario').value = ''; // Limpiar usuario
+        console.log('✅ [TOGGLE] Mostrando selector de núcleo');
+    } else {
+        usuarioGroup.style.display = 'none';
+        nucleoGroup.style.display = 'none';
+    }
+}
+
+// ==========================================
+// EXPORTAR FUNCIONES
+// ==========================================
+
+window.submitAsignacion = submitAsignacion;
+window.showAsignarModal = showAsignarModal;
+window.toggleAsignarTipo = toggleAsignarTipo;
+
+console.log('✅ Fix de asignación de vivienda aplicado correctamente');
+
+
+// ==========================================
+// 🏠 ASIGNACIÓN DIRECTA DE VIVIENDA (SIN MODAL)
+// ==========================================
+
+console.log('🏠 [VIVIENDA] Cargando sistema de asignación directa...');
+
+/**
+ * ✅ Asignar vivienda directamente con prompts
+ */
+window.asignarViviendaDirecta = async function(viviendaId, numeroVivienda) {
+    console.log('🏠 [ASIGNAR] Iniciando asignación para vivienda:', numeroVivienda);
+    
+    // PASO 1: Preguntar qué tipo de asignación
+    const tipo = prompt(
+        `🏠 Asignar Vivienda: ${numeroVivienda}\n\n` +
+        `Selecciona el tipo de asignación:\n` +
+        `1 = Usuario Individual\n` +
+        `2 = Núcleo Familiar\n\n` +
+        `Escribe 1 o 2:`
+    );
+    
+    if (!tipo || (tipo !== '1' && tipo !== '2')) {
+        console.log('❌ [ASIGNAR] Cancelado por usuario');
+        return;
+    }
+    
+    const esUsuario = tipo === '1';
+    
+    try {
+        // PASO 2: Obtener lista de usuarios o núcleos
+        let opciones = [];
+        let titulo = '';
+        
+        if (esUsuario) {
+            const response = await fetch('/api/users/all');
+            const data = await response.json();
+            
+            if (!data.success) throw new Error('Error al cargar usuarios');
+            
+            opciones = data.users.filter(u => u.estado === 'aceptado');
+            titulo = '👤 USUARIOS DISPONIBLES';
+            
+        } else {
+            const response = await fetch('/api/nucleos/all');
+            const data = await response.json();
+            
+            if (!data.success) throw new Error('Error al cargar núcleos');
+            
+            opciones = data.nucleos;
+            titulo = '👨‍👩‍👧‍👦 NÚCLEOS FAMILIARES';
+        }
+        
+        if (opciones.length === 0) {
+            alert('❌ No hay ' + (esUsuario ? 'usuarios' : 'núcleos') + ' disponibles');
+            return;
+        }
+        
+        // PASO 3: Mostrar lista y pedir selección
+        let mensaje = `${titulo}\n\n`;
+        
+        if (esUsuario) {
+            opciones.forEach((u, idx) => {
+                mensaje += `${idx + 1}. ${u.nombre_completo} (${u.email})\n`;
+            });
+            mensaje += `\n📝 Ingresa el número del usuario:`;
+        } else {
+            opciones.forEach((n, idx) => {
+                mensaje += `${idx + 1}. ${n.nombre_nucleo || 'Sin nombre'} (${n.total_miembros} miembros)\n`;
+            });
+            mensaje += `\n📝 Ingresa el número del núcleo:`;
+        }
+        
+        const seleccion = prompt(mensaje);
+        
+        if (!seleccion) {
+            console.log('❌ [ASIGNAR] Cancelado por usuario');
+            return;
+        }
+        
+        const index = parseInt(seleccion) - 1;
+        
+        if (index < 0 || index >= opciones.length) {
+            alert('❌ Selección inválida');
+            return;
+        }
+        
+        const opcionSeleccionada = opciones[index];
+        
+        // PASO 4: Confirmar
+        const nombreMostrar = esUsuario ? 
+            opcionSeleccionada.nombre_completo : 
+            opcionSeleccionada.nombre_nucleo || 'Núcleo sin nombre';
+        
+        if (!confirm(`¿Asignar vivienda ${numeroVivienda} a ${nombreMostrar}?`)) {
+            return;
+        }
+        
+        // PASO 5: Enviar asignación
+        const formData = new FormData();
+        formData.append('vivienda_id', viviendaId);
+        
+        if (esUsuario) {
+            formData.append('usuario_id', opcionSeleccionada.id_usuario);
+        } else {
+            formData.append('nucleo_id', opcionSeleccionada.id_nucleo);
+        }
+        
+        console.log('📤 [ASIGNAR] Enviando asignación...');
+        
+        const response = await fetch('/api/viviendas/asignar', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert('✅ ' + data.message);
+            
+            // Recargar tabla
+            if (typeof loadViviendas === 'function') {
+                loadViviendas();
+            }
+        } else {
+            alert('❌ Error: ' + data.message);
+        }
+        
+    } catch (error) {
+        console.error('❌ [ASIGNAR] Error:', error);
+        alert('❌ Error: ' + error.message);
+    }
+};
+
+/**
+ * ✅ Desasignar vivienda
+ */
+window.desasignarVivienda = async function(asignacionId, numeroVivienda) {
+    console.log('🏠 [DESASIGNAR] Iniciando desasignación:', asignacionId);
+    
+    if (!confirm(`¿Desasignar la vivienda ${numeroVivienda}?\n\nLos usuarios/núcleo quedarán sin vivienda asignada.`)) {
+        return;
+    }
+    
+    try {
+        const formData = new FormData();
+        formData.append('asignacion_id', asignacionId);
+        
+        const response = await fetch('/api/viviendas/desasignar', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert('✅ ' + data.message);
+            
+            if (typeof loadViviendas === 'function') {
+                loadViviendas();
+            }
+        } else {
+            alert('❌ Error: ' + data.message);
+        }
+        
+    } catch (error) {
+        console.error('❌ [DESASIGNAR] Error:', error);
+        alert('❌ Error de conexión');
+    }
+};
+
+console.log('✅ Sistema de asignación directa cargado');
+console.log('✅ Funciones disponibles:');
+console.log('  - asignarViviendaDirecta()');
+console.log('  - desasignarVivienda()');

@@ -15,43 +15,36 @@ class Material
         $this->conn = Database::getConnection();
     }
 
-    // Crear nuevo material
-    public function create($nombre, $caracteristicas)
+    // ✅ OPTIMIZADO: Stock ahora está en Materiales.cantidad_disponible
+    public function create($nombre, $caracteristicas, $stockInicial = 0)
     {
         try {
-            $query = "INSERT INTO Materiales (nombre, caracteristicas) VALUES (:nombre, :caracteristicas)";
+            $query = "INSERT INTO Materiales (nombre, caracteristicas, cantidad_disponible) 
+                      VALUES (:nombre, :caracteristicas, :stock)";
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':nombre', $nombre);
             $stmt->bindParam(':caracteristicas', $caracteristicas);
+            $stmt->bindParam(':stock', $stockInicial, PDO::PARAM_INT);
             $stmt->execute();
             
-            $materialId = $this->conn->lastInsertId();
-            
-            // Inicializar stock en 0
-            $stockQuery = "INSERT INTO Stock_Materiales (id_material, cantidad_disponible) VALUES (:id_material, 0)";
-            $stockStmt = $this->conn->prepare($stockQuery);
-            $stockStmt->bindParam(':id_material', $materialId);
-            $stockStmt->execute();
-            
-            return $materialId;
+            return $this->conn->lastInsertId();
         } catch (PDOException $e) {
             error_log("Error al crear material: " . $e->getMessage());
             throw $e;
         }
     }
 
-    // Obtener todos los materiales con su stock
+    // ✅ OPTIMIZADO: Obtener todos con stock integrado
     public function getAll()
     {
         try {
             $query = "SELECT 
-                        m.id_material,
-                        m.nombre,
-                        m.caracteristicas,
-                        COALESCE(s.cantidad_disponible, 0) as stock
-                      FROM Materiales m
-                      LEFT JOIN Stock_Materiales s ON m.id_material = s.id_material
-                      ORDER BY m.nombre ASC";
+                        id_material,
+                        nombre,
+                        caracteristicas,
+                        cantidad_disponible as stock
+                      FROM Materiales
+                      ORDER BY nombre ASC";
             
             $stmt = $this->conn->prepare($query);
             $stmt->execute();
@@ -62,18 +55,17 @@ class Material
         }
     }
 
-    // Obtener material por ID
+    // ✅ OPTIMIZADO: Obtener por ID con stock integrado
     public function getById($id)
     {
         try {
             $query = "SELECT 
-                        m.id_material,
-                        m.nombre,
-                        m.caracteristicas,
-                        COALESCE(s.cantidad_disponible, 0) as stock
-                      FROM Materiales m
-                      LEFT JOIN Stock_Materiales s ON m.id_material = s.id_material
-                      WHERE m.id_material = :id";
+                        id_material,
+                        nombre,
+                        caracteristicas,
+                        cantidad_disponible as stock
+                      FROM Materiales
+                      WHERE id_material = :id";
             
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':id', $id);
@@ -85,11 +77,12 @@ class Material
         }
     }
 
-    // Actualizar material
     public function update($id, $nombre, $caracteristicas)
     {
         try {
-            $query = "UPDATE Materiales SET nombre = :nombre, caracteristicas = :caracteristicas WHERE id_material = :id";
+            $query = "UPDATE Materiales 
+                      SET nombre = :nombre, caracteristicas = :caracteristicas 
+                      WHERE id_material = :id";
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':id', $id);
             $stmt->bindParam(':nombre', $nombre);
@@ -101,14 +94,16 @@ class Material
         }
     }
 
-    // Actualizar stock
+    // ✅ OPTIMIZADO: Actualizar stock directamente en Materiales
     public function updateStock($id, $cantidad)
     {
         try {
-            $query = "UPDATE Stock_Materiales SET cantidad_disponible = :cantidad WHERE id_material = :id";
+            $query = "UPDATE Materiales 
+                      SET cantidad_disponible = :cantidad 
+                      WHERE id_material = :id";
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':id', $id);
-            $stmt->bindParam(':cantidad', $cantidad);
+            $stmt->bindParam(':cantidad', $cantidad, PDO::PARAM_INT);
             return $stmt->execute();
         } catch (PDOException $e) {
             error_log("Error al actualizar stock: " . $e->getMessage());
@@ -116,7 +111,7 @@ class Material
         }
     }
 
-    // Eliminar material
+    // ✅ OPTIMIZADO: Eliminar sin tabla Stock_Materiales
     public function delete($id)
     {
         try {
@@ -131,13 +126,7 @@ class Material
                 throw new \Exception("No se puede eliminar el material porque está asignado a tareas");
             }
             
-            // Eliminar stock primero (FK constraint)
-            $stockQuery = "DELETE FROM Stock_Materiales WHERE id_material = :id";
-            $stockStmt = $this->conn->prepare($stockQuery);
-            $stockStmt->bindParam(':id', $id);
-            $stockStmt->execute();
-            
-            // Eliminar material
+            // Eliminar material directamente (FK cascade eliminará de Proveedor_Material)
             $query = "DELETE FROM Materiales WHERE id_material = :id";
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':id', $id);
@@ -148,20 +137,19 @@ class Material
         }
     }
 
-    // Buscar materiales
+    // ✅ OPTIMIZADO: Buscar con stock integrado
     public function search($searchTerm)
     {
         try {
             $searchTerm = "%{$searchTerm}%";
             $query = "SELECT 
-                        m.id_material,
-                        m.nombre,
-                        m.caracteristicas,
-                        COALESCE(s.cantidad_disponible, 0) as stock
-                      FROM Materiales m
-                      LEFT JOIN Stock_Materiales s ON m.id_material = s.id_material
-                      WHERE m.nombre LIKE :search OR m.caracteristicas LIKE :search
-                      ORDER BY m.nombre ASC";
+                        id_material,
+                        nombre,
+                        caracteristicas,
+                        cantidad_disponible as stock
+                      FROM Materiales
+                      WHERE nombre LIKE :search OR caracteristicas LIKE :search
+                      ORDER BY nombre ASC";
             
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':search', $searchTerm);
@@ -173,34 +161,32 @@ class Material
         }
     }
 
-    // Asignar material a tarea
-    // Asignar material a tarea
-public function assignToTask($tareaId, $materialId, $cantidadRequerida)
-{
-    try {
-        $query = "INSERT INTO Tarea_Material (id_tarea, id_material, cantidad_requerida) 
-                  VALUES (:tarea_id, :material_id, :cantidad)
-                  ON DUPLICATE KEY UPDATE cantidad_requerida = VALUES(cantidad_requerida)";
-        
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':tarea_id', $tareaId, PDO::PARAM_INT);
-        $stmt->bindParam(':material_id', $materialId, PDO::PARAM_INT);
-        $stmt->bindParam(':cantidad', $cantidadRequerida, PDO::PARAM_INT);
-        
-        $result = $stmt->execute();
-        
-        if (!$result) {
-            error_log("Error en execute: " . print_r($stmt->errorInfo(), true));
+    public function assignToTask($tareaId, $materialId, $cantidadRequerida)
+    {
+        try {
+            $query = "INSERT INTO Tarea_Material (id_tarea, id_material, cantidad_requerida) 
+                      VALUES (:tarea_id, :material_id, :cantidad)
+                      ON DUPLICATE KEY UPDATE cantidad_requerida = VALUES(cantidad_requerida)";
+            
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':tarea_id', $tareaId, PDO::PARAM_INT);
+            $stmt->bindParam(':material_id', $materialId, PDO::PARAM_INT);
+            $stmt->bindParam(':cantidad', $cantidadRequerida, PDO::PARAM_INT);
+            
+            $result = $stmt->execute();
+            
+            if (!$result) {
+                error_log("Error en execute: " . print_r($stmt->errorInfo(), true));
+            }
+            
+            return $result;
+        } catch (PDOException $e) {
+            error_log("Error al asignar material a tarea: " . $e->getMessage());
+            throw $e;
         }
-        
-        return $result;
-    } catch (PDOException $e) {
-        error_log("Error al asignar material a tarea: " . $e->getMessage());
-        throw $e;
     }
-}
 
-    // Obtener materiales de una tarea
+    // ✅ OPTIMIZADO: Obtener materiales de tarea con stock integrado
     public function getTaskMaterials($tareaId)
     {
         try {
@@ -209,10 +195,9 @@ public function assignToTask($tareaId, $materialId, $cantidadRequerida)
                         m.nombre,
                         m.caracteristicas,
                         tm.cantidad_requerida,
-                        COALESCE(s.cantidad_disponible, 0) as stock_disponible
+                        m.cantidad_disponible as stock_disponible
                       FROM Tarea_Material tm
                       INNER JOIN Materiales m ON tm.id_material = m.id_material
-                      LEFT JOIN Stock_Materiales s ON m.id_material = s.id_material
                       WHERE tm.id_tarea = :tarea_id
                       ORDER BY m.nombre ASC";
             
@@ -226,7 +211,6 @@ public function assignToTask($tareaId, $materialId, $cantidadRequerida)
         }
     }
 
-    // Remover material de tarea
     public function removeFromTask($tareaId, $materialId)
     {
         try {
@@ -241,7 +225,6 @@ public function assignToTask($tareaId, $materialId, $cantidadRequerida)
         }
     }
 
-    // Solicitar material (pedido)
     public function createRequest($materialId, $cantidad, $usuarioId, $descripcion = null)
     {
         try {
@@ -261,7 +244,6 @@ public function assignToTask($tareaId, $materialId, $cantidadRequerida)
         }
     }
 
-    // Obtener solicitudes de materiales
     public function getRequests($estado = null)
     {
         try {

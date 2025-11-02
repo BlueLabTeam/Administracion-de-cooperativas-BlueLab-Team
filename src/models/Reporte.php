@@ -31,17 +31,7 @@ class Reporte
                         'nombre_mes' => $this->getNombreMes($mes)
                     ],
                     'usuarios' => [],
-                    'resumen' => [
-                        'total_usuarios' => 0,
-                        'total_horas_trabajadas' => 0,
-                        'total_horas_requeridas' => 0,
-                        'total_deuda_horas' => 0,
-                        'total_tareas_asignadas' => 0,
-                        'total_tareas_completadas' => 0,
-                        'total_cuotas_pagadas' => 0,
-                        'total_cuotas_pendientes' => 0,
-                        'promedio_cumplimiento' => 0
-                    ]
+                    'resumen' => $this->getResumenVacio()
                 ];
             }
             
@@ -52,17 +42,7 @@ class Reporte
                     'nombre_mes' => $this->getNombreMes($mes)
                 ],
                 'usuarios' => [],
-                'resumen' => [
-                    'total_usuarios' => 0,
-                    'total_horas_trabajadas' => 0,
-                    'total_horas_requeridas' => 0,
-                    'total_deuda_horas' => 0,
-                    'total_tareas_asignadas' => 0,
-                    'total_tareas_completadas' => 0,
-                    'total_cuotas_pagadas' => 0,
-                    'total_cuotas_pendientes' => 0,
-                    'promedio_cumplimiento' => 0
-                ]
+                'resumen' => $this->getResumenVacio()
             ];
 
             $sumaCumplimiento = 0;
@@ -77,17 +57,17 @@ class Reporte
                     'tipo_vivienda' => $usuario['tipo_vivienda']
                 ];
 
-                // Horas
-                $horas = $this->getHorasUsuarioMes($usuario['id_usuario'], $mes, $anio);
+                // ✅ HORAS CON JUSTIFICACIONES
+                $horas = $this->getHorasUsuarioMesConJustificaciones($usuario['id_usuario'], $mes, $anio);
                 $datosUsuario['horas_trabajadas'] = $horas['total_horas'];
                 $datosUsuario['horas_requeridas'] = $horas['horas_requeridas'];
                 $datosUsuario['horas_aprobadas'] = $horas['horas_aprobadas'];
                 $datosUsuario['horas_pendientes'] = $horas['horas_pendientes'];
-                $datosUsuario['horas_faltantes'] = max(0, $horas['horas_requeridas'] - $horas['horas_aprobadas']);
-                $datosUsuario['porcentaje_cumplimiento'] = $horas['horas_requeridas'] > 0 
-                    ? round(($horas['horas_aprobadas'] / $horas['horas_requeridas']) * 100, 2) 
-                    : 0;
-                $datosUsuario['deuda_horas'] = $datosUsuario['horas_faltantes'] * 160;
+                $datosUsuario['horas_justificadas'] = $horas['horas_justificadas'];
+                $datosUsuario['horas_efectivas'] = $horas['horas_efectivas'];
+                $datosUsuario['horas_faltantes'] = $horas['horas_faltantes_real'];
+                $datosUsuario['porcentaje_cumplimiento'] = $horas['porcentaje_cumplimiento'];
+                $datosUsuario['deuda_horas'] = $horas['deuda_horas_pesos'];
 
                 // Tareas
                 $tareas = $this->getTareasUsuarioMes($usuario['id_usuario'], $mes, $anio);
@@ -144,61 +124,67 @@ class Reporte
     }
 
     private function getUsuariosConVivienda()
-    {
-        error_log("Ejecutando getUsuariosConVivienda()");
-        
-        $sql = "SELECT 
-                    u.id_usuario,
-                    u.nombre_completo,
-                    u.cedula,
-                    u.email,
-                    v.numero_vivienda,
-                    tv.nombre as tipo_vivienda
-                FROM Usuario u
-                INNER JOIN Asignacion_Vivienda av ON u.id_usuario = av.id_usuario
-                INNER JOIN Viviendas v ON av.id_vivienda = v.id_vivienda
-                INNER JOIN Tipo_Vivienda tv ON v.id_tipo = tv.id_tipo
-                WHERE av.activa = 1
-                ORDER BY u.nombre_completo";
+{
+    error_log("Ejecutando getUsuariosConVivienda()");
+    
+    // ✅ CAMBIAR: Incluir TODOS los usuarios aceptados, tengan o no vivienda
+    $sql = "SELECT 
+                u.id_usuario,
+                u.nombre_completo,
+                u.cedula,
+                u.email,
+                v.numero_vivienda,
+                tv.nombre as tipo_vivienda
+            FROM Usuario u
+            LEFT JOIN Asignacion_Vivienda av ON u.id_usuario = av.id_usuario AND av.activa = 1
+            LEFT JOIN Viviendas v ON av.id_vivienda = v.id_vivienda
+            LEFT JOIN Tipo_Vivienda tv ON v.id_tipo = tv.id_tipo
+            WHERE u.estado = 'aceptado'
+            ORDER BY u.nombre_completo";
 
-        try {
-            $stmt = $this->conn->prepare($sql);
-            $stmt->execute();
-            $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            
-            error_log("Usuarios encontrados: " . count($usuarios));
-            if (count($usuarios) > 0) {
-                error_log("Primer usuario: " . $usuarios[0]['nombre_completo']);
-            }
-            
-            return $usuarios;
-        } catch (\PDOException $e) {
-            error_log("Error en getUsuariosConVivienda: " . $e->getMessage());
-            throw $e;
+    try {
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        error_log("Usuarios encontrados: " . count($usuarios));
+        if (count($usuarios) > 0) {
+            error_log("Primer usuario: " . $usuarios[0]['nombre_completo']);
         }
+        
+        return $usuarios;
+    } catch (\PDOException $e) {
+        error_log("Error en getUsuariosConVivienda: " . $e->getMessage());
+        throw $e;
     }
+}
 
-    private function getHorasUsuarioMes($idUsuario, $mes, $anio)
-    {
-        // Primero obtenemos las horas requeridas de la vivienda asignada
-        $sqlHorasRequeridas = "SELECT tv.habitaciones * 21 as horas_requeridas
-                               FROM Tipo_Vivienda tv
-                               INNER JOIN Viviendas v ON tv.id_tipo = v.id_tipo
-                               INNER JOIN Asignacion_Vivienda av ON v.id_vivienda = av.id_vivienda
-                               WHERE av.id_usuario = :id_usuario AND av.activa = 1
-                               LIMIT 1";
+    /**
+     * ✅ NUEVO: Obtener horas CON JUSTIFICACIONES
+     */
+    private function getHorasUsuarioMesConJustificaciones($idUsuario, $mes, $anio)
+{
+    // ✅ Obtener horas requeridas (manejar usuarios SIN vivienda)
+    $sqlHorasRequeridas = "SELECT 
+                            COALESCE(tv.habitaciones * 21, 84) as horas_requeridas
+                           FROM Usuario u
+                           LEFT JOIN Asignacion_Vivienda av ON u.id_usuario = av.id_usuario AND av.activa = 1
+                           LEFT JOIN Viviendas v ON av.id_vivienda = v.id_vivienda
+                           LEFT JOIN Tipo_Vivienda tv ON v.id_tipo = tv.id_tipo
+                           WHERE u.id_usuario = :id_usuario
+                           LIMIT 1";
+    
+    try {
+        $stmtRequeridas = $this->conn->prepare($sqlHorasRequeridas);
+        $stmtRequeridas->execute([':id_usuario' => $idUsuario]);
+        $horasReq = $stmtRequeridas->fetch(PDO::FETCH_ASSOC);
+        $horasRequeridas = $horasReq['horas_requeridas'] ?? 84;
+    } catch (\PDOException $e) {
+        error_log("Error obteniendo horas requeridas: " . $e->getMessage());
+        $horasRequeridas = 84;
+    }
         
-        try {
-            $stmtRequeridas = $this->conn->prepare($sqlHorasRequeridas);
-            $stmtRequeridas->execute([':id_usuario' => $idUsuario]);
-            $horasReq = $stmtRequeridas->fetch(PDO::FETCH_ASSOC);
-            $horasRequeridas = $horasReq['horas_requeridas'] ?? 0;
-        } catch (\PDOException $e) {
-            error_log("Error obteniendo horas requeridas: " . $e->getMessage());
-            $horasRequeridas = 0;
-        }
-        
-        // Luego obtenemos las horas trabajadas
+        // Obtener horas trabajadas
         $sql = "SELECT 
                     COALESCE(SUM(rh.total_horas), 0) as total_horas,
                     COALESCE(SUM(CASE WHEN rh.estado = 'aprobado' THEN rh.total_horas ELSE 0 END), 0) as horas_aprobadas,
@@ -207,6 +193,14 @@ class Reporte
                 WHERE rh.id_usuario = :id_usuario
                 AND MONTH(rh.fecha) = :mes
                 AND YEAR(rh.fecha) = :anio";
+
+        // ✅ Obtener horas justificadas
+        $sqlJustificadas = "SELECT COALESCE(SUM(horas_justificadas), 0) as horas_justificadas
+                            FROM Justificaciones_Horas
+                            WHERE id_usuario = :id_usuario
+                            AND mes = :mes
+                            AND anio = :anio
+                            AND estado = 'aprobada'";
 
         try {
             $stmt = $this->conn->prepare($sql);
@@ -217,16 +211,47 @@ class Reporte
             ]);
 
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
-            $result['horas_requeridas'] = $horasRequeridas;
             
-            return $result;
+            // Obtener justificadas
+            $stmtJust = $this->conn->prepare($sqlJustificadas);
+            $stmtJust->execute([
+                ':id_usuario' => $idUsuario,
+                ':mes' => $mes,
+                ':anio' => $anio
+            ]);
+            $justResult = $stmtJust->fetch(PDO::FETCH_ASSOC);
+            
+            $horasJustificadas = floatval($justResult['horas_justificadas'] ?? 0);
+            $horasEfectivas = floatval($result['horas_aprobadas']) + $horasJustificadas;
+            $horasFaltantesReal = max(0, $horasRequeridas - $horasEfectivas);
+            $deudaHorasPesos = $horasFaltantesReal * 160;
+            $porcentajeCumplimiento = $horasRequeridas > 0 
+                ? round(($horasEfectivas / $horasRequeridas) * 100, 2)
+                : 0;
+            
+            return [
+                'total_horas' => floatval($result['total_horas']),
+                'horas_aprobadas' => floatval($result['horas_aprobadas']),
+                'horas_pendientes' => floatval($result['horas_pendientes']),
+                'horas_requeridas' => $horasRequeridas,
+                'horas_justificadas' => $horasJustificadas,
+                'horas_efectivas' => $horasEfectivas,
+                'horas_faltantes_real' => $horasFaltantesReal,
+                'deuda_horas_pesos' => $deudaHorasPesos,
+                'porcentaje_cumplimiento' => $porcentajeCumplimiento
+            ];
         } catch (\PDOException $e) {
-            error_log("Error en getHorasUsuarioMes: " . $e->getMessage());
+            error_log("Error en getHorasUsuarioMesConJustificaciones: " . $e->getMessage());
             return [
                 'total_horas' => 0,
                 'horas_aprobadas' => 0,
                 'horas_pendientes' => 0,
-                'horas_requeridas' => $horasRequeridas
+                'horas_requeridas' => $horasRequeridas,
+                'horas_justificadas' => 0,
+                'horas_efectivas' => 0,
+                'horas_faltantes_real' => $horasRequeridas,
+                'deuda_horas_pesos' => $horasRequeridas * 160,
+                'porcentaje_cumplimiento' => 0
             ];
         }
     }
@@ -426,5 +451,20 @@ class Reporte
             9 => 'Septiembre', 10 => 'Octubre', 11 => 'Noviembre', 12 => 'Diciembre'
         ];
         return $meses[$mes] ?? 'Desconocido';
+    }
+
+    private function getResumenVacio()
+    {
+        return [
+            'total_usuarios' => 0,
+            'total_horas_trabajadas' => 0,
+            'total_horas_requeridas' => 0,
+            'total_deuda_horas' => 0,
+            'total_tareas_asignadas' => 0,
+            'total_tareas_completadas' => 0,
+            'total_cuotas_pagadas' => 0,
+            'total_cuotas_pendientes' => 0,
+            'promedio_cumplimiento' => 0
+        ];
     }
 }

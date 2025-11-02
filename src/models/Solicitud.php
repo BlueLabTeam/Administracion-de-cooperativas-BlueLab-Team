@@ -54,84 +54,35 @@ class Solicitud
     }
 
     /**
-     * Obtener solicitudes del usuario
+     * Obtener solicitudes del usuario - ✅ USAR VISTA
      */
     public function getMisSolicitudes($idUsuario, $filtros = [])
     {
         try {
             error_log("========================================");
-            error_log("getMisSolicitudes - Inicio");
+            error_log("getMisSolicitudes - Usando Vista");
             error_log("Usuario ID: $idUsuario");
             error_log("Filtros: " . json_encode($filtros));
 
-            // Primero verificar si la vista existe, si no usar consulta directa
-            $vistaExiste = false;
-            try {
-                $checkStmt = $this->conn->query("SHOW TABLES LIKE 'Vista_Solicitudes_Completa'");
-                $vistaExiste = $checkStmt->rowCount() > 0;
-                error_log("Vista existe: " . ($vistaExiste ? 'SI' : 'NO'));
-            } catch (\PDOException $e) {
-                error_log("Error al verificar vista: " . $e->getMessage());
-            }
-
-            if ($vistaExiste) {
-                // Usar la vista
-                $sql = "
-                    SELECT * FROM Vista_Solicitudes_Completa
-                    WHERE id_usuario = :id_usuario
-                ";
-            } else {
-                // Consulta directa a las tablas
-                error_log("Usando consulta directa (sin vista)");
-                $sql = "
-                    SELECT 
-                        s.id_solicitud,
-                        s.id_usuario,
-                        u.nombre_completo,
-                        u.email,
-                        u.cedula,
-                        s.tipo_solicitud,
-                        s.asunto,
-                        s.descripcion,
-                        s.archivo_adjunto,
-                        s.estado,
-                        s.prioridad,
-                        s.fecha_creacion,
-                        s.fecha_actualizacion,
-                        COUNT(rs.id_respuesta) as total_respuestas,
-                        MAX(rs.fecha_respuesta) as ultima_respuesta
-                    FROM Solicitudes s
-                    INNER JOIN Usuario u ON s.id_usuario = u.id_usuario
-                    LEFT JOIN Respuestas_Solicitudes rs ON s.id_solicitud = rs.id_solicitud
-                    WHERE s.id_usuario = :id_usuario
-                ";
-            }
+            // ✅ USAR VISTA OPTIMIZADA
+            $sql = "
+                SELECT * FROM Vista_Solicitudes_Completa
+                WHERE id_usuario = :id_usuario
+            ";
 
             $params = ['id_usuario' => $idUsuario];
 
             if (!empty($filtros['estado'])) {
-                if ($vistaExiste) {
-                    $sql .= " AND estado = :estado";
-                } else {
-                    $sql .= " AND s.estado = :estado";
-                }
+                $sql .= " AND estado = :estado";
                 $params['estado'] = $filtros['estado'];
             }
 
             if (!empty($filtros['tipo'])) {
-                if ($vistaExiste) {
-                    $sql .= " AND tipo_solicitud = :tipo";
-                } else {
-                    $sql .= " AND s.tipo_solicitud = :tipo";
-                }
+                $sql .= " AND tipo_solicitud = :tipo";
                 $params['tipo'] = $filtros['tipo'];
             }
 
-            if (!$vistaExiste) {
-                $sql .= " GROUP BY s.id_solicitud";
-            }
-
-            $sql .= " ORDER BY " . ($vistaExiste ? "fecha_creacion" : "s.fecha_creacion") . " DESC";
+            $sql .= " ORDER BY fecha_creacion DESC";
 
             error_log("SQL: $sql");
             error_log("Params: " . json_encode($params));
@@ -160,79 +111,42 @@ class Solicitud
     }
 
     /**
-     * Obtener TODAS las solicitudes (Admin)
+     * Obtener TODAS las solicitudes (Admin) - ✅ USAR VISTA
      */
     public function getAllSolicitudes($filtros = [])
     {
         try {
             error_log("========================================");
-            error_log("getAllSolicitudes - Inicio");
+            error_log("getAllSolicitudes - Usando Vista");
             error_log("Filtros: " . json_encode($filtros));
 
-            // Verificar si la vista existe
-            $vistaExiste = false;
-            try {
-                $checkStmt = $this->conn->query("SHOW TABLES LIKE 'Vista_Solicitudes_Completa'");
-                $vistaExiste = $checkStmt->rowCount() > 0;
-            } catch (\PDOException $e) {
-                error_log("Error al verificar vista: " . $e->getMessage());
-            }
-
-            if ($vistaExiste) {
-                $sql = "SELECT * FROM Vista_Solicitudes_Completa WHERE 1=1";
-            } else {
-                $sql = "
-                    SELECT 
-                        s.id_solicitud,
-                        s.id_usuario,
-                        u.nombre_completo,
-                        u.email,
-                        u.cedula,
-                        s.tipo_solicitud,
-                        s.asunto,
-                        s.descripcion,
-                        s.archivo_adjunto,
-                        s.estado,
-                        s.prioridad,
-                        s.fecha_creacion,
-                        s.fecha_actualizacion,
-                        COUNT(rs.id_respuesta) as total_respuestas,
-                        MAX(rs.fecha_respuesta) as ultima_respuesta
-                    FROM Solicitudes s
-                    INNER JOIN Usuario u ON s.id_usuario = u.id_usuario
-                    LEFT JOIN Respuestas_Solicitudes rs ON s.id_solicitud = rs.id_solicitud
-                    WHERE 1=1
-                ";
-            }
+            // ✅ USAR VISTA OPTIMIZADA
+            $sql = "SELECT * FROM Vista_Solicitudes_Completa WHERE 1=1";
 
             $params = [];
 
             if (!empty($filtros['estado'])) {
-                $sql .= " AND " . ($vistaExiste ? "" : "s.") . "estado = :estado";
+                $sql .= " AND estado = :estado";
                 $params['estado'] = $filtros['estado'];
             }
 
             if (!empty($filtros['tipo'])) {
-                $sql .= " AND " . ($vistaExiste ? "" : "s.") . "tipo_solicitud = :tipo";
+                $sql .= " AND tipo_solicitud = :tipo";
                 $params['tipo'] = $filtros['tipo'];
             }
 
             if (!empty($filtros['prioridad'])) {
-                $sql .= " AND " . ($vistaExiste ? "" : "s.") . "prioridad = :prioridad";
+                $sql .= " AND prioridad = :prioridad";
                 $params['prioridad'] = $filtros['prioridad'];
             }
 
-            if (!$vistaExiste) {
-                $sql .= " GROUP BY s.id_solicitud";
-            }
-
             $sql .= " ORDER BY 
-                CASE " . ($vistaExiste ? "" : "s.") . "prioridad 
+                CASE prioridad 
                     WHEN 'alta' THEN 1 
                     WHEN 'media' THEN 2 
                     WHEN 'baja' THEN 3 
                 END,
-                " . ($vistaExiste ? "" : "s.") . "fecha_creacion DESC";
+                fecha_creacion DESC";
 
             error_log("SQL: $sql");
             error_log("Params: " . json_encode($params));
@@ -255,50 +169,15 @@ class Solicitud
     }
 
     /**
-     * Obtener detalle de una solicitud
+     * Obtener detalle de una solicitud - ✅ USAR VISTA
      */
     public function getById($solicitudId)
     {
         try {
-            // Verificar si la vista existe
-            $vistaExiste = false;
-            try {
-                $checkStmt = $this->conn->query("SHOW TABLES LIKE 'Vista_Solicitudes_Completa'");
-                $vistaExiste = $checkStmt->rowCount() > 0;
-            } catch (\PDOException $e) {
-                error_log("Error al verificar vista: " . $e->getMessage());
-            }
-
-            if ($vistaExiste) {
-                $stmt = $this->conn->prepare("
-                    SELECT * FROM Vista_Solicitudes_Completa
-                    WHERE id_solicitud = :id
-                ");
-            } else {
-                $stmt = $this->conn->prepare("
-                    SELECT 
-                        s.id_solicitud,
-                        s.id_usuario,
-                        u.nombre_completo,
-                        u.email,
-                        u.cedula,
-                        s.tipo_solicitud,
-                        s.asunto,
-                        s.descripcion,
-                        s.archivo_adjunto,
-                        s.estado,
-                        s.prioridad,
-                        s.fecha_creacion,
-                        s.fecha_actualizacion,
-                        COUNT(rs.id_respuesta) as total_respuestas,
-                        MAX(rs.fecha_respuesta) as ultima_respuesta
-                    FROM Solicitudes s
-                    INNER JOIN Usuario u ON s.id_usuario = u.id_usuario
-                    LEFT JOIN Respuestas_Solicitudes rs ON s.id_solicitud = rs.id_solicitud
-                    WHERE s.id_solicitud = :id
-                    GROUP BY s.id_solicitud
-                ");
-            }
+            $stmt = $this->conn->prepare("
+                SELECT * FROM Vista_Solicitudes_Completa
+                WHERE id_solicitud = :id
+            ");
 
             $stmt->execute(['id' => $solicitudId]);
             return $stmt->fetch(PDO::FETCH_ASSOC);

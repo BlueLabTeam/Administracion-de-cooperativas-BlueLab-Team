@@ -1,7 +1,6 @@
 <?php
 date_default_timezone_set('America/Montevideo');
 
-
 require __DIR__ . '/../vendor/autoload.php';
 
 use App\middlewares\Middleware;
@@ -9,7 +8,7 @@ use App\utils\Herramientas;
 
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
-// Manejo de archivos estáticos ANTES de iniciar sesión
+// Manejo de archivos estaticos ANTES de iniciar sesion
 if (strpos($uri, '/files/') === 0) {
     $path = $_GET['path'] ?? '';
     
@@ -67,7 +66,7 @@ if (strpos($uri, '/files/') === 0) {
 
 Herramientas::startSession();
 
-// Rutas que solo requieren login (no validación de estado)
+// Rutas que solo requieren login (no validacion de estado)
 $loginOnlyRoutes = [
     '/api/pay/firstPay',
     '/api/viviendas/tipos',
@@ -96,13 +95,23 @@ $privateRoutes = [
     '/api/tasks/nucleos',
     '/api/tasks/cancel',
     '/api/users/all',
+    '/api/users/aprobar-rechazar',
     '/api/users/details',
+    '/api/users/payment-details',
     '/api/nucleos/create',      
     '/api/nucleos/all',            
     '/api/nucleos/details',        
     '/api/nucleos/update',       
     '/api/nucleos/delete',       
     '/api/nucleos/users-available',
+    '/api/nucleos/disponibles',
+    '/api/nucleos/solicitar-unirse',
+    '/api/nucleos/mi-nucleo-info',
+    '/api/nucleos/mis-solicitudes',
+    '/api/nucleos/cancelar-solicitud',
+    '/api/nucleos/solicitudes-pendientes',
+    '/api/nucleos/aprobar-solicitud',
+    '/api/nucleos/rechazar-solicitud',
     '/api/materiales/create',
     '/api/materiales/all',
     '/api/materiales/details',
@@ -138,8 +147,6 @@ $privateRoutes = [
     '/api/horas/historial-mensual',
     '/api/cuotas/mis-cuotas',
     '/api/cuotas/detalle',
-    '/api/cuotas/generar',
-    '/api/cuotas/verificar-pago',
     '/api/cuotas/pagar',
     '/api/cuotas/verificar-cuota-mes',
     '/api/cuotas/generar-mi-cuota',
@@ -148,6 +155,7 @@ $privateRoutes = [
     '/api/cuotas/generar-masivas',
     '/api/cuotas/estadisticas',
     '/api/cuotas/precios',
+    '/api/cuotas/verificar-auto',
     '/api/cuotas/actualizar-precio',
     '/api/solicitudes/create',
     '/api/solicitudes/mis-solicitudes',
@@ -165,17 +173,11 @@ $privateRoutes = [
     '/api/reporte/cuotas',
     '/api/reporte/estadisticas',
     '/api/reporte/exportar',
-    '/api/nucleos/disponibles',
-'/api/nucleos/solicitar-unirse',
- '/api/nucleos/mi-nucleo-info',
-'/api/nucleos/mis-solicitudes',
-'/api/nucleos/cancelar-solicitud',
-'/api/nucleos/solicitudes-pendientes',
-'/api/nucleos/aprobar-solicitud',
-'/api/nucleos/rechazar-solicitud',
+    '/api/debug/mis-cuotas',
+    '/api/test/generar-cuota-simple',
 ];
 
-// Aplicar middleware según el tipo de ruta
+// Aplicar middleware segun el tipo de ruta
 if (in_array($uri, $loginOnlyRoutes)) {
     Herramientas::validarLogin();
 } elseif (in_array($uri, $privateRoutes)) {
@@ -273,7 +275,7 @@ switch ($uri) {
             (new App\Controllers\TaskController())->addAvance($tareaId, $userId, $comentario, $progreso, $archivo);
         } else {
             http_response_code(400);
-            echo json_encode(['error' => 'Faltan parámetros']);
+            echo json_encode(['error' => 'Faltan parametros']);
         }
         break;
     case '/api/tasks/details':
@@ -308,6 +310,12 @@ switch ($uri) {
     case '/api/users/update-profile':
         (new App\Controllers\UserController())->updateProfile();
         break;
+    case '/api/users/aprobar-rechazar':
+        (new App\Controllers\UserController())->aprobarRechazar();
+        break;
+        case '/api/users/payment-details':
+    (new App\Controllers\UserController())->getPaymentDetails();
+    break;
 
     // API NUCLEOS
     case '/api/nucleos/create':
@@ -328,7 +336,31 @@ switch ($uri) {
     case '/api/nucleos/users-available':
         (new App\Controllers\NucleoController())->getAvailableUsers();
         break;
-
+    case '/api/nucleos/disponibles':
+        (new App\Controllers\NucleoController())->getNucleosDisponibles();
+        break;
+    case '/api/nucleos/solicitar-unirse':
+        (new App\Controllers\NucleoController())->solicitarUnirse();
+        break;
+    case '/api/nucleos/mis-solicitudes':
+        (new App\Controllers\NucleoController())->getMisSolicitudesNucleo();
+        break;
+    case '/api/nucleos/cancelar-solicitud':
+        (new App\Controllers\NucleoController())->cancelarSolicitudNucleo();
+        break;
+    case '/api/nucleos/solicitudes-pendientes':
+        (new App\Controllers\NucleoController())->getSolicitudesPendientesAdmin();
+        break;
+    case '/api/nucleos/aprobar-solicitud':
+        (new App\Controllers\NucleoController())->aprobarSolicitudNucleo();
+        break;
+    case '/api/nucleos/rechazar-solicitud':
+        (new App\Controllers\NucleoController())->rechazarSolicitudNucleo();
+        break;
+    case '/api/nucleos/mi-nucleo-info':
+        (new App\Controllers\NucleoController())->getMiNucleoInfo();
+        break;
+        
     // API MATERIALES
     case '/api/materiales/create':
         (new App\Controllers\MaterialController())->create();
@@ -449,20 +481,17 @@ switch ($uri) {
     case '/api/cuotas/detalle':
         (new App\Controllers\CuotaController())->getDetalleCuota();
         break;
-    case '/api/cuotas/generar':
+    case '/api/cuotas/generar-mi-cuota':
         (new App\Controllers\CuotaController())->generarMiCuota();
         break;
     case '/api/cuotas/verificar-cuota-mes':
         (new App\Controllers\CuotaController())->verificarCuotaMes();
         break;
-    case '/api/cuotas/generar-mi-cuota':
-        (new App\Controllers\CuotaController())->generarMiCuota();
-        break;
-    case '/api/cuotas/verificar-pago':
-        (new App\Controllers\CuotaController())->verificarPagoCuota();
-        break;
     case '/api/cuotas/pagar':
         (new App\Controllers\CuotaController())->pagarCuota();
+        break;
+    case '/api/cuotas/verificar-auto':
+        (new App\Controllers\CuotaController())->verificarYGenerarCuotaAuto();
         break;
 
     // API CUOTAS - ADMIN
@@ -510,7 +539,7 @@ switch ($uri) {
         (new App\Controllers\SolicitudController())->getEstadisticas();
         break;
 
-    // ✅ API JUSTIFICACIONES DE HORAS - ADMIN
+    // API JUSTIFICACIONES DE HORAS
     case '/api/justificaciones/crear':
         (new App\Controllers\JustificacionHorasController())->crearJustificacion();
         break;
@@ -521,59 +550,160 @@ switch ($uri) {
         (new App\Controllers\JustificacionHorasController())->eliminarJustificacion();
         break;
 
-        // API REPORTES - ADMIN
-case '/api/reporte/mensual':
-    (new App\Controllers\ReporteController())->generarReporteMensual();
-    break;
+    // API REPORTES - ADMIN
+    case '/api/reporte/mensual':
+        (new App\Controllers\ReporteController())->generarReporteMensual();
+        break;
+    case '/api/reporte/horas':
+        (new App\Controllers\ReporteController())->getResumenHorasMensual();
+        break;
+    case '/api/reporte/tareas':
+        (new App\Controllers\ReporteController())->getResumenTareasMensual();
+        break;
+    case '/api/reporte/cuotas':
+        (new App\Controllers\ReporteController())->getResumenCuotasMensual();
+        break;
+    case '/api/reporte/estadisticas':
+        (new App\Controllers\ReporteController())->getEstadisticasGenerales();
+        break;
+    case '/api/reporte/exportar':
+        (new App\Controllers\ReporteController())->exportarReporteMensual();
+        break;
 
-case '/api/reporte/horas':
-    (new App\Controllers\ReporteController())->getResumenHorasMensual();
-    break;
+    // DEBUG: Verificar cuotas del usuario
+    case '/api/debug/mis-cuotas':
+        while (ob_get_level() > 0) {
+            ob_end_clean();
+        }
+        
+        header('Content-Type: application/json; charset=utf-8');
+        
+        try {
+            if (!isset($_SESSION['user_id'])) {
+                echo json_encode(['error' => 'No autenticado'], JSON_UNESCAPED_UNICODE);
+                exit();
+            }
+            
+            $userId = $_SESSION['user_id'];
+            $pdo = \App\config\Database::getConnection();
+            
+            // 1. Verificar usuario
+            $stmtUser = $pdo->prepare("SELECT * FROM Usuario WHERE id_usuario = ?");
+            $stmtUser->execute([$userId]);
+            $user = $stmtUser->fetch(PDO::FETCH_ASSOC);
+            
+            // 2. Buscar cuotas directamente
+            $stmtCuotas = $pdo->prepare("
+                SELECT * FROM Cuotas_Mensuales 
+                WHERE id_usuario = ? 
+                ORDER BY anio DESC, mes DESC
+            ");
+            $stmtCuotas->execute([$userId]);
+            $cuotasDirectas = $stmtCuotas->fetchAll(PDO::FETCH_ASSOC);
+            
+            // 3. Buscar desde vista
+            $stmtVista = $pdo->prepare("
+                SELECT * FROM Vista_Cuotas_Con_Justificaciones 
+                WHERE id_usuario = ? 
+                ORDER BY anio DESC, mes DESC
+            ");
+            $stmtVista->execute([$userId]);
+            $cuotasVista = $stmtVista->fetchAll(PDO::FETCH_ASSOC);
+            
+            // 4. Verificar vivienda
+            $stmtVivienda = $pdo->prepare("
+                SELECT av.*, v.numero_vivienda, v.id_tipo
+                FROM Asignacion_Vivienda av
+                LEFT JOIN Viviendas v ON av.id_vivienda = v.id_vivienda
+                WHERE (av.id_usuario = ? OR av.id_nucleo = (
+                    SELECT id_nucleo FROM Usuario WHERE id_usuario = ?
+                ))
+                AND av.activa = 1
+            ");
+            $stmtVivienda->execute([$userId, $userId]);
+            $vivienda = $stmtVivienda->fetch(PDO::FETCH_ASSOC);
+            
+            // 5. Verificar configuracion de precios
+            $stmtPrecios = $pdo->prepare("
+                SELECT cc.*, tv.nombre as tipo_nombre
+                FROM Config_Cuotas cc
+                INNER JOIN Tipo_Vivienda tv ON cc.id_tipo = tv.id_tipo
+                WHERE cc.activo = 1
+            ");
+            $stmtPrecios->execute();
+            $precios = $stmtPrecios->fetchAll(PDO::FETCH_ASSOC);
+            
+            echo json_encode([
+                'usuario' => [
+                    'id' => $user['id_usuario'],
+                    'nombre' => $user['nombre_completo'],
+                    'estado' => $user['estado'],
+                    'id_nucleo' => $user['id_nucleo']
+                ],
+                'vivienda' => $vivienda ?: null,
+                'precios_configurados' => $precios,
+                'cuotas_tabla_directa' => [
+                    'count' => count($cuotasDirectas),
+                    'data' => $cuotasDirectas
+                ],
+                'cuotas_vista' => [
+                    'count' => count($cuotasVista),
+                    'data' => $cuotasVista
+                ],
+                'mes_actual' => date('n'),
+                'anio_actual' => date('Y')
+            ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+            
+        } catch (\Exception $e) {
+            error_log("Error en debug: " . $e->getMessage());
+            http_response_code(500);
+            echo json_encode([
+                'error' => 'Error interno',
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ], JSON_UNESCAPED_UNICODE);
+        }
+        
+        exit();
 
-case '/api/reporte/tareas':
-    (new App\Controllers\ReporteController())->getResumenTareasMensual();
-    break;
-
-case '/api/reporte/cuotas':
-    (new App\Controllers\ReporteController())->getResumenCuotasMensual();
-    break;
-
-case '/api/reporte/estadisticas':
-    (new App\Controllers\ReporteController())->getEstadisticasGenerales();
-    break;
-
-case '/api/reporte/exportar':
-    (new App\Controllers\ReporteController())->exportarReporteMensual();
-    break;
-
-    // API NÚCLEOS - SOLICITUDES (Usuario)
-case '/api/nucleos/disponibles':
-    (new App\Controllers\NucleoController())->getNucleosDisponibles();
-    break;
-case '/api/nucleos/solicitar-unirse':
-    (new App\Controllers\NucleoController())->solicitarUnirse();
-    break;
-case '/api/nucleos/mis-solicitudes':
-    (new App\Controllers\NucleoController())->getMisSolicitudesNucleo();
-    break;
-case '/api/nucleos/cancelar-solicitud':
-    (new App\Controllers\NucleoController())->cancelarSolicitudNucleo();
-    break;
-
-// API NÚCLEOS - SOLICITUDES (Admin)
-case '/api/nucleos/solicitudes-pendientes':
-    (new App\Controllers\NucleoController())->getSolicitudesPendientesAdmin();
-    break;
-case '/api/nucleos/aprobar-solicitud':
-    (new App\Controllers\NucleoController())->aprobarSolicitudNucleo();
-    break;
-case '/api/nucleos/rechazar-solicitud':
-    (new App\Controllers\NucleoController())->rechazarSolicitudNucleo();
-    break;
-
-    case '/api/nucleos/mi-nucleo-info':
-    (new App\Controllers\NucleoController())->getMiNucleoInfo();
-    break;
+    // TEST: Endpoint simple para generar cuota
+    case '/api/test/generar-cuota-simple':
+        while (ob_get_level() > 0) {
+            ob_end_clean();
+        }
+        
+        header('Content-Type: application/json; charset=utf-8');
+        
+        try {
+            if (!isset($_SESSION['user_id'])) {
+                echo json_encode(['error' => 'No autenticado']);
+                exit();
+            }
+            
+            $userId = $_SESSION['user_id'];
+            $mes = intval($_POST['mes'] ?? date('n'));
+            $anio = intval($_POST['anio'] ?? date('Y'));
+            
+            error_log("=== TEST GENERAR CUOTA ===");
+            error_log("Usuario: $userId | Mes: $mes | Anio: $anio");
+            
+            $cuotaModel = new \App\Models\Cuota();
+            $resultado = $cuotaModel->generarCuotaIndividual($userId, $mes, $anio);
+            
+            error_log("Resultado: " . json_encode($resultado));
+            
+            echo json_encode($resultado, JSON_UNESCAPED_UNICODE);
+            
+        } catch (\Exception $e) {
+            error_log("ERROR: " . $e->getMessage());
+            echo json_encode([
+                'success' => false,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+        }
+        
+        exit();
 
     default:
         http_response_code(404);

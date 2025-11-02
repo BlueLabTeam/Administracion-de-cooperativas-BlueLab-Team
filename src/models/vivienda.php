@@ -15,48 +15,93 @@ class Vivienda
         $this->conn = Database::getConnection();
     }
 
-    // Obtener todas las viviendas con información completa
+    // ✅ OPTIMIZADO: Ahora incluye etapa directamente desde Viviendas
     public function getAll()
-    {
-        try {
-            $sql = "SELECT 
-                        v.id_vivienda,
-                        v.numero_vivienda,
-                        v.direccion,
-                        v.estado,
-                        v.metros_cuadrados,
-                        v.observaciones,
-                        v.fecha_construccion,
-                        v.id_tipo,
-                        tv.nombre as tipo_nombre,
-                        tv.habitaciones,
-                        tv.descripcion as tipo_descripcion,
-                        av.id_asignacion,
-                        av.fecha_asignacion,
-                        av.activa,
-                        u.id_usuario,
-                        u.nombre_completo as usuario_asignado,
-                        nf.id_nucleo,
-                        nf.nombre_nucleo as nucleo_asignado
-                    FROM Viviendas v
-                    INNER JOIN Tipo_Vivienda tv ON v.id_tipo = tv.id_tipo
-                    LEFT JOIN Asignacion_Vivienda av ON v.id_vivienda = av.id_vivienda AND av.activa = TRUE
-                    LEFT JOIN Usuario u ON av.id_usuario = u.id_usuario
-                    LEFT JOIN Nucleo_Familiar nf ON av.id_nucleo = nf.id_nucleo
-                    ORDER BY v.numero_vivienda";
-            
-            $stmt = $this->conn->query($sql);
-            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            
-            return $result;
-        } catch (PDOException $e) {
-            error_log("Error en Vivienda::getAll: " . $e->getMessage());
-            error_log("SQL Query: " . $sql);
-            throw $e;
-        }
+{
+    try {
+        $sql = "SELECT 
+                    v.id_vivienda,
+                    v.numero_vivienda,
+                    v.direccion,
+                    v.estado,
+                    v.metros_cuadrados,
+                    v.observaciones,
+                    v.fecha_construccion,
+                    v.id_tipo,
+                    v.id_etapa,
+                    tv.nombre as tipo_nombre,
+                    tv.habitaciones,
+                    tv.descripcion as tipo_descripcion,
+                    e.nombre as etapa_nombre,
+                    e.estado as etapa_estado,
+                    e.fechas as etapa_fechas,
+                    av.id_asignacion,
+                    av.fecha_asignacion,
+                    av.activa,
+                    
+                    -- ✅ USUARIO ASIGNADO DIRECTO
+                    u.id_usuario,
+                    u.nombre_completo as usuario_asignado,
+                    
+                    -- ✅ NÚCLEO ASIGNADO
+                    nf.id_nucleo,
+                    nf.nombre_nucleo as nucleo_asignado,
+                    
+                    -- ✅ TODOS LOS MIEMBROS DEL NÚCLEO (separados por comas)
+                    GROUP_CONCAT(
+                        DISTINCT u_nucleo.nombre_completo 
+                        ORDER BY u_nucleo.nombre_completo 
+                        SEPARATOR ', '
+                    ) as miembros_nucleo,
+                    
+                    -- ✅ CANTIDAD DE MIEMBROS DEL NÚCLEO
+                    COUNT(DISTINCT u_nucleo.id_usuario) as total_miembros_nucleo
+                    
+                FROM Viviendas v
+                INNER JOIN Tipo_Vivienda tv ON v.id_tipo = tv.id_tipo
+                LEFT JOIN Etapas e ON v.id_etapa = e.id_etapa
+                LEFT JOIN Asignacion_Vivienda av ON v.id_vivienda = av.id_vivienda AND av.activa = TRUE
+                LEFT JOIN Usuario u ON av.id_usuario = u.id_usuario
+                LEFT JOIN Nucleo_Familiar nf ON av.id_nucleo = nf.id_nucleo
+                
+                -- ✅ JOIN PARA OBTENER TODOS LOS MIEMBROS DEL NÚCLEO
+                LEFT JOIN Usuario u_nucleo ON u_nucleo.id_nucleo = nf.id_nucleo
+                
+                GROUP BY 
+                    v.id_vivienda, 
+                    v.numero_vivienda,
+                    v.direccion,
+                    v.estado,
+                    v.metros_cuadrados,
+                    v.observaciones,
+                    v.fecha_construccion,
+                    v.id_tipo,
+                    v.id_etapa,
+                    tv.nombre,
+                    tv.habitaciones,
+                    tv.descripcion,
+                    e.nombre,
+                    e.estado,
+                    e.fechas,
+                    av.id_asignacion,
+                    av.fecha_asignacion,
+                    av.activa,
+                    u.id_usuario,
+                    u.nombre_completo,
+                    nf.id_nucleo,
+                    nf.nombre_nucleo
+                
+                ORDER BY v.numero_vivienda";
+        
+        $stmt = $this->conn->query($sql);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        error_log("Error en Vivienda::getAll: " . $e->getMessage());
+        throw $e;
     }
+}
 
-    // Obtener vivienda por ID
+    // ✅ OPTIMIZADO: Incluye etapa
     public function getById($id)
     {
         try {
@@ -64,9 +109,12 @@ class Vivienda
                         v.*,
                         tv.nombre as tipo_nombre,
                         tv.habitaciones,
-                        tv.descripcion as tipo_descripcion
+                        tv.descripcion as tipo_descripcion,
+                        e.nombre as etapa_nombre,
+                        e.estado as etapa_estado
                     FROM Viviendas v
                     INNER JOIN Tipo_Vivienda tv ON v.id_tipo = tv.id_tipo
+                    LEFT JOIN Etapas e ON v.id_etapa = e.id_etapa
                     WHERE v.id_vivienda = :id";
             
             $stmt = $this->conn->prepare($sql);
@@ -80,17 +128,22 @@ class Vivienda
         }
     }
 
-    // Crear nueva vivienda
+    // ✅ OPTIMIZADO: Ahora incluye id_etapa
     public function create($data)
     {
         try {
-            $sql = "INSERT INTO Viviendas (numero_vivienda, direccion, id_tipo, estado, metros_cuadrados, observaciones, fecha_construccion) 
-                    VALUES (:numero, :direccion, :tipo, :estado, :metros, :observaciones, :fecha)";
+            $sql = "INSERT INTO Viviendas 
+                    (numero_vivienda, direccion, id_tipo, id_etapa, estado, metros_cuadrados, observaciones, fecha_construccion) 
+                    VALUES (:numero, :direccion, :tipo, :etapa, :estado, :metros, :observaciones, :fecha)";
             
             $stmt = $this->conn->prepare($sql);
             $stmt->bindParam(':numero', $data['numero_vivienda']);
             $stmt->bindParam(':direccion', $data['direccion']);
             $stmt->bindParam(':tipo', $data['id_tipo'], PDO::PARAM_INT);
+            
+            $etapa = $data['id_etapa'] ?? null;
+            $stmt->bindParam(':etapa', $etapa, $etapa ? PDO::PARAM_INT : PDO::PARAM_NULL);
+            
             $stmt->bindParam(':estado', $data['estado']);
             
             $metros = $data['metros_cuadrados'] ?: null;
@@ -109,7 +162,7 @@ class Vivienda
         }
     }
 
-    // Actualizar vivienda
+    // ✅ OPTIMIZADO: Incluye id_etapa
     public function update($id, $data)
     {
         try {
@@ -117,6 +170,7 @@ class Vivienda
                     SET numero_vivienda = :numero,
                         direccion = :direccion,
                         id_tipo = :tipo,
+                        id_etapa = :etapa,
                         estado = :estado,
                         metros_cuadrados = :metros,
                         observaciones = :observaciones,
@@ -128,6 +182,10 @@ class Vivienda
             $stmt->bindParam(':numero', $data['numero_vivienda']);
             $stmt->bindParam(':direccion', $data['direccion']);
             $stmt->bindParam(':tipo', $data['id_tipo'], PDO::PARAM_INT);
+            
+            $etapa = $data['id_etapa'] ?? null;
+            $stmt->bindParam(':etapa', $etapa, $etapa ? PDO::PARAM_INT : PDO::PARAM_NULL);
+            
             $stmt->bindParam(':estado', $data['estado']);
             
             $metros = $data['metros_cuadrados'] ?: null;
@@ -145,7 +203,6 @@ class Vivienda
         }
     }
 
-    // Eliminar vivienda
     public function delete($id)
     {
         try {
@@ -170,16 +227,13 @@ class Vivienda
         }
     }
 
-    // Asignar vivienda a usuario o núcleo
     public function asignar($viviendaId, $usuarioId = null, $nucleoId = null, $observaciones = '')
     {
         try {
-            // Validar que haya al menos uno
             if (!$usuarioId && !$nucleoId) {
                 throw new \Exception("Debe especificar un usuario o núcleo");
             }
             
-            // Verificar si la vivienda ya está asignada
             $sql = "SELECT COUNT(*) FROM Asignacion_Vivienda WHERE id_vivienda = :vivienda AND activa = TRUE";
             $stmt = $this->conn->prepare($sql);
             $stmt->bindParam(':vivienda', $viviendaId, PDO::PARAM_INT);
@@ -189,7 +243,6 @@ class Vivienda
                 throw new \Exception("La vivienda ya está asignada");
             }
             
-            // Crear asignación
             $sql = "INSERT INTO Asignacion_Vivienda (id_vivienda, id_usuario, id_nucleo, observaciones, activa, fecha_asignacion) 
                     VALUES (:vivienda, :usuario, :nucleo, :obs, TRUE, NOW())";
             
@@ -213,7 +266,6 @@ class Vivienda
         }
     }
 
-    // Desasignar vivienda
     public function desasignar($asignacionId)
     {
         try {
@@ -247,7 +299,6 @@ class Vivienda
         }
     }
 
-    // Obtener tipos de vivienda
     public function getTipos()
     {
         try {
@@ -260,7 +311,7 @@ class Vivienda
         }
     }
 
-    // Obtener vivienda asignada a un usuario
+    // ✅ OPTIMIZADO: Incluye etapa
     public function getViviendaUsuario($usuarioId)
     {
         try {
@@ -272,14 +323,18 @@ class Vivienda
                         v.metros_cuadrados,
                         v.observaciones,
                         v.fecha_construccion,
+                        v.id_etapa,
                         tv.nombre as tipo_nombre,
                         tv.habitaciones,
                         tv.descripcion as tipo_descripcion,
+                        e.nombre as etapa_nombre,
+                        e.estado as etapa_estado,
                         av.fecha_asignacion,
                         av.observaciones as asignacion_observaciones
                     FROM Asignacion_Vivienda av
                     INNER JOIN Viviendas v ON av.id_vivienda = v.id_vivienda
                     INNER JOIN Tipo_Vivienda tv ON v.id_tipo = tv.id_tipo
+                    LEFT JOIN Etapas e ON v.id_etapa = e.id_etapa
                     WHERE av.id_usuario = :usuario AND av.activa = TRUE
                     LIMIT 1";
             
@@ -296,7 +351,7 @@ class Vivienda
         }
     }
 
-    // Obtener vivienda asignada a un núcleo
+    // ✅ OPTIMIZADO: Incluye etapa
     public function getViviendaNucleo($nucleoId)
     {
         try {
@@ -308,14 +363,18 @@ class Vivienda
                         v.metros_cuadrados,
                         v.observaciones,
                         v.fecha_construccion,
+                        v.id_etapa,
                         tv.nombre as tipo_nombre,
                         tv.habitaciones,
                         tv.descripcion as tipo_descripcion,
+                        e.nombre as etapa_nombre,
+                        e.estado as etapa_estado,
                         av.fecha_asignacion,
                         av.observaciones as asignacion_observaciones
                     FROM Asignacion_Vivienda av
                     INNER JOIN Viviendas v ON av.id_vivienda = v.id_vivienda
                     INNER JOIN Tipo_Vivienda tv ON v.id_tipo = tv.id_tipo
+                    LEFT JOIN Etapas e ON v.id_etapa = e.id_etapa
                     WHERE av.id_nucleo = :nucleo AND av.activa = TRUE
                     LIMIT 1";
             
@@ -332,4 +391,16 @@ class Vivienda
         }
     }
     
+    // ✅ NUEVA FUNCIÓN: Obtener todas las etapas
+    public function getEtapas()
+    {
+        try {
+            $sql = "SELECT * FROM Etapas ORDER BY id_etapa";
+            $stmt = $this->conn->query($sql);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error en Vivienda::getEtapas: " . $e->getMessage());
+            throw $e;
+        }
+    }
 }

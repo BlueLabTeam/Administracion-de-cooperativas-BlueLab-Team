@@ -339,45 +339,46 @@
 		</div>
 		
 		<form id="asignarForm" onsubmit="submitAsignacion(event)">
-			<input type="hidden" id="asignar-vivienda-id">
-			
-			<div class="material-form-group">
-				<label id="asignar-vivienda-info" style="font-weight: bold; color: #667eea;"></label>
-			</div>
-			
-			<div class="material-form-group">
-				<label for="asignar-tipo">Asignar a:</label>
-				<select id="asignar-tipo" onchange="toggleAsignarTipo()" required>
-					<option value="">Seleccione...</option>
-					<option value="usuario">Usuario Individual</option>
-					<option value="nucleo">Núcleo Familiar</option>
-				</select>
-			</div>
-			
-			<div class="material-form-group" id="asignar-usuario-group" style="display: none;">
-				<label for="asignar-usuario">Seleccionar Usuario:</label>
-				<select id="asignar-usuario">
-					<option value="">Seleccione un usuario...</option>
-				</select>
-			</div>
-			
-			<div class="material-form-group" id="asignar-nucleo-group" style="display: none;">
-				<label for="asignar-nucleo">Seleccionar Núcleo:</label>
-				<select id="asignar-nucleo">
-					<option value="">Seleccione un núcleo...</option>
-				</select>
-			</div>
-			
-			<div class="material-form-group">
-				<label for="asignar-observaciones">Observaciones:</label>
-				<textarea id="asignar-observaciones" placeholder="Notas sobre la asignación..."></textarea>
-			</div>
-			
-			<div class="material-form-actions">
-				<button type="button" class="btn btn-secondary" onclick="closeAsignarModal()">Cancelar</button>
-				<button type="submit" class="btn btn-primary">Confirmar Asignación</button>
-			</div>
-		</form>
+    <input type="hidden" id="asignar-vivienda-id">
+    
+    <div class="form-group">
+        <label>Vivienda</label>
+        <p id="asignar-vivienda-info" style="font-weight: bold; color: #005CB9;"></p>
+    </div>
+
+    <div class="form-group">
+        <label for="asignar-tipo">Asignar a *</label>
+        <select id="asignar-tipo" required onchange="toggleAsignarTipo()">
+            <option value="">Seleccione...</option>
+            <option value="usuario">Usuario Individual</option>
+            <option value="nucleo">Núcleo Familiar</option>
+        </select>
+    </div>
+
+    <div class="form-group" id="asignar-usuario-group" style="display: none;">
+        <label for="asignar-usuario">Usuario *</label>
+        <select id="asignar-usuario">
+            <option value="">Cargando...</option>
+        </select>
+    </div>
+
+    <div class="form-group" id="asignar-nucleo-group" style="display: none;">
+        <label for="asignar-nucleo">Núcleo Familiar *</label>
+        <select id="asignar-nucleo">
+            <option value="">Cargando...</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="asignar-observaciones">Observaciones</label>
+        <textarea id="asignar-observaciones" rows="3"></textarea>
+    </div>
+
+    <div class="form-actions">
+        <button type="button" class="btn btn-secondary" onclick="closeAsignarModal()">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Asignar Vivienda</button>
+    </div>
+</form>
 	</div>
 </div>
 

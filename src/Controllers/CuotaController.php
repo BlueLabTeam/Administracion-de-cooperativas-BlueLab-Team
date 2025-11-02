@@ -24,7 +24,16 @@ class CuotaController
      */
     public function getMisCuotas()
     {
-        header('Content-Type: application/json');
+        // Limpiar TODOS los buffers de salida
+        while (ob_get_level() > 0) {
+            ob_end_clean();
+        }
+        
+        // Evitar cualquier output antes del header
+        error_reporting(E_ALL);
+        ini_set('display_errors', 0);
+        
+        header('Content-Type: application/json; charset=utf-8');
 
         if (!isset($_SESSION['user_id'])) {
             http_response_code(401);
@@ -33,27 +42,41 @@ class CuotaController
         }
 
         try {
+            $userId = $_SESSION['user_id'];
+            
             $filtros = [
                 'estado' => $_GET['estado'] ?? null,
                 'mes' => $_GET['mes'] ?? null,
                 'anio' => $_GET['anio'] ?? null
             ];
-            error_log("🔍 Filtros usados en getMisCuotas: " . json_encode($filtros));
-
-
-            $cuotas = $this->cuotaModel->getCuotasUsuario($_SESSION['user_id'], $filtros);
-
+            
+            error_log("===========================================");
+            error_log("🔍 [getMisCuotas] Usuario ID: $userId");
+            error_log("🔍 Filtros: " . json_encode($filtros));
+            
+            $cuotas = $this->cuotaModel->getCuotasUsuario($userId, $filtros);
+            
+            error_log("📊 Cuotas obtenidas: " . count($cuotas));
+            error_log("===========================================");
+            
             echo json_encode([
                 'success' => true,
                 'cuotas' => $cuotas,
                 'count' => count($cuotas)
-            ]);
+            ], JSON_UNESCAPED_UNICODE);
 
         } catch (\Exception $e) {
-            error_log("Error en getMisCuotas: " . $e->getMessage());
+            error_log("❌ ERROR en getMisCuotas: " . $e->getMessage());
+            error_log("❌ Stack: " . $e->getTraceAsString());
+            
             http_response_code(500);
-            echo json_encode(['success' => false, 'message' => 'Error al obtener cuotas']);
+            echo json_encode([
+                'success' => false, 
+                'message' => 'Error al obtener cuotas',
+                'error' => $e->getMessage()
+            ], JSON_UNESCAPED_UNICODE);
         }
+        
         exit();
     }
 
@@ -62,7 +85,11 @@ class CuotaController
      */
     public function getDetalleCuota()
     {
-        header('Content-Type: application/json');
+        while (ob_get_level() > 0) {
+            ob_end_clean();
+        }
+        
+        header('Content-Type: application/json; charset=utf-8');
 
         if (!isset($_SESSION['user_id'])) {
             http_response_code(401);
@@ -99,7 +126,7 @@ class CuotaController
                 'success' => true,
                 'cuota' => $cuota,
                 'validacion' => $validacion
-            ]);
+            ], JSON_UNESCAPED_UNICODE);
 
         } catch (\Exception $e) {
             error_log("Error en getDetalleCuota: " . $e->getMessage());
@@ -110,11 +137,15 @@ class CuotaController
     }
 
     /**
-     * Pagar cuota del usuario
+     * Verificar y generar cuota automaticamente si no existe
      */
-    public function pagarCuota()
+    public function verificarYGenerarCuotaAuto()
     {
-        header('Content-Type: application/json');
+        while (ob_get_level() > 0) {
+            ob_end_clean();
+        }
+        
+        header('Content-Type: application/json; charset=utf-8');
 
         if (!isset($_SESSION['user_id'])) {
             http_response_code(401);
@@ -122,192 +153,233 @@ class CuotaController
             exit();
         }
 
-        error_log("=== INICIO pagarCuota ===");
+        try {
+            $mes = intval($_GET['mes'] ?? date('n'));
+            $anio = intval($_GET['anio'] ?? date('Y'));
+            
+            $cuotas = $this->cuotaModel->getCuotasUsuario($_SESSION['user_id'], [
+                'mes' => $mes,
+                'anio' => $anio
+            ]);
+
+            if (count($cuotas) > 0) {
+                echo json_encode([
+                    'success' => true,
+                    'existe' => true,
+                    'cuota' => $cuotas[0],
+                    'generada' => false
+                ], JSON_UNESCAPED_UNICODE);
+            } else {
+                $resultado = $this->cuotaModel->generarCuotaIndividual(
+                    $_SESSION['user_id'], 
+                    $mes, 
+                    $anio
+                );
+
+                echo json_encode([
+                    'success' => $resultado['success'],
+                    'existe' => false,
+                    'generada' => true,
+                    'cuota' => $resultado['cuota'] ?? null,
+                    'message' => $resultado['message']
+                ], JSON_UNESCAPED_UNICODE);
+            }
+
+        } catch (\Exception $e) {
+            error_log("Error en verificarYGenerarCuotaAuto: " . $e->getMessage());
+            http_response_code(500);
+            echo json_encode([
+                'success' => false,
+                'message' => 'Error al verificar cuota'
+            ], JSON_UNESCAPED_UNICODE);
+        }
+        exit();
+    }
+
+    /**
+     * Pagar cuota del usuario
+     */
+    public function pagarCuota()
+    {
+        while (ob_get_level() > 0) {
+            ob_end_clean();
+        }
+        
+        header('Content-Type: application/json; charset=utf-8');
+
+        if (!isset($_SESSION['user_id'])) {
+            http_response_code(401);
+            echo json_encode(['success' => false, 'message' => 'No autenticado']);
+            exit();
+        }
 
         try {
             $cuotaId = $_POST['cuota_id'] ?? null;
             $montoPagado = $_POST['monto_pagado'] ?? null;
             $metodoPago = $_POST['metodo_pago'] ?? 'transferencia';
             $numeroComprobante = $_POST['numero_comprobante'] ?? null;
+            $incluyeDeudaHoras = $_POST['incluye_deuda_horas'] ?? 'false';
+            $montoDeudaHoras = $_POST['monto_deuda_horas'] ?? 0;
 
             if (!$cuotaId || !$montoPagado) {
                 echo json_encode([
                     'success' => false,
                     'message' => 'Datos incompletos'
-                ]);
+                ], JSON_UNESCAPED_UNICODE);
                 exit();
             }
 
-            // Verificar archivo
             if (!isset($_FILES['comprobante'])) {
-                error_log("❌ No se recibió archivo");
                 echo json_encode([
                     'success' => false,
-                    'message' => 'No se recibió el comprobante'
-                ]);
+                    'message' => 'No se recibio el comprobante'
+                ], JSON_UNESCAPED_UNICODE);
                 exit();
             }
 
             $archivo = $_FILES['comprobante'];
 
             if ($archivo['error'] !== UPLOAD_ERR_OK) {
-                error_log("❌ Error en upload: " . $archivo['error']);
                 echo json_encode([
                     'success' => false,
                     'message' => 'Error al subir el archivo'
-                ]);
+                ], JSON_UNESCAPED_UNICODE);
                 exit();
             }
-            $incluyeDeudaHoras = $_POST['incluye_deuda_horas'] ?? 'false';
-$montoDeudaHoras = $_POST['monto_deuda_horas'] ?? 0;
 
-if ($incluyeDeudaHoras === 'true') {
-    error_log("💰 Pago incluye deuda de horas: $" . $montoDeudaHoras);
-}
-
-
-            // Procesar archivo
             $nombreArchivo = time() . '_' . basename($archivo['name']);
             $directorio = __DIR__ . '/../../storage/uploads/cuotas/';
             $destino = $directorio . $nombreArchivo;
-            
-            error_log("📁 Directorio destino: $directorio");
-
-            // Ruta relativa para la BD
             $rutaRelativa = 'uploads/cuotas/' . $nombreArchivo;
 
-            // Crear directorio si no existe
             if (!is_dir($directorio)) {
                 mkdir($directorio, 0775, true);
             }
 
-            // Mover archivo
             if (!move_uploaded_file($archivo['tmp_name'], $destino)) {
-                error_log("❌ Error al mover archivo");
                 echo json_encode([
                     'success' => false,
                     'message' => 'Error al guardar el comprobante'
-                ]);
+                ], JSON_UNESCAPED_UNICODE);
                 exit();
             }
 
-            error_log("✅ Archivo guardado exitosamente");
-
-            // Registrar pago en BD
-           $resultado = $this->cuotaModel->registrarPago(
-    $cuotaId,
-    $_SESSION['user_id'],
-    $montoPagado,
-    $metodoPago,
-    $rutaRelativa,
-    $numeroComprobante,
-    $incluyeDeudaHoras === 'true',  // NUEVO
-    $montoDeudaHoras                // NUEVO
-);
+            $resultado = $this->cuotaModel->registrarPago(
+                $cuotaId,
+                $_SESSION['user_id'],
+                $montoPagado,
+                $metodoPago,
+                $rutaRelativa,
+                $numeroComprobante,
+                $incluyeDeudaHoras === 'true',
+                $montoDeudaHoras
+            );
 
             if (!$resultado['success'] && file_exists($destino)) {
                 unlink($destino);
-                error_log("🗑️ Archivo eliminado por error en BD");
             }
 
-            echo json_encode($resultado);
+            echo json_encode($resultado, JSON_UNESCAPED_UNICODE);
 
         } catch (\Exception $e) {
-            error_log("❌ Error en pagarCuota: " . $e->getMessage());
+            error_log("Error en pagarCuota: " . $e->getMessage());
             http_response_code(500);
             echo json_encode([
                 'success' => false,
                 'message' => 'Error al registrar pago'
-            ]);
+            ], JSON_UNESCAPED_UNICODE);
         }
         
-        error_log("=== FIN pagarCuota ===");
         exit();
     }
 
     /**
- * Verificar si existe cuota del mes para el usuario
- * ENDPOINT: GET /api/cuotas/verificar-cuota-mes?mes=10&anio=2025
- */
-public function verificarCuotaMes()
-{
-    header('Content-Type: application/json');
-
-    if (!isset($_SESSION['user_id'])) {
-        http_response_code(401);
-        echo json_encode(['success' => false, 'message' => 'No autenticado']);
-        exit();
-    }
-
-    $mes = $_GET['mes'] ?? date('n');
-    $anio = $_GET['anio'] ?? date('Y');
-
-    try {
-        // ✅ USAR cuotaModel en lugar de conn
-        $cuotas = $this->cuotaModel->getCuotasUsuario($_SESSION['user_id'], [
-            'mes' => $mes,
-            'anio' => $anio
-        ]);
-
-        $existe = count($cuotas) > 0;
-
-        echo json_encode([
-            'success' => true,
-            'existe' => $existe,
-            'mes' => $mes,
-            'anio' => $anio
-        ]);
-
-    } catch (\Exception $e) {
-        error_log("Error en verificarCuotaMes: " . $e->getMessage());
-        http_response_code(500);
-        echo json_encode(['success' => false, 'message' => 'Error al verificar cuota']);
-    }
-    exit();
-}
-
-/**
- * Generar cuota del mes actual para MI usuario
- * ENDPOINT: POST /api/cuotas/generar-mi-cuota
- */
-public function generarMiCuota()
-{
-    // Limpiar output buffer
-    while (ob_get_level() > 0) {
-        ob_end_clean();
-    }
-    
-    header('Content-Type: application/json; charset=utf-8');
-
-    if (!isset($_SESSION['user_id'])) {
-        http_response_code(401);
-        echo json_encode(['success' => false, 'message' => 'No autenticado']);
-        exit();
-    }
-
-    try {
-        $mes = intval($_POST['mes'] ?? date('n'));
-        $anio = intval($_POST['anio'] ?? date('Y'));
+     * Verificar si existe cuota del mes
+     */
+    public function verificarCuotaMes()
+    {
+        while (ob_get_level() > 0) {
+            ob_end_clean();
+        }
         
-        $resultado = $this->cuotaModel->generarCuotaIndividual(
-            $_SESSION['user_id'], 
-            $mes, 
-            $anio
-        );
+        header('Content-Type: application/json; charset=utf-8');
 
-        echo json_encode($resultado);
+        if (!isset($_SESSION['user_id'])) {
+            http_response_code(401);
+            echo json_encode(['success' => false, 'message' => 'No autenticado']);
+            exit();
+        }
 
-    } catch (\Exception $e) {
-        error_log("❌ Error en generarMiCuota: " . $e->getMessage());
-        http_response_code(500);
-        echo json_encode([
-            'success' => false,
-            'message' => 'Error al generar cuota'
-        ]);
+        $mes = $_GET['mes'] ?? date('n');
+        $anio = $_GET['anio'] ?? date('Y');
+
+        try {
+            $cuotas = $this->cuotaModel->getCuotasUsuario($_SESSION['user_id'], [
+                'mes' => $mes,
+                'anio' => $anio
+            ]);
+
+            $existe = count($cuotas) > 0;
+
+            echo json_encode([
+                'success' => true,
+                'existe' => $existe,
+                'cuota' => $existe ? $cuotas[0] : null,
+                'mes' => $mes,
+                'anio' => $anio
+            ], JSON_UNESCAPED_UNICODE);
+
+        } catch (\Exception $e) {
+            error_log("Error en verificarCuotaMes: " . $e->getMessage());
+            http_response_code(500);
+            echo json_encode(['success' => false, 'message' => 'Error al verificar cuota']);
+        }
+        exit();
     }
-    
-    exit();
-}
+
+    /**
+     * Generar cuota del mes actual para MI usuario
+     */
+    public function generarMiCuota()
+    {
+        while (ob_get_level() > 0) {
+            ob_end_clean();
+        }
+        
+        header('Content-Type: application/json; charset=utf-8');
+
+        if (!isset($_SESSION['user_id'])) {
+            http_response_code(401);
+            echo json_encode(['success' => false, 'message' => 'No autenticado']);
+            exit();
+        }
+
+        try {
+            $mes = intval($_POST['mes'] ?? date('n'));
+            $anio = intval($_POST['anio'] ?? date('Y'));
+            
+            error_log("📅 [generarMiCuota] Usuario: {$_SESSION['user_id']}, Mes: $mes, Año: $anio");
+            
+            $resultado = $this->cuotaModel->generarCuotaIndividual(
+                $_SESSION['user_id'], 
+                $mes, 
+                $anio
+            );
+
+            echo json_encode($resultado, JSON_UNESCAPED_UNICODE);
+
+        } catch (\Exception $e) {
+            error_log("❌ Error en generarMiCuota: " . $e->getMessage());
+            http_response_code(500);
+            echo json_encode([
+                'success' => false,
+                'message' => 'Error al generar cuota: ' . $e->getMessage()
+            ], JSON_UNESCAPED_UNICODE);
+        }
+        
+        exit();
+    }
+
     // ========================================
     // FUNCIONES DE ADMINISTRADOR
     // ========================================
@@ -317,7 +389,11 @@ public function generarMiCuota()
      */
     public function getAllCuotas()
     {
-        header('Content-Type: application/json');
+        while (ob_get_level() > 0) {
+            ob_end_clean();
+        }
+        
+        header('Content-Type: application/json; charset=utf-8');
 
         if (!isset($_SESSION['user_id']) || !$_SESSION['is_admin']) {
             http_response_code(403);
@@ -338,7 +414,7 @@ public function generarMiCuota()
                 'success' => true,
                 'cuotas' => $cuotas,
                 'count' => count($cuotas)
-            ]);
+            ], JSON_UNESCAPED_UNICODE);
 
         } catch (\Exception $e) {
             error_log("Error en getAllCuotas: " . $e->getMessage());
@@ -349,19 +425,21 @@ public function generarMiCuota()
     }
 
     /**
-     * Validar pago de cuota (Admin) - APROBAR/RECHAZAR
+     * Validar pago de cuota (Admin)
      */
     public function validarPago()
     {
-        header('Content-Type: application/json');
+        while (ob_get_level() > 0) {
+            ob_end_clean();
+        }
+        
+        header('Content-Type: application/json; charset=utf-8');
 
         if (!isset($_SESSION['user_id']) || !$_SESSION['is_admin']) {
             http_response_code(403);
             echo json_encode(['success' => false, 'message' => 'No autorizado']);
             exit();
         }
-
-        error_log("=== INICIO validarPago (ADMIN) ===");
 
         try {
             $pagoId = $_POST['pago_id'] ?? null;
@@ -379,7 +457,7 @@ public function generarMiCuota()
             if (!in_array($accion, ['aprobar', 'rechazar'])) {
                 echo json_encode([
                     'success' => false,
-                    'message' => 'Acción inválida'
+                    'message' => 'Accion invalida'
                 ]);
                 exit();
             }
@@ -391,28 +469,30 @@ public function generarMiCuota()
                 $observaciones
             );
 
-            echo json_encode($resultado);
+            echo json_encode($resultado, JSON_UNESCAPED_UNICODE);
 
         } catch (\Exception $e) {
-            error_log("❌ Error en validarPago: " . $e->getMessage());
+            error_log("Error en validarPago: " . $e->getMessage());
             http_response_code(500);
             echo json_encode([
                 'success' => false,
                 'message' => 'Error al validar pago'
-            ]);
+            ], JSON_UNESCAPED_UNICODE);
         }
         
-        error_log("=== FIN validarPago ===");
         exit();
     }
 
     /**
-     * Generar cuotas masivas para el mes (Admin)
-     * IMPORTANTE: Se ejecuta automáticamente el 1° de cada mes via CRON
+     * Generar cuotas masivas (Admin)
      */
     public function generarCuotasMasivas()
     {
-        header('Content-Type: application/json');
+        while (ob_get_level() > 0) {
+            ob_end_clean();
+        }
+        
+        header('Content-Type: application/json; charset=utf-8');
 
         if (!isset($_SESSION['user_id']) || !$_SESSION['is_admin']) {
             http_response_code(403);
@@ -424,30 +504,33 @@ public function generarMiCuota()
             $mes = intval($_POST['mes'] ?? date('n'));
             $anio = intval($_POST['anio'] ?? date('Y'));
 
-            error_log("📅 Generando cuotas para: $mes/$anio");
+            error_log("📅 [ADMIN] Generando cuotas masivas para: $mes/$anio");
 
-            // Llamar al método del modelo
             $resultado = $this->cuotaModel->generarCuotasMensuales($mes, $anio);
 
-            echo json_encode($resultado);
+            echo json_encode($resultado, JSON_UNESCAPED_UNICODE);
 
         } catch (\Exception $e) {
-            error_log("❌ Error en generarCuotasMasivas: " . $e->getMessage());
+            error_log("Error en generarCuotasMasivas: " . $e->getMessage());
             http_response_code(500);
             echo json_encode([
                 'success' => false,
                 'message' => 'Error al generar cuotas: ' . $e->getMessage()
-            ]);
+            ], JSON_UNESCAPED_UNICODE);
         }
         exit();
     }
 
     /**
-     * Obtener estadísticas de cuotas (Admin)
+     * Obtener estadisticas (Admin)
      */
     public function getEstadisticas()
     {
-        header('Content-Type: application/json');
+        while (ob_get_level() > 0) {
+            ob_end_clean();
+        }
+        
+        header('Content-Type: application/json; charset=utf-8');
 
         if (!isset($_SESSION['user_id']) || !$_SESSION['is_admin']) {
             http_response_code(403);
@@ -464,23 +547,26 @@ public function generarMiCuota()
             echo json_encode([
                 'success' => true,
                 'estadisticas' => $estadisticas
-            ]);
+            ], JSON_UNESCAPED_UNICODE);
 
         } catch (\Exception $e) {
             error_log("Error en getEstadisticas: " . $e->getMessage());
             http_response_code(500);
-            echo json_encode(['success' => false, 'message' => 'Error al obtener estadísticas']);
+            echo json_encode(['success' => false, 'message' => 'Error al obtener estadisticas']);
         }
         exit();
     }
 
     /**
-     * Actualizar precio GLOBAL (afecta a todos los usuarios de ese tipo)
-     * IMPORTANTE: Solo actualiza la configuración para próximas cuotas
+     * Actualizar precio
      */
     public function actualizarPrecio()
     {
-        header('Content-Type: application/json');
+        while (ob_get_level() > 0) {
+            ob_end_clean();
+        }
+        
+        header('Content-Type: application/json; charset=utf-8');
 
         if (!isset($_SESSION['user_id']) || !$_SESSION['is_admin']) {
             http_response_code(403);
@@ -499,7 +585,7 @@ public function generarMiCuota()
 
             $resultado = $this->cuotaModel->actualizarPrecio($idTipo, $montoMensual);
 
-            echo json_encode($resultado);
+            echo json_encode($resultado, JSON_UNESCAPED_UNICODE);
 
         } catch (\Exception $e) {
             error_log("Error en actualizarPrecio: " . $e->getMessage());
@@ -510,11 +596,15 @@ public function generarMiCuota()
     }
 
     /**
-     * Obtener precios actuales (GLOBALES por tipo de vivienda)
+     * Obtener precios actuales
      */
     public function getPreciosActuales()
     {
-        header('Content-Type: application/json');
+        while (ob_get_level() > 0) {
+            ob_end_clean();
+        }
+        
+        header('Content-Type: application/json; charset=utf-8');
 
         if (!isset($_SESSION['user_id']) || !$_SESSION['is_admin']) {
             http_response_code(403);
@@ -528,7 +618,7 @@ public function generarMiCuota()
             echo json_encode([
                 'success' => true,
                 'precios' => $precios
-            ]);
+            ], JSON_UNESCAPED_UNICODE);
 
         } catch (\Exception $e) {
             error_log("Error en getPreciosActuales: " . $e->getMessage());
