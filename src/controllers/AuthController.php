@@ -95,7 +95,7 @@ class AuthController
             exit();
         }
 
-        $userModel = new \App\Models\User();
+        $userModel = new User();
         $existingUser = $userModel->findByEmail($email);
 
         if ($existingUser) {

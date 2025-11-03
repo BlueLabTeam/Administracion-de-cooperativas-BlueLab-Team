@@ -187,20 +187,23 @@ if (in_array($uri, $loginOnlyRoutes)) {
 switch ($uri) {
     // VISTAS
     case '/':
+        $controller = new App\controllers\ViewsController();
+        $controller->index();
+        break;
     case '/home':
-        $controller = new App\Controllers\ViewsController();
+        $controller = new App\controllers\ViewsController();
         $controller->index();
         break;
     case '/login':
-        $controller = new App\Controllers\ViewsController();
+        $controller = new App\controllers\ViewsController();
         $controller->showLoginForm();
         break;
     case '/register':
-        $controller = new App\Controllers\ViewsController();
+        $controller = new App\controllers\ViewsController();
         $controller->showRegistrationForm();
         break;
     case '/dashboard':
-        $controller = new App\Controllers\ViewsController();
+        $controller = new App\controllers\ViewsController();
         $controller->showDashboard();
         break;
     case '/dashboard-admin':

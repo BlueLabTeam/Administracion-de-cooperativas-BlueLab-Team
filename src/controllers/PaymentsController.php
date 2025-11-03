@@ -3,6 +3,7 @@
 namespace App\controllers;
 
 use App\models\Pay;
+use App\models\User;
 
 class PaymentsController
 {
