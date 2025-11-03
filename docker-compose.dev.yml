@@ -49,8 +49,8 @@ services:
       MYSQL_PASSWORD: ${DB_PASSWORD}
     # expose:
     #   - "3306"
-    # ports:
-    #   - "127.0.0.1:3306:3306" # Solo accesible desde localhost
+    ports:
+      - "127.0.0.1:3306:3306"
     volumes:
       - db_data:/var/lib/mysql
       - ./docker/db/master/init-master.sh:/docker-entrypoint-initdb.d/init-master.sh
@@ -84,9 +84,9 @@ services:
     volumes:
       - ./storage/backup-server/data:/data/backups
     ports:
-      - "2222:22"  # Puerto SSH expuesto al host
+      - "2222:22" # Puerto SSH expuesto al host
     restart: unless-stopped
 
-volumes:  
+volumes:
   db_data:
   db_data_slave:
