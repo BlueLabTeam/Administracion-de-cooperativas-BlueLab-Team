@@ -31,6 +31,7 @@ services:
       - ./src:/var/www/src
       - ./storage/uploads:/var/www/storage/uploads
       - ./vendor:/var/www/vendor
+    user: 1000:1000
     depends_on:
       gestcoop_db:
         condition: service_started

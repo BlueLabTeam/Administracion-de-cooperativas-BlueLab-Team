@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Controllers;
+namespace App\controllers;
 
-use App\Models\DeudaHoras;
+use App\models\DeudaHoras;
 
 class DeudaHorasController
 {
@@ -159,3 +159,5 @@ public function getHistorialMensual()
         exit();
     }
 }
+
+

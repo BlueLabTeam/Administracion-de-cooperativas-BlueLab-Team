@@ -207,66 +207,66 @@ switch ($uri) {
         $controller->showDashboard();
         break;
     case '/dashboard-admin':
-        $controller = new App\Controllers\ViewsController();
+        $controller = new App\controllers\ViewsController();
         $controller->showDashboardAdmin();
         break;
     case '/pagoPendiente':
-        $controller = new App\Controllers\ViewsController();
+        $controller = new App\controllers\ViewsController();
         $controller->showRegistrarPago();
         break;
     case '/pagoEnviado':
-        $controller = new App\Controllers\ViewsController();
+        $controller = new App\controllers\ViewsController();
         $controller->showSalaEspera();
         break;
 
     // API AUTH
     case '/api/login':
-        (new App\Controllers\AuthController())->login();
+        (new App\controllers\AuthController())->login();
         break;
     case '/api/register':
-        (new App\Controllers\AuthController())->register();
+        (new App\controllers\AuthController())->register();
         break;
     case '/api/logout':
-        (new App\Controllers\AuthController())->logout();
+        (new App\controllers\AuthController())->logout();
         break;
 
     // API PAGOS
     case '/api/pay/firstPay':
-        (new App\Controllers\PaymentsController())->addPay();
+        (new App\controllers\PaymentsController())->addPay();
         break;
     case '/api/payment/approve':
-        (new App\Controllers\PaymentsController())->approvePayment();
+        (new App\controllers\PaymentsController())->approvePayment();
         break;
     case '/api/payment/reject':
-        (new App\Controllers\PaymentsController())->rejectPayment();
+        (new App\controllers\PaymentsController())->rejectPayment();
         break;
 
     // API NOTIFICACIONES
     case '/api/notifications/create':
-        (new App\Controllers\NotificationController())->create();
+        (new App\controllers\NotificationController())->create();
         break;
     case '/api/notifications/user':
-        (new App\Controllers\NotificationController())->getUserNotifications();
+        (new App\controllers\NotificationController())->getUserNotifications();
         break;
     case '/api/notifications/mark-read':
-        (new App\Controllers\NotificationController())->markAsRead();
+        (new App\controllers\NotificationController())->markAsRead();
         break;
     case '/api/notifications/users':
-        (new App\Controllers\NotificationController())->getUsers();
+        (new App\controllers\NotificationController())->getUsers();
         break;
 
     // API TAREAS
     case '/api/tasks/create':
-        (new App\Controllers\TaskController())->create();
+        (new App\controllers\TaskController())->create();
         break;
     case '/api/tasks/user':
-        (new App\Controllers\TaskController())->getUserTasks();
+        (new App\controllers\TaskController())->getUserTasks();
         break;
     case '/api/tasks/all':
-        (new App\Controllers\TaskController())->getAllTasks();
+        (new App\controllers\TaskController())->getAllTasks();
         break;
     case '/api/tasks/update-progress':
-        (new App\Controllers\TaskController())->updateProgress();
+        (new App\controllers\TaskController())->updateProgress();
         break;
     case '/api/tasks/add-avance':
         $tareaId = $_POST['id_tarea'] ?? null;
@@ -275,302 +275,302 @@ switch ($uri) {
         $progreso = $_POST['progreso_reportado'] ?? 0;
         $archivo = $_FILES['archivo']['name'] ?? null;
         if ($tareaId && $userId && $comentario) {
-            (new App\Controllers\TaskController())->addAvance($tareaId, $userId, $comentario, $progreso, $archivo);
+            (new App\controllers\TaskController())->addAvance($tareaId, $userId, $comentario, $progreso, $archivo);
         } else {
             http_response_code(400);
             echo json_encode(['error' => 'Faltan parametros']);
         }
         break;
     case '/api/tasks/details':
-        (new App\Controllers\TaskController())->getTaskDetails();
+        (new App\controllers\TaskController())->getTaskDetails();
         break;
     case '/api/tasks/users':
-        (new App\Controllers\TaskController())->getUsers();
+        (new App\controllers\TaskController())->getUsers();
         break;
     case '/api/tasks/nucleos':
-        (new App\Controllers\TaskController())->getNucleos();
+        (new App\controllers\TaskController())->getNucleos();
         break;
     case '/api/tasks/cancel':
-        (new App\Controllers\TaskController())->cancelTask();
+        (new App\controllers\TaskController())->cancelTask();
         break;
 
     // API USUARIOS
     case '/api/users/all':
-        (new App\Controllers\UserController())->getAllUsers();
+        (new App\controllers\UserController())->getAllUsers();
         break;
     case '/api/users/details':
         $userId = $_GET['id_usuario'] ?? null;
         if ($userId) {
-            (new App\Controllers\UserController())->getUserById($userId);
+            (new App\controllers\UserController())->getUserById($userId);
         } else {
             http_response_code(400);
             echo json_encode(['error' => 'Falta id_usuario']);
         }
         break;
     case '/api/users/my-profile':
-        (new App\Controllers\UserController())->getMyProfile();
+        (new App\controllers\UserController())->getMyProfile();
         break;
     case '/api/users/update-profile':
-        (new App\Controllers\UserController())->updateProfile();
+        (new App\controllers\UserController())->updateProfile();
         break;
     case '/api/users/aprobar-rechazar':
-        (new App\Controllers\UserController())->aprobarRechazar();
+        (new App\controllers\UserController())->aprobarRechazar();
         break;
         case '/api/users/payment-details':
-    (new App\Controllers\UserController())->getPaymentDetails();
+    (new App\controllers\UserController())->getPaymentDetails();
     break;
 
     // API NUCLEOS
     case '/api/nucleos/create':
-        (new App\Controllers\NucleoController())->create();
+        (new App\controllers\NucleoController())->create();
         break;
     case '/api/nucleos/all':
-        (new App\Controllers\NucleoController())->getAll();
+        (new App\controllers\NucleoController())->getAll();
         break;
     case '/api/nucleos/details':
-        (new App\Controllers\NucleoController())->getDetails();
+        (new App\controllers\NucleoController())->getDetails();
         break;
     case '/api/nucleos/update':
-        (new App\Controllers\NucleoController())->update();
+        (new App\controllers\NucleoController())->update();
         break;
     case '/api/nucleos/delete':
-        (new App\Controllers\NucleoController())->delete();
+        (new App\controllers\NucleoController())->delete();
         break;
     case '/api/nucleos/users-available':
-        (new App\Controllers\NucleoController())->getAvailableUsers();
+        (new App\controllers\NucleoController())->getAvailableUsers();
         break;
     case '/api/nucleos/disponibles':
-        (new App\Controllers\NucleoController())->getNucleosDisponibles();
+        (new App\controllers\NucleoController())->getNucleosDisponibles();
         break;
     case '/api/nucleos/solicitar-unirse':
-        (new App\Controllers\NucleoController())->solicitarUnirse();
+        (new App\controllers\NucleoController())->solicitarUnirse();
         break;
     case '/api/nucleos/mis-solicitudes':
-        (new App\Controllers\NucleoController())->getMisSolicitudesNucleo();
+        (new App\controllers\NucleoController())->getMisSolicitudesNucleo();
         break;
     case '/api/nucleos/cancelar-solicitud':
-        (new App\Controllers\NucleoController())->cancelarSolicitudNucleo();
+        (new App\controllers\NucleoController())->cancelarSolicitudNucleo();
         break;
     case '/api/nucleos/solicitudes-pendientes':
-        (new App\Controllers\NucleoController())->getSolicitudesPendientesAdmin();
+        (new App\controllers\NucleoController())->getSolicitudesPendientesAdmin();
         break;
     case '/api/nucleos/aprobar-solicitud':
-        (new App\Controllers\NucleoController())->aprobarSolicitudNucleo();
+        (new App\controllers\NucleoController())->aprobarSolicitudNucleo();
         break;
     case '/api/nucleos/rechazar-solicitud':
-        (new App\Controllers\NucleoController())->rechazarSolicitudNucleo();
+        (new App\controllers\NucleoController())->rechazarSolicitudNucleo();
         break;
     case '/api/nucleos/mi-nucleo-info':
-        (new App\Controllers\NucleoController())->getMiNucleoInfo();
+        (new App\controllers\NucleoController())->getMiNucleoInfo();
         break;
         
     // API MATERIALES
     case '/api/materiales/create':
-        (new App\Controllers\MaterialController())->create();
+        (new App\controllers\MaterialController())->create();
         break;
     case '/api/materiales/all':
-        (new App\Controllers\MaterialController())->getAll();
+        (new App\controllers\MaterialController())->getAll();
         break;
     case '/api/materiales/details':
-        (new App\Controllers\MaterialController())->getById();
+        (new App\controllers\MaterialController())->getById();
         break;
     case '/api/materiales/update':
-        (new App\Controllers\MaterialController())->update();
+        (new App\controllers\MaterialController())->update();
         break;
     case '/api/materiales/update-stock':
-        (new App\Controllers\MaterialController())->updateStock();
+        (new App\controllers\MaterialController())->updateStock();
         break;
     case '/api/materiales/delete':
-        (new App\Controllers\MaterialController())->delete();
+        (new App\controllers\MaterialController())->delete();
         break;
     case '/api/materiales/search':
-        (new App\Controllers\MaterialController())->search();
+        (new App\controllers\MaterialController())->search();
         break;
     case '/api/materiales/assign-task':
-        (new App\Controllers\MaterialController())->assignToTask();
+        (new App\controllers\MaterialController())->assignToTask();
         break;
     case '/api/materiales/task-materials':
-        (new App\Controllers\MaterialController())->getTaskMaterials();
+        (new App\controllers\MaterialController())->getTaskMaterials();
         break;
     case '/api/materiales/remove-from-task':
-        (new App\Controllers\MaterialController())->removeFromTask();
+        (new App\controllers\MaterialController())->removeFromTask();
         break;
     case '/api/materiales/request':
-        (new App\Controllers\MaterialController())->createRequest();
+        (new App\controllers\MaterialController())->createRequest();
         break;
     case '/api/materiales/requests':
-        (new App\Controllers\MaterialController())->getRequests();
+        (new App\controllers\MaterialController())->getRequests();
         break;
 
     // API VIVIENDAS
     case '/api/viviendas/all':
-        (new App\Controllers\ViviendaController())->getAll();
+        (new App\controllers\ViviendaController())->getAll();
         break;
     case '/api/viviendas/details':
-        (new App\Controllers\ViviendaController())->getById();
+        (new App\controllers\ViviendaController())->getById();
         break;
     case '/api/viviendas/create':
-        (new App\Controllers\ViviendaController())->create();
+        (new App\controllers\ViviendaController())->create();
         break;
     case '/api/viviendas/update':
-        (new App\Controllers\ViviendaController())->update();
+        (new App\controllers\ViviendaController())->update();
         break;
     case '/api/viviendas/delete':
-        (new App\Controllers\ViviendaController())->delete();
+        (new App\controllers\ViviendaController())->delete();
         break;
     case '/api/viviendas/asignar':
-        (new App\Controllers\ViviendaController())->asignar();
+        (new App\controllers\ViviendaController())->asignar();
         break;
     case '/api/viviendas/desasignar':
-        (new App\Controllers\ViviendaController())->desasignar();
+        (new App\controllers\ViviendaController())->desasignar();
         break;
     case '/api/viviendas/tipos':
         Herramientas::validarLogin();
-        (new App\Controllers\ViviendaController())->getTipos();
+        (new App\controllers\ViviendaController())->getTipos();
         break;
     case '/api/viviendas/my-vivienda':
-        (new App\Controllers\ViviendaController())->getMyVivienda();
+        (new App\controllers\ViviendaController())->getMyVivienda();
         break;
 
     // API REGISTRO DE HORAS - USUARIO
     case '/api/horas/iniciar':
-        (new App\Controllers\RegistroHorasController())->iniciarJornada();
+        (new App\controllers\RegistroHorasController())->iniciarJornada();
         break;
     case '/api/horas/cerrar':
-        (new App\Controllers\RegistroHorasController())->cerrarJornada();
+        (new App\controllers\RegistroHorasController())->cerrarJornada();
         break;
     case '/api/horas/mis-registros':
-        (new App\Controllers\RegistroHorasController())->getMisRegistros();
+        (new App\controllers\RegistroHorasController())->getMisRegistros();
         break;
     case '/api/horas/registro-abierto':
-        (new App\Controllers\RegistroHorasController())->getRegistroAbiertoHoy();
+        (new App\controllers\RegistroHorasController())->getRegistroAbiertoHoy();
         break;
     case '/api/horas/resumen-semanal':
-        (new App\Controllers\RegistroHorasController())->getResumenSemanal();
+        (new App\controllers\RegistroHorasController())->getResumenSemanal();
         break;
     case '/api/horas/estadisticas':
-        (new App\Controllers\RegistroHorasController())->getEstadisticasMes();
+        (new App\controllers\RegistroHorasController())->getEstadisticasMes();
         break;
     case '/api/horas/editar':
-        (new App\Controllers\RegistroHorasController())->editarRegistro();
+        (new App\controllers\RegistroHorasController())->editarRegistro();
         break;
 
     // API REGISTRO DE HORAS - ADMIN
     case '/api/horas/all':
-        (new App\Controllers\RegistroHorasController())->getAllRegistros();
+        (new App\controllers\RegistroHorasController())->getAllRegistros();
         break;
     case '/api/horas/aprobar':
-        (new App\Controllers\RegistroHorasController())->aprobarHoras();
+        (new App\controllers\RegistroHorasController())->aprobarHoras();
         break;
     case '/api/horas/rechazar':
-        (new App\Controllers\RegistroHorasController())->rechazarHoras();
+        (new App\controllers\RegistroHorasController())->rechazarHoras();
         break;
     case '/api/horas/resumen-usuario':
-        (new App\Controllers\RegistroHorasController())->getResumenPorUsuario();
+        (new App\controllers\RegistroHorasController())->getResumenPorUsuario();
         break;
 
     // API DEUDA DE HORAS
     case '/api/horas/deuda-actual':
-        (new App\Controllers\DeudaHorasController())->getDeudaActual();
+        (new App\controllers\DeudaHorasController())->getDeudaActual();
         break;
     case '/api/horas/historial-mensual':
-        (new App\Controllers\DeudaHorasController())->getHistorialMensual();
+        (new App\controllers\DeudaHorasController())->getHistorialMensual();
         break;
 
     // API CUOTAS - USUARIO
     case '/api/cuotas/mis-cuotas':
-        (new App\Controllers\CuotaController())->getMisCuotas();
+        (new App\controllers\CuotaController())->getMisCuotas();
         break;
     case '/api/cuotas/detalle':
-        (new App\Controllers\CuotaController())->getDetalleCuota();
+        (new App\controllers\CuotaController())->getDetalleCuota();
         break;
     case '/api/cuotas/generar-mi-cuota':
-        (new App\Controllers\CuotaController())->generarMiCuota();
+        (new App\controllers\CuotaController())->generarMiCuota();
         break;
     case '/api/cuotas/verificar-cuota-mes':
-        (new App\Controllers\CuotaController())->verificarCuotaMes();
+        (new App\controllers\CuotaController())->verificarCuotaMes();
         break;
     case '/api/cuotas/pagar':
-        (new App\Controllers\CuotaController())->pagarCuota();
+        (new App\controllers\CuotaController())->pagarCuota();
         break;
     case '/api/cuotas/verificar-auto':
-        (new App\Controllers\CuotaController())->verificarYGenerarCuotaAuto();
+        (new App\controllers\CuotaController())->verificarYGenerarCuotaAuto();
         break;
 
     // API CUOTAS - ADMIN
     case '/api/cuotas/all':
-        (new App\Controllers\CuotaController())->getAllCuotas();
+        (new App\controllers\CuotaController())->getAllCuotas();
         break;
     case '/api/cuotas/validar-pago':
-        (new App\Controllers\CuotaController())->validarPago();
+        (new App\controllers\CuotaController())->validarPago();
         break;
     case '/api/cuotas/generar-masivas':
-        (new App\Controllers\CuotaController())->generarCuotasMasivas();
+        (new App\controllers\CuotaController())->generarCuotasMasivas();
         break;
     case '/api/cuotas/estadisticas':
-        (new App\Controllers\CuotaController())->getEstadisticas();
+        (new App\controllers\CuotaController())->getEstadisticas();
         break;
     case '/api/cuotas/precios':
-        (new App\Controllers\CuotaController())->getPreciosActuales();
+        (new App\controllers\CuotaController())->getPreciosActuales();
         break;
     case '/api/cuotas/actualizar-precio':
-        (new App\Controllers\CuotaController())->actualizarPrecio();
+        (new App\controllers\CuotaController())->actualizarPrecio();
         break;
 
     // API SOLICITUDES - USUARIO
     case '/api/solicitudes/create':
-        (new App\Controllers\SolicitudController())->create();
+        (new App\controllers\SolicitudController())->create();
         break;
     case '/api/solicitudes/mis-solicitudes':
-        (new App\Controllers\SolicitudController())->getMisSolicitudes();
+        (new App\controllers\SolicitudController())->getMisSolicitudes();
         break;
     case '/api/solicitudes/detalle':
-        (new App\Controllers\SolicitudController())->getDetalle();
+        (new App\controllers\SolicitudController())->getDetalle();
         break;
     case '/api/solicitudes/responder':
-        (new App\Controllers\SolicitudController())->addRespuesta();
+        (new App\controllers\SolicitudController())->addRespuesta();
         break;
     
     // API SOLICITUDES - ADMIN
     case '/api/solicitudes/all':
-        (new App\Controllers\SolicitudController())->getAllSolicitudes();
+        (new App\controllers\SolicitudController())->getAllSolicitudes();
         break;
     case '/api/solicitudes/update-estado':
-        (new App\Controllers\SolicitudController())->updateEstado();
+        (new App\controllers\SolicitudController())->updateEstado();
         break;
     case '/api/solicitudes/estadisticas':
-        (new App\Controllers\SolicitudController())->getEstadisticas();
+        (new App\controllers\SolicitudController())->getEstadisticas();
         break;
 
     // API JUSTIFICACIONES DE HORAS
     case '/api/justificaciones/crear':
-        (new App\Controllers\JustificacionHorasController())->crearJustificacion();
+        (new App\controllers\JustificacionHorasController())->crearJustificacion();
         break;
     case '/api/justificaciones/usuario':
-        (new App\Controllers\JustificacionHorasController())->getJustificacionesUsuario();
+        (new App\controllers\JustificacionHorasController())->getJustificacionesUsuario();
         break;
     case '/api/justificaciones/eliminar':
-        (new App\Controllers\JustificacionHorasController())->eliminarJustificacion();
+        (new App\controllers\JustificacionHorasController())->eliminarJustificacion();
         break;
 
     // API REPORTES - ADMIN
     case '/api/reporte/mensual':
-        (new App\Controllers\ReporteController())->generarReporteMensual();
+        (new App\controllers\ReporteController())->generarReporteMensual();
         break;
     case '/api/reporte/horas':
-        (new App\Controllers\ReporteController())->getResumenHorasMensual();
+        (new App\controllers\ReporteController())->getResumenHorasMensual();
         break;
     case '/api/reporte/tareas':
-        (new App\Controllers\ReporteController())->getResumenTareasMensual();
+        (new App\controllers\ReporteController())->getResumenTareasMensual();
         break;
     case '/api/reporte/cuotas':
-        (new App\Controllers\ReporteController())->getResumenCuotasMensual();
+        (new App\controllers\ReporteController())->getResumenCuotasMensual();
         break;
     case '/api/reporte/estadisticas':
-        (new App\Controllers\ReporteController())->getEstadisticasGenerales();
+        (new App\controllers\ReporteController())->getEstadisticasGenerales();
         break;
     case '/api/reporte/exportar':
-        (new App\Controllers\ReporteController())->exportarReporteMensual();
+        (new App\controllers\ReporteController())->exportarReporteMensual();
         break;
 
     // DEBUG: Verificar cuotas del usuario
@@ -690,7 +690,7 @@ switch ($uri) {
             error_log("=== TEST GENERAR CUOTA ===");
             error_log("Usuario: $userId | Mes: $mes | Anio: $anio");
             
-            $cuotaModel = new \App\Models\Cuota();
+            $cuotaModel = new \App\models\Cuota();
             $resultado = $cuotaModel->generarCuotaIndividual($userId, $mes, $anio);
             
             error_log("Resultado: " . json_encode($resultado));

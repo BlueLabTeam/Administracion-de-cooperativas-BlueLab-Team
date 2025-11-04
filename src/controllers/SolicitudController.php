@@ -2,7 +2,7 @@
 
 namespace App\Controllers;
 
-use App\Models\Solicitud;
+use App\models\Solicitud;
 
 class SolicitudController
 {

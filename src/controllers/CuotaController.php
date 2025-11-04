@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Controllers;
+namespace App\controllers;
 
-use App\Models\Cuota;
-use App\Models\Vivienda;
+use App\models\Cuota;
+use App\models\Vivienda;
 
 class CuotaController
 {

@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Controllers;
+namespace App\controllers;
 
-use App\Models\JustificacionHoras;
+use App\models\JustificacionHoras;
 
 class JustificacionHorasController
 {

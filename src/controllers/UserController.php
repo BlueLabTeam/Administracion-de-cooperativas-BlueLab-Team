@@ -2,7 +2,7 @@
 
 namespace App\controllers;
 
-use App\Models\User;
+use App\models\User;
 use App\config\Database;
 
 class UserController

@@ -2,9 +2,9 @@
 
 namespace App\Controllers;
 
-use App\Models\Vivienda;
-use App\Models\User;
-use App\Models\Nucleo;
+use App\models\Vivienda;
+use App\models\User;
+use App\models\Nucleo;
 use App\config\Database;
 use PDO;
 

@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Controllers;
+namespace App\controllers;
 
-use App\Models\Nucleo;
+use App\models\Nucleo;
 
 class NucleoController
 {

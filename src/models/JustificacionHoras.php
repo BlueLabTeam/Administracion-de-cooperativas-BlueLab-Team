@@ -1,7 +1,7 @@
 <?php
 // App/Models/JustificacionHoras.php
 
-namespace App\Models;
+namespace App\models;
 
 use App\config\Database;
 use PDO;

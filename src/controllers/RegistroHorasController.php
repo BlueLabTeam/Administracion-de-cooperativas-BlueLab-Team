@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Controllers;
+namespace App\controllers;
 
-use App\Models\RegistroHoras;
+use App\models\RegistroHoras;
 
 class RegistroHorasController
 {

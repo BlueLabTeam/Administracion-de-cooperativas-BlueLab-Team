@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Controllers;
+namespace App\controllers;
 
-use App\Models\Material;
+use App\models\Material;
 
 class MaterialController
 {
