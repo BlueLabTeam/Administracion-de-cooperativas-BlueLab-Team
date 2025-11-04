@@ -8,18 +8,17 @@ services:
       - "443:443"
     volumes:
       - ./public:/var/www/public
-
       # # Funcionalidad a futuro
       # - ./certs:/etc/apache2/certs
       # - ./docker/apache/default-ssl.conf:/usr/local/apache2/conf/extra/httpd-ssl.conf
-
-      #configuraciones apache
+      # configuraciones apache
       - ./docker/apache/apache.conf:/usr/local/apache2/conf/extra/apache-custom.conf
       - ./docker/apache/gestcoop.conf:/usr/local/apache2/conf/extra/gestcoop.conf
       - ./docker/apache/httpd.conf:/usr/local/apache2/conf/httpd.conf
     depends_on:
       gestcoop_php:
         condition: service_started
+
   gestcoop_php:
     build:
       context: ./docker/php
@@ -37,6 +36,7 @@ services:
         condition: service_started
     env_file:
       - .env
+
   gestcoop_db:
     image: mysql:8.0
     container_name: gestcoop_db
@@ -48,8 +48,7 @@ services:
       MYSQL_DATABASE: ${DB_NAME}
       MYSQL_USER: ${DB_USER}
       MYSQL_PASSWORD: ${DB_PASSWORD}
-    # expose:
-    #   - "3306"
+      TZ: America/Montevideo
     ports:
       - "127.0.0.1:3306:3306"
     volumes:
@@ -58,6 +57,7 @@ services:
       - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql
       - ./sql/seeds.sql:/docker-entrypoint-initdb.d/seeds.sql
       - ./docker/db/master/config/:/etc/mysql/conf.d/master.cnf
+
   gestcoop_db_slave:
     image: mysql:8.0
     container_name: gestcoop_db_slave
@@ -68,6 +68,7 @@ services:
       - .env
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      TZ: America/Montevideo
     depends_on:
       gestcoop_db:
         condition: service_started
@@ -77,6 +78,7 @@ services:
       - ./docker/db/slave/init-slave.sh:/docker-entrypoint-initdb.d/init-slave.sh
       - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql
       - ./sql/seeds.sql:/docker-entrypoint-initdb.d/seeds.sql
+
   gestcoop_backup_server:
     build:
       context: ./docker/backup-server

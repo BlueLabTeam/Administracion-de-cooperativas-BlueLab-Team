@@ -17,187 +17,290 @@ class RegistroHoras
     /**
      * Iniciar una nueva jornada
      */
-   public function iniciarJornada($id_usuario, $fecha, $hora_entrada, $descripcion = '')
-    {
-        try {
-            error_log("=== MODEL: iniciarJornada ===");
-            error_log("Usuario: $id_usuario, Fecha: $fecha, Hora: $hora_entrada");
+  public function iniciarJornada($id_usuario, $fecha, $hora_entrada, $descripcion = '')
+{
+    try {
+        // ✅ ASEGURAR que usamos la fecha del servidor PHP (zona horaria correcta)
+        $fecha_servidor = date('Y-m-d');
+        
+        error_log("=== MODEL: iniciarJornada ===");
+        error_log("Usuario: $id_usuario");
+        error_log("Fecha recibida: $fecha");
+        error_log("Fecha servidor (PHP): $fecha_servidor");
+        error_log("Hora: $hora_entrada");
 
-           
-        /*
-        $dia_semana = date('N', strtotime($fecha));
-        if ($dia_semana > 5) {
-            error_log("❌ Intento de registro en fin de semana");
-            return [
-                'success' => false,
-                'message' => 'No se pueden registrar horas en fin de semana'
-            ];
+        // ✅ PASO 1: Verificar si ya existe un registro para hoy (fecha servidor)
+        $stmt = $this->conn->prepare("
+            SELECT id_registro, hora_entrada, hora_salida 
+            FROM Registro_Horas 
+            WHERE id_usuario = :id_usuario 
+            AND fecha = :fecha
+        ");
+        
+        if (!$stmt) {
+            error_log("❌ Error al preparar statement: " . json_encode($this->conn->errorInfo()));
+            throw new \Exception("Error al preparar consulta");
         }
-        */
+        
+        $stmt->execute([
+            'id_usuario' => $id_usuario,
+            'fecha' => $fecha_servidor  // ✅ Usar fecha del servidor
+        ]);
+        
+        $registro_existente = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            // Verificar si ya existe un registro para hoy
-            $stmt = $this->conn->prepare("
-                SELECT id_registro, hora_salida 
-                FROM Registro_Horas 
-                WHERE id_usuario = :id_usuario 
-                AND fecha = :fecha
-            ");
+        if ($registro_existente) {
+            error_log("⚠️ Registro existente encontrado: " . json_encode($registro_existente));
             
-            if (!$stmt) {
-                error_log("❌ Error al preparar statement: " . json_encode($this->conn->errorInfo()));
-                throw new \Exception("Error al preparar consulta");
+            // ❌ SI YA TIENE SALIDA: Jornada completa
+            if ($registro_existente['hora_salida'] !== null) {
+                return [
+                    'success' => false,
+                    'message' => 'Ya completaste tu jornada de hoy. Solo puedes registrar una entrada por día.',
+                    'codigo' => 'JORNADA_COMPLETA',
+                    'registro_existente' => $registro_existente
+                ];
             }
             
-            $stmt->execute([
-                'id_usuario' => $id_usuario,
-                'fecha' => $fecha
-            ]);
-            
-            $registro_existente = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            if ($registro_existente) {
-                error_log("⚠️ Registro existente encontrado: " . json_encode($registro_existente));
-                if ($registro_existente['hora_salida'] === null) {
-                    return [
-                        'success' => false,
-                        'message' => 'Ya tienes una jornada abierta para hoy'
-                    ];
-                } else {
-                    return [
-                        'success' => false,
-                        'message' => 'Ya completaste tu jornada de hoy'
-                    ];
-                }
-            }
-
-            // Crear nuevo registro
-            error_log("✅ Creando nuevo registro...");
-            $stmt = $this->conn->prepare("
-                INSERT INTO Registro_Horas 
-                (id_usuario, fecha, hora_entrada, descripcion, estado) 
-                VALUES (:id_usuario, :fecha, :hora_entrada, :descripcion, 'pendiente')
-            ");
-
-            if (!$stmt) {
-                error_log("❌ Error al preparar INSERT: " . json_encode($this->conn->errorInfo()));
-                throw new \Exception("Error al preparar INSERT");
-            }
-
-            $ejecutado = $stmt->execute([
-                'id_usuario' => $id_usuario,
-                'fecha' => $fecha,
-                'hora_entrada' => $hora_entrada,
-                'descripcion' => $descripcion
-            ]);
-
-            if (!$ejecutado) {
-                error_log("❌ Error al ejecutar INSERT: " . json_encode($stmt->errorInfo()));
-                throw new \Exception("Error al ejecutar INSERT");
-            }
-
-            $id_registro = $this->conn->lastInsertId();
-            error_log("✅ Registro creado con ID: " . $id_registro);
-
-            return [
-                'success' => true,
-                'message' => 'Entrada registrada correctamente',
-                'id_registro' => $id_registro,
-                'hora_entrada' => $hora_entrada
-            ];
-
-        } catch (\PDOException $e) {
-            error_log("❌ PDOException en iniciarJornada: " . $e->getMessage());
-            error_log("Stack: " . $e->getTraceAsString());
+            // ⚠️ SI NO TIENE SALIDA: Jornada en curso
+            error_log("⚠️ Ya existe entrada sin salida para hoy");
             return [
                 'success' => false,
-                'message' => 'Error de base de datos: ' . $e->getMessage(),
-                'debug' => [
-                    'code' => $e->getCode(),
-                    'file' => $e->getFile(),
-                    'line' => $e->getLine()
+                'message' => 'Ya tienes una entrada registrada para hoy desde las ' . substr($registro_existente['hora_entrada'], 0, 5),
+                'codigo' => 'JORNADA_ABIERTA',
+                // ✅ IMPORTANTE: Devolver el registro existente con estructura consistente
+                'id_registro' => $registro_existente['id_registro'],
+                'hora_entrada' => $registro_existente['hora_entrada'],
+                'fecha' => $fecha_servidor,  // ✅ Usar fecha del servidor
+                'registro' => [
+                    'id_registro' => $registro_existente['id_registro'],
+                    'hora_entrada' => $registro_existente['hora_entrada'],
+                    'fecha' => $fecha_servidor
                 ]
             ];
-        } catch (\Exception $e) {
-            error_log("❌ Exception en iniciarJornada: " . $e->getMessage());
-            return [
-                'success' => false,
-                'message' => 'Error al registrar entrada: ' . $e->getMessage()
-            ];
         }
+
+        // ✅ PASO 2: Crear nuevo registro
+        error_log("✅ No hay registro previo, creando nuevo...");
+        
+        $stmt = $this->conn->prepare("
+            INSERT INTO Registro_Horas 
+            (id_usuario, fecha, hora_entrada, descripcion, estado) 
+            VALUES (:id_usuario, :fecha, :hora_entrada, :descripcion, 'pendiente')
+        ");
+
+        if (!$stmt) {
+            error_log("❌ Error al preparar INSERT: " . json_encode($this->conn->errorInfo()));
+            throw new \Exception("Error al preparar INSERT");
+        }
+
+        $ejecutado = $stmt->execute([
+            'id_usuario' => $id_usuario,
+            'fecha' => $fecha_servidor,  // ✅ Usar fecha del servidor
+            'hora_entrada' => $hora_entrada,
+            'descripcion' => $descripcion
+        ]);
+
+        if (!$ejecutado) {
+            $errorInfo = $stmt->errorInfo();
+            error_log("❌ Error al ejecutar INSERT: " . json_encode($errorInfo));
+            throw new \Exception("Error al ejecutar INSERT: " . $errorInfo[2]);
+        }
+
+        $id_registro = $this->conn->lastInsertId();
+        
+        if (!$id_registro || $id_registro == 0) {
+            error_log("❌ lastInsertId devolvió: " . var_export($id_registro, true));
+            throw new \Exception("No se pudo obtener el ID del registro creado");
+        }
+        
+        error_log("✅ Registro creado exitosamente con ID: " . $id_registro);
+
+        // ✅ PASO 3: Verificar que se creó correctamente
+        $stmt = $this->conn->prepare("
+            SELECT id_registro, fecha, hora_entrada, descripcion, estado
+            FROM Registro_Horas
+            WHERE id_registro = :id_registro
+        ");
+        $stmt->execute(['id_registro' => $id_registro]);
+        $registro_verificado = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$registro_verificado) {
+            error_log("❌ No se pudo verificar el registro creado");
+            throw new \Exception("Error al verificar el registro creado");
+        }
+        
+        error_log("✅ Registro verificado: " . json_encode($registro_verificado));
+
+        // ✅ PASO 4: Devolver respuesta con ESTRUCTURA CONSISTENTE
+        return [
+            'success' => true,
+            'message' => 'Entrada registrada correctamente',
+            'codigo' => 'ENTRADA_REGISTRADA',
+            // ✅ IMPORTANTE: Campos en el nivel raíz para compatibilidad
+            'id_registro' => (int)$id_registro,
+            'hora_entrada' => $hora_entrada,
+            'fecha' => $fecha_servidor,  // ✅ Usar fecha del servidor
+            // ✅ También dentro de 'registro' para compatibilidad
+            'registro' => [
+                'id_registro' => (int)$id_registro,
+                'hora_entrada' => $hora_entrada,
+                'fecha' => $fecha_servidor,
+                'descripcion' => $descripcion,
+                'estado' => 'pendiente'
+            ]
+        ];
+
+    } catch (\PDOException $e) {
+        error_log("❌ PDOException en iniciarJornada: " . $e->getMessage());
+        error_log("   Code: " . $e->getCode());
+        error_log("   File: " . $e->getFile() . ":" . $e->getLine());
+        error_log("   Stack: " . $e->getTraceAsString());
+        
+        return [
+            'success' => false,
+            'message' => 'Error de base de datos: ' . $e->getMessage(),
+            'codigo' => 'ERROR_BD',
+            'debug' => [
+                'code' => $e->getCode(),
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]
+        ];
+    } catch (\Exception $e) {
+        error_log("❌ Exception en iniciarJornada: " . $e->getMessage());
+        error_log("   Stack: " . $e->getTraceAsString());
+        
+        return [
+            'success' => false,
+            'message' => 'Error al registrar entrada: ' . $e->getMessage(),
+            'codigo' => 'ERROR_GENERAL'
+        ];
     }
+}
+
 
     /**
      * Cerrar jornada (marcar salida)
      */
     public function cerrarJornada($id_registro, $hora_salida)
-    {
-        try {
-            // Obtener el registro
-            $stmt = $this->conn->prepare("
-                SELECT hora_entrada, fecha 
-                FROM Registro_Horas 
-                WHERE id_registro = :id_registro
-            ");
-            $stmt->execute(['id_registro' => $id_registro]);
-            $registro = $stmt->fetch(PDO::FETCH_ASSOC);
+{
+    try {
+        error_log("=== cerrarJornada ===");
+        error_log("ID Registro: " . $id_registro);
+        error_log("Hora salida: " . $hora_salida);
+        
+        // ✅ PASO 1: Obtener el registro
+        $stmt = $this->conn->prepare("
+            SELECT 
+                id_registro,
+                id_usuario,
+                hora_entrada, 
+                fecha,
+                hora_salida as salida_existente
+            FROM Registro_Horas 
+            WHERE id_registro = :id_registro
+        ");
+        $stmt->execute(['id_registro' => $id_registro]);
+        $registro = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            if (!$registro) {
-                return [
-                    'success' => false,
-                    'message' => 'Registro no encontrado'
-                ];
-            }
-
-            // Calcular horas trabajadas
-            $entrada = new \DateTime($registro['fecha'] . ' ' . $registro['hora_entrada']);
-            $salida = new \DateTime($registro['fecha'] . ' ' . $hora_salida);
-            
-            if ($salida <= $entrada) {
-                return [
-                    'success' => false,
-                    'message' => 'La hora de salida debe ser posterior a la entrada'
-                ];
-            }
-
-            $interval = $entrada->diff($salida);
-            $total_horas = $interval->h + ($interval->i / 60);
-
-            // Validar que no exceda 12 horas
-            if ($total_horas > 12) {
-                return [
-                    'success' => false,
-                    'message' => 'No se pueden registrar más de 12 horas en un día'
-                ];
-            }
-
-            // Actualizar registro
-            $stmt = $this->conn->prepare("
-                UPDATE Registro_Horas 
-                SET hora_salida = :hora_salida,
-                    total_horas = :total_horas
-                WHERE id_registro = :id_registro
-            ");
-
-            $stmt->execute([
-                'hora_salida' => $hora_salida,
-                'total_horas' => round($total_horas, 2),
-                'id_registro' => $id_registro
-            ]);
-
-            return [
-                'success' => true,
-                'message' => 'Salida registrada correctamente',
-                'total_horas' => round($total_horas, 2)
-            ];
-
-        } catch (\PDOException $e) {
-            error_log("Error en cerrarJornada: " . $e->getMessage());
+        if (!$registro) {
+            error_log("❌ Registro no encontrado: ID " . $id_registro);
             return [
                 'success' => false,
-                'message' => 'Error al registrar salida: ' . $e->getMessage()
+                'message' => 'Registro no encontrado'
             ];
         }
+        
+        error_log("✅ Registro encontrado: Usuario " . $registro['id_usuario']);
+        error_log("   Fecha: " . $registro['fecha']);
+        error_log("   Hora entrada: " . $registro['hora_entrada']);
+        
+        // ✅ PASO 2: Verificar si ya tiene salida
+        if ($registro['salida_existente'] !== null) {
+            error_log("⚠️ El registro ya tiene salida: " . $registro['salida_existente']);
+            return [
+                'success' => false,
+                'message' => 'Este registro ya tiene una salida registrada'
+            ];
+        }
+
+        // ✅ PASO 3: Calcular horas trabajadas
+        $entrada = new \DateTime($registro['fecha'] . ' ' . $registro['hora_entrada']);
+        $salida = new \DateTime($registro['fecha'] . ' ' . $hora_salida);
+        
+        error_log("📅 Entrada: " . $entrada->format('Y-m-d H:i:s'));
+        error_log("📅 Salida: " . $salida->format('Y-m-d H:i:s'));
+        
+        if ($salida <= $entrada) {
+            error_log("❌ Salida anterior o igual a entrada");
+            return [
+                'success' => false,
+                'message' => 'La hora de salida debe ser posterior a la entrada'
+            ];
+        }
+
+        $interval = $entrada->diff($salida);
+        $total_horas = $interval->h + ($interval->i / 60) + ($interval->s / 3600);
+
+        error_log("⏱️ Total calculado: " . $total_horas . " horas");
+
+        // ✅ PASO 4: Validar máximo 12 horas
+        if ($total_horas > 12) {
+            error_log("❌ Excede 12 horas: " . $total_horas);
+            return [
+                'success' => false,
+                'message' => 'No se pueden registrar más de 12 horas en un día'
+            ];
+        }
+
+        // ✅ PASO 5: Actualizar registro
+        $stmt = $this->conn->prepare("
+            UPDATE Registro_Horas 
+            SET hora_salida = :hora_salida,
+                total_horas = :total_horas
+            WHERE id_registro = :id_registro
+        ");
+
+        $ejecutado = $stmt->execute([
+            'hora_salida' => $hora_salida,
+            'total_horas' => round($total_horas, 2),
+            'id_registro' => $id_registro
+        ]);
+        
+        if (!$ejecutado) {
+            $errorInfo = $stmt->errorInfo();
+            error_log("❌ Error al actualizar: " . json_encode($errorInfo));
+            throw new \Exception("Error al actualizar registro: " . $errorInfo[2]);
+        }
+
+        error_log("✅ Salida registrada correctamente");
+        error_log("   Total horas: " . round($total_horas, 2));
+
+        return [
+            'success' => true,
+            'message' => 'Salida registrada correctamente',
+            'total_horas' => round($total_horas, 2),
+            'hora_salida' => $hora_salida,
+            'id_registro' => $id_registro
+        ];
+
+    } catch (\PDOException $e) {
+        error_log("❌ PDOException en cerrarJornada: " . $e->getMessage());
+        error_log("   Stack: " . $e->getTraceAsString());
+        return [
+            'success' => false,
+            'message' => 'Error al registrar salida: ' . $e->getMessage()
+        ];
+    } catch (\Exception $e) {
+        error_log("❌ Exception en cerrarJornada: " . $e->getMessage());
+        return [
+            'success' => false,
+            'message' => 'Error al registrar salida: ' . $e->getMessage()
+        ];
     }
+}
 
     /**
      * Obtener registros de un usuario
@@ -245,19 +348,52 @@ class RegistroHoras
     public function getRegistroAbiertoHoy($id_usuario)
     {
         try {
+            // ✅ Usar fecha PHP en zona horaria correcta
+            $fecha_hoy = date('Y-m-d');
+            
+            error_log("=== getRegistroAbiertoHoy ===");
+            error_log("Usuario ID: " . $id_usuario);
+            error_log("Fecha PHP: " . $fecha_hoy);
+            
             $stmt = $this->conn->prepare("
-                SELECT * 
+                SELECT 
+                    id_registro,
+                    id_usuario,
+                    fecha,
+                    hora_entrada,
+                    hora_salida,
+                    total_horas,
+                    descripcion,
+                    estado,
+                    observaciones
                 FROM Registro_Horas 
                 WHERE id_usuario = :id_usuario 
-                AND fecha = CURDATE()
+                AND fecha = :fecha
                 AND hora_salida IS NULL
+                ORDER BY hora_entrada DESC
+                LIMIT 1
             ");
 
-            $stmt->execute(['id_usuario' => $id_usuario]);
-            return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+            $stmt->execute([
+                'id_usuario' => $id_usuario,
+                'fecha' => $fecha_hoy
+            ]);
+            
+            $registro = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if ($registro) {
+                error_log("✅ Registro abierto encontrado: ID " . $registro['id_registro']);
+                error_log("   Fecha: " . $registro['fecha']);
+                error_log("   Hora entrada: " . $registro['hora_entrada']);
+                return $registro;
+            } else {
+                error_log("ℹ️ No hay registro abierto para " . $fecha_hoy);
+                return null;
+            }
 
         } catch (\PDOException $e) {
-            error_log("Error en getRegistroAbiertoHoy: " . $e->getMessage());
+            error_log("❌ Error en getRegistroAbiertoHoy: " . $e->getMessage());
+            error_log("   Stack: " . $e->getTraceAsString());
             return null;
         }
     }

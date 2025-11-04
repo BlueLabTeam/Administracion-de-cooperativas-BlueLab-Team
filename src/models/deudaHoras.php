@@ -306,6 +306,8 @@ class DeudaHoras
             return [];
         }
     }
+
+    
     public function obtenerHistorialDeuda($id_usuario, $limite = 20)
     {
         try {
