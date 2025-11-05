@@ -1,5 +1,3 @@
-
-
 /* ==========================================
    HEADER PRINCIPAL
    ========================================== */
@@ -54,6 +52,55 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+}
+
+/* ==========================================
+   SELECTOR DE IDIOMA EN HEADER
+   ========================================== */
+.language-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.15);
+    padding: 6px 12px;
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+}
+
+.language-toggle:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+}
+
+.lang-btn {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.lang-btn:hover {
+    color: var(--color-white);
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.lang-btn.active {
+    background: var(--color-white);
+    color: var(--color-primary);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.lang-separator {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 12px;
 }
 
 /* ==========================================
@@ -478,6 +525,11 @@
         flex-wrap: wrap;
     }
 
+    .language-toggle {
+        order: -1;
+        margin-bottom: 8px;
+    }
+
     .menu {
         padding: var(--spacing-xl) var(--spacing-md);
     }
@@ -520,5 +572,14 @@
 
     .menu li a small {
         font-size: var(--font-size-xs);
+    }
+
+    .language-toggle {
+        padding: 4px 10px;
+    }
+
+    .lang-btn {
+        font-size: 12px;
+        padding: 3px 6px;
     }
 }
