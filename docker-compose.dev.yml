@@ -82,7 +82,7 @@ services:
   gestcoop_backup_server:
     build:
       context: ./docker/backup-server
-      dockerfile: Dockerfile
+      dockerfile: dockerfile
     container_name: gestcoop_backup_server
     volumes:
       - ./storage/backup-server/data:/data/backups
