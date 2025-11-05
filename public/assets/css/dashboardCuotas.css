@@ -125,7 +125,6 @@
 
 .desglose-item {
     display: flex;
-    justify-content: space-between;
     align-items: center;
     padding: var(--spacing-md) 0;
     font-size: var(--font-size-base);
