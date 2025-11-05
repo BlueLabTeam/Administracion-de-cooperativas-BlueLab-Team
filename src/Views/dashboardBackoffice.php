@@ -14,7 +14,6 @@
 	<link rel="stylesheet" href="/assets/css/dashboardHeader.css" />
 	<link rel="stylesheet" href="/assets/css/dashboardTablasUnificadas.css" />
 	<link rel="stylesheet" href="/assets/css/dashboardCuotasAdmin.css" />
-	<link rel="stylesheet" href="/assets/css/dashboardNotificaciones.css" />
 	<link rel="stylesheet" href="/assets/css/dashboardViviendas.css" />
 	<link rel="stylesheet" href="/assets/css/dashboardTareas.css" />
 	<link rel="stylesheet" href="/assets/css/dashboardPagos.css" />

@@ -20,7 +20,6 @@ if (!isset($_SESSION['user_id'])) {
 	<link rel="stylesheet" href="/assets/css/dashboardBase.css" />
 	<link rel="stylesheet" href="/assets/css/dashboardHeader.css" />
 	<link rel="stylesheet" href="/assets/css/justificacion.css" />
-	<link rel="stylesheet" href="/assets/css/dashboardNotificaciones.css" />
 	<link rel="stylesheet" href="/assets/css/dashboardTareas.css" />
 	<link rel="stylesheet" href="/assets/css/dashboardHoras.css" />
 	<link rel="stylesheet" href="/assets/css/dashboardDeudaHoras.css" />
