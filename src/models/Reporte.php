@@ -17,7 +17,7 @@ class Reporte
     public function generarReporteMensual($mes, $anio)
     {
         error_log("=== INICIO Reporte::generarReporteMensual ===");
-        error_log("Mes: $mes, Anio: $anio");
+        error_log("🔍 Generando reporte para: MES=$mes, AÑO=$anio");
         
         try {
             $usuarios = $this->getUsuariosConVivienda();
@@ -26,8 +26,8 @@ class Reporte
                 error_log("WARNING: No se encontraron usuarios con vivienda");
                 return [
                     'periodo' => [
-                        'mes' => $mes,
-                        'anio' => $anio,
+                        'mes' => (int)$mes,
+                        'anio' => (int)$anio,
                         'nombre_mes' => $this->getNombreMes($mes)
                     ],
                     'usuarios' => [],
@@ -37,8 +37,8 @@ class Reporte
             
             $resultado = [
                 'periodo' => [
-                    'mes' => $mes,
-                    'anio' => $anio,
+                    'mes' => (int)$mes,
+                    'anio' => (int)$anio,
                     'nombre_mes' => $this->getNombreMes($mes)
                 ],
                 'usuarios' => [],
@@ -57,7 +57,7 @@ class Reporte
                     'tipo_vivienda' => $usuario['tipo_vivienda']
                 ];
 
-                // ✅ HORAS CON JUSTIFICACIONES
+                // ✅ HORAS CON JUSTIFICACIONES (mes/año específico)
                 $horas = $this->getHorasUsuarioMesConJustificaciones($usuario['id_usuario'], $mes, $anio);
                 $datosUsuario['horas_trabajadas'] = $horas['total_horas'];
                 $datosUsuario['horas_requeridas'] = $horas['horas_requeridas'];
@@ -69,7 +69,7 @@ class Reporte
                 $datosUsuario['porcentaje_cumplimiento'] = $horas['porcentaje_cumplimiento'];
                 $datosUsuario['deuda_horas'] = $horas['deuda_horas_pesos'];
 
-                // Tareas
+                // ✅ Tareas (mes/año específico)
                 $tareas = $this->getTareasUsuarioMes($usuario['id_usuario'], $mes, $anio);
                 $datosUsuario['tareas_asignadas'] = $tareas['total'];
                 $datosUsuario['tareas_completadas'] = $tareas['completadas'];
@@ -78,7 +78,7 @@ class Reporte
                     ? round(($tareas['completadas'] / $tareas['total']) * 100, 2) 
                     : 0;
 
-                // Cuotas
+                // ✅ Cuotas (mes/año específico)
                 $cuota = $this->getCuotaUsuarioMes($usuario['id_usuario'], $mes, $anio);
                 $datosUsuario['estado_cuota'] = $cuota['estado'] ?? 'sin_cuota';
                 $datosUsuario['monto_cuota'] = $cuota['monto_total'] ?? 0;
@@ -113,78 +113,75 @@ class Reporte
                 );
             }
 
-            error_log("SUCCESS: Reporte generado con " . count($resultado['usuarios']) . " usuarios");
+            error_log("✅ Reporte generado: " . count($resultado['usuarios']) . " usuarios para $mes/$anio");
             return $resultado;
 
         } catch (\Exception $e) {
-            error_log("ERROR en generarReporteMensual: " . $e->getMessage());
+            error_log("❌ ERROR en generarReporteMensual: " . $e->getMessage());
             error_log("Stack trace: " . $e->getTraceAsString());
             return null;
         }
     }
 
     private function getUsuariosConVivienda()
-{
-    error_log("Ejecutando getUsuariosConVivienda()");
-    
-    // ✅ CAMBIAR: Incluir TODOS los usuarios aceptados, tengan o no vivienda
-    $sql = "SELECT 
-                u.id_usuario,
-                u.nombre_completo,
-                u.cedula,
-                u.email,
-                v.numero_vivienda,
-                tv.nombre as tipo_vivienda
-            FROM Usuario u
-            LEFT JOIN Asignacion_Vivienda av ON u.id_usuario = av.id_usuario AND av.activa = 1
-            LEFT JOIN Viviendas v ON av.id_vivienda = v.id_vivienda
-            LEFT JOIN Tipo_Vivienda tv ON v.id_tipo = tv.id_tipo
-            WHERE u.estado = 'aceptado'
-            ORDER BY u.nombre_completo";
+    {
+        error_log("Ejecutando getUsuariosConVivienda()");
+        
+        $sql = "SELECT 
+                    u.id_usuario,
+                    u.nombre_completo,
+                    u.cedula,
+                    u.email,
+                    v.numero_vivienda,
+                    tv.nombre as tipo_vivienda
+                FROM Usuario u
+                LEFT JOIN Asignacion_Vivienda av ON u.id_usuario = av.id_usuario AND av.activa = 1
+                LEFT JOIN Viviendas v ON av.id_vivienda = v.id_vivienda
+                LEFT JOIN Tipo_Vivienda tv ON v.id_tipo = tv.id_tipo
+                WHERE u.estado = 'aceptado'
+                ORDER BY u.nombre_completo";
 
-    try {
-        $stmt = $this->conn->prepare($sql);
-        $stmt->execute();
-        $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
-        error_log("Usuarios encontrados: " . count($usuarios));
-        if (count($usuarios) > 0) {
-            error_log("Primer usuario: " . $usuarios[0]['nombre_completo']);
+        try {
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute();
+            $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            error_log("Usuarios encontrados: " . count($usuarios));
+            return $usuarios;
+        } catch (\PDOException $e) {
+            error_log("Error en getUsuariosConVivienda: " . $e->getMessage());
+            throw $e;
         }
-        
-        return $usuarios;
-    } catch (\PDOException $e) {
-        error_log("Error en getUsuariosConVivienda: " . $e->getMessage());
-        throw $e;
     }
-}
 
     /**
-     * ✅ NUEVO: Obtener horas CON JUSTIFICACIONES
+     * ✅ CORREGIDO: Obtener horas del mes/año específico
      */
     private function getHorasUsuarioMesConJustificaciones($idUsuario, $mes, $anio)
-{
-    // ✅ Obtener horas requeridas (manejar usuarios SIN vivienda)
-    $sqlHorasRequeridas = "SELECT 
-                            COALESCE(tv.habitaciones * 21, 84) as horas_requeridas
-                           FROM Usuario u
-                           LEFT JOIN Asignacion_Vivienda av ON u.id_usuario = av.id_usuario AND av.activa = 1
-                           LEFT JOIN Viviendas v ON av.id_vivienda = v.id_vivienda
-                           LEFT JOIN Tipo_Vivienda tv ON v.id_tipo = tv.id_tipo
-                           WHERE u.id_usuario = :id_usuario
-                           LIMIT 1";
-    
-    try {
-        $stmtRequeridas = $this->conn->prepare($sqlHorasRequeridas);
-        $stmtRequeridas->execute([':id_usuario' => $idUsuario]);
-        $horasReq = $stmtRequeridas->fetch(PDO::FETCH_ASSOC);
-        $horasRequeridas = $horasReq['horas_requeridas'] ?? 84;
-    } catch (\PDOException $e) {
-        error_log("Error obteniendo horas requeridas: " . $e->getMessage());
-        $horasRequeridas = 84;
-    }
+    {
+        error_log("🕐 Obteniendo horas para usuario $idUsuario: mes=$mes, año=$anio");
         
-        // Obtener horas trabajadas
+        // Obtener horas requeridas
+        $sqlHorasRequeridas = "SELECT 
+                                COALESCE(tv.habitaciones * 21, 84) as horas_requeridas
+                               FROM Usuario u
+                               LEFT JOIN Asignacion_Vivienda av ON u.id_usuario = av.id_usuario AND av.activa = 1
+                               LEFT JOIN Viviendas v ON av.id_vivienda = v.id_vivienda
+                               LEFT JOIN Tipo_Vivienda tv ON v.id_tipo = tv.id_tipo
+                               WHERE u.id_usuario = :id_usuario
+                               LIMIT 1";
+        
+        try {
+            $stmtRequeridas = $this->conn->prepare($sqlHorasRequeridas);
+            $stmtRequeridas->execute([':id_usuario' => $idUsuario]);
+            $horasReq = $stmtRequeridas->fetch(PDO::FETCH_ASSOC);
+            $horasRequeridas = $horasReq['horas_requeridas'] ?? 84;
+        } catch (\PDOException $e) {
+            error_log("Error obteniendo horas requeridas: " . $e->getMessage());
+            $horasRequeridas = 84;
+        }
+            
+        // ✅ FILTRAR POR MES/AÑO ESPECÍFICO
         $sql = "SELECT 
                     COALESCE(SUM(rh.total_horas), 0) as total_horas,
                     COALESCE(SUM(CASE WHEN rh.estado = 'aprobado' THEN rh.total_horas ELSE 0 END), 0) as horas_aprobadas,
@@ -194,7 +191,7 @@ class Reporte
                 AND MONTH(rh.fecha) = :mes
                 AND YEAR(rh.fecha) = :anio";
 
-        // ✅ Obtener horas justificadas
+        // ✅ FILTRAR JUSTIFICACIONES POR MES/AÑO ESPECÍFICO
         $sqlJustificadas = "SELECT COALESCE(SUM(horas_justificadas), 0) as horas_justificadas
                             FROM Justificaciones_Horas
                             WHERE id_usuario = :id_usuario
@@ -212,7 +209,6 @@ class Reporte
 
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
             
-            // Obtener justificadas
             $stmtJust = $this->conn->prepare($sqlJustificadas);
             $stmtJust->execute([
                 ':id_usuario' => $idUsuario,
@@ -228,6 +224,8 @@ class Reporte
             $porcentajeCumplimiento = $horasRequeridas > 0 
                 ? round(($horasEfectivas / $horasRequeridas) * 100, 2)
                 : 0;
+            
+            error_log("✅ Horas calculadas: aprobadas={$result['horas_aprobadas']}, justificadas=$horasJustificadas, efectivas=$horasEfectivas");
             
             return [
                 'total_horas' => floatval($result['total_horas']),
@@ -256,8 +254,22 @@ class Reporte
         }
     }
 
+    /**
+     * ✅ CORREGIDO: Tareas que están ACTIVAS en el mes/año específico
+     * Una tarea está activa en un mes si:
+     * - Empieza antes/durante el mes Y termina después/durante el mes
+     */
     private function getTareasUsuarioMes($idUsuario, $mes, $anio)
     {
+        error_log("📋 Obteniendo tareas para usuario $idUsuario: mes=$mes, año=$anio");
+        
+        // ✅ CALCULAR primer y último día del mes
+        $primerDia = "$anio-" . str_pad($mes, 2, '0', STR_PAD_LEFT) . "-01";
+        $ultimoDia = date("Y-m-t", strtotime($primerDia));
+        
+        error_log("📅 Rango de fechas: $primerDia a $ultimoDia");
+        
+        // ✅ Seleccionar tareas que están activas DURANTE el mes
         $sql = "SELECT 
                     COUNT(*) as total,
                     COALESCE(SUM(CASE WHEN tu.estado_usuario = 'completada' THEN 1 ELSE 0 END), 0) as completadas,
@@ -265,26 +277,35 @@ class Reporte
                 FROM Tarea_Usuario tu
                 INNER JOIN Tareas t ON tu.id_tarea = t.id_tarea
                 WHERE tu.id_usuario = :id_usuario
-                AND ((MONTH(t.fecha_inicio) = :mes AND YEAR(t.fecha_inicio) = :anio)
-                     OR (MONTH(t.fecha_fin) = :mes AND YEAR(t.fecha_fin) = :anio))";
+                AND t.fecha_inicio <= :ultimo_dia
+                AND t.fecha_fin >= :primer_dia
+                AND t.estado != 'cancelada'";
 
         try {
             $stmt = $this->conn->prepare($sql);
             $stmt->execute([
                 ':id_usuario' => $idUsuario,
-                ':mes' => $mes,
-                ':anio' => $anio
+                ':primer_dia' => $primerDia,
+                ':ultimo_dia' => $ultimoDia
             ]);
 
-            return $stmt->fetch(PDO::FETCH_ASSOC);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            error_log("✅ Tareas encontradas: {$result['total']} (completadas: {$result['completadas']})");
+            
+            return $result;
         } catch (\PDOException $e) {
             error_log("Error en getTareasUsuarioMes: " . $e->getMessage());
             return ['total' => 0, 'completadas' => 0, 'pendientes' => 0];
         }
     }
 
+    /**
+     * ✅ CORRECTO: Ya filtra por mes/año específico
+     */
     private function getCuotaUsuarioMes($idUsuario, $mes, $anio)
     {
+        error_log("💰 Obteniendo cuota para usuario $idUsuario: mes=$mes, año=$anio");
+        
         $sql = "SELECT 
                     c.estado,
                     (c.monto + c.monto_pendiente_anterior) as monto_total,
@@ -304,7 +325,10 @@ class Reporte
                 ':anio' => $anio
             ]);
 
-            return $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            error_log("✅ Cuota estado: " . ($result['estado'] ?? 'sin_cuota'));
+            
+            return $result ?: [];
         } catch (\PDOException $e) {
             error_log("Error en getCuotaUsuarioMes: " . $e->getMessage());
             return [];
@@ -328,6 +352,9 @@ class Reporte
         }
     }
 
+    /**
+     * ✅ CORREGIDO: Resumen de horas por mes/año
+     */
     public function getResumenHorasPorUsuario($mes, $anio)
     {
         $sql = "SELECT 
@@ -343,6 +370,7 @@ class Reporte
                 LEFT JOIN Registro_Horas rh ON u.id_usuario = rh.id_usuario 
                     AND MONTH(rh.fecha) = :mes 
                     AND YEAR(rh.fecha) = :anio
+                WHERE u.estado = 'aceptado'
                 GROUP BY u.id_usuario, u.nombre_completo, tv.habitaciones
                 ORDER BY u.nombre_completo";
 
@@ -351,8 +379,14 @@ class Reporte
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * ✅ CORREGIDO: Resumen de tareas por mes/año
+     */
     public function getResumenTareasPorUsuario($mes, $anio)
     {
+        $primerDia = "$anio-" . str_pad($mes, 2, '0', STR_PAD_LEFT) . "-01";
+        $ultimoDia = date("Y-m-t", strtotime($primerDia));
+        
         $sql = "SELECT 
                     u.id_usuario,
                     u.nombre_completo,
@@ -361,16 +395,24 @@ class Reporte
                 FROM Usuario u
                 LEFT JOIN Tarea_Usuario tu ON u.id_usuario = tu.id_usuario
                 LEFT JOIN Tareas t ON tu.id_tarea = t.id_tarea
-                    AND ((MONTH(t.fecha_inicio) = :mes AND YEAR(t.fecha_inicio) = :anio)
-                         OR (MONTH(t.fecha_fin) = :mes AND YEAR(t.fecha_fin) = :anio))
+                    AND t.fecha_inicio <= :ultimo_dia
+                    AND t.fecha_fin >= :primer_dia
+                    AND t.estado != 'cancelada'
+                WHERE u.estado = 'aceptado'
                 GROUP BY u.id_usuario, u.nombre_completo
                 ORDER BY u.nombre_completo";
 
         $stmt = $this->conn->prepare($sql);
-        $stmt->execute([':mes' => $mes, ':anio' => $anio]);
+        $stmt->execute([
+            ':primer_dia' => $primerDia,
+            ':ultimo_dia' => $ultimoDia
+        ]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * ✅ CORRECTO: Ya filtra por mes/año
+     */
     public function getResumenCuotasPorUsuario($mes, $anio)
     {
         $sql = "SELECT 
@@ -384,6 +426,7 @@ class Reporte
                     AND c.mes = :mes 
                     AND c.anio = :anio
                 LEFT JOIN Pagos_Cuotas p ON c.id_cuota = p.id_cuota AND p.estado_validacion = 'aprobado'
+                WHERE u.estado = 'aceptado'
                 ORDER BY u.nombre_completo";
 
         $stmt = $this->conn->prepare($sql);
@@ -400,6 +443,9 @@ class Reporte
         ];
     }
 
+    /**
+     * ✅ CORRECTO: Ya filtra por mes/año
+     */
     private function getEstadisticasHoras($mes, $anio)
     {
         $sql = "SELECT 
@@ -414,21 +460,33 @@ class Reporte
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * ✅ CORREGIDO: Estadísticas de tareas activas en el mes
+     */
     private function getEstadisticasTareas($mes, $anio)
     {
+        $primerDia = "$anio-" . str_pad($mes, 2, '0', STR_PAD_LEFT) . "-01";
+        $ultimoDia = date("Y-m-t", strtotime($primerDia));
+        
         $sql = "SELECT 
                     COUNT(*) as total_tareas,
                     COALESCE(SUM(CASE WHEN estado = 'completada' THEN 1 ELSE 0 END), 0) as completadas,
                     COALESCE(SUM(CASE WHEN estado = 'cancelada' THEN 1 ELSE 0 END), 0) as canceladas
                 FROM Tareas
-                WHERE (MONTH(fecha_inicio) = :mes AND YEAR(fecha_inicio) = :anio)
-                   OR (MONTH(fecha_fin) = :mes AND YEAR(fecha_fin) = :anio)";
+                WHERE fecha_inicio <= :ultimo_dia
+                AND fecha_fin >= :primer_dia";
 
         $stmt = $this->conn->prepare($sql);
-        $stmt->execute([':mes' => $mes, ':anio' => $anio]);
+        $stmt->execute([
+            ':primer_dia' => $primerDia,
+            ':ultimo_dia' => $ultimoDia
+        ]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * ✅ CORRECTO: Ya filtra por mes/año
+     */
     private function getEstadisticasCuotas($mes, $anio)
     {
         $sql = "SELECT 

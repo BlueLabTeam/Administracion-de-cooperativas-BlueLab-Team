@@ -3731,33 +3731,11 @@ async function generarCuotasMesActual() {
     await generarCuotasMasivas(mes, anio);
 }
 
-function mostrarGenerarCuotasPersonalizado() {
-    const hoy = new Date();
-    document.getElementById('generar-mes').value = hoy.getMonth() + 1;
-    document.getElementById('generar-anio').value = hoy.getFullYear();
-    document.getElementById('generarCuotasModal').style.display = 'flex';
-}
 
-function closeGenerarCuotasModal() {
-    document.getElementById('generarCuotasModal').style.display = 'none';
-    document.getElementById('generarCuotasForm').reset();
-}
 
-async function submitGenerarCuotas(event) {
-    event.preventDefault();
-    
-    const mes = document.getElementById('generar-mes').value;
-    const anio = document.getElementById('generar-anio').value;
-    
-    const nombreMes = obtenerNombreMes(mes);
 
-    if (!confirm(`¿Generar cuotas para ${nombreMes} ${anio}?\n\nSe crearán cuotas para todos los usuarios con vivienda asignada.`)) {
-        return;
-    }
-    
-    closeGenerarCuotasModal();
-    await generarCuotasMasivas(mes, anio);
-}
+
+
 
 async function generarCuotasMasivas(mes, anio) {
     const formData = new FormData();
@@ -4125,9 +4103,7 @@ window.editarPrecioCuota = editarPrecioCuota;
 window.closeEditarPrecioModal = closeEditarPrecioModal;
 window.submitEditarPrecio = submitEditarPrecio;
 window.generarCuotasMesActual = generarCuotasMesActual;
-window.mostrarGenerarCuotasPersonalizado = mostrarGenerarCuotasPersonalizado;
-window.closeGenerarCuotasModal = closeGenerarCuotasModal;
-window.submitGenerarCuotas = submitGenerarCuotas;
+
 window.loadAllCuotasAdmin = loadAllCuotasAdmin;
 window.abrirValidarPagoModal = abrirValidarPagoModal;
 window.closeValidarPagoModal = closeValidarPagoModal;
@@ -4860,31 +4836,73 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-function inicializarReportes() {
-    const selectAnio = document.getElementById('reporte-anio');
-    if (selectAnio) {
-        const anioActual = new Date().getFullYear();
-        selectAnio.innerHTML = '<option value="">Seleccione año...</option>';
-        for (let i = 0; i < 3; i++) {
-            const anio = anioActual - i;
-            const option = document.createElement('option');
-            option.value = anio;
-            option.textContent = anio;
-            if (i === 0) option.selected = true;
-            selectAnio.appendChild(option);
-        }
-    }
+async function inicializarReportes() {
+    console.log('📅 [REPORTES] Inicializando sistema de reportes...');
     
-    const selectMes = document.getElementById('reporte-mes');
-    if (selectMes) {
-        const mesActual = new Date().getMonth() + 1;
-        selectMes.value = mesActual;
+    try {
+        // ✅ OBTENER FECHA DEL USUARIO MÁS ANTIGUO
+        const response = await fetch('/api/users/fecha-mas-antigua');
+        const data = await response.json();
+        
+        let anioMinimo = new Date().getFullYear() - 5; // Por defecto 5 años atrás
+        
+        if (data.success && data.fecha_ingreso) {
+            const fechaIngreso = new Date(data.fecha_ingreso + 'T00:00:00');
+            anioMinimo = fechaIngreso.getFullYear();
+            console.log('📅 [REPORTES] Usuario más antiguo:', data.fecha_ingreso);
+            console.log('📅 [REPORTES] Año mínimo permitido:', anioMinimo);
+        }
+        
+        // ✅ GENERAR SELECTOR DE AÑOS DINÁMICO
+        const selectAnio = document.getElementById('reporte-anio');
+        if (selectAnio) {
+            const anioActual = new Date().getFullYear();
+            selectAnio.innerHTML = '<option value="">Seleccione año...</option>';
+            
+            // Desde el año actual hasta el año del usuario más antiguo
+            for (let anio = anioActual; anio >= anioMinimo; anio--) {
+                const option = document.createElement('option');
+                option.value = anio;
+                option.textContent = anio;
+                if (anio === anioActual) option.selected = true;
+                selectAnio.appendChild(option);
+            }
+            
+            console.log(`📅 [REPORTES] Años disponibles: ${anioActual} - ${anioMinimo}`);
+        }
+        
+        // ✅ SELECCIONAR MES ACTUAL
+        const selectMes = document.getElementById('reporte-mes');
+        if (selectMes) {
+            const mesActual = new Date().getMonth() + 1;
+            selectMes.value = mesActual;
+        }
+        
+    } catch (error) {
+        console.error('❌ [REPORTES] Error al inicializar:', error);
+        
+        // Fallback: últimos 5 años
+        const selectAnio = document.getElementById('reporte-anio');
+        if (selectAnio) {
+            const anioActual = new Date().getFullYear();
+            selectAnio.innerHTML = '<option value="">Seleccione año...</option>';
+            for (let i = 0; i < 5; i++) {
+                const anio = anioActual - i;
+                const option = document.createElement('option');
+                option.value = anio;
+                option.textContent = anio;
+                if (i === 0) option.selected = true;
+                selectAnio.appendChild(option);
+            }
+        }
     }
 }
 
 async function generarReporte() {
     const mes = document.getElementById('reporte-mes').value;
     const anio = document.getElementById('reporte-anio').value;
+    
+    console.log('📊 [REPORTE] Generando reporte para:', { mes, anio });
     
     if (!mes || !anio) {
         alert('⚠️ Selecciona mes y año');
@@ -4899,36 +4917,79 @@ async function generarReporte() {
     document.getElementById('btn-exportar').style.display = 'none';
     
     try {
-        const url = `/api/reporte/mensual?mes=${mes}&anio=${anio}`;
+        // ✅ FIX: Construir URL con parámetros correctos
+        const url = `/api/reporte/mensual?mes=${encodeURIComponent(mes)}&anio=${encodeURIComponent(anio)}`;
+        
+        console.log('🌐 [REPORTE] URL completa:', url);
+        
         const response = await fetch(url, {
             method: 'GET',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
             credentials: 'same-origin'
         });
+        
+        console.log('📡 [REPORTE] Response status:', response.status);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
         
         const contentType = response.headers.get('content-type');
         if (!contentType || !contentType.includes('application/json')) {
             const text = await response.text();
-            console.error('❌ Error:', text.substring(0, 500));
-            alert('❌ Error del servidor');
-            return;
+            console.error('❌ [REPORTE] Respuesta no es JSON:', text.substring(0, 500));
+            throw new Error('El servidor no devolvió JSON válido');
         }
         
         const data = await response.json();
+        console.log('📊 [REPORTE] Data recibida:', data);
         
         if (data.success) {
+            // ✅ Validar que los datos sean del período correcto
+            if (!data.reporte || !data.reporte.resumen) {
+                throw new Error('Estructura de datos inválida');
+            }
+            
+            console.log('✅ [REPORTE] Reporte válido para:', {
+                mes: data.reporte.periodo?.mes || mes,
+                anio: data.reporte.periodo?.anio || anio,
+                total_usuarios: data.reporte.resumen.total_usuarios
+            });
+            
             reporteActual = data.reporte;
             mostrarReporte(data.reporte);
         } else {
-            alert('❌ ' + data.message);
+            alert('❌ ' + (data.message || 'Error al generar reporte'));
+            container.innerHTML = `<p style="text-align: center; padding: 40px; color: #dc3545;">${data.message || 'Error al generar reporte'}</p>`;
         }
     } catch (error) {
-        console.error('Error:', error);
-        alert('❌ Error de conexión');
+        console.error('❌ [REPORTE] Error:', error);
+        alert('❌ Error al generar reporte: ' + error.message);
+        container.innerHTML = `<p style="text-align: center; padding: 40px; color: #dc3545;">Error: ${error.message}</p>`;
     }
 }
 
 function mostrarReporte(reporte) {
+    console.log('📊 [MOSTRAR] Renderizando reporte...');
+    
+    // Validar que tengamos datos
+    if (!reporte || !reporte.resumen) {
+        alert('❌ Datos de reporte inválidos');
+        return;
+    }
+    
+    // Mostrar información del período
+    const mes = document.getElementById('reporte-mes').value;
+    const anio = document.getElementById('reporte-anio').value;
+    const nombreMes = obtenerNombreMes(mes);
+    
+    console.log('📅 [MOSTRAR] Período:', `${nombreMes} ${anio}`);
+    console.log('👥 [MOSTRAR] Total usuarios:', reporte.resumen.total_usuarios);
+    
+    // ✅ Actualizar estadísticas
     document.getElementById('reporte-total-usuarios').textContent = reporte.resumen.total_usuarios || 0;
     document.getElementById('reporte-total-horas').textContent = 
         Math.round(reporte.resumen.total_horas_trabajadas || 0) + 'h';
@@ -4937,12 +4998,23 @@ function mostrarReporte(reporte) {
     document.getElementById('reporte-cumplimiento-promedio').textContent = 
         (reporte.resumen.promedio_cumplimiento || 0) + '%';
     
+    // ✅ Mostrar contenedores
     document.getElementById('reporte-resumen-container').style.display = 'block';
     document.getElementById('reporte-tabla-container').style.display = 'block';
     document.getElementById('btn-exportar').style.display = 'inline-block';
     
+    // ✅ Renderizar tabla
     renderTablaReporte(reporte.usuarios);
+    
+    console.log('✅ [MOSTRAR] Reporte renderizado correctamente');
 }
+
+window.generarReporte = generarReporte;
+window.exportarReporteCSV = exportarReporteCSV;
+window.mostrarReporte = mostrarReporte;
+
+console.log('✅ [FIX REPORTES] Corrección aplicada');
+console.log('✅ [FIX REPORTES] Ahora los filtros de mes/año se aplican correctamente');
 
 function renderTablaReporte(usuarios) {
     const container = document.getElementById('reporteTableContainer');
@@ -5083,7 +5155,18 @@ async function exportarReporteCSV() {
     const mes = document.getElementById('reporte-mes').value;
     const anio = document.getElementById('reporte-anio').value;
     
-    window.location.href = `/api/reporte/exportar?mes=${mes}&anio=${anio}&formato=csv`;
+    console.log('📥 [EXPORTAR] Exportando para:', { mes, anio });
+    
+    if (!mes || !anio) {
+        alert('⚠️ Selecciona mes y año');
+        return;
+    }
+    
+    // ✅ Construir URL con parámetros correctos
+    const url = `/api/reporte/exportar?mes=${encodeURIComponent(mes)}&anio=${encodeURIComponent(anio)}&formato=csv`;
+    console.log('🌐 [EXPORTAR] URL:', url);
+    
+    window.location.href = url;
 }
 
 // Exportar funciones globales

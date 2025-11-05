@@ -430,9 +430,6 @@
             <button class="btn btn-primary" onclick="generarCuotasMesActual()">
                 <i class="fas fa-calendar-plus"></i> Generar Cuotas del Mes Actual
             </button>
-            <button class="btn btn-secondary" onclick="mostrarGenerarCuotasPersonalizado()">
-                <i class="fas fa-calendar-alt"></i> Generar Cuotas (Mes Específico)
-            </button>
         </div>
     </div>
     
@@ -560,61 +557,6 @@
         </form>
     </div>
 </div>
-
-<!-- Modal para generar cuotas personalizadas -->
-<div id="generarCuotasModal" class="modal-overlay" style="display: none;">
-    <div class="modal-content">
-        <button class="modal-close-btn" onclick="closeGenerarCuotasModal()">×</button>
-        
-        <h2 class="modal-title">📅 Generar Cuotas Mensuales</h2>
-        
-        <form id="generarCuotasForm" onsubmit="submitGenerarCuotas(event)">
-            <div class="form-group">
-                <label for="generar-mes">Mes *</label>
-                <select id="generar-mes" required>
-                    <option value="">Seleccione un mes...</option>
-                    <option value="1">Enero</option>
-                    <option value="2">Febrero</option>
-                    <option value="3">Marzo</option>
-                    <option value="4">Abril</option>
-                    <option value="5">Mayo</option>
-                    <option value="6">Junio</option>
-                    <option value="7">Julio</option>
-                    <option value="8">Agosto</option>
-                    <option value="9">Septiembre</option>
-                    <option value="10">Octubre</option>
-                    <option value="11">Noviembre</option>
-                    <option value="12">Diciembre</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label for="generar-anio">Año *</label>
-                <input type="number" 
-                       id="generar-anio" 
-                       min="2024" 
-                       max="2030" 
-                       required 
-                       placeholder="Ej: 2025">
-            </div>
-            
-            <div class="alert-info">
-                <strong>ℹ️ Información:</strong>
-                <p>Se generarán cuotas automáticamente para todos los usuarios con vivienda asignada.</p>
-            </div>
-            
-            <div class="form-actions">
-                <button type="button" class="btn btn-secondary" onclick="closeGenerarCuotasModal()">
-                    Cancelar
-                </button>
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-calendar-check"></i> Generar Cuotas
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
-
 
 
 
