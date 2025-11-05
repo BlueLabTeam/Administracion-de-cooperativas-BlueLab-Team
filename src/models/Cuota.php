@@ -222,7 +222,7 @@ class Cuota
             ]);
 
             if (count($cuotasExistentes) > 0) {
-                error_log("✅ Cuota ya existe: ID " . $cuotasExistentes[0]['id_cuota']);
+                error_log(" Cuota ya existe: ID " . $cuotasExistentes[0]['id_cuota']);
                 error_log("===========================================");
                 return [
                     'success' => true,
@@ -280,7 +280,7 @@ class Cuota
                 $config = $stmtPrecio->fetch(PDO::FETCH_ASSOC);
 
                 $montoCuota = $config ? floatval($config['monto_mensual']) : 0;
-                error_log("✅ Vivienda encontrada - ID: $idVivienda - Monto: $$montoCuota");
+                error_log(" Vivienda encontrada - ID: $idVivienda - Monto: $$montoCuota");
             } else {
                 $pendienteAsignacion = 1;
                 error_log("⚠️ Usuario sin vivienda - Cuota creada con monto = 0");
@@ -331,7 +331,7 @@ class Cuota
 
             if (!$insertSuccess) {
                 $errorInfo = $stmtInsert->errorInfo();
-                error_log("❌ Error al insertar: " . print_r($errorInfo, true));
+                error_log(" Error al insertar: " . print_r($errorInfo, true));
                 error_log("===========================================");
                 return [
                     'success' => false,
@@ -340,12 +340,12 @@ class Cuota
             }
 
             $nuevaCuotaId = $this->conn->lastInsertId();
-            error_log("✅ Cuota creada con ID: $nuevaCuotaId");
+            error_log(" Cuota creada con ID: $nuevaCuotaId");
 
             // Recuperar cuota completa
             $cuotaCreada = $this->getCuotaById($nuevaCuotaId);
             
-            error_log("✅ Cuota recuperada correctamente");
+            error_log(" Cuota recuperada correctamente");
             error_log("===========================================");
             
             return [
@@ -359,8 +359,8 @@ class Cuota
             ];
 
         } catch (\PDOException $e) {
-            error_log("❌ Exception en generarCuotaIndividual: " . $e->getMessage());
-            error_log("❌ Stack trace: " . $e->getTraceAsString());
+            error_log(" Exception en generarCuotaIndividual: " . $e->getMessage());
+            error_log(" Stack trace: " . $e->getTraceAsString());
             error_log("===========================================");
             return [
                 'success' => false,
@@ -539,12 +539,12 @@ class Cuota
             
             $resultados = $stmt->fetchAll(PDO::FETCH_ASSOC);
             
-            error_log("✅ Resultados consulta directa: " . count($resultados));
+            error_log(" Resultados consulta directa: " . count($resultados));
             
             return $resultados;
             
         } catch (\PDOException $e) {
-            error_log("❌ ERROR en getCuotasUsuarioDirecto: " . $e->getMessage());
+            error_log(" ERROR en getCuotasUsuarioDirecto: " . $e->getMessage());
             return [];
         }
     }
@@ -565,9 +565,9 @@ class Cuota
             // PASO 1: Verificar si la vista existe
             try {
                 $testVista = $this->conn->query("SELECT COUNT(*) FROM Vista_Cuotas_Con_Justificaciones LIMIT 1");
-                error_log("✅ Vista existe y es accesible");
+                error_log(" Vista existe y es accesible");
             } catch (\PDOException $e) {
-                error_log("❌ ERROR: Vista no existe o no es accesible: " . $e->getMessage());
+                error_log(" ERROR: Vista no existe o no es accesible: " . $e->getMessage());
                 
                 // Fallback: consulta directa sin vista
                 error_log("⚠️ Usando consulta directa sin vista...");
@@ -674,9 +674,9 @@ class Cuota
             return $resultados;
             
         } catch (\PDOException $e) {
-            error_log("❌ ERROR en getCuotasUsuario: " . $e->getMessage());
-            error_log("❌ SQL State: " . $e->getCode());
-            error_log("❌ Stack trace: " . $e->getTraceAsString());
+            error_log(" ERROR en getCuotasUsuario: " . $e->getMessage());
+            error_log(" SQL State: " . $e->getCode());
+            error_log(" Stack trace: " . $e->getTraceAsString());
             
             // Fallback: consulta directa
             error_log("⚠️ Intentando con consulta directa...");
@@ -736,10 +736,7 @@ class Cuota
         }
     }
 
-    /**
-     * Obtener cuota por ID
-     */
- 
+    
 
     /**
      * Verificar si puede pagar

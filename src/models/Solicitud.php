@@ -54,7 +54,7 @@ class Solicitud
     }
 
     /**
-     * Obtener solicitudes del usuario - ✅ USAR VISTA
+     * Obtener solicitudes del usuario -  USAR VISTA
      */
     public function getMisSolicitudes($idUsuario, $filtros = [])
     {
@@ -64,7 +64,7 @@ class Solicitud
             error_log("Usuario ID: $idUsuario");
             error_log("Filtros: " . json_encode($filtros));
 
-            // ✅ USAR VISTA OPTIMIZADA
+            //  USAR VISTA OPTIMIZADA
             $sql = "
                 SELECT * FROM Vista_Solicitudes_Completa
                 WHERE id_usuario = :id_usuario
@@ -103,7 +103,7 @@ class Solicitud
             return $resultado;
 
         } catch (\PDOException $e) {
-            error_log("❌ Error en getMisSolicitudes: " . $e->getMessage());
+            error_log(" Error en getMisSolicitudes: " . $e->getMessage());
             error_log("SQL State: " . $e->getCode());
             error_log("Stack trace: " . $e->getTraceAsString());
             return [];
@@ -111,7 +111,7 @@ class Solicitud
     }
 
     /**
-     * Obtener TODAS las solicitudes (Admin) - ✅ USAR VISTA
+     * Obtener TODAS las solicitudes (Admin) -  USAR VISTA
      */
     public function getAllSolicitudes($filtros = [])
     {
@@ -120,7 +120,7 @@ class Solicitud
             error_log("getAllSolicitudes - Usando Vista");
             error_log("Filtros: " . json_encode($filtros));
 
-            // ✅ USAR VISTA OPTIMIZADA
+            //  USAR VISTA OPTIMIZADA
             $sql = "SELECT * FROM Vista_Solicitudes_Completa WHERE 1=1";
 
             $params = [];
@@ -162,14 +162,14 @@ class Solicitud
             return $resultado;
 
         } catch (\PDOException $e) {
-            error_log("❌ Error en getAllSolicitudes: " . $e->getMessage());
+            error_log(" Error en getAllSolicitudes: " . $e->getMessage());
             error_log("SQL State: " . $e->getCode());
             return [];
         }
     }
 
     /**
-     * Obtener detalle de una solicitud - ✅ USAR VISTA
+     * Obtener detalle de una solicitud -  USAR VISTA
      */
     public function getById($solicitudId)
     {

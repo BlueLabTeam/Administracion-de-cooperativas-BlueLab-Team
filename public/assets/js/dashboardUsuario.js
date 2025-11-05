@@ -3,20 +3,20 @@ document.addEventListener('DOMContentLoaded', function () {
     const menuItems = document.querySelectorAll('.menu li');
 
     document.addEventListener('DOMContentLoaded', function() {
-    console.log('🔧 Inicializando listeners de solicitudes');
+    ('🔧 Inicializando listeners de solicitudes');
     
     // Listener para la sección de solicitudes
     const solicitudesMenuItem = document.querySelector('.menu li[data-section="solicitudes"]');
     
     if (solicitudesMenuItem) {
-        console.log('✅ Menu item de solicitudes encontrado');
+        (' Menu item de solicitudes encontrado');
         
         solicitudesMenuItem.addEventListener('click', function() {
-            console.log('🎯 CLICK EN SOLICITUDES DETECTADO');
+            ('🎯 CLICK EN SOLICITUDES DETECTADO');
             
             // Esperar un momento para que la sección se active
             setTimeout(() => {
-                console.log('⏰ Ejecutando loadMisSolicitudes()');
+                ('⏰ Ejecutando loadMisSolicitudes()');
                 loadMisSolicitudes();
             }, 100);
         });
@@ -25,22 +25,22 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
-// ========== CARGAR MIS SOLICITUDES (VERSIÃ"N MEJORADA CON MÃS LOGS) ==========
+// ========== CARGAR MIS SOLICITUDES==========
 async function loadMisSolicitudes() {
-    console.log('==========================================');
-    console.log('📋 INICIANDO CARGA DE SOLICITUDES');
-    console.log('==========================================');
+    ('==========================================');
+    ('📋 INICIANDO CARGA DE SOLICITUDES');
+    ('==========================================');
     
     const container = document.getElementById('misSolicitudesContainer');
     
     if (!container) {
         console.error('❌ Container "misSolicitudesContainer" NO ENCONTRADO');
-        console.log('Elementos disponibles con "solicitudes":', 
+        ('Elementos disponibles con "solicitudes":', 
             document.querySelectorAll('[id*="solicitud"]'));
         return;
     }
 
-    console.log('✅ Container encontrado:', container);
+    (' Container encontrado:', container);
     container.innerHTML = '<p class="loading">Cargando solicitudes...</p>';
 
     try {
@@ -51,8 +51,8 @@ async function loadMisSolicitudes() {
         if (estado) url += `estado=${estado}&`;
         if (tipo) url += `tipo=${tipo}&`;
 
-        console.log('🔗 URL de petición:', url);
-        console.log('📤 Iniciando fetch...');
+        ('🔗 URL de petición:', url);
+        ('📤 Iniciando fetch...');
 
         const response = await fetch(url, {
             method: 'GET',
@@ -62,18 +62,18 @@ async function loadMisSolicitudes() {
             credentials: 'same-origin'
         });
 
-        console.log('📡 Response status:', response.status);
-        console.log('📡 Response headers:', [...response.headers.entries()]);
+        ('📡 Response status:', response.status);
+        ('📡 Response headers:', [...response.headers.entries()]);
 
         // Leer como texto primero para debug
         const responseText = await response.text();
-        console.log('📥 Response text (primeros 500 chars):', responseText.substring(0, 500));
+        ('📥 Response text (primeros 500 chars):', responseText.substring(0, 500));
 
         // Intentar parsear
         let data;
         try {
             data = JSON.parse(responseText);
-            console.log('✅ JSON parseado correctamente');
+            (' JSON parseado correctamente');
         } catch (parseError) {
             console.error('❌ Error al parsear JSON:', parseError);
             console.error('📄 Respuesta completa:', responseText);
@@ -90,22 +90,22 @@ async function loadMisSolicitudes() {
             return;
         }
 
-        console.log('📊 Data recibida:', data);
-        console.log('   - success:', data.success);
-        console.log('   - count:', data.count);
-        console.log('   - solicitudes length:', data.solicitudes?.length);
+        ('📊 Data recibida:', data);
+        ('   - success:', data.success);
+        ('   - count:', data.count);
+        ('   - solicitudes length:', data.solicitudes?.length);
 
         if (data.success) {
-            console.log('✅ Petición exitosa, renderizando...');
+            (' Petición exitosa, renderizando...');
             
             if (data.solicitudes && data.solicitudes.length > 0) {
-                console.log('📋 Primera solicitud:', data.solicitudes[0]);
+                ('📋 Primera solicitud:', data.solicitudes[0]);
             }
             
             renderMisSolicitudes(data.solicitudes);
             updateSolicitudesStats(data.solicitudes);
             
-            console.log('✅ Renderizado completado');
+            (' Renderizado completado');
         } else {
             console.error('❌ success = false');
             container.innerHTML = `
@@ -137,15 +137,15 @@ async function loadMisSolicitudes() {
         `;
     }
     
-    console.log('==========================================');
-    console.log('📋 FIN CARGA DE SOLICITUDES');
-    console.log('==========================================');
+    ('==========================================');
+    ('📋 FIN CARGA DE SOLICITUDES');
+    ('==========================================');
 }
 
 // Exportar para uso global
 window.loadMisSolicitudes = loadMisSolicitudes;
 
-console.log('✅ Fix de solicitudes cargado');
+(' Fix de solicitudes cargado');
 
     menuItems.forEach(item => {
         item.addEventListener('click', function (e) {
@@ -179,9 +179,9 @@ console.log('✅ Fix de solicitudes cargado');
     // Listener para sección de horas
     const horasMenuItem = document.querySelector('.menu li[data-section="horas"]');
     if (horasMenuItem) {
-        console.log('✅ Listener de horas agregado');
+        (' Listener de horas agregado');
         horasMenuItem.addEventListener('click', function () {
-            console.log('>>> Click en sección horas');
+            ('>>> Click en sección horas');
             inicializarSeccionHoras();
         });
     }
@@ -258,7 +258,7 @@ function getTipoIcon(tipo) {
         'info': 'ℹ️',
         'importante': '⚠️',
         'urgente': '🚨',
-        'exito': '✅'
+        'exito': ''
     };
     return icons[tipo] || 'ℹ️';
 }
@@ -339,12 +339,10 @@ async function loadUserTasks() {
     }
 }
 
-// ==========================================
-// 🔧 FUNCIÓN MEJORADA: renderUserTasks con VENCIDAS
-// ==========================================
+
 
 function renderUserTasks(tareas, containerId, esNucleo = false) {
-    console.log('🎨 [RENDER USER TASKS] Iniciando con detección de vencidas');
+    ('🎨 [RENDER USER TASKS] Iniciando con detección de vencidas');
     
     const container = document.getElementById(containerId);
 
@@ -353,7 +351,7 @@ function renderUserTasks(tareas, containerId, esNucleo = false) {
         return;
     }
 
-    // ✅ PASO 1: Detectar tareas vencidas
+    //  PASO 1: Detectar tareas vencidas
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
 
@@ -363,7 +361,7 @@ function renderUserTasks(tareas, containerId, esNucleo = false) {
         const esVencida = !esCompletada && fechaFinObj < hoy;
 
         if (esVencida) {
-            console.log(`🔴 TAREA VENCIDA (Usuario): ${tarea.titulo} - Fin: ${tarea.fecha_fin}`);
+            (`🔴 TAREA VENCIDA (Usuario): ${tarea.titulo} - Fin: ${tarea.fecha_fin}`);
         }
 
         return {
@@ -373,20 +371,20 @@ function renderUserTasks(tareas, containerId, esNucleo = false) {
         };
     });
 
-    // ✅ PASO 2: Renderizar
+    //  PASO 2: Renderizar
     container.innerHTML = tareasConEstado.map(tarea => {
         const fechaInicio = formatearFechaUY(tarea.fecha_inicio);
         const fechaFin = formatearFechaUY(tarea.fecha_fin);
         const progreso = tarea.progreso || 0;
 
-        // ✅ DETERMINAR ESTADO VISUAL
+        //  DETERMINAR ESTADO VISUAL
         let estadoTexto, estadoBadgeClass, tareaClass;
 
         if (tarea.esVencida) {
             estadoTexto = '⏰ Vencida';
             estadoBadgeClass = 'vencida';
             tareaClass = 'tarea-vencida';
-            console.log(`✅ Badge VENCIDA aplicado: ${tarea.titulo}`);
+            (` Badge VENCIDA aplicado: ${tarea.titulo}`);
         } else if (tarea.esCompletada) {
             estadoTexto = formatEstadoUsuario(tarea.estado_usuario);
             estadoBadgeClass = 'completada';
@@ -453,7 +451,7 @@ function renderUserTasks(tareas, containerId, esNucleo = false) {
         `;
     }).join('');
 
-    console.log('✅ [RENDER USER TASKS] Completado');
+    (' [RENDER USER TASKS] Completado');
 }
 
 function updateTasksSummary(tareasUsuario, tareasNucleo) {
@@ -794,7 +792,7 @@ function mostrarDetallesTareaUsuario(tarea, avances, materiales = []) {
 }
 
 // ==========================================
-// MI VIVIENDA (USUARIO)
+// MI VIVIENDA 
 // ==========================================
 
 function loadMyVivienda() {
@@ -858,10 +856,10 @@ function renderMyVivienda(vivienda) {
     `;
 }
 // ==========================================
-// SISTEMA DE REGISTRO DE HORAS - USUARIO
+// SISTEMA DE REGISTRO DE HORAS 
 // ==========================================
 
-console.log('🟢 Iniciando sistema de registro de horas');
+('🟢 Iniciando sistema de registro de horas');
 
 // Variables globales
 let relojInterval;
@@ -870,7 +868,7 @@ let registroAbiertoData = null;
 
 // ========== INICIALIZACIÓN ==========
 document.addEventListener('DOMContentLoaded', function () {
-    console.log('📋 Inicializando módulo de horas');
+    ('📋 Inicializando módulo de horas');
 
     // Iniciar reloj en tiempo real
     updateClock();
@@ -880,7 +878,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const horasMenuItem = document.querySelector('.menu li[data-section="horas"]');
     if (horasMenuItem) {
         horasMenuItem.addEventListener('click', function () {
-            console.log('>>> Sección horas abierta');
+            ('>>> Sección horas abierta');
             inicializarSeccionHoras();
         });
     }
@@ -895,7 +893,7 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 // ========== RELOJ EN TIEMPO REAL ==========
-// ========== RELOJ EN TIEMPO REAL (CORREGIDO) ==========
+
 function updateClock() {
     // Obtener hora actual del navegador
     const now = new Date();
@@ -918,11 +916,11 @@ function updateClock() {
     }
 }
 
-// ALTERNATIVA: Si quieres también mostrar la fecha completa
+
 function updateClockWithDate() {
     const now = new Date();
     
-    // Opciones para fecha y hora en Uruguay
+    
     const dateOptions = {
         timeZone: 'America/Montevideo',
         weekday: 'long',
@@ -962,7 +960,7 @@ function updateClockWithDate() {
 async function cargarDeudaHorasWidget() {
     const container = document.getElementById('deuda-actual-container');
     if (!container) {
-        console.log('⚠️ Container deuda-actual-container no encontrado');
+        ('⚠️ Container deuda-actual-container no encontrado');
         return;
     }
     
@@ -972,7 +970,7 @@ async function cargarDeudaHorasWidget() {
         const response = await fetch('/api/horas/deuda-actual');
         const data = await response.json();
         
-        console.log('💰 Deuda de horas recibida:', data);
+        ('💰 Deuda de horas recibida:', data);
         
         if (data.success && data.deuda) {
             renderDeudaHorasWidget(data.deuda);
@@ -1088,7 +1086,7 @@ function getNombreMes(mes) {
 
 // ========== INICIALIZAR SECCIÓN ==========
 async function inicializarSeccionHoras() {
-    console.log('🔄 Inicializando sección de horas');
+    ('🔄 Inicializando sección de horas');
 
     try {
         // Verificar si hay registro abierto
@@ -1099,10 +1097,10 @@ async function inicializarSeccionHoras() {
             loadResumenSemanal(),
             loadMisRegistros(),
             cargarEstadisticas(),
-            cargarDeudaHorasWidget() // ✅ AGREGAR ESTA LÍNEA
+            cargarDeudaHorasWidget() //  AGREGAR ESTA LÍNEA
         ]);
 
-        console.log('✅ Sección inicializada correctamente');
+        (' Sección inicializada correctamente');
 
     } catch (error) {
         console.error('❌ Error al inicializar:', error);
@@ -1121,8 +1119,8 @@ async function verificarRegistroAbierto() {
 
         // DEBUG: Ver respuesta cruda
         const responseText = await response.text();
-        console.log('🔍 Response status:', response.status);
-        console.log('🔍 Response text:', responseText.substring(0, 500));
+        ('🔍 Response status:', response.status);
+        ('🔍 Response text:', responseText.substring(0, 500));
 
         // Intentar parsear JSON
         let data;
@@ -1134,25 +1132,25 @@ async function verificarRegistroAbierto() {
             throw new Error('El servidor devolvió HTML en lugar de JSON. Revisa los logs de PHP.');
         }
 
-        console.log('📊 Verificación de registro:', data);
+        ('📊 Verificación de registro:', data);
 
         if (data.success && data.registro) {
             // Hay un registro abierto
             registroAbiertoId = data.registro.id_registro;
             registroAbiertoData = data.registro;
             mostrarBotonSalida(data.registro.hora_entrada);
-            console.log('✅ Registro abierto encontrado:', registroAbiertoId);
+            (' Registro abierto encontrado:', registroAbiertoId);
         } else {
             // No hay registro abierto
             registroAbiertoId = null;
             registroAbiertoData = null;
             mostrarBotonEntrada();
-            console.log('ℹ️ No hay registro abierto');
+            ('ℹ️ No hay registro abierto');
         }
 
     } catch (error) {
         console.error('❌ Error en verificarRegistroAbierto:', error);
-        // En caso de error, mostrar botón de entrada por defecto
+    
         mostrarBotonEntrada();
     }
 }
@@ -1186,11 +1184,11 @@ function mostrarBotonSalida(horaEntrada) {
 
 // ========== MARCAR ENTRADA ==========
 async function marcarEntrada() {
-    console.log('🚀 Iniciando marcación de entrada');
+    ('🚀 Iniciando marcación de entrada');
 
     const descripcion = prompt('Describe brevemente tu trabajo de hoy (opcional):');
     if (descripcion === null) {
-        console.log('ℹ️ Usuario canceló la entrada');
+        ('ℹ️ Usuario canceló la entrada');
         return;
     }
 
@@ -1205,7 +1203,7 @@ async function marcarEntrada() {
         formData.append('hora_entrada', hoy.toTimeString().split(' ')[0]);
         formData.append('descripcion', descripcion || '');
 
-        console.log('📤 Enviando datos de entrada');
+        ('📤 Enviando datos de entrada');
 
         const response = await fetch('/api/horas/iniciar', {
             method: 'POST',
@@ -1214,10 +1212,10 @@ async function marcarEntrada() {
         });
 
         const data = await response.json();
-        console.log('📥 Respuesta del servidor:', data);
+        ('📥 Respuesta del servidor:', data);
 
         if (data.success) {
-            alert(`✅ ${data.message}\nHora registrada: ${data.hora_entrada}`);
+            alert(` ${data.message}\nHora registrada: ${data.hora_entrada}`);
             registroAbiertoId = data.id_registro;
             
             // Restablecer botón antes de recargar
@@ -1241,7 +1239,7 @@ async function marcarEntrada() {
 
 // ========== MARCAR SALIDA ==========
 async function marcarSalida() {
-    console.log('🚀 Iniciando marcación de salida');
+    ('🚀 Iniciando marcación de salida');
 
     if (!registroAbiertoId) {
         alert('❌ No hay registro activo para cerrar');
@@ -1249,7 +1247,7 @@ async function marcarSalida() {
     }
 
     if (!confirm('¿Deseas registrar tu salida ahora?')) {
-        console.log('ℹ️ Usuario canceló la salida');
+        ('ℹ️ Usuario canceló la salida');
         return;
     }
 
@@ -1264,7 +1262,7 @@ async function marcarSalida() {
         formData.append('id_registro', registroAbiertoId);
         formData.append('hora_salida', ahora.toTimeString().split(' ')[0]);
 
-        console.log('📤 Enviando datos de salida');
+        ('📤 Enviando datos de salida');
 
         const response = await fetch('/api/horas/cerrar', {
             method: 'POST',
@@ -1273,10 +1271,10 @@ async function marcarSalida() {
         });
 
         const data = await response.json();
-        console.log('📥 Respuesta del servidor:', data);
+        ('📥 Respuesta del servidor:', data);
 
         if (data.success) {
-            alert(`✅ ${data.message}\n\n⏱️ Total trabajado: ${data.total_horas} horas`);
+            alert(` ${data.message}\n\n⏱️ Total trabajado: ${data.total_horas} horas`);
             registroAbiertoId = null;
             registroAbiertoData = null;
             
@@ -1331,7 +1329,7 @@ async function cargarEstadisticas() {
             }
         }
 
-        console.log('✅ Estadísticas actualizadas');
+        (' Estadísticas actualizadas');
 
     } catch (error) {
         console.error('❌ Error al cargar estadísticas:', error);
@@ -1351,7 +1349,7 @@ async function loadResumenSemanal() {
 
         if (data.success && data.resumen) {
             renderResumenSemanal(data.resumen);
-            console.log('✅ Resumen semanal cargado');
+            (' Resumen semanal cargado');
         } else {
             container.innerHTML = '<p class="error">Error al cargar resumen semanal</p>';
         }
@@ -1375,7 +1373,7 @@ function renderResumenSemanal(resumen) {
         });
     }
 
-    // Generar fechas de la semana (Lunes a Domingo - 7 días)
+    // Generar fechas de la semana 
     const fechaInicio = new Date(resumen.semana.inicio + 'T00:00:00');
     const fechas = [];
     for (let i = 0; i < 7; i++) {
@@ -1400,7 +1398,7 @@ function renderResumenSemanal(resumen) {
         const dia = diasSemana[index];
         const fechaFormateada = formatearFechaSimple(fecha);
         const esHoy = fecha === new Date().toISOString().split('T')[0];
-        const esFinDeSemana = index === 5 || index === 6; // Sábado o Domingo
+        const esFinDeSemana = index === 5 || index === 6; 
 
         html += `
             <div class="dia-card ${registro ? 'con-registro' : 'sin-registro'} ${esHoy ? 'dia-hoy' : ''} ${esFinDeSemana ? 'fin-de-semana' : ''}">
@@ -1450,7 +1448,7 @@ function getEstadoBadge(estado) {
     return badges[estado] || '';
 }
 
-// ========== HISTORIAL DE REGISTROS (VERSIÓN SIMPLIFICADA) ==========
+// ========== HISTORIAL DE REGISTROS ==========
 async function loadMisRegistros() {
     const container = document.getElementById('historial-registros-container');
     if (!container) return;
@@ -1471,7 +1469,7 @@ async function loadMisRegistros() {
 
         if (data.success && data.registros) {
             renderHistorialRegistros(data.registros);
-            console.log(`✅ ${data.registros.length} registros cargados`);
+            (` ${data.registros.length} registros cargados`);
         } else {
             container.innerHTML = '<p class="error">Error al cargar registros</p>';
         }
@@ -1609,12 +1607,12 @@ async function filtrarRegistros() {
         return;
     }
 
-    console.log(`🔍 Filtrando registros: ${fechaInicio} a ${fechaFin}`);
+    (`🔍 Filtrando registros: ${fechaInicio} a ${fechaFin}`);
     await loadMisRegistros();
 }
 
 
-console.log('✅ Sistema de registro de horas cargado completamente');
+(' Sistema de registro de horas cargado completamente');
 
 
 window.marcarEntrada = marcarEntrada;
@@ -1639,13 +1637,13 @@ function toggleEditProfile() {
     // Debug: verificar que los elementos existen
     if (!viewDiv || !editDiv) {
         console.error('Error: No se encontraron los divs de perfil');
-        console.log('viewDiv:', viewDiv);
-        console.log('editDiv:', editDiv);
+        ('viewDiv:', viewDiv);
+        ('editDiv:', editDiv);
         return;
     }
     
     if (editDiv.style.display === 'none' || editDiv.style.display === '') {
-        // Mostrar formulario de ediciÃ³n
+    
         loadProfileData();
         viewDiv.style.display = 'none';
         editDiv.style.display = 'block';
@@ -1767,7 +1765,7 @@ async function cargarDatosUsuario() {
             // Guardar datos globalmente
             profileData = data.user;
             
-            console.log('✅ Datos de usuario cargados correctamente');
+            (' Datos de usuario cargados correctamente');
         } else {
             console.error('Error en respuesta:', data);
         }
@@ -1849,7 +1847,7 @@ async function submitProfileEdit(event) {
         const data = await response.json();
         
         if (data.success) {
-            alert('✅ ' + data.message);
+            alert(' ' + data.message);
             
             // Recargar los datos del usuario para actualizar la vista
             await cargarDatosUsuario();
@@ -1874,7 +1872,7 @@ async function submitProfileEdit(event) {
 
 // Inicializar al cargar la página
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🔄 Cargando datos del usuario...');
+    ('🔄 Cargando datos del usuario...');
     cargarDatosUsuario();
 });
 
@@ -1885,10 +1883,10 @@ window.cargarDatosUsuario = cargarDatosUsuario;
 
 
 // ==========================================
-// SISTEMA DE CUOTAS MENSUALES CON DEUDA DE HORAS - USUARIO
+// SISTEMA DE CUOTAS MENSUALES CON DEUDA DE HORAS 
 // ==========================================
 
-console.log('🟢 Cargando módulo de cuotas con deuda de horas');
+(' Cargando módulo de cuotas con deuda de horas');
 
 // Variable global para almacenar deuda de horas
 let deudaHorasActual = 0;
@@ -1898,7 +1896,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const cuotasMenuItem = document.querySelector('.menu li[data-section="cuotas"]');
     if (cuotasMenuItem) {
     cuotasMenuItem.addEventListener('click', async function() {
-        console.log('>>> Sección cuotas abierta');
+        ('>>> Sección cuotas abierta');
         
         // Limpiar cache
         ultimoCheckCuotas = null;
@@ -1923,7 +1921,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 async function generarCuotaMesActualSiNoExiste() {
-    console.log('🔄 Verificando cuota del mes actual...');
+    ('🔄 Verificando cuota del mes actual...');
     
     try {
         const hoy = new Date();
@@ -1934,10 +1932,10 @@ async function generarCuotaMesActualSiNoExiste() {
         const response = await fetch(`/api/cuotas/verificar-cuota-mes?mes=${mesActual}&anio=${anioActual}`);
         const data = await response.json();
         
-        console.log('📊 Verificación de cuota:', data);
+        ('📊 Verificación de cuota:', data);
         
         if (data.success && !data.existe) {
-            console.log('⚠️ No existe cuota del mes actual, generando...');
+            ('⚠️ No existe cuota del mes actual, generando...');
             
             // Generar cuota del mes actual
             const formData = new FormData();
@@ -1951,12 +1949,12 @@ async function generarCuotaMesActualSiNoExiste() {
             
             // 🔥 DEBUG: Ver respuesta completa
             const dataGenerar = await responseGenerar.json();
-            console.log('🔍 RESPUESTA COMPLETA DE GENERAR:', dataGenerar);
+            ('🔍 RESPUESTA COMPLETA DE GENERAR:', dataGenerar);
             
             if (dataGenerar.success) {
-                console.log('✅ Cuota generada:', dataGenerar.message);
+                (' Cuota generada:', dataGenerar.message);
                 if (dataGenerar.debug) {
-                    console.log('🐛 DEBUG INFO:', dataGenerar.debug);
+                    ('🐛 DEBUG INFO:', dataGenerar.debug);
                 }
             } else {
                 console.warn('⚠️ No se pudo generar cuota:', dataGenerar.message);
@@ -1965,7 +1963,7 @@ async function generarCuotaMesActualSiNoExiste() {
                 }
             }
         } else if (data.existe) {
-            console.log('✅ Cuota del mes ya existe');
+            (' Cuota del mes ya existe');
         }
     } catch (error) {
         console.error('❌ Error al verificar/generar cuota:', error);
@@ -1974,22 +1972,22 @@ async function generarCuotaMesActualSiNoExiste() {
 
 // ========== INICIALIZAR SECCIÓN ==========
 async function inicializarSeccionCuotas() {
-    console.log('📋 Inicializando sección de cuotas con deuda');
+    ('📋 Inicializando sección de cuotas con deuda');
     
     try {
-        // ✅ PASO 1: Generar cuota del mes actual si no existe
+        //  PASO 1: Generar cuota del mes actual si no existe
         await generarCuotaMesActualSiNoExiste();
         
-        // ✅ PASO 2: Cargar deuda de horas
+        //  PASO 2: Cargar deuda de horas
         await loadDeudaHorasParaCuotas();
         
-        // ✅ PASO 3: Cargar el resto
+        //  PASO 3: Cargar el resto
         await Promise.all([
             loadInfoViviendaCuota(),
             loadMisCuotas()
         ]);
         
-        console.log('✅ Sección de cuotas inicializada');
+        (' Sección de cuotas inicializada');
     } catch (error) {
         console.error('❌ Error al inicializar cuotas:', error);
         alert('Error al cargar la información de cuotas');
@@ -1999,7 +1997,7 @@ async function inicializarSeccionCuotas() {
 
 // ========== CARGAR DEUDA DE HORAS ==========
 async function loadDeudaHorasParaCuotas() {
-    console.log('💰 Cargando deuda de horas para cuotas');
+    ('💰 Cargando deuda de horas para cuotas');
     
     try {
         const response = await fetch('/api/horas/deuda-actual');
@@ -2011,9 +2009,9 @@ async function loadDeudaHorasParaCuotas() {
             const deudaAcumulada = parseFloat(data.deuda.deuda_acumulada) || 0;
             deudaHorasActual = deudaMesActual + deudaAcumulada;
             
-            console.log('💵 Deuda total de horas: $' + deudaHorasActual);
-            console.log('   - Mes actual: $' + deudaMesActual);
-            console.log('   - Acumulada: $' + deudaAcumulada);
+            ('💵 Deuda total de horas: $' + deudaHorasActual);
+            ('   - Mes actual: $' + deudaMesActual);
+            ('   - Acumulada: $' + deudaAcumulada);
         } else {
             deudaHorasActual = 0;
             console.warn('⚠️ No se pudo cargar deuda de horas');
@@ -2087,14 +2085,14 @@ async function loadMisCuotas() {
         const response = await fetch(url);
         const data = await response.json();
         
-        console.log('📊 Cuotas recibidas:', data);
+        ('📊 Cuotas recibidas:', data);
         
         if (data.success) {
-            // ✅ DEBUG: Solo si hay cuotas
+            //  DEBUG: Solo si hay cuotas
             if (data.cuotas && data.cuotas.length > 0) {
-                console.log('🔍 PRIMERA CUOTA:', data.cuotas[0]);
-                console.log('💵 monto_base:', data.cuotas[0]?.monto_base);
-                console.log('💵 monto:', data.cuotas[0]?.monto);
+                ('🔍 PRIMERA CUOTA:', data.cuotas[0]);
+                ('💵 monto_base:', data.cuotas[0]?.monto_base);
+                ('💵 monto:', data.cuotas[0]?.monto);
             }
             
             renderMisCuotasOrganizadas(data.cuotas);
@@ -2124,14 +2122,14 @@ function renderMisCuotasOrganizadas(cuotas) {
     }
     
     let html = '';
-    // ⭐ SECCIÓN DESTACADA: DEUDA TOTAL DEL MES (CON CONTROL DE PERÍODO)
+    //DEUDA TOTAL DEL MES (CON CONTROL DE PERÍODO)
 const cuotaMasReciente = cuotas[0];
 
 // Calcular deuda total
 const montoCuota = parseFloat(cuotaMasReciente.monto_base || cuotaMasReciente.monto_actual || cuotaMasReciente.monto || 0);
 const montoTotal = montoCuota + deudaHorasActual;
 
-console.log('💵 Cálculo de montos:', {
+('💵 Cálculo de montos:', {
     monto_base: cuotaMasReciente.monto_base,
     monto_actual: cuotaMasReciente.monto_actual,
     monto: cuotaMasReciente.monto,
@@ -2157,7 +2155,7 @@ async function verificarCambiosCuotas() {
             if (ultimoCheckCuotas === null) {
                 ultimoCheckCuotas = checksum;
             } else if (ultimoCheckCuotas !== checksum) {
-                console.log('🔄 Detectado cambio en cuota, recargando...');
+                ('🔄 Detectado cambio en cuota, recargando...');
                 ultimoCheckCuotas = checksum;
                 
                 // Recargar solo si estamos en la sección de cuotas
@@ -2213,7 +2211,7 @@ setInterval(() => {
     if (cuotasSection && cuotasSection.classList.contains('active')) {
         verificarCambiosCuotas();
     }
-}, 30000); // 30 segundos
+}, 30000); 
 
 // Verificar al cargar la sección
 const originalInicializarSeccionCuotas = window.inicializarSeccionCuotas;
@@ -2230,7 +2228,7 @@ function obtenerPrecioActualizado(cuota) {
         0
     );
     
-    console.log(`💰 Precio para cuota ${cuota.id_cuota}:`, {
+    (`💰 Precio para cuota ${cuota.id_cuota}:`, {
         monto_base: cuota.monto_base,
         monto_actual: cuota.monto_actual,
         monto: cuota.monto,
@@ -2248,7 +2246,7 @@ const estadoFinal = cuotaMasReciente.estado_actual || cuotaMasReciente.estado;
 const tienePagoPendiente = cuotaMasReciente.id_pago && cuotaMasReciente.estado_pago === 'pendiente';
 const estaPagada = estadoFinal === 'pagada';
 
-// 🆕 VERIFICAR SI ESTÁ EN PERÍODO DE PAGO
+//  VERIFICAR SI ESTÁ EN PERÍODO DE PAGO
 const hoy = new Date();
 const diaActual = hoy.getDate();
 const mesActual = hoy.getMonth() + 1;
@@ -2265,7 +2263,7 @@ if (esMesCuota && !estaDentroPeriodoPago) {
     diasParaPagar = 25 - diaActual;
 }
 
-console.log('📅 Control de período:', {
+('📅 Control de período:', {
     diaActual,
     mesActual,
     esMesCuota,
@@ -2282,7 +2280,7 @@ html += `
                 Resumen del Mes Actual
             </h2>
             <span class="deuda-total-badge ${estaPagada ? 'badge-pagada' : tienePagoPendiente ? 'badge-pendiente' : puedePagar ? 'badge-requerida' : 'badge-bloqueado'}">
-                ${estaPagada ? '✅ PAGADA' : 
+                ${estaPagada ? ' PAGADA' : 
                   tienePagoPendiente ? '⏳ EN VALIDACIÓN' : 
                   puedePagar ? '⚠️ PERÍODO DE PAGO ABIERTO' : 
                   '🔒 PERÍODO DE TRABAJO'}
@@ -2356,7 +2354,7 @@ html += `
                 </div>
                 
                 <div class="alert-success" style="margin-top: 20px; background: rgba(76, 175, 80, 0.15); border-color: rgba(76, 175, 80, 0.3);">
-                    <strong style="color: #4caf50;">✅ Período de Pago Habilitado</strong>
+                    <strong style="color: #4caf50;"> Período de Pago Habilitado</strong>
                     <p style="color: rgba(255, 255, 255, 0.9); margin: 10px 0 0 0;">
                         Ya puedes realizar el pago de tu cuota. El período de pago está activo hasta fin de mes.
                     </p>
@@ -2475,8 +2473,8 @@ function renderCuotaCard(cuota) {
     const esPagada = cuota.estado === 'pagada';
     const tienePagoPendiente = cuota.id_pago && cuota.estado_pago === 'pendiente';
     
-    // 🔥 DEBUG: Log para cada cuota
-    console.log(`📋 Cuota ${cuota.id_cuota} (${mes} ${cuota.anio}):`, {
+    // DEBUG: Log para cada cuota
+    (`📋 Cuota ${cuota.id_cuota} (${mes} ${cuota.anio}):`, {
         estado: estadoFinal,
         esPagada,
         tienePagoPendiente,
@@ -2493,7 +2491,7 @@ function renderCuotaCard(cuota) {
         ? montoCuota + deudaHorasActual 
         : montoCuota;
     
-    console.log(`💵 Monto a mostrar: $${montoMostrar} (Cuota: $${montoCuota} + Deuda: $${deudaHorasActual})`);
+    (`💵 Monto a mostrar: $${montoMostrar} (Cuota: $${montoCuota} + Deuda: $${deudaHorasActual})`);
     
     return `
         <div class="cuota-card estado-${estadoFinal}">
@@ -2559,7 +2557,7 @@ function renderCuotaCard(cuota) {
                     </button>
                 ` : ''}
                 
-                <!-- ✅ BOTÓN DE PAGAR - SIEMPRE VISIBLE SI NO ESTÁ PAGADA -->
+                <!--  BOTÓN DE PAGAR - SIEMPRE VISIBLE SI NO ESTÁ PAGADA -->
                 ${estadoFinal !== 'pagada' && !tienePagoPendiente ? `
                     <button class="btn btn-primary btn-small" onclick="abrirPagarDeudaTotal(${cuota.id_cuota}, ${montoMostrar})">
                         <i class="fas fa-credit-card"></i> Pagar Ahora
@@ -2580,9 +2578,9 @@ function renderCuotaCard(cuota) {
 
 // ========== PAGAR DEUDA TOTAL ==========
 async function abrirPagarDeudaTotal(cuotaId, montoTotal) {
-    console.log('💳 Abriendo modal para pagar deuda total');
-    console.log('   Cuota ID:', cuotaId);
-    console.log('   Monto total:', montoTotal);
+    ('💳 Abriendo modal para pagar deuda total');
+    ('   Cuota ID:', cuotaId);
+    ('   Monto total:', montoTotal);
     
     try {
         const response = await fetch(`/api/cuotas/detalle?cuota_id=${cuotaId}`);
@@ -2666,7 +2664,7 @@ function closePagarCuotaModal() {
 // ========== ENVIAR PAGO ==========
 async function submitPagarCuota(event) {
     event.preventDefault();
-    console.log('💾 Enviando pago de cuota con deuda');
+    ('💾 Enviando pago de cuota con deuda');
     
     const cuotaId = document.getElementById('pagar-cuota-id').value;
     const monto = document.getElementById('pagar-monto').value;
@@ -2695,7 +2693,7 @@ async function submitPagarCuota(event) {
     formData.append('numero_comprobante', numeroComprobante);
     formData.append('comprobante', archivo);
     
-    // Agregar flag si incluye deuda de horas
+
     if (deudaHorasActual > 0) {
         formData.append('incluye_deuda_horas', 'true');
         formData.append('monto_deuda_horas', deudaHorasActual);
@@ -2710,9 +2708,9 @@ async function submitPagarCuota(event) {
         const data = await response.json();
         
         if (data.success) {
-            alert('✅ ' + data.mensaje + '\n\nTu pago será revisado por un administrador.');
+            alert(' ' + data.mensaje + '\n\nTu pago será revisado por un administrador.');
             closePagarCuotaModal();
-            await inicializarSeccionCuotas(); // Recargar todo
+            await inicializarSeccionCuotas(); 
         } else {
             alert('❌ ' + data.message);
         }
@@ -2842,7 +2840,7 @@ window.submitPagarCuota = submitPagarCuota;
 window.verDetalleCuota = verDetalleCuota;
 window.verComprobante = verComprobante;
 
-console.log('✅ Módulo de cuotas con deuda de horas cargado completamente');
+(' Módulo de cuotas con deuda de horas cargado completamente');
 
 // ==========================================
 // SISTEMA DE PAGO: SOLO ÚLTIMO DÍA DEL MES
@@ -2890,7 +2888,7 @@ function renderMisCuotasOrganizadas(cuotas) {
     
     let html = '';
     
-    // ⭐ SECCIÓN DESTACADA: CUOTA DEL MES ACTUAL
+    // CUOTA DEL MES ACTUAL
     const cuotaMasReciente = cuotas[0];
     
     // Calcular deuda total
@@ -2902,7 +2900,7 @@ function renderMisCuotasOrganizadas(cuotas) {
     const tienePagoPendiente = cuotaMasReciente.id_pago && cuotaMasReciente.estado_pago === 'pendiente';
     const estaPagada = estadoFinal === 'pagada';
     
-    // ⭐ NUEVO: Verificar si es el último día del mes
+    // Verificar si es el último día del mes
     const hoy = new Date();
     const mesActual = hoy.getMonth() + 1;
     const anioActual = hoy.getFullYear();
@@ -2914,7 +2912,7 @@ function renderMisCuotasOrganizadas(cuotas) {
     // Calcular días restantes
     const diasRestantes = diasHastaPago();
     
-    console.log('📅 Control de período:', {
+    ('📅 Control de período:', {
         esMesCuota,
         esUltimoDia,
         puedePagar,
@@ -2929,7 +2927,7 @@ function renderMisCuotasOrganizadas(cuotas) {
                     Resumen del Mes Actual
                 </h2>
                 <span class="deuda-total-badge ${estaPagada ? 'badge-pagada' : tienePagoPendiente ? 'badge-pendiente' : puedePagar ? 'badge-requerida' : 'badge-bloqueado'}">
-                    ${estaPagada ? '✅ PAGADA' : 
+                    ${estaPagada ? ' PAGADA' : 
                       tienePagoPendiente ? '⏳ EN VALIDACIÓN' : 
                       puedePagar ? '⚠️ ÚLTIMO DÍA - PAGAR HOY' : 
                       diasRestantes > 0 ? `🔒 ${diasRestantes} DÍA${diasRestantes !== 1 ? 'S' : ''} PARA PAGAR` :
@@ -3058,8 +3056,7 @@ function renderMisCuotasOrganizadas(cuotas) {
         <hr style="margin: 40px 0; border: none; border-top: 2px solid #e0e0e0;">
     `;
     
-    // Resto del código (cuotas pendientes y historial) sin cambios...
-    // [El resto del código de renderizado de cuotas aquí]
+
     
     container.innerHTML = html;
 }
@@ -3069,14 +3066,14 @@ window.esUltimoDiaMes = esUltimoDiaMes;
 window.diasHastaPago = diasHastaPago;
 window.obtenerUltimoDiaMes = obtenerUltimoDiaMes;
 
-console.log('✅ Sistema actualizado: Pago solo último día del mes');
+(' Sistema actualizado: Pago solo último día del mes');
 
-// ========== MODAL DE PAGO (SOLO TRANSFERENCIA) ==========
+// ========== MODAL DE PAGO  ==========
 
 async function abrirPagarDeudaTotal(cuotaId, montoTotal) {
-    console.log('💳 Abriendo modal para pagar deuda total');
-    console.log('   Cuota ID:', cuotaId);
-    console.log('   Monto total:', montoTotal);
+    ('💳 Abriendo modal para pagar deuda total');
+    ('   Cuota ID:', cuotaId);
+    ('   Monto total:', montoTotal);
     
     try {
         const response = await fetch(`/api/cuotas/detalle?cuota_id=${cuotaId}`);
@@ -3142,7 +3139,7 @@ async function abrirPagarDeudaTotal(cuotaId, montoTotal) {
         document.getElementById('pagar-cuota-id').value = cuotaId;
         document.getElementById('pagar-monto').value = montoTotal;
         
-        // ⭐ OCULTAR selector de método (solo transferencia)
+        //  OCULTAR selector de método 
         const metodoSelect = document.getElementById('pagar-metodo');
         if (metodoSelect) {
             metodoSelect.value = 'transferencia';
@@ -3166,11 +3163,11 @@ async function abrirPagarDeudaTotal(cuotaId, montoTotal) {
     }
 }
 
-// ========== ENVIAR PAGO (SOLO TRANSFERENCIA) ==========
+// ========== ENVIAR PAGO ==========
 
 async function submitPagarCuota(event) {
     event.preventDefault();
-    console.log('💾 Enviando pago de cuota (SOLO TRANSFERENCIA)');
+    ('💾 Enviando pago de cuota (SOLO TRANSFERENCIA)');
     
     const cuotaId = document.getElementById('pagar-cuota-id').value;
     const monto = document.getElementById('pagar-monto').value;
@@ -3213,7 +3210,7 @@ async function submitPagarCuota(event) {
         const data = await response.json();
         
         if (data.success) {
-            alert('✅ ' + data.mensaje + '\n\nTu pago por transferencia será revisado por un administrador.');
+            alert(' ' + data.mensaje + '\n\nTu pago por transferencia será revisado por un administrador.');
             closePagarCuotaModal();
             await inicializarSeccionCuotas();
         } else {
@@ -3256,20 +3253,20 @@ window.cargarDeudaHorasWidget = cargarDeudaHorasWidget;
 window.abrirPagarDeudaTotal = abrirPagarDeudaTotal;
 window.submitPagarCuota = submitPagarCuota;
 
-console.log('✅ Sistema actualizado: 21h semanales (84h mensuales) + Solo Transferencia');
+(' Sistema actualizado: 21h semanales (84h mensuales) + Solo Transferencia');
 
 // ==========================================
-// SISTEMA DE SOLICITUDES - USUARIO (CORREGIDO)
+// SISTEMA DE SOLICITUDES 
 // ==========================================
 
-console.log('🟢 Cargando módulo de solicitudes');
+('🟢 Cargando módulo de solicitudes');
 
 // ========== INICIALIZACIÓN ==========
 document.addEventListener('DOMContentLoaded', function() {
     const solicitudesMenuItem = document.querySelector('.menu li[data-section="solicitudes"]');
     if (solicitudesMenuItem) {
         solicitudesMenuItem.addEventListener('click', function() {
-            console.log('>>> Sección solicitudes abierta');
+            ('>>> Sección solicitudes abierta');
             loadMisSolicitudes();
         });
     }
@@ -3293,7 +3290,7 @@ async function loadMisSolicitudes() {
         if (estado) url += `estado=${estado}&`;
         if (tipo) url += `tipo=${tipo}&`;
 
-        console.log('📡 Fetching:', url);
+        ('📡 Fetching:', url);
 
         const response = await fetch(url, {
             method: 'GET',
@@ -3304,7 +3301,7 @@ async function loadMisSolicitudes() {
         });
 
         const data = await response.json();
-        console.log('📥 Solicitudes recibidas:', data);
+        ('📥 Solicitudes recibidas:', data);
 
         if (data.success) {
             renderMisSolicitudes(data.solicitudes);
@@ -3502,10 +3499,10 @@ function cerrarModalNuevaSolicitud() {
     if (modal) modal.remove();
 }
 
-// ========== ENVIAR NUEVA SOLICITUD (CORREGIDO) ==========
+// ========== ENVIAR NUEVA SOLICITUD ==========
 async function submitNuevaSolicitud(event) {
     event.preventDefault();
-    console.log('📤 Iniciando envío de solicitud');
+    ('📤 Iniciando envío de solicitud');
 
     const form = document.getElementById('nuevaSolicitudForm');
     const submitBtn = document.getElementById('btn-submit-solicitud');
@@ -3516,31 +3513,31 @@ async function submitNuevaSolicitud(event) {
     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
 
     try {
-        // ✅ CREAR FormData CORRECTAMENTE
+        //  CREAR FormData CORRECTAMENTE
         const formData = new FormData(form);
         
         // 📋 DEBUG: Verificar contenido
-        console.log('📋 FormData contenido:');
+        ('📋 FormData contenido:');
         for (let [key, value] of formData.entries()) {
             if (value instanceof File) {
-                console.log(`  ${key}: [File] ${value.name} (${value.size} bytes)`);
+                (`  ${key}: [File] ${value.name} (${value.size} bytes)`);
             } else {
-                console.log(`  ${key}: ${value}`);
+                (`  ${key}: ${value}`);
             }
         }
 
-        // ✅ ENVIAR SIN Content-Type (FormData lo establece automáticamente)
+      
         const response = await fetch('/api/solicitudes/create', {
             method: 'POST',
             body: formData,
             credentials: 'same-origin'
         });
 
-        console.log('📡 Response status:', response.status);
+        ('📡 Response status:', response.status);
         
         // Leer respuesta como texto primero
         const responseText = await response.text();
-        console.log('📥 Response text:', responseText.substring(0, 500));
+        ('📥 Response text:', responseText.substring(0, 500));
 
         // Intentar parsear JSON
         let data;
@@ -3552,10 +3549,10 @@ async function submitNuevaSolicitud(event) {
             throw new Error('El servidor devolvió HTML en lugar de JSON. Revisa los logs de PHP.');
         }
 
-        console.log('✅ Data parseada:', data);
+        (' Data parseada:', data);
 
         if (data.success) {
-            alert('✅ ' + data.message);
+            alert(' ' + data.message);
             cerrarModalNuevaSolicitud();
             loadMisSolicitudes();
         } else {
@@ -3744,7 +3741,7 @@ async function submitRespuesta(event, solicitudId) {
         const data = await response.json();
 
         if (data.success) {
-            alert('✅ ' + data.message);
+            alert(' ' + data.message);
             cerrarModalResponder();
             loadMisSolicitudes();
         } else {
@@ -3807,7 +3804,7 @@ window.responderSolicitud = responderSolicitud;
 window.cerrarModalResponder = cerrarModalResponder;
 window.submitRespuesta = submitRespuesta;
 
-console.log('✅ Módulo de solicitudes cargado completamente');
+(' Módulo de solicitudes cargado completamente');
 
 // ==========================================
 // JUSTIFICACIONES DE HORAS - VISTA USUARIO
@@ -3819,7 +3816,7 @@ console.log('✅ Módulo de solicitudes cargado completamente');
 async function cargarJustificacionesUsuario() {
     const container = document.getElementById('justificaciones-usuario-container');
     if (!container) {
-        console.log('⚠️ Container de justificaciones no encontrado');
+        ('⚠️ Container de justificaciones no encontrado');
         return;
     }
     
@@ -3844,7 +3841,7 @@ async function cargarJustificacionesUsuario() {
         const response = await fetch(`/api/justificaciones/usuario?id_usuario=${userId}&mes=${mes}&anio=${anio}`);
         const data = await response.json();
         
-        console.log('📋 Justificaciones recibidas:', data);
+        ('📋 Justificaciones recibidas:', data);
         
         if (data.success && data.justificaciones) {
             renderJustificacionesUsuario(data.justificaciones);
@@ -4184,7 +4181,7 @@ function renderDeudaHorasWidget(deuda) {
                     </div>
                 </div>
                 
-                <!-- ✅ NUEVA SECCIÓN: JUSTIFICACIONES -->
+                <!--  NUEVA SECCIÓN: JUSTIFICACIONES -->
                 <div id="justificaciones-usuario-container" style="margin-top: 20px;">
                     <!-- Se carga dinámicamente -->
                 </div>
@@ -4199,7 +4196,7 @@ function renderDeudaHorasWidget(deuda) {
                 
                 ${horasJustificadas > 0 ? `
                     <div class="alert-success" style="margin-top: 15px;">
-                        <strong>✅ Horas Justificadas Aplicadas</strong>
+                        <strong> Horas Justificadas Aplicadas</strong>
                         <p>Se han descontado <strong>${horasJustificadas}h</strong> justificadas (-${montoJustificado.toFixed(2)}) de tu deuda.</p>
                         <p>Deuda final: <strong>${deudaPesos.toLocaleString('es-UY', {minimumFractionDigits: 2})}</strong></p>
                     </div>
@@ -4221,7 +4218,7 @@ function renderDeudaHorasWidget(deuda) {
         </div>
     `;
     
-    // ✅ CARGAR JUSTIFICACIONES DESPUÉS DE RENDERIZAR
+    //  CARGAR JUSTIFICACIONES DESPUÉS DE RENDERIZAR
     setTimeout(() => {
         cargarJustificacionesUsuario();
     }, 100);
@@ -4232,14 +4229,14 @@ window.cargarJustificacionesUsuario = cargarJustificacionesUsuario;
 window.verTodasJustificaciones = verTodasJustificaciones;
 window.verArchivoJustificacion = verArchivoJustificacion;
 
-console.log('✅ Módulo de justificaciones para usuario cargado');
+(' Módulo de justificaciones para usuario cargado');
 
 // ==========================================
-// 🔧 FIX: NÚCLEO FAMILIAR SIN DUPLICADOS
+//  FIX: NÚCLEO FAMILIAR SIN DUPLICADOS
 // ==========================================
-// Reemplazar en dashboardUsuario.js desde la línea del módulo de núcleos
 
-console.log('🟢 Cargando módulo de núcleos para usuario (FIXED)');
+
+('🟢 Cargando módulo de núcleos para usuario (FIXED)');
 
 // ========== VARIABLE GLOBAL PARA EVITAR MÚLTIPLES CARGAS ==========
 let nucleoYaCargado = false;
@@ -4247,20 +4244,20 @@ let verificacionEnCurso = false;
 
 // ========== INICIALIZACIÓN OPTIMIZADA (SIN DUPLICADOS) ==========
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('📋 DOM Ready - Preparando verificación de núcleo');
+    ('📋 DOM Ready - Preparando verificación de núcleo');
     
-    // ✅ SOLO ejecutar UNA VEZ cuando la página carga
+    //  SOLO ejecutar UNA VEZ cuando la página carga
     setTimeout(() => {
         if (!nucleoYaCargado && !verificacionEnCurso) {
             verificarEstadoNucleo();
         }
     }, 500);
     
-    // ✅ Listener para cuando se hace click en "Inicio"
+    //  Listener para cuando se hace click en "Inicio"
     const inicioMenuItem = document.querySelector('.menu li[data-section="inicio"]');
     if (inicioMenuItem) {
         inicioMenuItem.addEventListener('click', function() {
-            console.log('🏠 Click en sección Inicio');
+            ('🏠 Click en sección Inicio');
             
             // Solo recargar si no se ha mostrado aún
             if (!nucleoYaCargado) {
@@ -4274,31 +4271,31 @@ document.addEventListener('DOMContentLoaded', function() {
 
 /**
  * Verificar si el usuario tiene núcleo o debe solicitar uno
- * ✅ CON PROTECCIÓN CONTRA DUPLICADOS
+ *  CON PROTECCIÓN CONTRA DUPLICADOS
  */
 async function verificarEstadoNucleo() {
-    // 🛡️ PROTECCIÓN: Evitar múltiples ejecuciones simultáneas
+    // PROTECCIÓN: Evitar múltiples ejecuciones simultáneas
     if (verificacionEnCurso) {
-        console.log('⏳ Verificación ya en curso, saltando...');
+        ('⏳ Verificación ya en curso, saltando...');
         return;
     }
     
     if (nucleoYaCargado) {
-        console.log('✅ Núcleo ya cargado previamente, saltando...');
+        (' Núcleo ya cargado previamente, saltando...');
         return;
     }
     
     verificacionEnCurso = true;
-    console.log('🔍 Verificando estado de núcleo...');
+    ('🔍 Verificando estado de núcleo...');
     
     try {
         const response = await fetch('/api/users/my-profile');
         const data = await response.json();
         
-        console.log('📊 Datos de perfil:', data);
+        ('📊 Datos de perfil:', data);
         
         if (data.success && data.user) {
-            // ✅ BUSCAR SECCIÓN DE INICIO
+            //  BUSCAR SECCIÓN DE INICIO
             const inicioSection = document.getElementById('inicio-section');
             
             if (!inicioSection) {
@@ -4307,30 +4304,30 @@ async function verificarEstadoNucleo() {
                 return;
             }
             
-            // 🧹 LIMPIAR CUALQUIER CARD/BANNER ANTERIOR
+            // LIMPIAR CUALQUIER CARD/BANNER ANTERIOR
             const elementosAnteriores = inicioSection.querySelectorAll('.nucleo-info-card, .banner-nucleo-invitation');
             
             if (elementosAnteriores.length > 0) {
-                console.log('🗑️ Removiendo', elementosAnteriores.length, 'elementos anteriores');
+                ('🗑️ Removiendo', elementosAnteriores.length, 'elementos anteriores');
                 elementosAnteriores.forEach(el => el.remove());
             }
             
             const idNucleo = data.user.id_nucleo;
-            console.log('🔍 id_nucleo del usuario:', idNucleo);
+            ('🔍 id_nucleo del usuario:', idNucleo);
             
             if (idNucleo) {
-                // ✅ TIENE NÚCLEO - Mostrar info
-                console.log('✅ Usuario tiene núcleo:', idNucleo);
+                //  TIENE NÚCLEO - Mostrar info
+                (' Usuario tiene núcleo:', idNucleo);
                 await mostrarInfoNucleoEnInicio(idNucleo, inicioSection);
             } else {
                 // ❌ NO TIENE NÚCLEO - Mostrar banner
-                console.log('⚠️ Usuario sin núcleo, mostrando banner');
+                ('⚠️ Usuario sin núcleo, mostrando banner');
                 mostrarBannerNucleoEnInicio(inicioSection);
             }
             
-            // ✅ Marcar como cargado
+            //  Marcar como cargado
             nucleoYaCargado = true;
-            console.log('✅ Núcleo cargado correctamente');
+            (' Núcleo cargado correctamente');
         }
     } catch (error) {
         console.error('❌ Error al verificar núcleo:', error);
@@ -4341,11 +4338,11 @@ async function verificarEstadoNucleo() {
 
 /**
  * Mostrar información del núcleo en la sección de inicio
- * ✅ SIN DUPLICADOS
+ *  
  */
 async function mostrarInfoNucleoEnInicio(idNucleo, inicioSection) {
     try {
-        console.log('📡 Cargando info del núcleo para inicio...');
+        ('📡 Cargando info del núcleo para inicio...');
         
         const response = await fetch('/api/nucleos/mi-nucleo-info');
         const data = await response.json();
@@ -4359,7 +4356,7 @@ async function mostrarInfoNucleoEnInicio(idNucleo, inicioSection) {
         const miembros = data.miembros || [];
         const miId = data.mi_id;
         
-        console.log('📋 Núcleo:', nucleo.nombre_nucleo, '- Miembros:', miembros.length);
+        ('📋 Núcleo:', nucleo.nombre_nucleo, '- Miembros:', miembros.length);
         
         let miembrosHTML = '';
         
@@ -4480,7 +4477,7 @@ async function mostrarInfoNucleoEnInicio(idNucleo, inicioSection) {
             </div>
         `;
         
-        // ✅ INSERTAR AL PRINCIPIO DE LA SECCIÓN (DESPUÉS DEL TÍTULO)
+       
         const tituloInicio = inicioSection.querySelector('.section-title, h2');
         if (tituloInicio) {
             tituloInicio.insertAdjacentHTML('afterend', infoHTML);
@@ -4488,7 +4485,7 @@ async function mostrarInfoNucleoEnInicio(idNucleo, inicioSection) {
             inicioSection.insertAdjacentHTML('afterbegin', infoHTML);
         }
         
-        console.log('✅ Card de núcleo insertado en inicio');
+        (' Card de núcleo insertado en inicio');
         
     } catch (error) {
         console.error('❌ Error al mostrar núcleo en inicio:', error);
@@ -4497,7 +4494,7 @@ async function mostrarInfoNucleoEnInicio(idNucleo, inicioSection) {
 
 /**
  * Mostrar banner para unirse a un núcleo en la sección de inicio
- * ✅ SIN DUPLICADOS
+ *  
  */
 function mostrarBannerNucleoEnInicio(inicioSection) {
     const banner = `
@@ -4549,7 +4546,7 @@ function mostrarBannerNucleoEnInicio(inicioSection) {
         inicioSection.insertAdjacentHTML('afterbegin', banner);
     }
     
-    console.log('✅ Banner de núcleo insertado en inicio');
+    (' Banner de núcleo insertado en inicio');
 }
 
 /**
@@ -4670,7 +4667,7 @@ async function verDetallesNucleoDesdeInicio(idNucleo) {
     }
 }
 
-// ========== RESTO DE FUNCIONES (Sin cambios) ==========
+// ========== RESTO DE FUNCIONES ==========
 
 async function abrirModalNucleosDisponibles() {
     try {
@@ -4815,7 +4812,7 @@ async function solicitarUnirseNucleo(idNucleo, nombreNucleo) {
         const data = await response.json();
         
         if (data.success) {
-            alert('✅ ' + data.message);
+            alert(' ' + data.message);
             document.getElementById('nucleosDisponiblesModal').remove();
             
             // Recargar
@@ -4843,7 +4840,7 @@ window.abrirModalNucleosDisponibles = abrirModalNucleosDisponibles;
 window.solicitarUnirseNucleo = solicitarUnirseNucleo;
 window.verDetallesNucleoDesdeInicio = verDetallesNucleoDesdeInicio;
 
-console.log('✅ Módulo de núcleos para usuario cargado (FIXED - Sin duplicados)');
+(' Módulo de núcleos para usuario cargado (FIXED - Sin duplicados)');
 
 /**
  * Enviar solicitud para unirse a un núcleo
@@ -4873,7 +4870,7 @@ async function solicitarUnirseNucleo(idNucleo, nombreNucleo) {
         const data = await response.json();
         
         if (data.success) {
-            alert('✅ ' + data.message);
+            alert(' ' + data.message);
             cerrarModalNucleosDisponibles();
             
             // Recargar para ocultar el banner si es necesario
@@ -4941,7 +4938,7 @@ function mostrarModalMisSolicitudes(solicitudes) {
                 </button>
             `;
         } else if (sol.estado === 'aprobada') {
-            estadoHTML = '<span style="background: #4caf50; color: white; padding: 5px 12px; border-radius: 20px; font-size: 12px;">✅ Aprobada</span>';
+            estadoHTML = '<span style="background: #4caf50; color: white; padding: 5px 12px; border-radius: 20px; font-size: 12px;"> Aprobada</span>';
         } else {
             estadoHTML = '<span style="background: #f44336; color: white; padding: 5px 12px; border-radius: 20px; font-size: 12px;">❌ Rechazada</span>';
         }
@@ -5073,7 +5070,7 @@ async function cancelarMiSolicitud(idSolicitud) {
         const data = await response.json();
         
         if (data.success) {
-            alert('✅ Solicitud cancelada');
+            alert(' Solicitud cancelada');
             cerrarModalMisSolicitudes();
             verMisSolicitudesNucleo();
         } else {
@@ -5100,39 +5097,25 @@ window.cancelarMiSolicitud = cancelarMiSolicitud;
 window.verDetallesNucleoDesdeInicio = verDetallesNucleoDesdeInicio;
 
 
-console.log('✅ Módulo de núcleos para usuario cargado completamente');
+(' Módulo de núcleos para usuario cargado completamente');
 
 // ==========================================
-// 🔧 FIX GLOBAL DE FECHAS - ZONA HORARIA URUGUAY
-// ==========================================
-// 📝 AGREGAR AL FINAL DE dashboardUsuario.js Y dashboardAdmin.js
+// FIX GLOBAL DE FECHAS 
 // ==========================================
 
-console.log('🌍 [FIX FECHAS] Iniciando configuración para Uruguay...');
 
-/**
- * PROBLEMA IDENTIFICADO:
- * - new Date('2025-01-15') → se interpreta como UTC medianoche
- * - Si estás en UTC-3 (Uruguay), muestra 14 de enero 21:00
- * - new Date('2025-01-15T00:00:00') → TAMBIÉN se interpreta como UTC
- * - Solución: Agregar EXPLÍCITAMENTE la zona horaria local
- */
+('🌍 [FIX FECHAS] Iniciando configuración para Uruguay...');
 
-// ========== FUNCIONES GLOBALES DE FORMATO DE FECHAS ==========
 
-/**
- * Parsear fecha SQL (YYYY-MM-DD) en zona horaria local de Uruguay
- * ✅ SOLUCIÓN: Agregar 'T00:00:00' para forzar medianoche local
- */
 function parseFechaLocal(fechaSQL) {
     if (!fechaSQL) return null;
     
-    // ✅ CORRECTO: Agregar T00:00:00 para interpretación local
+  
     return new Date(fechaSQL + 'T00:00:00');
 }
 
 /**
- * Formatear fecha en formato DD/MM/YYYY (Uruguay)
+ * Formatear fecha en formato
  */
 function formatearFechaUY(fecha) {
     if (!fecha) return '-';
@@ -5166,7 +5149,7 @@ function formatearFechaHoraUY(fechaHora) {
 }
 
 /**
- * Formatear fecha en formato largo (ej: "15 de enero de 2025")
+ * Formatear fecha en formato largo 
  */
 function formatearFechaLargaUY(fecha) {
     if (!fecha) return '-';
@@ -5220,7 +5203,7 @@ function getHoraActualSQL() {
  * Fix para dashboardUsuario.js - Tareas
  */
 function fixFechasTareas() {
-    console.log('🔧 Aplicando fix de fechas en tareas...');
+    ('🔧 Aplicando fix de fechas en tareas...');
     
     // Reemplazar en renderUserTasks
     window.renderUserTasks_ORIGINAL = window.renderUserTasks;
@@ -5234,7 +5217,7 @@ function fixFechasTareas() {
         }
 
         container.innerHTML = tareas.map(tarea => {
-            // ✅ FIX: Usar parseFechaLocal
+            //  FIX: Usar parseFechaLocal
             const fechaInicio = formatearFechaUY(tarea.fecha_inicio);
             const fechaFin = formatearFechaUY(tarea.fecha_fin);
             
@@ -5287,14 +5270,14 @@ function fixFechasTareas() {
         }).join('');
     };
     
-    console.log('✅ Fix de fechas en tareas aplicado');
+    (' Fix de fechas en tareas aplicado');
 }
 
 /**
  * Fix para dashboardAdmin.js - Tareas Admin
  */
 function fixFechasTareasAdmin() {
-    console.log('🔧 Aplicando fix de fechas en tareas admin...');
+    ('🔧 Aplicando fix de fechas en tareas admin...');
     
     // Reemplazar en renderTasksList
     window.renderTasksList_ORIGINAL = window.renderTasksList;
@@ -5308,7 +5291,7 @@ function fixFechasTareasAdmin() {
         }
 
         container.innerHTML = tareas.map(tarea => {
-            // ✅ FIX: Usar formatearFechaUY
+            //  FIX: Usar formatearFechaUY
             const fechaInicio = formatearFechaUY(tarea.fecha_inicio);
             const fechaFin = formatearFechaUY(tarea.fecha_fin);
             
@@ -5380,43 +5363,42 @@ function fixFechasTareasAdmin() {
         }).join('');
     };
     
-    console.log('✅ Fix de fechas en tareas admin aplicado');
+    (' Fix de fechas en tareas admin aplicado');
 }
 
 /**
  * Fix para Registro de Horas
  */
 function fixFechasRegistroHoras() {
-    console.log('🔧 Aplicando fix de fechas en registro de horas...');
+    ('🔧 Aplicando fix de fechas en registro de horas...');
     
-    // Reemplazar formatearFechaSimple si existe
+
     window.formatearFechaSimple = formatearFechaUY;
     
-    console.log('✅ Fix de fechas en registro de horas aplicado');
+    (' Fix de fechas en registro de horas aplicado');
 }
 
 /**
  * Fix para Solicitudes
  */
 function fixFechasSolicitudes() {
-    console.log('🔧 Aplicando fix de fechas en solicitudes...');
+    ('🔧 Aplicando fix de fechas en solicitudes...');
     
     // La función de renderizado de solicitudes ya usa toLocaleDateString
     // pero podemos asegurarnos que use la zona horaria correcta
     
-    console.log('✅ Fix de fechas en solicitudes aplicado');
+    (' Fix de fechas en solicitudes aplicado');
 }
 
 // ========== INICIALIZACIÓN AUTOMÁTICA ==========
 
-// NO usar DOMContentLoaded porque el script se ejecuta al final
 // Ejecutar inmediatamente
-console.log('🌍 [FIX FECHAS] Inicializando sistema de fechas para Uruguay...');
-console.log('📅 [FIX FECHAS] Zona horaria detectada:', Intl.DateTimeFormat().resolvedOptions().timeZone);
+('🌍 [FIX FECHAS] Inicializando sistema de fechas para Uruguay...');
+('📅 [FIX FECHAS] Zona horaria detectada:', Intl.DateTimeFormat().resolvedOptions().timeZone);
 
 try {
-    console.log('📅 [FIX FECHAS] Fecha actual SQL:', getFechaActualSQL());
-    console.log('⏰ [FIX FECHAS] Hora actual SQL:', getHoraActualSQL());
+    ('📅 [FIX FECHAS] Fecha actual SQL:', getFechaActualSQL());
+    ('⏰ [FIX FECHAS] Hora actual SQL:', getHoraActualSQL());
 } catch (e) {
     console.warn('⚠️ [FIX FECHAS] Funciones aún no definidas, se definirán a continuación');
 }
@@ -5430,7 +5412,7 @@ window.formatearFechaLargaUY = formatearFechaLargaUY;
 window.getFechaActualSQL = getFechaActualSQL;
 window.getHoraActualSQL = getHoraActualSQL;
 
-console.log('✅ [FIX FECHAS] Funciones exportadas:', {
+(' [FIX FECHAS] Funciones exportadas:', {
     parseFechaLocal: typeof window.parseFechaLocal,
     formatearFechaUY: typeof window.formatearFechaUY,
     getFechaActualSQL: typeof window.getFechaActualSQL
@@ -5440,19 +5422,19 @@ console.log('✅ [FIX FECHAS] Funciones exportadas:', {
 
 // Esperar un momento para que otras funciones se carguen
 setTimeout(function() {
-    console.log('🔧 [FIX FECHAS] Aplicando fixes automáticos...');
+    ('🔧 [FIX FECHAS] Aplicando fixes automáticos...');
     
     try {
         fixFechasTareas();
         fixFechasTareasAdmin();
         fixFechasRegistroHoras();
-        console.log('✅ [FIX FECHAS] Sistema de fechas configurado correctamente');
-        console.log('📅 [FIX FECHAS] Zona horaria:', Intl.DateTimeFormat().resolvedOptions().timeZone);
-        console.log('📅 [FIX FECHAS] Fecha actual SQL:', getFechaActualSQL());
-        console.log('⏰ [FIX FECHAS] Hora actual SQL:', getHoraActualSQL());
+        (' [FIX FECHAS] Sistema de fechas configurado correctamente');
+        ('📅 [FIX FECHAS] Zona horaria:', Intl.DateTimeFormat().resolvedOptions().timeZone);
+        ('📅 [FIX FECHAS] Fecha actual SQL:', getFechaActualSQL());
+        ('⏰ [FIX FECHAS] Hora actual SQL:', getHoraActualSQL());
         
         // Prueba
-        console.log('🧪 [FIX FECHAS] Prueba: formatearFechaUY("2025-01-15") =', formatearFechaUY('2025-01-15'));
+        ('🧪 [FIX FECHAS] Prueba: formatearFechaUY("2025-01-15") =', formatearFechaUY('2025-01-15'));
     } catch (error) {
         console.warn('⚠️ [FIX FECHAS] Error al aplicar fixes:', error);
     }
@@ -5460,20 +5442,20 @@ setTimeout(function() {
 
 
 
-console.log('✅ [FIX FECHAS] Módulo cargado - Zona horaria: America/Montevideo');
+(' [FIX FECHAS] Módulo cargado - Zona horaria: America/Montevideo');
 
 // ==========================================
-// 🔧 FIX: TAREAS VENCIDAS - DASHBOARD USUARIO
-// Agregar al FINAL de dashboardUsuario.js
+// FIX: TAREAS VENCIDAS 
+// 
 // ==========================================
 
-console.log('🟢 [VENCIDAS] Aplicando fix de tareas vencidas en usuario...');
+('🟢 [VENCIDAS] Aplicando fix de tareas vencidas en usuario...');
 
 /**
- * 🔧 OVERRIDE: renderUserTasks con detección de VENCIDAS
+ * OVERRIDE: renderUserTasks con detección de VENCIDAS
  */
 (function() {
-    console.log('🔄 [OVERRIDE USER] Sobrescribiendo renderUserTasks...');
+    ('🔄 [OVERRIDE USER] Sobrescribiendo renderUserTasks...');
 
     // Guardar versión original si existe
     if (window.renderUserTasks) {
@@ -5481,12 +5463,12 @@ console.log('🟢 [VENCIDAS] Aplicando fix de tareas vencidas en usuario...');
     }
 
     /**
-     * ✅ VERSIÓN CORRECTA con detección de VENCIDAS
+     *  VERSIÓN con detección de VENCIDAS
      */
     window.renderUserTasks = function(tareas, containerId, esNucleo = false) {
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        console.log('🎨 [RENDER USER TASKS] Iniciando con detección de vencidas');
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+        ('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+        ('🎨 [RENDER USER TASKS] Iniciando con detección de vencidas');
+        ('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
         
         const container = document.getElementById(containerId);
 
@@ -5495,10 +5477,10 @@ console.log('🟢 [VENCIDAS] Aplicando fix de tareas vencidas en usuario...');
             return;
         }
 
-        // ✅ PASO 1: Detectar tareas vencidas
+        //  PASO 1: Detectar tareas vencidas
         const hoy = new Date();
         hoy.setHours(0, 0, 0, 0);
-        console.log('📅 Fecha HOY:', hoy.toISOString().split('T')[0]);
+        ('📅 Fecha HOY:', hoy.toISOString().split('T')[0]);
 
         const tareasConEstado = tareas.map(tarea => {
             const fechaFinObj = new Date(tarea.fecha_fin + 'T00:00:00');
@@ -5506,9 +5488,9 @@ console.log('🟢 [VENCIDAS] Aplicando fix de tareas vencidas en usuario...');
             const esVencida = !esCompletada && fechaFinObj < hoy;
 
             if (esVencida) {
-                console.log(`🔴 TAREA VENCIDA (Usuario): ${tarea.titulo}`);
-                console.log(`   - Fecha fin: ${tarea.fecha_fin}`);
-                console.log(`   - Estado: ${tarea.estado_usuario}`);
+                (`🔴 TAREA VENCIDA (Usuario): ${tarea.titulo}`);
+                (`   - Fecha fin: ${tarea.fecha_fin}`);
+                (`   - Estado: ${tarea.estado_usuario}`);
             }
 
             return {
@@ -5518,20 +5500,20 @@ console.log('🟢 [VENCIDAS] Aplicando fix de tareas vencidas en usuario...');
             };
         });
 
-        // ✅ PASO 2: Renderizar
+        //  PASO 2: Renderizar
         container.innerHTML = tareasConEstado.map(tarea => {
             const fechaInicio = formatearFechaUY(tarea.fecha_inicio);
             const fechaFin = formatearFechaUY(tarea.fecha_fin);
             const progreso = tarea.progreso || 0;
 
-            // ✅ DETERMINAR ESTADO VISUAL
+            //  DETERMINAR ESTADO VISUAL
             let estadoTexto, estadoBadgeClass, tareaClass;
 
             if (tarea.esVencida) {
                 estadoTexto = '⏰ Vencida';
                 estadoBadgeClass = 'vencida';
                 tareaClass = 'tarea-vencida';
-                console.log(`✅ Badge VENCIDA aplicado: ${tarea.titulo}`);
+                (` Badge VENCIDA aplicado: ${tarea.titulo}`);
             } else if (tarea.esCompletada) {
                 estadoTexto = formatEstadoUsuario(tarea.estado_usuario);
                 estadoBadgeClass = 'completada';
@@ -5598,15 +5580,15 @@ console.log('🟢 [VENCIDAS] Aplicando fix de tareas vencidas en usuario...');
             `;
         }).join('');
 
-        console.log('✅ [RENDER USER TASKS] Completado');
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+        (' [RENDER USER TASKS] Completado');
+        ('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
     };
 
-    console.log('✅ [OVERRIDE USER] renderUserTasks sobrescrito correctamente');
+    (' [OVERRIDE USER] renderUserTasks sobrescrito correctamente');
 })();
 
 /**
- * 🔧 FUNCIONES AUXILIARES (si no existen)
+ * FUNCIONES AUXILIARES (si no existen)
  */
 if (typeof formatEstadoUsuario !== 'function') {
     window.formatEstadoUsuario = function(estado) {
@@ -5631,7 +5613,7 @@ if (typeof formatPrioridad !== 'function') {
 }
 
 /**
- * 🔧 ASEGURAR formatearFechaUY existe
+ *  ASEGURAR formatearFechaUY existe
  */
 if (typeof formatearFechaUY !== 'function') {
     window.formatearFechaUY = function(fecha) {
@@ -5647,28 +5629,28 @@ if (typeof formatearFechaUY !== 'function') {
 }
 
 /**
- * 🔧 FORZAR RECARGA AL ENTRAR A SECCIÓN TAREAS
+ *  FORZAR RECARGA AL ENTRAR A SECCIÓN TAREAS
  */
 document.addEventListener('DOMContentLoaded', function() {
     const tareasMenuItem = document.querySelector('.menu li[data-section="tareas"]');
     if (tareasMenuItem) {
-        console.log('✅ Listener de tareas usuario agregado');
+        (' Listener de tareas usuario agregado');
         tareasMenuItem.addEventListener('click', function() {
-            console.log('>>> Click en sección tareas USUARIO');
+            ('>>> Click en sección tareas USUARIO');
             
             // Esperar un momento para que la sección se active
             setTimeout(() => {
-                console.log('🔄 Cargando tareas de usuario...');
+                ('🔄 Cargando tareas de usuario...');
                 
                 // Verificar si los contenedores existen
                 const tareasUsuarioList = document.getElementById('tareasUsuarioList');
                 const tareasNucleoList = document.getElementById('tareasNucleoList');
                 
                 if (tareasUsuarioList) {
-                    console.log('✅ Container tareasUsuarioList encontrado');
+                    (' Container tareasUsuarioList encontrado');
                 }
                 if (tareasNucleoList) {
-                    console.log('✅ Container tareasNucleoList encontrado');
+                    (' Container tareasNucleoList encontrado');
                 }
                 
                 // Cargar tareas
@@ -5685,7 +5667,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 /**
- * 🎨 CSS PARA TAREAS VENCIDAS (Usuario)
+ *  CSS PARA TAREAS VENCIDAS (Usuario)
  */
 const cssVencidas = `
 <style>
@@ -5786,8 +5768,8 @@ if (!document.getElementById('css-vencidas-usuario')) {
     style.id = 'css-vencidas-usuario';
     style.innerHTML = cssVencidas;
     document.head.appendChild(style);
-    console.log('✅ CSS de tareas vencidas inyectado');
+    (' CSS de tareas vencidas inyectado');
 }
 
-console.log('✅ [VENCIDAS] Fix de tareas vencidas aplicado completamente en usuario');
-console.log('✅ [VENCIDAS] Sistema listo para detectar tareas vencidas');
+(' [VENCIDAS] Fix de tareas vencidas aplicado completamente en usuario');
+(' [VENCIDAS] Sistema listo para detectar tareas vencidas');

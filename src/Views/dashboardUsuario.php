@@ -1,5 +1,5 @@
 <?php
-// Verificar que el usuario esté autenticado
+
 if (!isset($_SESSION['user_id'])) {
     header('Location: /login');
     exit();
@@ -14,7 +14,6 @@ if (!isset($_SESSION['user_id'])) {
 	<title>Gestcoop – Panel de Usuario</title>
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-	   <!-- ✅ PRIMERO: Variables globales -->
     <link rel="stylesheet" href="/assets/css/dashboardVariables.css" />
 	
 	<link rel="stylesheet" href="/assets/css/dashboardBase.css" />
@@ -132,7 +131,7 @@ if (!isset($_SESSION['user_id'])) {
 				<div class="form-row">
 					<div class="form-group">
 						<label for="edit-email">Email *</label>
-						<input type="email" id="edit-email" required>
+						<input type="email" id="edit-email" required autocomplete="username">
 					</div>
 					<div class="form-group">
 						<label for="edit-fecha-nacimiento">Fecha de Nacimiento</label>
@@ -156,17 +155,17 @@ if (!isset($_SESSION['user_id'])) {
 				<h4 style="margin-bottom: 15px;">Cambiar Contraseña (Opcional)</h4>
 				<div class="form-group">
 					<label for="edit-password-actual">Contraseña Actual</label>
-					<input type="password" id="edit-password-actual" placeholder="Dejar en blanco si no deseas cambiarla">
+					<input type="password" id="edit-password-actual" placeholder="Dejar en blanco si no deseas cambiarla" autocomplete="current-password">
 				</div>
 
 				<div class="form-row">
 					<div class="form-group">
 						<label for="edit-password-nueva">Nueva Contraseña</label>
-						<input type="password" id="edit-password-nueva" minlength="6">
+						<input type="password" id="edit-password-nueva" minlength="6" autocomplete="current-password">
 					</div>
 					<div class="form-group">
 						<label for="edit-password-confirmar">Confirmar Nueva Contraseña</label>
-						<input type="password" id="edit-password-confirmar" minlength="6">
+						<input type="password" id="edit-password-confirmar" minlength="6" autocomplete="current-password">
 					</div>
 				</div>
 
@@ -351,7 +350,7 @@ if (!isset($_SESSION['user_id'])) {
             </label>
             <select id="filtro-anio-cuotas" onchange="loadMisCuotas()">
                 <option value="">Todos los años</option>
-                <!-- Se llena dinámicamente con JS -->
+             
             </select>
         </div>
 
@@ -459,7 +458,7 @@ if (!isset($_SESSION['user_id'])) {
 
 		<!-- HORAS -->
 <section id="horas-section" class="section-content">
-	<h2 class="section-title">⏰ Registro de Horas</h2>
+	<h2 class="section-title"> Registro de Horas</h2>
 	
 	<!-- Botones de Entrada/Salida -->
 	<div class="info-card">
@@ -556,7 +555,7 @@ if (!isset($_SESSION['user_id'])) {
 
 		<!-- TAREAS -->
 		<section id="tareas-section" class="section-content">
-			<h2 class="section-title">✅ Mis Tareas</h2>
+			<h2 class="section-title"> Mis Tareas</h2>
 			
 			<!-- Resumen de Tareas -->
 			<div class="stats-grid" style="margin-bottom: 20px;">

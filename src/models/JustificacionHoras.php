@@ -1,5 +1,5 @@
 <?php
-// App/Models/JustificacionHoras.php
+
 
 namespace App\models;
 
@@ -101,7 +101,7 @@ class JustificacionHoras
             
             $justificacionId = $this->conn->lastInsertId();
             
-            error_log("✅ Justificación creada con ID: $justificacionId");
+            error_log(" Justificación creada con ID: $justificacionId");
             
             $this->conn->commit();
             
@@ -115,7 +115,7 @@ class JustificacionHoras
             
         } catch (\Exception $e) {
             $this->conn->rollBack();
-            error_log("❌ Error en crearJustificacion: " . $e->getMessage());
+            error_log(" Error en crearJustificacion: " . $e->getMessage());
             return [
                 'success' => false,
                 'message' => $e->getMessage()

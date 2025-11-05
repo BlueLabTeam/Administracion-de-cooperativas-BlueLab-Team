@@ -1,9 +1,5 @@
-/* ==========================================
-   ESTILOS ADMIN CUOTAS - VERSIÓN ACTUALIZADA
-   Usa variables CSS de dashboardVariables.css
-   ========================================== */
 
-/* ========== MODAL OVERLAY (Ya definido en variables, solo específicos) ========== */
+/* ========== MODAL OVERLAY ========== */
 .modal-overlay.show {
     display: flex;
 }

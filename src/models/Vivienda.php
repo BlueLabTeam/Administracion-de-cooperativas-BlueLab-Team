@@ -15,7 +15,7 @@ class Vivienda
         $this->conn = Database::getConnection();
     }
 
-    // ✅ OPTIMIZADO: Ahora incluye etapa directamente desde Viviendas
+    //  Ahora incluye etapa directamente desde Viviendas
     public function getAll()
 {
     try {
@@ -39,22 +39,22 @@ class Vivienda
                     av.fecha_asignacion,
                     av.activa,
                     
-                    -- ✅ USUARIO ASIGNADO DIRECTO
+                    --  USUARIO ASIGNADO DIRECTO
                     u.id_usuario,
                     u.nombre_completo as usuario_asignado,
                     
-                    -- ✅ NÚCLEO ASIGNADO
+                    --  NÚCLEO ASIGNADO
                     nf.id_nucleo,
                     nf.nombre_nucleo as nucleo_asignado,
                     
-                    -- ✅ TODOS LOS MIEMBROS DEL NÚCLEO (separados por comas)
+                    --  TODOS LOS MIEMBROS DEL NÚCLEO (separados por comas)
                     GROUP_CONCAT(
                         DISTINCT u_nucleo.nombre_completo 
                         ORDER BY u_nucleo.nombre_completo 
                         SEPARATOR ', '
                     ) as miembros_nucleo,
                     
-                    -- ✅ CANTIDAD DE MIEMBROS DEL NÚCLEO
+                    --  CANTIDAD DE MIEMBROS DEL NÚCLEO
                     COUNT(DISTINCT u_nucleo.id_usuario) as total_miembros_nucleo
                     
                 FROM Viviendas v
@@ -64,7 +64,7 @@ class Vivienda
                 LEFT JOIN Usuario u ON av.id_usuario = u.id_usuario
                 LEFT JOIN Nucleo_Familiar nf ON av.id_nucleo = nf.id_nucleo
                 
-                -- ✅ JOIN PARA OBTENER TODOS LOS MIEMBROS DEL NÚCLEO
+                --  JOIN PARA OBTENER TODOS LOS MIEMBROS DEL NÚCLEO
                 LEFT JOIN Usuario u_nucleo ON u_nucleo.id_nucleo = nf.id_nucleo
                 
                 GROUP BY 
@@ -101,7 +101,7 @@ class Vivienda
     }
 }
 
-    // ✅ OPTIMIZADO: Incluye etapa
+ 
     public function getById($id)
     {
         try {
@@ -128,7 +128,7 @@ class Vivienda
         }
     }
 
-    // ✅ OPTIMIZADO: Ahora incluye id_etapa
+
     public function create($data)
     {
         try {
@@ -162,7 +162,7 @@ class Vivienda
         }
     }
 
-    // ✅ OPTIMIZADO: Incluye id_etapa
+    //  OPTIMIZADO: Incluye id_etapa
     public function update($id, $data)
     {
         try {
@@ -311,7 +311,7 @@ class Vivienda
         }
     }
 
-    // ✅ OPTIMIZADO: Incluye etapa
+
     public function getViviendaUsuario($usuarioId)
     {
         try {
@@ -351,7 +351,7 @@ class Vivienda
         }
     }
 
-    // ✅ OPTIMIZADO: Incluye etapa
+   
     public function getViviendaNucleo($nucleoId)
     {
         try {
@@ -391,7 +391,7 @@ class Vivienda
         }
     }
     
-    // ✅ NUEVA FUNCIÓN: Obtener todas las etapas
+   
     public function getEtapas()
     {
         try {

@@ -59,7 +59,7 @@ function inicializarNavegacion() {
     const menuItems = document.querySelectorAll('.menu li');
     const secciones = document.querySelectorAll('.seccion');
 
-    // Por defecto, mostrar "Inicio"
+    
     const defaultSection = 'inicio';
 
     menuItems.forEach(li => {

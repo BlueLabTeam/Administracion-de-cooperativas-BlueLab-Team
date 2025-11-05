@@ -98,6 +98,7 @@ $privateRoutes = [
     '/api/users/aprobar-rechazar',
     '/api/users/details',
     '/api/users/payment-details',
+    '/api/users/fecha-mas-antigua',
     '/api/nucleos/create',      
     '/api/nucleos/all',            
     '/api/nucleos/details',        
@@ -173,11 +174,9 @@ $privateRoutes = [
     '/api/reporte/cuotas',
     '/api/reporte/estadisticas',
     '/api/reporte/exportar',
-    '/api/debug/mis-cuotas',
-    '/api/test/generar-cuota-simple',
 ];
 
-// Aplicar middleware segun el tipo de ruta
+
 if (in_array($uri, $loginOnlyRoutes)) {
     Herramientas::validarLogin();
 } elseif (in_array($uri, $privateRoutes)) {
@@ -318,6 +317,10 @@ switch ($uri) {
         break;
         case '/api/users/payment-details':
     (new App\controllers\UserController())->getPaymentDetails();
+    break;
+    
+    case '/api/users/fecha-mas-antigua':
+    (new App\controllers\UserController())->getFechaMasAntigua();
     break;
 
     // API NUCLEOS
@@ -573,140 +576,9 @@ switch ($uri) {
         (new App\controllers\ReporteController())->exportarReporteMensual();
         break;
 
-    // DEBUG: Verificar cuotas del usuario
-    case '/api/debug/mis-cuotas':
-        while (ob_get_level() > 0) {
-            ob_end_clean();
-        }
-        
-        header('Content-Type: application/json; charset=utf-8');
-        
-        try {
-            if (!isset($_SESSION['user_id'])) {
-                echo json_encode(['error' => 'No autenticado'], JSON_UNESCAPED_UNICODE);
-                exit();
-            }
-            
-            $userId = $_SESSION['user_id'];
-            $pdo = \App\config\Database::getConnection();
-            
-            // 1. Verificar usuario
-            $stmtUser = $pdo->prepare("SELECT * FROM Usuario WHERE id_usuario = ?");
-            $stmtUser->execute([$userId]);
-            $user = $stmtUser->fetch(PDO::FETCH_ASSOC);
-            
-            // 2. Buscar cuotas directamente
-            $stmtCuotas = $pdo->prepare("
-                SELECT * FROM Cuotas_Mensuales 
-                WHERE id_usuario = ? 
-                ORDER BY anio DESC, mes DESC
-            ");
-            $stmtCuotas->execute([$userId]);
-            $cuotasDirectas = $stmtCuotas->fetchAll(PDO::FETCH_ASSOC);
-            
-            // 3. Buscar desde vista
-            $stmtVista = $pdo->prepare("
-                SELECT * FROM Vista_Cuotas_Con_Justificaciones 
-                WHERE id_usuario = ? 
-                ORDER BY anio DESC, mes DESC
-            ");
-            $stmtVista->execute([$userId]);
-            $cuotasVista = $stmtVista->fetchAll(PDO::FETCH_ASSOC);
-            
-            // 4. Verificar vivienda
-            $stmtVivienda = $pdo->prepare("
-                SELECT av.*, v.numero_vivienda, v.id_tipo
-                FROM Asignacion_Vivienda av
-                LEFT JOIN Viviendas v ON av.id_vivienda = v.id_vivienda
-                WHERE (av.id_usuario = ? OR av.id_nucleo = (
-                    SELECT id_nucleo FROM Usuario WHERE id_usuario = ?
-                ))
-                AND av.activa = 1
-            ");
-            $stmtVivienda->execute([$userId, $userId]);
-            $vivienda = $stmtVivienda->fetch(PDO::FETCH_ASSOC);
-            
-            // 5. Verificar configuracion de precios
-            $stmtPrecios = $pdo->prepare("
-                SELECT cc.*, tv.nombre as tipo_nombre
-                FROM Config_Cuotas cc
-                INNER JOIN Tipo_Vivienda tv ON cc.id_tipo = tv.id_tipo
-                WHERE cc.activo = 1
-            ");
-            $stmtPrecios->execute();
-            $precios = $stmtPrecios->fetchAll(PDO::FETCH_ASSOC);
-            
-            echo json_encode([
-                'usuario' => [
-                    'id' => $user['id_usuario'],
-                    'nombre' => $user['nombre_completo'],
-                    'estado' => $user['estado'],
-                    'id_nucleo' => $user['id_nucleo']
-                ],
-                'vivienda' => $vivienda ?: null,
-                'precios_configurados' => $precios,
-                'cuotas_tabla_directa' => [
-                    'count' => count($cuotasDirectas),
-                    'data' => $cuotasDirectas
-                ],
-                'cuotas_vista' => [
-                    'count' => count($cuotasVista),
-                    'data' => $cuotasVista
-                ],
-                'mes_actual' => date('n'),
-                'anio_actual' => date('Y')
-            ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-            
-        } catch (\Exception $e) {
-            error_log("Error en debug: " . $e->getMessage());
-            http_response_code(500);
-            echo json_encode([
-                'error' => 'Error interno',
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ], JSON_UNESCAPED_UNICODE);
-        }
-        
-        exit();
+    
 
-    // TEST: Endpoint simple para generar cuota
-    case '/api/test/generar-cuota-simple':
-        while (ob_get_level() > 0) {
-            ob_end_clean();
-        }
-        
-        header('Content-Type: application/json; charset=utf-8');
-        
-        try {
-            if (!isset($_SESSION['user_id'])) {
-                echo json_encode(['error' => 'No autenticado']);
-                exit();
-            }
-            
-            $userId = $_SESSION['user_id'];
-            $mes = intval($_POST['mes'] ?? date('n'));
-            $anio = intval($_POST['anio'] ?? date('Y'));
-            
-            error_log("=== TEST GENERAR CUOTA ===");
-            error_log("Usuario: $userId | Mes: $mes | Anio: $anio");
-            
-            $cuotaModel = new \App\models\Cuota();
-            $resultado = $cuotaModel->generarCuotaIndividual($userId, $mes, $anio);
-            
-            error_log("Resultado: " . json_encode($resultado));
-            
-            echo json_encode($resultado, JSON_UNESCAPED_UNICODE);
-            
-        } catch (\Exception $e) {
-            error_log("ERROR: " . $e->getMessage());
-            echo json_encode([
-                'success' => false,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-        }
-        
-        exit();
+
 
     default:
         http_response_code(404);

@@ -24,23 +24,21 @@
   padding: 15px;
 }
 
-/* ==========================
-   INCORPORACIÓN
-========================== */
+
 .incorporacion ol {
   display: grid;
-  grid-template-columns: repeat(4, 1fr); /* 4 pasos en fila */
+  grid-template-columns: repeat(4, 1fr); 
   gap: 20px;
   list-style: none;
   padding: 0;
-  margin: 0 auto;        /* centra el grid */
-  max-width: 1200px;     /* ancho máximo */
-  justify-items: center; /* centra los items en cada celda */
+  margin: 0 auto;        
+  max-width: 1200px;    
+  justify-items: center; 
 }
 
 .incorporacion ol li {
-  width: 100%; /* ocupa todo el ancho de su celda */
-  max-width: 250px; /* evita que se estiren demasiado */
+  width: 100%; 
+  max-width: 250px; 
 }
 
 .incorporacion ol li:hover {
@@ -79,22 +77,19 @@
   color: white;
 }
 
-/* Responsive para móviles */
+
 @media (max-width: 768px) {
   .incorporacion ol {
-    grid-template-columns: repeat(2, 1fr); /* 2 por fila */
+    grid-template-columns: repeat(2, 1fr); 
   }
 }
 
 @media (max-width: 480px) {
   .incorporacion ol {
-    grid-template-columns: 1fr; /* 1 por fila */
+    grid-template-columns: 1fr; 
   }
 }
 
-/* ==========================
-   PREGUNTAS FRECUENTES
-========================== */
 .preguntas ul li {
   cursor: pointer;
   transition: all 0.3s ease;

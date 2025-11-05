@@ -198,7 +198,7 @@ class Task
             
             $result = $stmt->execute();
             
-            // ✅ NUEVA LÓGICA: Verificar si todos completaron la tarea
+            //  NUEVA LÓGICA: Verificar si todos completaron la tarea
             if ($result) {
                 $this->checkAndUpdateTaskCompletion($tareaId);
             }
@@ -256,7 +256,7 @@ class Task
                 $stmtUpdate->bindParam(':tarea_id', $tareaId, \PDO::PARAM_INT);
                 $stmtUpdate->execute();
                 
-                error_log("✅ Tarea $tareaId marcada como completada (todos los asignados terminaron)");
+                error_log(" Tarea $tareaId marcada como completada (todos los asignados terminaron)");
             }
             
         } catch (\PDOException $e) {
@@ -356,7 +356,7 @@ class Task
         }
     }
 
-    // ✅ FUNCIÓN MODIFICADA: Obtener todas las tareas con progreso calculado
+    //   Obtener todas las tareas con progreso calculado
     public function getAllTasks($filtroEstado = null)
     {
         try {
@@ -375,7 +375,7 @@ class Task
                         u.nombre_completo as creador,
                         COUNT(DISTINCT CASE WHEN t.tipo_asignacion = 'usuario' THEN tu.id_usuario END) as total_usuarios,
                         COUNT(DISTINCT CASE WHEN t.tipo_asignacion = 'nucleo' THEN tn.id_nucleo END) as total_nucleos,
-                        -- ✅ CALCULAR PROGRESO PROMEDIO
+                        --  CALCULAR PROGRESO PROMEDIO
                         CASE 
                             WHEN t.tipo_asignacion = 'usuario' THEN 
                                 COALESCE(AVG(tu.progreso), 0)
@@ -383,7 +383,7 @@ class Task
                                 COALESCE(AVG(tn.progreso), 0)
                             ELSE 0
                         END as progreso_promedio,
-                        -- ✅ CONTAR ASIGNACIONES COMPLETADAS
+                        --  CONTAR ASIGNACIONES COMPLETADAS
                         CASE 
                             WHEN t.tipo_asignacion = 'usuario' THEN 
                                 SUM(CASE WHEN tu.estado_usuario = 'completada' THEN 1 ELSE 0 END)

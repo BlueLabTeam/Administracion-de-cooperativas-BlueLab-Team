@@ -3,13 +3,13 @@
       .addEventListener("submit", async (e) => {
         e.preventDefault();
         
-        console.log("=== INICIO SUBMIT ===");
+        ("=== INICIO SUBMIT ===");
         
         const formData = new FormData(e.target);
         
         // Verificar que el archivo esté en el FormData
         for (let [key, value] of formData.entries()) {
-            console.log(`${key}:`, value);
+            (`${key}:`, value);
         }
         
         const debugDiv = document.getElementById('debug');
@@ -23,11 +23,11 @@
             body: formData,
           });
 
-          console.log("Response status:", response.status);
+          ("Response status:", response.status);
           debugContent.textContent += `Status: ${response.status}\n`;
 
           const textResponse = await response.text();
-          console.log("Response body:", textResponse);
+          ("Response body:", textResponse);
           debugContent.textContent += `Response:\n${textResponse}`;
 
           try {

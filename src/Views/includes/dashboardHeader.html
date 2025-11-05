@@ -24,7 +24,7 @@
                 <button class="btn-usuario">Usuario</button>
             </a>
             <?php if (isset($_SESSION['is_admin']) && $_SESSION['is_admin']): ?>
-                <a href="/dashboard-admin" style="text-decoration: none;" onclick="console.log('Click en Admin'); return true;">
+                <a href="/dashboard-admin" style="text-decoration: none;" onclick="('Click en Admin'); return true;">
                     <button class="btn-admin" type="button">Admin</button>
                 </a>
             <?php else: ?>

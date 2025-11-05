@@ -1,10 +1,6 @@
-/* ==========================================
-   DASHBOARD BASE - ESTILOS ESPECÍFICOS
-   Solo componentes exclusivos del dashboard
-   ========================================== */
 
 /* ==========================================
-   SISTEMA DE SECCIONES (Específico Dashboard)
+   SISTEMA DE SECCIONES 
    ========================================== */
 .section-content {
     display: none;
@@ -16,7 +12,7 @@
 }
 
 /* ==========================================
-   MENSAJES DE ESTADO (Específicos)
+   MENSAJES DE ESTADO 
    ========================================== */
 .no-tasks,
 .no-notifications,
@@ -32,7 +28,7 @@
 }
 
 /* ==========================================
-   SELECCIÓN DE USUARIOS (Específico)
+   SELECCIÓN DE USUARIOS 
    ========================================== */
 .user-selection {
     border: 2px solid var(--border-color);
@@ -93,7 +89,7 @@
 }
 
 /* ==========================================
-   PROFILE GRID (Específico Usuario)
+   PROFILE GRID 
    ========================================== */
 .profile-info-grid {
     display: grid;
@@ -132,7 +128,7 @@
 }
 
 /* ==========================================
-   SECTION HEADER (Específico Dashboard)
+   SECTION HEADER 
    ========================================== */
 .section-header {
     margin-bottom: var(--spacing-2xl);
@@ -150,7 +146,7 @@
 }
 
 /* ==========================================
-   CONTAINERS (Específicos de secciones)
+   CONTAINERS 
    ========================================== */
 .solicitudes-container,
 .cuotas-container {
@@ -160,7 +156,7 @@
 }
 
 /* ==========================================
-   CUOTA INFO MODAL (Específico)
+   CUOTA INFO MODAL 
    ========================================== */
 .cuota-info-modal {
     background: var(--color-gray-50);
@@ -203,7 +199,7 @@
 }
 
 /* ==========================================
-   MATERIALES SELECTOR (Específico Tareas)
+   MATERIALES SELECTOR 
    ========================================== */
 .materiales-tarea-selector {
     border: 2px solid var(--border-color);
@@ -257,7 +253,7 @@
 }
 
 /* ==========================================
-   REPORTES FILTERS (Específico Admin)
+   REPORTES FILTERS 
    ========================================== */
 .reportes-filters {
     display: flex;

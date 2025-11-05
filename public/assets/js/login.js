@@ -10,9 +10,9 @@
         });
 
         // DEBUG: Ver qué responde el servidor
-        console.log("Status:", response.status);
+        ("Status:", response.status);
         const text = await response.text();
-        console.log("Respuesta del servidor:", text);
+        ("Respuesta del servidor:", text);
 
         const data = JSON.parse(text);
 

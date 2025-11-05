@@ -152,7 +152,7 @@
 
         <!-- TAREAS -->
         <section id="tareas-section" class="section-content">
-            <h2 class="section-title">✅ Mis Tareas</h2>
+            <h2 class="section-title"> Mis Tareas</h2>
 
             <div class="tasks-summary">
                 <div class="summary-card">

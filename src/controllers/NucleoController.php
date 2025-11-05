@@ -505,9 +505,7 @@ class NucleoController
     /**
      * Obtener información del núcleo familiar del usuario actual
      */
-   /**
- * Obtener información del núcleo familiar del usuario actual
- */
+
 public function getMiNucleoInfo()
 {
     header('Content-Type: application/json');

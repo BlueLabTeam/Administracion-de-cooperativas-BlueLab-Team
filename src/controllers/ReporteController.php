@@ -16,9 +16,7 @@ class ReporteController
         $this->reporteModel = new Reporte();
     }
 
-    /**
-     * Generar reporte mensual completo
-     */
+    
     /**
  * Generar reporte mensual completo
  */
@@ -45,7 +43,7 @@ public function generarReporteMensual()
         $reporte = $this->reporteModel->generarReporteMensual($mes, $anio);
 
         if ($reporte) {
-            error_log("✅ Reporte generado exitosamente");
+            error_log(" Reporte generado exitosamente");
             Herramientas::jsonResponse(true, 'Reporte generado exitosamente', [
                 'reporte' => $reporte
             ]);

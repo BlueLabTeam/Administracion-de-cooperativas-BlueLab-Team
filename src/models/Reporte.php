@@ -57,7 +57,7 @@ class Reporte
                     'tipo_vivienda' => $usuario['tipo_vivienda']
                 ];
 
-                // ✅ HORAS CON JUSTIFICACIONES (mes/año específico)
+                //  HORAS CON JUSTIFICACIONES (mes/año específico)
                 $horas = $this->getHorasUsuarioMesConJustificaciones($usuario['id_usuario'], $mes, $anio);
                 $datosUsuario['horas_trabajadas'] = $horas['total_horas'];
                 $datosUsuario['horas_requeridas'] = $horas['horas_requeridas'];
@@ -69,7 +69,7 @@ class Reporte
                 $datosUsuario['porcentaje_cumplimiento'] = $horas['porcentaje_cumplimiento'];
                 $datosUsuario['deuda_horas'] = $horas['deuda_horas_pesos'];
 
-                // ✅ Tareas (mes/año específico)
+                //  Tareas (mes/año específico)
                 $tareas = $this->getTareasUsuarioMes($usuario['id_usuario'], $mes, $anio);
                 $datosUsuario['tareas_asignadas'] = $tareas['total'];
                 $datosUsuario['tareas_completadas'] = $tareas['completadas'];
@@ -78,7 +78,7 @@ class Reporte
                     ? round(($tareas['completadas'] / $tareas['total']) * 100, 2) 
                     : 0;
 
-                // ✅ Cuotas (mes/año específico)
+                //  Cuotas (mes/año específico)
                 $cuota = $this->getCuotaUsuarioMes($usuario['id_usuario'], $mes, $anio);
                 $datosUsuario['estado_cuota'] = $cuota['estado'] ?? 'sin_cuota';
                 $datosUsuario['monto_cuota'] = $cuota['monto_total'] ?? 0;
@@ -113,11 +113,11 @@ class Reporte
                 );
             }
 
-            error_log("✅ Reporte generado: " . count($resultado['usuarios']) . " usuarios para $mes/$anio");
+            error_log(" Reporte generado: " . count($resultado['usuarios']) . " usuarios para $mes/$anio");
             return $resultado;
 
         } catch (\Exception $e) {
-            error_log("❌ ERROR en generarReporteMensual: " . $e->getMessage());
+            error_log(" ERROR en generarReporteMensual: " . $e->getMessage());
             error_log("Stack trace: " . $e->getTraceAsString());
             return null;
         }
@@ -155,7 +155,7 @@ class Reporte
     }
 
     /**
-     * ✅ CORREGIDO: Obtener horas del mes/año específico
+     * Obtener horas del mes/año específico
      */
     private function getHorasUsuarioMesConJustificaciones($idUsuario, $mes, $anio)
     {
@@ -181,7 +181,7 @@ class Reporte
             $horasRequeridas = 84;
         }
             
-        // ✅ FILTRAR POR MES/AÑO ESPECÍFICO
+        //  FILTRAR POR MES/AÑO ESPECÍFICO
         $sql = "SELECT 
                     COALESCE(SUM(rh.total_horas), 0) as total_horas,
                     COALESCE(SUM(CASE WHEN rh.estado = 'aprobado' THEN rh.total_horas ELSE 0 END), 0) as horas_aprobadas,
@@ -191,7 +191,7 @@ class Reporte
                 AND MONTH(rh.fecha) = :mes
                 AND YEAR(rh.fecha) = :anio";
 
-        // ✅ FILTRAR JUSTIFICACIONES POR MES/AÑO ESPECÍFICO
+        //  FILTRAR JUSTIFICACIONES POR MES/AÑO ESPECÍFICO
         $sqlJustificadas = "SELECT COALESCE(SUM(horas_justificadas), 0) as horas_justificadas
                             FROM Justificaciones_Horas
                             WHERE id_usuario = :id_usuario
@@ -225,7 +225,7 @@ class Reporte
                 ? round(($horasEfectivas / $horasRequeridas) * 100, 2)
                 : 0;
             
-            error_log("✅ Horas calculadas: aprobadas={$result['horas_aprobadas']}, justificadas=$horasJustificadas, efectivas=$horasEfectivas");
+            error_log(" Horas calculadas: aprobadas={$result['horas_aprobadas']}, justificadas=$horasJustificadas, efectivas=$horasEfectivas");
             
             return [
                 'total_horas' => floatval($result['total_horas']),
@@ -254,22 +254,18 @@ class Reporte
         }
     }
 
-    /**
-     * ✅ CORREGIDO: Tareas que están ACTIVAS en el mes/año específico
-     * Una tarea está activa en un mes si:
-     * - Empieza antes/durante el mes Y termina después/durante el mes
-     */
+
     private function getTareasUsuarioMes($idUsuario, $mes, $anio)
     {
         error_log("📋 Obteniendo tareas para usuario $idUsuario: mes=$mes, año=$anio");
         
-        // ✅ CALCULAR primer y último día del mes
+        //  CALCULAR primer y último día del mes
         $primerDia = "$anio-" . str_pad($mes, 2, '0', STR_PAD_LEFT) . "-01";
         $ultimoDia = date("Y-m-t", strtotime($primerDia));
         
         error_log("📅 Rango de fechas: $primerDia a $ultimoDia");
         
-        // ✅ Seleccionar tareas que están activas DURANTE el mes
+        //  Seleccionar tareas que están activas DURANTE el mes
         $sql = "SELECT 
                     COUNT(*) as total,
                     COALESCE(SUM(CASE WHEN tu.estado_usuario = 'completada' THEN 1 ELSE 0 END), 0) as completadas,
@@ -290,7 +286,7 @@ class Reporte
             ]);
 
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
-            error_log("✅ Tareas encontradas: {$result['total']} (completadas: {$result['completadas']})");
+            error_log(" Tareas encontradas: {$result['total']} (completadas: {$result['completadas']})");
             
             return $result;
         } catch (\PDOException $e) {
@@ -300,7 +296,7 @@ class Reporte
     }
 
     /**
-     * ✅ CORRECTO: Ya filtra por mes/año específico
+     * Ya filtra por mes/año específico
      */
     private function getCuotaUsuarioMes($idUsuario, $mes, $anio)
     {
@@ -326,7 +322,7 @@ class Reporte
             ]);
 
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
-            error_log("✅ Cuota estado: " . ($result['estado'] ?? 'sin_cuota'));
+            error_log(" Cuota estado: " . ($result['estado'] ?? 'sin_cuota'));
             
             return $result ?: [];
         } catch (\PDOException $e) {
@@ -353,7 +349,7 @@ class Reporte
     }
 
     /**
-     * ✅ CORREGIDO: Resumen de horas por mes/año
+     *  Resumen de horas por mes/año
      */
     public function getResumenHorasPorUsuario($mes, $anio)
     {
@@ -380,7 +376,7 @@ class Reporte
     }
 
     /**
-     * ✅ CORREGIDO: Resumen de tareas por mes/año
+     *  Resumen de tareas por mes/año
      */
     public function getResumenTareasPorUsuario($mes, $anio)
     {
@@ -411,7 +407,7 @@ class Reporte
     }
 
     /**
-     * ✅ CORRECTO: Ya filtra por mes/año
+     *   Ya filtra por mes/año
      */
     public function getResumenCuotasPorUsuario($mes, $anio)
     {
@@ -444,7 +440,7 @@ class Reporte
     }
 
     /**
-     * ✅ CORRECTO: Ya filtra por mes/año
+     *  Ya filtra por mes/año
      */
     private function getEstadisticasHoras($mes, $anio)
     {
@@ -461,7 +457,7 @@ class Reporte
     }
 
     /**
-     * ✅ CORREGIDO: Estadísticas de tareas activas en el mes
+     * Estadísticas de tareas activas en el mes
      */
     private function getEstadisticasTareas($mes, $anio)
     {
@@ -485,7 +481,7 @@ class Reporte
     }
 
     /**
-     * ✅ CORRECTO: Ya filtra por mes/año
+     *  Ya filtra por mes/año
      */
     private function getEstadisticasCuotas($mes, $anio)
     {

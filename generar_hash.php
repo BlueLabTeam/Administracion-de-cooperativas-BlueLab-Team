@@ -1,8 +1,5 @@
 <?php
-/**
- * Generador de Hash para contraseñas
- * Ejecutar: php generar_hash.php
- */
+
 
 // Contraseña a hashear
 $password = 'adminadmin';

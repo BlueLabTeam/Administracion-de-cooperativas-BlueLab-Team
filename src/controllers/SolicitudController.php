@@ -17,19 +17,19 @@ class SolicitudController
     }
 
     /**
-     * Crear nueva solicitud (VERSIÓN CORREGIDA - SIN NOTIFICACIONES)
+     * Crear nueva solicitud 
      */
     public function create()
     {
-        // ✅ CRÍTICO: Limpiar TODOS los buffers de salida
+        // Limpiar TODOS los buffers de salida
         while (ob_get_level()) {
             ob_end_clean();
         }
         
-        // ✅ CRÍTICO: Establecer header ANTES de cualquier output
+        //  Establecer header ANTES de cualquier output
         header('Content-Type: application/json; charset=utf-8');
         
-        // ✅ CRÍTICO: Deshabilitar output buffering
+        //  Deshabilitar output buffering
         if (function_exists('apache_setenv')) {
             @apache_setenv('no-gzip', '1');
         }
@@ -71,7 +71,7 @@ class SolicitudController
             error_log("  - Prioridad: $prioridad");
 
             if (empty($asunto) || empty($descripcion)) {
-                error_log("❌ Validación fallida: asunto o descripción vacíos");
+                error_log(" Validación fallida: asunto o descripción vacíos");
                 echo json_encode([
                     'success' => false,
                     'message' => 'El asunto y la descripción son obligatorios'
@@ -96,7 +96,7 @@ class SolicitudController
 
                 // Validar tamaño (5MB)
                 if ($tamanio > 5242880) {
-                    error_log("❌ Archivo muy grande: $tamanio bytes");
+                    error_log(" Archivo muy grande: $tamanio bytes");
                     echo json_encode([
                         'success' => false,
                         'message' => 'El archivo es demasiado grande. Máximo 5MB.'
@@ -109,7 +109,7 @@ class SolicitudController
                 $permitidos = ['jpg', 'jpeg', 'png', 'gif', 'pdf', 'doc', 'docx'];
                 
                 if (!in_array($extension, $permitidos)) {
-                    error_log("❌ Tipo no permitido: $extension");
+                    error_log(" Tipo no permitido: $extension");
                     echo json_encode([
                         'success' => false,
                         'message' => "Tipo de archivo no permitido. Solo: " . implode(', ', $permitidos)
@@ -137,19 +137,19 @@ class SolicitudController
                 if (!is_dir($directorio)) {
                     error_log("📁 Creando directorio...");
                     if (!mkdir($directorio, 0775, true)) {
-                        error_log("❌ No se pudo crear directorio");
+                        error_log(" No se pudo crear directorio");
                         echo json_encode([
                             'success' => false,
                             'message' => 'Error al crear directorio de almacenamiento'
                         ], JSON_UNESCAPED_UNICODE);
                         exit();
                     }
-                    error_log("✅ Directorio creado");
+                    error_log(" Directorio creado");
                 }
 
                 // Verificar permisos de escritura
                 if (!is_writable($directorio)) {
-                    error_log("❌ Directorio sin permisos de escritura: $directorio");
+                    error_log(" Directorio sin permisos de escritura: $directorio");
                     echo json_encode([
                         'success' => false,
                         'message' => 'El directorio no tiene permisos de escritura'
@@ -160,7 +160,7 @@ class SolicitudController
                 // Mover archivo
                 error_log("📄 Moviendo archivo de $tmpName a $destino");
                 if (!move_uploaded_file($tmpName, $destino)) {
-                    error_log("❌ Error al mover archivo");
+                    error_log(" Error al mover archivo");
                     error_log("  - Origen existe: " . (file_exists($tmpName) ? 'SI' : 'NO'));
                     error_log("  - Destino existe: " . (file_exists($destino) ? 'SI' : 'NO'));
                     echo json_encode([
@@ -172,7 +172,7 @@ class SolicitudController
 
                 // Verificar que se guardó
                 if (!file_exists($destino)) {
-                    error_log("❌ Archivo no existe después de mover");
+                    error_log(" Archivo no existe después de mover");
                     echo json_encode([
                         'success' => false,
                         'message' => 'Error: el archivo no se guardó correctamente'
@@ -180,7 +180,7 @@ class SolicitudController
                     exit();
                 }
 
-                error_log("✅ Archivo guardado correctamente:");
+                error_log(" Archivo guardado correctamente:");
                 error_log("  - Ruta física: $destino");
                 error_log("  - Ruta BD: $archivo");
                 error_log("  - Tamaño final: " . filesize($destino) . " bytes");
@@ -198,7 +198,7 @@ class SolicitudController
                 ];
                 
                 $mensajeError = $errores[$errorCode] ?? "Error desconocido ($errorCode)";
-                error_log("❌ Error upload: $mensajeError");
+                error_log(" Error upload: $mensajeError");
                 
                 echo json_encode([
                     'success' => false,
@@ -208,7 +208,7 @@ class SolicitudController
             }
 
             // Guardar en base de datos
-            error_log("💾 Guardando solicitud en BD...");
+            error_log(" Guardando solicitud en BD...");
             error_log("  - Usuario: " . $_SESSION['user_id']);
             error_log("  - Tipo: $tipo");
             error_log("  - Asunto: $asunto");
@@ -228,15 +228,15 @@ class SolicitudController
             error_log(json_encode($resultado));
 
             if (!$resultado['success']) {
-                error_log("❌ Error al crear solicitud en BD");
+                error_log(" Error al crear solicitud en BD");
                 echo json_encode($resultado, JSON_UNESCAPED_UNICODE);
                 exit();
             }
 
-            error_log("✅ Solicitud creada en BD. ID: " . $resultado['id_solicitud']);
+            error_log(" Solicitud creada en BD. ID: " . $resultado['id_solicitud']);
 
             // Respuesta exitosa
-            error_log("✅ SOLICITUD CREADA EXITOSAMENTE");
+            error_log(" SOLICITUD CREADA EXITOSAMENTE");
             error_log("========================================");
             
             echo json_encode([
@@ -248,7 +248,7 @@ class SolicitudController
             exit();
 
         } catch (\Exception $e) {
-            error_log("❌ EXCEPCIÓN CAPTURADA:");
+            error_log(" EXCEPCIÓN CAPTURADA:");
             error_log("  - Mensaje: " . $e->getMessage());
             error_log("  - Archivo: " . $e->getFile());
             error_log("  - Línea: " . $e->getLine());
@@ -278,7 +278,7 @@ class SolicitudController
         error_log("GET params: " . json_encode($_GET));
 
         if (!isset($_SESSION['user_id'])) {
-            error_log("❌ Usuario no autenticado");
+            error_log(" Usuario no autenticado");
             http_response_code(401);
             echo json_encode(['success' => false, 'message' => 'No autenticado'], JSON_UNESCAPED_UNICODE);
             exit();
@@ -294,7 +294,7 @@ class SolicitudController
 
             $solicitudes = $this->solicitudModel->getMisSolicitudes($_SESSION['user_id'], $filtros);
 
-            error_log("✅ Solicitudes obtenidas: " . count($solicitudes));
+            error_log(" Solicitudes obtenidas: " . count($solicitudes));
 
             if (count($solicitudes) > 0) {
                 error_log("Primera solicitud: " . json_encode($solicitudes[0]));
@@ -313,7 +313,7 @@ class SolicitudController
             echo json_encode($response, JSON_UNESCAPED_UNICODE);
 
         } catch (\Exception $e) {
-            error_log("❌ EXCEPCIÓN en getMisSolicitudes Controller: " . $e->getMessage());
+            error_log(" EXCEPCIÓN en getMisSolicitudes Controller: " . $e->getMessage());
             error_log("Stack trace: " . $e->getTraceAsString());
             http_response_code(500);
             echo json_encode(['success' => false, 'message' => 'Error al obtener solicitudes'], JSON_UNESCAPED_UNICODE);

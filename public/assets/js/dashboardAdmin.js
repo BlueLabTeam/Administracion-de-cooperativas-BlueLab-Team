@@ -1,21 +1,21 @@
 
 
 
-console.log('=== Iniciando carga de dashboardAdmin.js ===');
+
 
 // Sistema SPA - Navegación entre secciones
 document.addEventListener('DOMContentLoaded', function () {
-    console.log('✓ DOMContentLoaded ejecutado');
+
 
     const menuItems = document.querySelectorAll('.menu li');
-    console.log('✓ Menu items encontrados:', menuItems.length);
+
 
     menuItems.forEach(item => {
         item.addEventListener('click', function (e) {
             e.preventDefault();
 
             const section = this.getAttribute('data-section');
-            console.log('>>> CLICK EN MENU:', section);
+        
 
             menuItems.forEach(mi => mi.classList.remove('activo'));
             this.classList.add('activo');
@@ -27,30 +27,30 @@ document.addEventListener('DOMContentLoaded', function () {
             const targetSection = document.getElementById(section + '-section');
             if (targetSection) {
                 targetSection.classList.add('active');
-                console.log('✓ Sección mostrada:', section);
+              
 
                 // CARGAR DATOS SEGÚN LA SECCIÓN
                 if (section === 'notificaciones') {
-                    console.log('>>> Cargando usuarios para notificaciones');
+                 
                     loadUsersForNotifications();
                 } else if (section === 'tareas') {
-                    console.log('>>> Cargando datos para tareas');
+                
                     loadTaskUsers();
                     loadNucleos();
                     loadAllTasks();
                     setTimeout(() => loadMaterialesParaTarea(), 300);
                 } else if (section === 'nucleo') {
-                    console.log('>>> Cargando núcleos familiares');
+                
                     loadNucleosFamiliares();
                 } else if (section === 'materiales') {
-                    console.log('>>> Cargando materiales');
+                    
                     loadMateriales();
                 } else if (section === 'viviendas') {
-                    console.log('>>> Cargando viviendas');
+                 
                     loadViviendas();
                     loadTiposVivienda();
                 } else if (section === 'usuarios') {
-                    console.log('>>> Cargando tabla de usuarios');
+                   
                     loadUsersForTable();
                 }
             } else {
@@ -59,9 +59,9 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-}); // ← CIERRE CORRECTO DEL DOMContentLoaded
+});
 
-console.log('=== Definiendo funciones globales ===');
+
 
 const COLORS = {
     primary: '#005CB9',
@@ -78,18 +78,14 @@ const COLORS = {
     shadow: '0 4px 12px rgba(0, 92, 185, 0.12)'
 };
 
-// ==========================================
-// 🔧 FIX PARA MODALES EN ADMIN
-// Agregar ANTES de cualquier función que abra modales
-// ==========================================
 
 /**
- * 🧹 Limpiar TODOS los modales anteriores antes de abrir uno nuevo
+ *  Limpiar TODOS los modales anteriores antes de abrir uno nuevo
  */
 function limpiarModalesAnteriores() {
-    console.log('🧹 [LIMPIEZA] Iniciando limpieza de modales...');
+  
     
-    // ✅ MODALES PERMANENTES DEL HTML (solo ocultar, NO eliminar)
+    //  MODALES PERMANENTES DEL HTML 
     const modalesPermanentes = [
         '#viviendaModal',
         '#asignarViviendaModal',
@@ -105,12 +101,12 @@ function limpiarModalesAnteriores() {
     modalesPermanentes.forEach(selector => {
         const modal = document.querySelector(selector);
         if (modal) {
-            console.log('👁️ Ocultando modal permanente:', selector);
+            
             modal.style.display = 'none';
         }
     });
     
-    // ❌ MODALES DINÁMICOS (sí eliminar)
+    //  MODALES DINÁMICOS
     const selectoresDinamicos = [
         '.modal-overlay:not(#editarPrecioModal):not(#validarPagoModal):not(#generarCuotasModal)',
         '.modal-detail',
@@ -128,26 +124,26 @@ function limpiarModalesAnteriores() {
     selectoresDinamicos.forEach(selector => {
         const modales = document.querySelectorAll(selector);
         modales.forEach(modal => {
-            console.log('🗑️ Eliminando modal dinámico:', selector);
+    
             modal.remove();
         });
     });
 }
 
 // ==========================================
-// 🔧 FUNCIÓN MEJORADA: Ver Detalles de Usuario
+//  Ver Detalles de Usuario
 // ==========================================
 
 function viewUserDetails(userId) {
-    console.log('👁️ [DETAILS] Cargando detalles de usuario:', userId);
 
-    // 🧹 LIMPIAR MODALES ANTERIORES
+
+    //  LIMPIAR MODALES ANTERIORES
     limpiarModalesAnteriores();
 
     fetch(`/api/users/details?id_usuario=${userId}`)
         .then(response => response.json())
         .then(data => {
-            console.log('👁️ [DETAILS] Response:', data);
+ 
             if (data.success) {
                 showUserDetailModal(data.user);
             } else {
@@ -161,7 +157,7 @@ function viewUserDetails(userId) {
 }
 
 function showUserDetailModal(user) {
-    console.log('👁️ [MODAL] Mostrando modal para:', user.nombre_completo);
+ 
     limpiarModalesAnteriores();
 
     const modalHTML = `
@@ -305,19 +301,19 @@ function showUserDetailModal(user) {
 }
 
 // ==========================================
-// 🔧 FUNCIÓN MEJORADA: Crear/Editar Vivienda
+//  Crear/Editar Vivienda
 // ==========================================
 
 function showCreateViviendaModal() {
-    console.log('>>> showCreateViviendaModal() EJECUTADA');
 
-    // 🧹 LIMPIAR MODALES ANTERIORES
+
+    //  LIMPIAR MODALES ANTERIORES
     limpiarModalesAnteriores();
 
     const modal = document.getElementById('viviendaModal');
     
     if (!modal) {
-        console.error('❌ Modal viviendaModal NO encontrado en el DOM');
+        console.error(' Modal viviendaModal NO encontrado en el DOM');
         alert('ERROR: Modal no encontrado. Recarga la página.');
         return;
     }
@@ -333,25 +329,25 @@ function showCreateViviendaModal() {
         document.getElementById('vivienda-estado').value = 'disponible';
         document.getElementById('vivienda-observaciones').value = '';
         
-        // ✅ MOSTRAR EL MODAL
+        //  MOSTRAR EL MODAL
         modal.style.display = 'flex';
-        console.log('✅ Modal mostrado');
+   
     }).catch(error => {
-        console.error('❌ Error al cargar tipos:', error);
+        console.error(' Error al cargar tipos:', error);
         alert('Error al cargar tipos de vivienda');
     });
 }
 
 function editVivienda(id) {
-    console.log('>>> Editando vivienda ID:', id);
+ 
 
-    // 🧹 LIMPIAR MODALES ANTERIORES
+    //  LIMPIAR MODALES ANTERIORES
     limpiarModalesAnteriores();
 
     const modal = document.getElementById('viviendaModal');
     
     if (!modal) {
-        console.error('❌ Modal viviendaModal NO encontrado');
+        console.error(' Modal viviendaModal NO encontrado');
         alert('ERROR: Modal no encontrado. Recarga la página.');
         return;
     }
@@ -372,9 +368,9 @@ function editVivienda(id) {
             document.getElementById('vivienda-estado').value = v.estado;
             document.getElementById('vivienda-observaciones').value = v.observaciones || '';
 
-            // ✅ MOSTRAR EL MODAL
+            //  MOSTRAR EL MODAL
             modal.style.display = 'flex';
-            console.log('✅ Modal de edición mostrado');
+         
         } else {
             alert('Error al cargar vivienda');
         }
@@ -390,18 +386,18 @@ function closeViviendaModal() {
         modal.style.display = 'none';
         document.getElementById('viviendaForm').reset();
     }
-    // 🧹 LIMPIAR POR SI ACASO
+   
     limpiarModalesAnteriores();
 }
 
 // ==========================================
-// 🔧 FUNCIÓN MEJORADA: Asignar Vivienda
+//  Asignar Vivienda
 // ==========================================
 
 function showAsignarModal(viviendaId, numeroVivienda) {
-    console.log('>>> Abriendo modal asignar:', viviendaId);
 
-    // 🧹 LIMPIAR MODALES ANTERIORES
+
+    
     limpiarModalesAnteriores();
 
     Promise.all([
@@ -439,18 +435,18 @@ function closeAsignarModal() {
         document.getElementById('asignar-usuario-group').style.display = 'none';
         document.getElementById('asignar-nucleo-group').style.display = 'none';
     }
-    // 🧹 LIMPIAR POR SI ACASO
+   
     limpiarModalesAnteriores();
 }
 
 // ==========================================
-// 🔧 FUNCIÓN MEJORADA: Materiales
+//  Materiales
 // ==========================================
 
 function showCreateMaterialModal() {
-    console.log('>>> showCreateMaterialModal() EJECUTADA');
+ 
 
-    // 🧹 LIMPIAR MODALES ANTERIORES
+
     limpiarModalesAnteriores();
 
     const modal = document.getElementById('materialModal');
@@ -466,7 +462,7 @@ function showCreateMaterialModal() {
     document.getElementById('material-nombre').value = '';
     document.getElementById('material-caracteristicas').value = '';
     modal.style.display = 'flex';
-    console.log('✓ Modal mostrado');
+
 }
 
 function closeMaterialModal() {
@@ -475,14 +471,14 @@ function closeMaterialModal() {
         modal.style.display = 'none';
         document.getElementById('materialForm').reset();
     }
-    // 🧹 LIMPIAR POR SI ACASO
+   
     limpiarModalesAnteriores();
 }
 
 function showStockModal(id, nombre, stockActual) {
-    console.log('>>> Abriendo modal stock para:', nombre);
+   
     
-    // 🧹 LIMPIAR MODALES ANTERIORES
+ 
     limpiarModalesAnteriores();
     
     document.getElementById('stock-material-id').value = id;
@@ -497,16 +493,16 @@ function closeStockModal() {
         modal.style.display = 'none';
         document.getElementById('stockForm').reset();
     }
-    // 🧹 LIMPIAR POR SI ACASO
+   
     limpiarModalesAnteriores();
 }
 
 // ==========================================
-// 🔧 AGREGAR EVENT LISTENER GLOBAL
+// EVENT LISTENER GLOBAL
 // ==========================================
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('✅ Inicializando limpieza automática de modales');
+    
     
     // Limpiar cuando se hace clic fuera de cualquier modal
     document.addEventListener('click', function(event) {
@@ -527,7 +523,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // ==========================================
-// 🔧 EXPORTAR FUNCIONES GLOBALES
+// EXPORTAR FUNCIONES GLOBALES
 // ==========================================
 
 window.limpiarModalesAnteriores = limpiarModalesAnteriores;
@@ -542,15 +538,14 @@ window.closeMaterialModal = closeMaterialModal;
 window.showStockModal = showStockModal;
 window.closeStockModal = closeStockModal;
 
-console.log('✅ Fix de modales cargado completamente');
 
 // ========== NOTIFICACIONES ==========
 
 function loadUsersForNotifications() {
-    console.log('→ loadUsersForNotifications() ejecutada');
+ 
     const usersList = document.getElementById('usersList');
 
-    console.log('DEBUG: Elemento usersList:', usersList);
+
 
     if (!usersList) {
         console.error('✗ NO SE ENCONTRÓ usersList');
@@ -559,7 +554,7 @@ function loadUsersForNotifications() {
 
     usersList.innerHTML = '<p class="loading">Cargando usuarios...</p>';
 
-    console.log('DEBUG: Haciendo fetch a /api/notifications/users');
+  
 
     fetch('/api/notifications/users', {
         method: 'GET',
@@ -567,11 +562,11 @@ function loadUsersForNotifications() {
         credentials: 'same-origin'
     })
         .then(response => {
-            console.log('DEBUG: Response status:', response.status);
+       
             return response.json();
         })
         .then(data => {
-            console.log('DEBUG: Data recibida:', data);
+   
             if (data.success) {
                 renderUsersList(data.users);
             } else {
@@ -824,7 +819,7 @@ function toggleAllNucleos() {
 
 function createTask(event) {
     event.preventDefault();
-    console.log('>>> Creando tarea');
+
 
     const form = event.target;
     const formData = new FormData(form);
@@ -850,22 +845,22 @@ function createTask(event) {
 
     //  Agregar materiales ANTES del fetch
     if (materialesAsignados.length > 0) {
-        console.log('>>> Agregando materiales:', materialesAsignados);
+  
         formData.append('materiales_json', JSON.stringify(materialesAsignados));
     } else {
-        console.log('>>> No hay materiales asignados');
+ 
     }
 
     // Log para debug
-    console.log('>>> FormData contenido:');
+
     for (let pair of formData.entries()) {
-        console.log(pair[0] + ': ' + pair[1]);
+
     }
 
     fetch('/api/tasks/create', { method: 'POST', body: formData })
         .then(response => response.json())
         .then(data => {
-            console.log('>>> Response del servidor:', data);
+       
             if (data.success) {
                 alert(data.message);
                 form.reset();
@@ -890,7 +885,7 @@ function loadAllTasks() {
     const container = document.getElementById('tasksList');
     const filtro = document.getElementById('filtro-estado')?.value || '';
     
-    // ✅ Solo enviar al backend si NO es "vencida" (ese estado lo calculamos localmente)
+    //  Solo enviar al backend si NO es "vencida" (ese estado lo calculamos localmente)
     let url = '/api/tasks/all';
     if (filtro && filtro !== 'vencida') {
         url += `?estado=${filtro}`;
@@ -902,7 +897,7 @@ function loadAllTasks() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                renderTasksList(data.tareas, filtro); // ✅ Pasar filtro a renderizar
+                renderTasksList(data.tareas, filtro); //  Pasar filtro a renderizar
             } else {
                 container.innerHTML = '<p class="error">Error al cargar tareas</p>';
             }
@@ -914,9 +909,7 @@ function loadAllTasks() {
 }
 
 function renderTasksList(tareas, filtroActivo = '') {
-    console.log('═══════════════════════════════════════');
-    console.log('🚀 [RENDER] renderTasksList INICIANDO');
-    console.log('═══════════════════════════════════════');
+
     
     const container = document.getElementById('tasksList');
 
@@ -927,9 +920,9 @@ function renderTasksList(tareas, filtroActivo = '') {
 
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
-    console.log('📅 Fecha HOY:', hoy);
+   
 
-    // ✅ PASO 1: Analizar cada tarea
+    //  PASO 1: Analizar cada tarea
     const tareasConEstado = tareas.map(tarea => {
         const fechaFinObj = new Date(tarea.fecha_fin + 'T00:00:00');
         const esCompletada = tarea.estado === 'completada';
@@ -937,20 +930,16 @@ function renderTasksList(tareas, filtroActivo = '') {
         const esVencida = !esCompletada && !esCancelada && fechaFinObj < hoy;
 
         if (esVencida) {
-            console.log('🔴 TAREA VENCIDA DETECTADA:');
-            console.log(`   ID: ${tarea.id_tarea}`);
-            console.log(`   Título: ${tarea.titulo}`);
-            console.log(`   Fecha fin: ${tarea.fecha_fin}`);
-            console.log(`   Estado: ${tarea.estado}`);
+    
         }
 
         return { ...tarea, esVencida, esCompletada, esCancelada };
     });
 
     const vencidasCount = tareasConEstado.filter(t => t.esVencida).length;
-    console.log(`🔴 Total tareas vencidas: ${vencidasCount}`);
 
-    // ✅ PASO 2: Filtrar
+
+    //  PASO 2: Filtrar
     const tareasFiltradas = tareasConEstado.filter(tarea => {
         if (filtroActivo === 'vencida') return tarea.esVencida;
         if (filtroActivo) return tarea.estado === filtroActivo;
@@ -962,7 +951,7 @@ function renderTasksList(tareas, filtroActivo = '') {
         return;
     }
 
-    // ✅ PASO 3: Renderizar
+    //  PASO 3: Renderizar
     const htmlArray = tareasFiltradas.map(tarea => {
         const fechaInicio = formatearFechaUY(tarea.fecha_inicio);
         const fechaFin = formatearFechaUY(tarea.fecha_fin);
@@ -974,7 +963,7 @@ function renderTasksList(tareas, filtroActivo = '') {
             parseInt(tarea.total_usuarios) : parseInt(tarea.total_nucleos);
         const completados = parseInt(tarea.asignaciones_completadas || 0);
 
-        // ✅ LÓGICA DE BADGE - TRIPLE VERIFICACIÓN
+        //  LÓGICA DE BADGE - TRIPLE VERIFICACIÓN
         let estadoTexto = '';
         let estadoBadgeClass = '';
         let claseVencida = '';
@@ -983,7 +972,7 @@ function renderTasksList(tareas, filtroActivo = '') {
             estadoTexto = '⏰ Vencida';
             estadoBadgeClass = 'vencida';
             claseVencida = 'tarea-vencida';
-            console.log(`✅ Aplicando badge VENCIDA a tarea ${tarea.id_tarea}: "${tarea.titulo}"`);
+     
         } else if (tarea.esCompletada) {
             estadoTexto = 'Completada';
             estadoBadgeClass = 'completada';
@@ -1058,24 +1047,20 @@ function renderTasksList(tareas, filtroActivo = '') {
     });
 
     container.innerHTML = htmlArray.join('');
-    console.log('✅ [RENDER] HTML insertado en DOM');
-    console.log('═══════════════════════════════════════\n');
+  
 }
 
-// Agregar función para ver materiales de tarea (Admin)
+// Afunción para ver materiales de tarea (Admin)
 function viewTaskMaterialsAdmin(tareaId) {
-    console.log('>>> viewTaskMaterialsAdmin llamada para tarea:', tareaId);
+  
 
     fetch(`/api/materiales/task-materials?tarea_id=${tareaId}`)
         .then(response => {
-            console.log('>>> Response status:', response.status);
+      
             return response.json();
         })
         .then(data => {
-            console.log('>>> Materiales recibidos COMPLETO:', JSON.stringify(data)); // ← CAMBIA ESTA LÍNEA
-            console.log('>>> data.success:', data.success);
-            console.log('>>> data.materiales:', data.materiales);
-            console.log('>>> Cantidad materiales:', data.materiales ? data.materiales.length : 'undefined');
+
 
             if (data.success) {
                 if (data.materiales && data.materiales.length > 0) {
@@ -1094,7 +1079,7 @@ function viewTaskMaterialsAdmin(tareaId) {
 }
 
 function showTaskMaterialsModalAdmin(materiales, tareaId) {
-    console.log('Mostrando modal con', materiales.length, 'materiales');
+
 
     const materialesHTML = `
         <div class="materials-grid">
@@ -1209,15 +1194,14 @@ function formatPrioridad(prioridad) {
 function cancelTask(tareaId) {
     if (!confirm('¿Estás seguro de cancelar esta tarea?')) return;
 
-    console.log('=== cancelTask DEBUG ===');
-    console.log('tareaId:', tareaId);
+
 
     const formData = new FormData();
-    formData.append('tarea_id', tareaId);  //  Asegurar que sea 'tarea_id'
+    formData.append('tarea_id', tareaId);  
 
     // Log para verificar FormData
     for (let [key, value] of formData.entries()) {
-        console.log(`${key}: ${value}`);
+     
     }
 
     fetch('/api/tasks/cancel', {
@@ -1225,11 +1209,11 @@ function cancelTask(tareaId) {
         body: formData
     })
         .then(response => {
-            console.log('Response status:', response.status);
+      
             return response.json();
         })
         .then(data => {
-            console.log('Response data:', data);
+       
             if (data.success) {
                 alert(data.message);
                 loadAllTasks();
@@ -1248,22 +1232,21 @@ function cancelTask(tareaId) {
 
 
 function viewTaskDetails(tareaId) {
-    console.log('=== viewTaskDetails DEBUG ===');
-    console.log('tareaId:', tareaId);
 
-    const url = `/api/tasks/details?tarea_id=${tareaId}`;  //  Asegurar parámetro
-    console.log('URL completa:', url);
+
+    const url = `/api/tasks/details?tarea_id=${tareaId}`; 
+ 
 
     fetch(url)
         .then(response => {
-            console.log('Response status:', response.status);
+         
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}`);
             }
             return response.json();
         })
         .then(data => {
-            console.log('Response data:', data);
+     
             if (data.success) {
                 mostrarDetallesTarea(data.tarea, data.avances);
             } else {
@@ -1326,49 +1309,40 @@ function mostrarDetallesTarea(tarea, avances) {
     document.body.insertAdjacentHTML('beforeend', modal);
 }
 // ==========================================
-// SECCIÓN USUARIOS CON DEBUG COMPLETO
+// SECCIÓN USUARIOS 
 // ==========================================
 
-console.log('🔵 [INIT] Script cargado');
 
-// ========== FUNCIÓN PRINCIPAL: CARGAR USUARIOS ==========
+
+// ====== CARGAR USUARIOS ==========
 function loadUsersForTable() {
-    console.log('');
-    console.log('═══════════════════════════════════════');
-    console.log('🟢 [START] loadUsersForTable() INICIADA');
-    console.log('═══════════════════════════════════════');
+
 
     // PASO 1: Buscar el contenedor
-    console.log('🔍 [PASO 1] Buscando elemento #usersTableContainer');
+    
     const container = document.getElementById('usersTableContainer');
 
-    console.log('📦 [PASO 1] Resultado:', container);
-    console.log('📦 [PASO 1] ¿Existe?', container !== null);
 
     if (!container) {
-        console.error('❌ [ERROR] NO SE ENCONTRÓ #usersTableContainer');
-        console.error('❌ [ERROR] Verifica que exista en dashboardBackoffice.php');
+        console.error(' [ERROR] NO SE ENCONTRÓ #usersTableContainer');
+        console.error(' [ERROR] Verifica que exista en dashboardBackoffice.php');
         alert('ERROR CRÍTICO: No se encuentra el contenedor de usuarios');
         return;
     }
 
-    console.log('✅ [PASO 1] Contenedor encontrado correctamente');
+ 
 
     // PASO 2: Mostrar loading
-    console.log('⏳ [PASO 2] Mostrando loading...');
+
     container.innerHTML = '<p class="loading">Cargando usuarios...</p>';
-    console.log('✅ [PASO 2] Loading mostrado');
+
 
     // PASO 3: Hacer fetch
-    console.log('');
-    console.log('🌐 [PASO 3] Preparando fetch...');
-    const url = '/api/users/all';
-    console.log('🌐 [PASO 3] URL:', url);
-    console.log('🌐 [PASO 3] Método: GET');
-    console.log('🌐 [PASO 3] Headers: Content-Type: application/json');
-    console.log('🌐 [PASO 3] Credentials: same-origin');
 
-    console.log('🚀 [PASO 3] Ejecutando fetch...');
+    const url = '/api/users/all';
+ 
+
+
 
     fetch(url, {
         method: 'GET',
@@ -1378,46 +1352,34 @@ function loadUsersForTable() {
         credentials: 'same-origin'
     })
         .then(response => {
-            console.log('');
-            console.log('📨 [PASO 4] Response recibido');
-            console.log('📨 [PASO 4] Status:', response.status);
-            console.log('📨 [PASO 4] StatusText:', response.statusText);
-            console.log('📨 [PASO 4] OK:', response.ok);
-            console.log('📨 [PASO 4] Headers:', [...response.headers.entries()]);
+;
 
             if (!response.ok) {
-                console.error('❌ [ERROR] Response no OK');
+                console.error(' [ERROR] Response no OK');
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
 
-            console.log('✅ [PASO 4] Response OK, parseando JSON...');
+         
             return response.json();
         })
         .then(data => {
-            console.log('');
-            console.log('📦 [PASO 5] JSON parseado');
-            console.log('📦 [PASO 5] Data completa:', data);
-            console.log('📦 [PASO 5] data.success:', data.success);
-            console.log('📦 [PASO 5] data.users:', data.users);
-            console.log('📦 [PASO 5] Tipo de data.users:', typeof data.users);
-            console.log('📦 [PASO 5] ¿Es array?:', Array.isArray(data.users));
-            console.log('📦 [PASO 5] Cantidad usuarios:', data.users ? data.users.length : 'NULL/UNDEFINED');
+
 
             if (data.users && data.users.length > 0) {
-                console.log('📦 [PASO 5] Primer usuario:', data.users[0]);
+        
             }
 
             if (data.success) {
-                console.log('✅ [PASO 5] Success = true, llamando renderUsersTable()');
+            
                 renderUsersTable(data.users);
             } else {
-                console.error('❌ [ERROR] Success = false');
-                console.error('❌ [ERROR] Mensaje:', data.message);
+                console.error(' [ERROR] Success = false');
+                console.error(' [ERROR] Mensaje:', data.message);
                 container.innerHTML = `<p class="error">Error: ${data.message}</p>`;
             }
         })
         .catch(error => {
-            console.log('');
+
             console.error('═══════════════════════════════════════');
             console.error('💥 [CATCH] Error capturado');
             console.error('═══════════════════════════════════════');
@@ -1435,25 +1397,16 @@ function loadUsersForTable() {
         `;
         })
         .finally(() => {
-            console.log('');
-            console.log('🏁 [FINALLY] Fetch completado (éxito o error)');
-            console.log('═══════════════════════════════════════');
+
         });
 }
 
 // ========== RENDERIZAR TABLA ==========
 function renderUsersTable(users) {
-    console.log('');
-    console.log('═══════════════════════════════════════');
-    console.log('🎨 [RENDER] renderUsersTable() INICIADA');
-    console.log('═══════════════════════════════════════');
 
-    console.log('🎨 [RENDER] Parámetro users:', users);
-    console.log('🎨 [RENDER] Tipo:', typeof users);
-    console.log('🎨 [RENDER] ¿Es array?:', Array.isArray(users));
 
     const container = document.getElementById('usersTableContainer');
-    console.log('🎨 [RENDER] Container encontrado:', container !== null);
+ 
 
     if (!users || users.length === 0) {
         console.warn('⚠️ [RENDER] No hay usuarios para mostrar');
@@ -1461,8 +1414,7 @@ function renderUsersTable(users) {
         return;
     }
 
-    console.log('🎨 [RENDER] Cantidad de usuarios:', users.length);
-    console.log('🎨 [RENDER] Generando HTML...');
+
 
     try {
         const tableHTML = `
@@ -1483,7 +1435,7 @@ function renderUsersTable(users) {
                     </thead>
                     <tbody>
                         ${users.map((user, index) => {
-            console.log(`🎨 [RENDER] Procesando usuario ${index + 1}:`, user.nombre_completo);
+          
             return renderUserRow(user);
         }).join('')}
                     </tbody>
@@ -1491,14 +1443,11 @@ function renderUsersTable(users) {
             </div>
         `;
 
-        console.log('🎨 [RENDER] HTML generado, longitud:', tableHTML.length);
-        console.log('🎨 [RENDER] Insertando en DOM...');
+   
 
         container.innerHTML = tableHTML;
 
-        console.log('✅ [RENDER] Tabla insertada exitosamente');
-        console.log('✅ [RENDER] Filas en DOM:', document.querySelectorAll('.user-row').length);
-        console.log('═══════════════════════════════════════');
+     
 
     } catch (error) {
         console.error('💥 [RENDER ERROR]', error);
@@ -1580,14 +1529,12 @@ function formatFecha(fecha) {
 }
 
 function filterUsers() {
-    console.log('🔍 [FILTER] Filtrando usuarios');
+
     const estadoFilter = document.getElementById('filtro-estado-usuarios').value.toLowerCase();
     const searchText = document.getElementById('search-users').value.toLowerCase();
     const rows = document.querySelectorAll('.user-row');
 
-    console.log('🔍 [FILTER] Estado:', estadoFilter);
-    console.log('🔍 [FILTER] Búsqueda:', searchText);
-    console.log('🔍 [FILTER] Total filas:', rows.length);
+ 
 
     let visibleCount = 0;
 
@@ -1606,15 +1553,15 @@ function filterUsers() {
         }
     });
 
-    console.log('🔍 [FILTER] Visibles:', visibleCount);
+ 
 }
 
 // ========== APROBAR PAGO ==========
 function approvePaymentFromTable(userId) {
-    console.log('✅ [APPROVE] Iniciando aprobación para usuario:', userId);
+   
 
     if (!confirm('¿Está seguro de aprobar este pago?')) {
-        console.log('✅ [APPROVE] Cancelado por usuario');
+     
         return;
     }
 
@@ -1627,8 +1574,7 @@ function approvePaymentFromTable(userId) {
     }
     if (rejectBtn) rejectBtn.disabled = true;
 
-    console.log('✅ [APPROVE] Enviando request...');
-
+  
     fetch('/api/payment/approve', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -1636,10 +1582,10 @@ function approvePaymentFromTable(userId) {
     })
         .then(response => response.json())
         .then(data => {
-            console.log('✅ [APPROVE] Response:', data);
+       
             if (data.success) {
                 alert(data.message);
-                console.log('✅ [APPROVE] Recargando tabla...');
+       
                 loadUsersForTable();
             } else {
                 alert('Error: ' + data.message);
@@ -1651,7 +1597,7 @@ function approvePaymentFromTable(userId) {
             }
         })
         .catch(error => {
-            console.error('✅ [APPROVE ERROR]', error);
+            console.error(' [APPROVE ERROR]', error);
             alert('Error al conectar con el servidor');
             if (approveBtn) {
                 approveBtn.disabled = false;
@@ -1663,16 +1609,15 @@ function approvePaymentFromTable(userId) {
 
 // ========== RECHAZAR PAGO ==========
 function rejectPaymentFromTable(userId) {
-    console.log('❌ [REJECT] Iniciando rechazo para usuario:', userId);
-
+ 
     const motivo = prompt('¿Por qué rechaza este pago? (opcional)');
     if (motivo === null) {
-        console.log('❌ [REJECT] Cancelado por usuario');
+    
         return;
     }
 
     if (!confirm('¿Está seguro de rechazar este pago?')) {
-        console.log('❌ [REJECT] Confirmación cancelada');
+   
         return;
     }
 
@@ -1685,7 +1630,7 @@ function rejectPaymentFromTable(userId) {
     }
     if (approveBtn) approveBtn.disabled = true;
 
-    console.log('❌ [REJECT] Enviando request...');
+   
 
     fetch('/api/payment/reject', {
         method: 'POST',
@@ -1694,10 +1639,10 @@ function rejectPaymentFromTable(userId) {
     })
         .then(response => response.json())
         .then(data => {
-            console.log('❌ [REJECT] Response:', data);
+        
             if (data.success) {
                 alert(data.message);
-                console.log('❌ [REJECT] Recargando tabla...');
+          
                 loadUsersForTable();
             } else {
                 alert('Error: ' + data.message);
@@ -1709,7 +1654,7 @@ function rejectPaymentFromTable(userId) {
             }
         })
         .catch(error => {
-            console.error('❌ [REJECT ERROR]', error);
+            console.error(' [REJECT ERROR]', error);
             alert('Error al conectar con el servidor');
             if (rejectBtn) {
                 rejectBtn.disabled = false;
@@ -1721,12 +1666,12 @@ function rejectPaymentFromTable(userId) {
 
 // ========== VER DETALLES ==========
 function viewUserDetails(userId) {
-    console.log('👁️ [DETAILS] Cargando detalles de usuario:', userId);
+   
 
     fetch(`/api/users/details?id_usuario=${userId}`)
         .then(response => response.json())
         .then(data => {
-            console.log('👁️ [DETAILS] Response:', data);
+    
             if (data.success) {
                 showUserDetailModal(data.user);
             } else {
@@ -1740,7 +1685,7 @@ function viewUserDetails(userId) {
 }
 
 function showUserDetailModal(user) {
-    console.log('👁️ [MODAL] Mostrando modal para:', user.nombre_completo);
+  
     limpiarModalesAnteriores();
 
     const modalHTML = `
@@ -1883,19 +1828,16 @@ function showUserDetailModal(user) {
     document.body.style.overflow = 'hidden';
 }
 
-console.log('🔵 [INIT] Todas las funciones de usuarios cargadas');
-console.log('🔵 [INIT] loadUsersForTable disponible:', typeof loadUsersForTable === 'function');
 
 
 // ==========================================
 // GESTIÓN DE NÚCLEOS FAMILIARES
 // ==========================================
 
-console.log('🟢 Cargando módulo de Núcleos Familiares');
 
 // Cargar núcleos al abrir la sección
 function loadNucleosFamiliares() {
-    console.log('>>> Cargando núcleos familiares');
+ 
     const container = document.getElementById('nucleosTableContainer');
 
     if (!container) {
@@ -1912,7 +1854,7 @@ function loadNucleosFamiliares() {
     })
         .then(response => response.json())
         .then(data => {
-            console.log('DEBUG: Núcleos recibidos:', data);
+        
             if (data.success) {
                 renderNucleosTable(data.nucleos);
             } else {
@@ -2371,18 +2313,18 @@ function deleteNucleo(nucleoId) {
         });
 }
 
-console.log('✓ Módulo de Núcleos Familiares cargado completamente');
+
 
 
 // ==========================================
 // GESTIÓN DE MATERIALES - VERSIÓN FINAL
 // ==========================================
 
-console.log('🟢 Cargando módulo de Materiales');
+
 
 // ========== CARGAR MATERIALES ==========
 function loadMateriales() {
-    console.log('>>> loadMateriales() ejecutada');
+ 
     const container = document.getElementById('materialesTableContainer');
 
     if (!container) {
@@ -2399,7 +2341,7 @@ function loadMateriales() {
     })
         .then(response => response.json())
         .then(data => {
-            console.log('DEBUG: Materiales recibidos:', data);
+        
             if (data.success) {
                 renderMaterialesTable(data.materiales);
             } else {
@@ -2514,7 +2456,7 @@ function searchMateriales() {
 
 // ========== MOSTRAR MODAL CREAR ==========
 function showCreateMaterialModal() {
-    console.log('>>> showCreateMaterialModal() EJECUTADA');
+ 
 
     const modal = document.getElementById('materialModal');
 
@@ -2532,12 +2474,12 @@ function showCreateMaterialModal() {
 
     // Mostrar modal
     modal.style.display = 'flex';
-    console.log('✓ Modal mostrado');
+   
 }
 
 // ========== EDITAR MATERIAL ==========
 function editMaterial(id) {
-    console.log('>>> Editando material ID:', id);
+   
 
     fetch(`/api/materiales/details?id=${id}`)
         .then(response => response.json())
@@ -2561,7 +2503,7 @@ function editMaterial(id) {
 // ========== GUARDAR MATERIAL ==========
 function saveMaterial(event) {
     event.preventDefault();
-    console.log('>>> Guardando material');
+    
 
     const id = document.getElementById('material-id').value;
     const nombre = document.getElementById('material-nombre').value.trim();
@@ -2634,7 +2576,7 @@ function deleteMaterial(id, nombre) {
 
 // ========== MOSTRAR MODAL STOCK ==========
 function showStockModal(id, nombre, stockActual) {
-    console.log('>>> Abriendo modal stock para:', nombre);
+   
     document.getElementById('stock-material-id').value = id;
     document.getElementById('stock-material-name').textContent = 'Material: ' + nombre;
     document.getElementById('stock-cantidad').value = stockActual;
@@ -2650,7 +2592,7 @@ function closeStockModal() {
 // ========== ACTUALIZAR STOCK ==========
 function updateStock(event) {
     event.preventDefault();
-    console.log('>>> Actualizando stock');
+ 
 
     const id = document.getElementById('stock-material-id').value;
     const cantidad = parseInt(document.getElementById('stock-cantidad').value);
@@ -2683,22 +2625,21 @@ function updateStock(event) {
 
 
 
-console.log('✅ Módulo de Materiales cargado');
-console.log('TEST: showCreateMaterialModal disponible:', typeof showCreateMaterialModal === 'function');
+
 
 
 // ==========================================
-// INTEGRACIÓN DE MATERIALES EN TAREAS - VERSIÓN CORREGIDA
+// INTEGRACIÓN DE MATERIALES EN TAREAS - 
 // ==========================================
 
-console.log('🔵 Cargando integración de Materiales en Tareas');
+
 
 // Variable global para materiales asignados
 let materialesAsignados = [];
 
 // ========== CARGAR MATERIALES DISPONIBLES PARA ASIGNAR ==========
 function loadMaterialesParaTarea() {
-    console.log('>>> loadMaterialesParaTarea() ejecutada');
+
     const container = document.getElementById('materiales-tarea-list');
 
     if (!container) {
@@ -2706,7 +2647,7 @@ function loadMaterialesParaTarea() {
         return;
     }
 
-    console.log('✓ Container encontrado, haciendo fetch...');
+   
     container.innerHTML = '<p class="loading">Cargando materiales...</p>';
 
     fetch('/api/materiales/all', {
@@ -2715,11 +2656,11 @@ function loadMaterialesParaTarea() {
         credentials: 'same-origin'
     })
         .then(response => {
-            console.log('Response status:', response.status);
+          
             return response.json();
         })
         .then(data => {
-            console.log('Materiales recibidos:', data);
+         
             if (data.success) {
                 renderMaterialesSelectorTarea(data.materiales);
             } else {
@@ -2734,7 +2675,7 @@ function loadMaterialesParaTarea() {
 
 // ========== RENDERIZAR SELECTOR DE MATERIALES ==========
 function renderMaterialesSelectorTarea(materiales) {
-    console.log('>>> renderMaterialesSelectorTarea con', materiales.length, 'materiales');
+
     const container = document.getElementById('materiales-tarea-list');
 
     if (!materiales || materiales.length === 0) {
@@ -2774,12 +2715,12 @@ function renderMaterialesSelectorTarea(materiales) {
         `;
     }).join('');
 
-    console.log('✓ Materiales renderizados');
+
 }
 
 // ========== AGREGAR MATERIAL A LA LISTA ==========
 function addMaterialToTask(materialId, materialNombre, stockDisponible) {
-    console.log('>>> Agregando material:', materialId, materialNombre);
+
     const cantidadInput = document.getElementById(`cantidad-${materialId}`);
     const cantidad = parseInt(cantidadInput.value);
 
@@ -2865,8 +2806,7 @@ function filterMaterialesTarea() {
 function createTask(event) {
     event.preventDefault();
 
-    console.log('=== INICIO createTask ===');
-    console.log('materialesAsignados:', materialesAsignados);
+   
 
     const form = event.target;
     const formData = new FormData(form);
@@ -2894,18 +2834,18 @@ function createTask(event) {
     // AGREGAR MATERIALES
     if (materialesAsignados.length > 0) {
         const materialesJSON = JSON.stringify(materialesAsignados);
-        console.log('materialesJSON generado:', materialesJSON);
+      
         formData.append('materiales_json', materialesJSON);
     } else {
         console.warn('No hay materiales asignados');
     }
 
     // DEBUG: Mostrar todo el FormData
-    console.log('=== FormData contenido ===');
+  
     for (let [key, value] of formData.entries()) {
-        console.log(`${key}: ${value}`);
+    
     }
-    console.log('========================');
+   
 
     // Enviar
     fetch('/api/tasks/create', {
@@ -2913,11 +2853,11 @@ function createTask(event) {
         body: formData
     })
         .then(response => {
-            console.log('Response status:', response.status);
+        
             return response.json();
         })
         .then(data => {
-            console.log('Response data:', data);
+      
             if (data.success) {
                 alert(data.message);
                 form.reset();
@@ -2940,13 +2880,13 @@ function createTask(event) {
 
 // ========== CARGAR MATERIALES AL ABRIR SECCIÓN TAREAS ==========
 document.addEventListener('DOMContentLoaded', function () {
-    console.log('>>> DOM Loaded - Configurando materiales en tareas');
+   
 
     // Cargar materiales cuando se abre la sección de tareas
     const tareasMenuItem = document.querySelector('.menu li[data-section="tareas"]');
     if (tareasMenuItem) {
         tareasMenuItem.addEventListener('click', function () {
-            console.log('>>> Sección tareas abierta');
+          
             loadTaskUsers();
             loadNucleos();
             loadAllTasks();
@@ -2966,22 +2906,16 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
-console.log('✅ Integración de Materiales en Tareas cargada');
-console.log('TEST loadMaterialesParaTarea:', typeof loadMaterialesParaTarea);
-
-
-
-
 
 // ==========================================
 // GESTIÓN DE VIVIENDAS
 // ==========================================
 
-console.log('🟢 Cargando módulo de Viviendas');
+
 
 // ========== CARGAR VIVIENDAS ==========
 function loadViviendas() {
-    console.log('>>> loadViviendas() ejecutada');
+  
     const container = document.getElementById('viviendasTableContainer');
 
     if (!container) {
@@ -2998,7 +2932,7 @@ function loadViviendas() {
     })
         .then(response => response.json())
         .then(data => {
-            console.log('Viviendas recibidas:', data);
+     
             if (data.success) {
                 renderViviendasTable(data.viviendas);
             } else {
@@ -3147,7 +3081,7 @@ function loadTiposVivienda() {
 
 // ========== MOSTRAR MODAL CREAR ==========
 function showCreateViviendaModal() {
-    console.log('>>> showCreateViviendaModal() EJECUTADA');
+  
 
     loadTiposVivienda().then(() => {
         document.getElementById('viviendaModalTitle').textContent = 'Nueva Vivienda';
@@ -3165,34 +3099,34 @@ function showCreateViviendaModal() {
 
 // ========== EDITAR VIVIENDA ==========
 function editVivienda(id) {
-    console.log('>>> Editando vivienda ID:', id);
-    console.log('🧹 Limpiando modales anteriores...');
+    ('>>> Editando vivienda ID:', id);
+    ('🧹 Limpiando modales anteriores...');
 
     // 🧹 LIMPIAR MODALES ANTERIORES
     limpiarModalesAnteriores();
 
     const modal = document.getElementById('viviendaModal');
-    console.log('🔍 Modal encontrado:', modal);
-    console.log('🔍 Modal display actual:', modal ? modal.style.display : 'NULL');
+    ('🔍 Modal encontrado:', modal);
+    ('🔍 Modal display actual:', modal ? modal.style.display : 'NULL');
     
     if (!modal) {
-        console.error('❌ Modal viviendaModal NO encontrado');
+        console.error(' Modal viviendaModal NO encontrado');
         alert('ERROR: Modal no encontrado. Recarga la página.');
         return;
     }
 
-    console.log('🌐 Cargando datos de vivienda...');
+    ('🌐 Cargando datos de vivienda...');
 
     Promise.all([
         fetch(`/api/viviendas/details?id=${id}`).then(r => r.json()),
         loadTiposVivienda()
     ]).then(([data]) => {
-        console.log('📦 Datos recibidos:', data);
+        ('📦 Datos recibidos:', data);
         
         if (data.success && data.vivienda) {
             const v = data.vivienda;
             
-            console.log('📝 Llenando formulario...');
+            ('📝 Llenando formulario...');
             document.getElementById('viviendaModalTitle').textContent = 'Editar Vivienda';
             document.getElementById('vivienda-id').value = v.id_vivienda;
             document.getElementById('vivienda-numero').value = v.numero_vivienda;
@@ -3203,17 +3137,17 @@ function editVivienda(id) {
             document.getElementById('vivienda-estado').value = v.estado;
             document.getElementById('vivienda-observaciones').value = v.observaciones || '';
 
-            console.log('👁️ Mostrando modal...');
+            ('👁️ Mostrando modal...');
             modal.style.display = 'flex';
-            console.log('✅ Modal display después de mostrar:', modal.style.display);
-            console.log('✅ Modal de edición mostrado correctamente');
+            (' Modal display después de mostrar:', modal.style.display);
+            (' Modal de edición mostrado correctamente');
         } else {
-            console.error('❌ Error en data.success o data.vivienda');
+            console.error(' Error en data.success o data.vivienda');
             alert('Error al cargar vivienda');
         }
     }).catch(error => {
-        console.error('❌ Error completo:', error);
-        console.error('❌ Error stack:', error.stack);
+        console.error(' Error completo:', error);
+        console.error(' Error stack:', error.stack);
         alert('Error al cargar vivienda: ' + error.message);
     });
 }
@@ -3221,7 +3155,7 @@ function editVivienda(id) {
 // ========== GUARDAR VIVIENDA ==========
 function saveVivienda(event) {
     event.preventDefault();
-    console.log('>>> Guardando vivienda');
+    ('>>> Guardando vivienda');
 
     const id = document.getElementById('vivienda-id').value;
     const formData = new FormData();
@@ -3344,7 +3278,7 @@ function showViviendaDetailsModal(vivienda) {
 
 // ========== ASIGNAR VIVIENDA ==========
 function showAsignarModal(viviendaId, numeroVivienda) {
-    console.log('>>> Abriendo modal asignar:', viviendaId);
+    ('>>> Abriendo modal asignar:', viviendaId);
 
     // Cargar usuarios y núcleos
     Promise.all([
@@ -3399,12 +3333,12 @@ function toggleAsignarTipo() {
 }
 
 // ==========================================
-// ✅ FIX FINAL: submitAsignacion() - CON RECARGA AUTOMÁTICA
+//  submitAsignacion() - CON RECARGA AUTOMÁTICA
 // ==========================================
 
 function submitAsignacion(event) {
     event.preventDefault();
-    console.log('📤 [ASIGNAR] Iniciando asignación de vivienda...');
+    ('📤 [ASIGNAR] Iniciando asignación de vivienda...');
 
     const viviendaId = document.getElementById('asignar-vivienda-id').value;
     const tipo = document.getElementById('asignar-tipo').value;
@@ -3412,7 +3346,7 @@ function submitAsignacion(event) {
     const nucleoId = document.getElementById('asignar-nucleo').value;
     const observaciones = document.getElementById('asignar-observaciones').value;
 
-    // ✅ VALIDACIÓN
+    //  VALIDACIÓN
     if (!tipo || (tipo === 'usuario' && !usuarioId) || (tipo === 'nucleo' && !nucleoId)) {
         alert('⚠️ Debe seleccionar un usuario o núcleo');
         return;
@@ -3429,7 +3363,7 @@ function submitAsignacion(event) {
     
     formData.append('observaciones', observaciones);
 
-    console.log('📤 [ASIGNAR] Enviando asignación...');
+    ('📤 [ASIGNAR] Enviando asignación...');
 
     fetch('/api/viviendas/asignar', {
         method: 'POST',
@@ -3438,29 +3372,29 @@ function submitAsignacion(event) {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert('✅ ' + data.message);
+                alert(' ' + data.message);
                 
-                // ✅ CERRAR MODAL
+                //  CERRAR MODAL
                 closeAsignarModal();
                 
-                // ✅ RECARGAR PÁGINA COMPLETA
-                console.log('🔄 [ASIGNAR] Recargando página...');
+                //  RECARGAR PÁGINA COMPLETA
+                ('🔄 [ASIGNAR] Recargando página...');
                 window.location.reload();
                 
             } else {
-                alert('❌ Error: ' + data.message);
+                alert(' Error: ' + data.message);
             }
         })
         .catch(error => {
-            console.error('❌ [ASIGNAR] Error:', error);
-            alert('❌ Error de conexión');
+            console.error(' [ASIGNAR] Error:', error);
+            alert(' Error de conexión');
         });
 }
 
-// ✅ EXPORTAR
+//  EXPORTAR
 window.submitAsignacion = submitAsignacion;
 
-console.log('✅ submitAsignacion con recarga automática aplicado');
+(' submitAsignacion con recarga automática aplicado');
 
 function closeAsignarModal() {
     document.getElementById('asignarViviendaModal').style.display = 'none';
@@ -3497,24 +3431,24 @@ function desasignarVivienda(asignacionId) {
         });
 }
 
-console.log('✅ Módulo de Viviendas cargado completamente');
+(' Módulo de Viviendas cargado completamente');
 
 // ==========================================
 // SISTEMA DE CUOTAS MENSUALES - ADMIN (SOLO 3 PRECIOS FIJOS)
 // ==========================================
 
-console.log('🟢 Cargando módulo de cuotas (Admin)');
+('🟢 Cargando módulo de cuotas (Admin)');
 
 // ========== INICIALIZACIÓN ==========
 document.addEventListener('DOMContentLoaded', function () {
-    console.log('✓ DOMContentLoaded ejecutado');
+    ('✓ DOMContentLoaded ejecutado');
 
     // Listener para cuotas
     const cuotasMenuItem = document.querySelector('.menu li[data-section="cuotas"]');
     if (cuotasMenuItem) {
-        console.log('✓ Listener de cuotas agregado');
+        ('✓ Listener de cuotas agregado');
         cuotasMenuItem.addEventListener('click', function () {
-            console.log('>>> Sección cuotas admin abierta');
+            ('>>> Sección cuotas admin abierta');
             inicializarSeccionCuotasAdmin();
         });
     }
@@ -3535,7 +3469,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // ========== INICIALIZAR SECCIÓN ==========
 async function inicializarSeccionCuotasAdmin() {
-    console.log('📋 Inicializando sección de cuotas admin');
+    ('📋 Inicializando sección de cuotas admin');
     
     try {
         await Promise.all([
@@ -3544,9 +3478,9 @@ async function inicializarSeccionCuotasAdmin() {
             loadAllCuotasAdmin()
         ]);
         
-        console.log('✓ Sección de cuotas admin inicializada');
+        ('✓ Sección de cuotas admin inicializada');
     } catch (error) {
-        console.error('❌ Error al inicializar cuotas admin:', error);
+        console.error(' Error al inicializar cuotas admin:', error);
     }
 }
 
@@ -3554,7 +3488,7 @@ async function inicializarSeccionCuotasAdmin() {
 async function loadPreciosCuotas() {
     const container = document.getElementById('preciosCuotasContainer');
     if (!container) {
-        console.error('❌ No se encontró preciosCuotasContainer');
+        console.error(' No se encontró preciosCuotasContainer');
         return;
     }
     
@@ -3564,7 +3498,7 @@ async function loadPreciosCuotas() {
         const response = await fetch('/api/cuotas/precios');
         const data = await response.json();
         
-        console.log('📊 Precios recibidos:', data);
+        ('📊 Precios recibidos:', data);
         
         if (data.success) {
             renderPreciosCuotas(data.precios);
@@ -3579,12 +3513,12 @@ async function loadPreciosCuotas() {
 
 // ========== RENDERIZAR 3 PRECIOS FIJOS ==========
 function renderPreciosCuotas(precios) {
-     console.log('🔍 [DEBUG] renderPreciosCuotas llamada');
-    console.log('🔍 [DEBUG] Stack trace:', new Error().stack);
-    console.log('🔍 [DEBUG] Precios recibidos:', precios.length);
+     ('🔍 [DEBUG] renderPreciosCuotas llamada');
+    ('🔍 [DEBUG] Stack trace:', new Error().stack);
+    ('🔍 [DEBUG] Precios recibidos:', precios.length);
     const container = document.getElementById('preciosCuotasContainer');
     
-    // ✅ LIMPIAR CONTENEDOR ANTES DE RENDERIZAR
+    //  LIMPIAR CONTENEDOR ANTES DE RENDERIZAR
     container.innerHTML = '';
     
     if (!precios || precios.length === 0) {
@@ -3704,15 +3638,15 @@ async function submitEditarPrecio(event) {
         const data = await response.json();
         
         if (data.success) {
-            alert('✅ ' + data.message);
+            alert(' ' + data.message);
             closeEditarPrecioModal();
             await loadPreciosCuotas();
         } else {
-            alert('❌ ' + data.message);
+            alert(' ' + data.message);
         }
     } catch (error) {
         console.error('Error:', error);
-        alert('❌ Error al actualizar precio');
+        alert(' Error al actualizar precio');
     }
 }
 
@@ -3751,15 +3685,15 @@ async function generarCuotasMasivas(mes, anio) {
         const data = await response.json();
         
         if (data.success) {
-            alert('✅ ' + data.message);
+            alert(' ' + data.message);
             await loadAllCuotasAdmin();
             await loadEstadisticasCuotas();
         } else {
-            alert('❌ ' + data.message);
+            alert(' ' + data.message);
         }
     } catch (error) {
         console.error('Error:', error);
-        alert('❌ Error al generar cuotas');
+        alert(' Error al generar cuotas');
     }
 }
 
@@ -3794,7 +3728,7 @@ async function loadEstadisticasCuotas() {
 async function loadAllCuotasAdmin() {
     const container = document.getElementById('allCuotasAdminContainer');
     if (!container) {
-        console.error('❌ No se encontró allCuotasAdminContainer');
+        console.error(' No se encontró allCuotasAdminContainer');
         return;
     }
     
@@ -3810,12 +3744,12 @@ async function loadAllCuotasAdmin() {
         if (anio) url += `anio=${anio}&`;
         if (estado) url += `estado=${estado}&`;
         
-        console.log('🌐 Cargando cuotas desde:', url);
+        ('🌐 Cargando cuotas desde:', url);
         
         const response = await fetch(url);
         const data = await response.json();
         
-        console.log('📊 Cuotas recibidas:', data);
+        ('📊 Cuotas recibidas:', data);
         
         if (data.success) {
             renderAllCuotasAdmin(data.cuotas);
@@ -3974,7 +3908,7 @@ function renderAllCuotasAdmin(cuotas) {
 
 // ========== VER COMPROBANTE ==========
 function verComprobanteAdmin(archivo) {
-    console.log('🖼️ Abriendo comprobante:', archivo);
+    ('🖼️ Abriendo comprobante:', archivo);
     window.open(`/files/?path=${archivo}`, '_blank');
 }
 
@@ -4065,16 +3999,16 @@ async function procesarValidacionPago(pagoId, accion, observaciones) {
         const data = await response.json();
         
         if (data.success) {
-            alert('✅ ' + data.mensaje);
+            alert(' ' + data.mensaje);
             closeValidarPagoModal();
             await loadAllCuotasAdmin();
             await loadEstadisticasCuotas();
         } else {
-            alert('❌ ' + data.message);
+            alert(' ' + data.message);
         }
     } catch (error) {
         console.error('Error:', error);
-        alert('❌ Error al procesar validación');
+        alert(' Error al procesar validación');
     }
 }
 
@@ -4112,20 +4046,20 @@ window.rechazarPagoAdmin = rechazarPagoAdmin;
 window.verComprobanteAdmin = verComprobanteAdmin;
 window.inicializarSeccionCuotasAdmin = inicializarSeccionCuotasAdmin;
 
-console.log('✅ Módulo de cuotas admin cargado completamente');
+(' Módulo de cuotas admin cargado completamente');
 
 // ==========================================
 // SISTEMA DE SOLICITUDES - ADMINISTRADOR
 // ==========================================
 
-console.log('🟢 Cargando módulo de solicitudes ADMIN');
+('🟢 Cargando módulo de solicitudes ADMIN');
 
 // ========== INICIALIZACIÓN ==========
 document.addEventListener('DOMContentLoaded', function() {
     const solicitudesMenuItem = document.querySelector('.menu li[data-section="solicitudes"]');
     if (solicitudesMenuItem) {
         solicitudesMenuItem.addEventListener('click', function() {
-            console.log('>>> Sección solicitudes ADMIN abierta');
+            ('>>> Sección solicitudes ADMIN abierta');
             loadAllSolicitudes();
             loadEstadisticasSolicitudes();
         });
@@ -4162,7 +4096,7 @@ async function loadAllSolicitudes() {
         }
 
     } catch (error) {
-        console.error('❌ Error:', error);
+        console.error(' Error:', error);
         container.innerHTML = '<p class="error">Error de conexión</p>';
     }
 }
@@ -4401,19 +4335,19 @@ async function submitRespuestaAdmin(event, solicitudId) {
         const data = await response.json();
 
         if (data.success) {
-            alert('✅ ' + data.message);
+            alert(' ' + data.message);
             cerrarModalResponderAdmin();
             loadAllSolicitudes();
             loadEstadisticasSolicitudes();
         } else {
-            alert('❌ ' + data.message);
+            alert(' ' + data.message);
             submitBtn.disabled = false;
             submitBtn.innerHTML = btnHTML;
         }
 
     } catch (error) {
         console.error('Error:', error);
-        alert('❌ Error de conexión');
+        alert(' Error de conexión');
         submitBtn.disabled = false;
         submitBtn.innerHTML = btnHTML;
     }
@@ -4445,16 +4379,16 @@ async function cambiarEstadoSolicitud(solicitudId, nuevoEstado) {
         const data = await response.json();
 
         if (data.success) {
-            alert('✅ ' + data.message);
+            alert(' ' + data.message);
             loadAllSolicitudes();
             loadEstadisticasSolicitudes();
         } else {
-            alert('❌ ' + data.message);
+            alert(' ' + data.message);
         }
 
     } catch (error) {
         console.error('Error:', error);
-        alert('❌ Error de conexión');
+        alert(' Error de conexión');
     }
 }
 
@@ -4503,13 +4437,13 @@ window.cerrarModalResponderAdmin = cerrarModalResponderAdmin;
 window.submitRespuestaAdmin = submitRespuestaAdmin;
 window.cambiarEstadoSolicitud = cambiarEstadoSolicitud;
 
-console.log('✅ Módulo de solicitudes ADMIN cargado completamente');
+(' Módulo de solicitudes ADMIN cargado completamente');
 
 // ==========================================
 // SISTEMA DE JUSTIFICACIÓN DE HORAS - ADMIN
 // ==========================================
 
-console.log('🟢 Cargando módulo de justificación de horas');
+('🟢 Cargando módulo de justificación de horas');
 
 /**
  * Abrir modal para justificar horas
@@ -4521,7 +4455,7 @@ console.log('🟢 Cargando módulo de justificación de horas');
  * @param {number} horasFaltantes - Horas faltantes del usuario
  */
 async function abrirModalJustificarHoras(cuotaId, idUsuario, nombreUsuario, mes, anio, horasFaltantes) {
-    console.log('📝 Abriendo modal justificar horas');
+    ('📝 Abriendo modal justificar horas');
 
     let justificacionesHTML = '';
     try {
@@ -4691,20 +4625,16 @@ function toggleOtroMotivo(select) {
     }
 }
 
-/**
- * Cerrar modal
- */
+
 function cerrarModalJustificarHoras() {
     const modal = document.getElementById('justificarHorasModal');
     if (modal) modal.remove();
 }
 
-/**
- * Enviar justificación
- */
+
 async function submitJustificarHoras(event, cuotaId, idUsuario, mes, anio) {
     event.preventDefault();
-    console.log('📤 Enviando justificación');
+    ('📤 Enviando justificación');
 
     const form = document.getElementById('justificarHorasForm');
     const submitBtn = form.querySelector('button[type="submit"]');
@@ -4748,21 +4678,21 @@ async function submitJustificarHoras(event, cuotaId, idUsuario, mes, anio) {
         const data = await response.json();
 
         if (data.success) {
-            alert('✅ ' + data.message);
+            alert(' ' + data.message);
             cerrarModalJustificarHoras();
             
             // Recargar cuotas
             await loadAllCuotasAdmin();
             await loadEstadisticasCuotas();
         } else {
-            alert('❌ ' + data.message);
+            alert(' ' + data.message);
             submitBtn.disabled = false;
             submitBtn.innerHTML = btnHTML;
         }
 
     } catch (error) {
         console.error('Error:', error);
-        alert('❌ Error de conexión');
+        alert(' Error de conexión');
         submitBtn.disabled = false;
         submitBtn.innerHTML = btnHTML;
     }
@@ -4789,7 +4719,7 @@ async function eliminarJustificacion(idJustificacion, cuotaId, idUsuario, mes, a
         const data = await response.json();
 
         if (data.success) {
-            alert('✅ ' + data.message);
+            alert(' ' + data.message);
             cerrarModalJustificarHoras();
             
             // Reabrir modal actualizado
@@ -4798,12 +4728,12 @@ async function eliminarJustificacion(idJustificacion, cuotaId, idUsuario, mes, a
                 loadAllCuotasAdmin();
             }, 500);
         } else {
-            alert('❌ ' + data.message);
+            alert(' ' + data.message);
         }
 
     } catch (error) {
         console.error('Error:', error);
-        alert('❌ Error de conexión');
+        alert(' Error de conexión');
     }
 }
 
@@ -4814,13 +4744,13 @@ window.submitJustificarHoras = submitJustificarHoras;
 window.eliminarJustificacion = eliminarJustificacion;
 window.toggleOtroMotivo = toggleOtroMotivo;
 
-console.log('✅ Módulo de justificación de horas cargado completamente');
+(' Módulo de justificación de horas cargado completamente');
 
 // ==========================================
-// SISTEMA DE REPORTES MENSUALES - CON CSS INLINE
+// SISTEMA DE REPORTES MENSUALES 
 // ==========================================
 
-console.log('🟢 Cargando módulo de Reportes (CSS INLINE)');
+('🟢 Cargando módulo de Reportes (CSS INLINE)');
 
 // Variables globales
 let reporteActual = null;
@@ -4830,36 +4760,26 @@ document.addEventListener('DOMContentLoaded', function() {
     const reportesMenuItem = document.querySelector('.menu li[data-section="reportes"]');
     if (reportesMenuItem) {
         reportesMenuItem.addEventListener('click', function() {
-            console.log('>>> Sección reportes abierta');
+            ('>>> Sección reportes abierta');
             inicializarReportes();
         });
     }
 });
 
 async function inicializarReportes() {
-    console.log('📅 [REPORTES] Inicializando sistema de reportes...');
-    
+  
+
     try {
-        // ✅ OBTENER FECHA DEL USUARIO MÁS ANTIGUO
-        const response = await fetch('/api/users/fecha-mas-antigua');
-        const data = await response.json();
-        
-        let anioMinimo = new Date().getFullYear() - 5; // Por defecto 5 años atrás
-        
-        if (data.success && data.fecha_ingreso) {
-            const fechaIngreso = new Date(data.fecha_ingreso + 'T00:00:00');
-            anioMinimo = fechaIngreso.getFullYear();
-            console.log('📅 [REPORTES] Usuario más antiguo:', data.fecha_ingreso);
-            console.log('📅 [REPORTES] Año mínimo permitido:', anioMinimo);
-        }
-        
-        // ✅ GENERAR SELECTOR DE AÑOS DINÁMICO
+        //  Simular año mínimo (sin pedirlo al servidor)
+        let anioMinimo = new Date().getFullYear() - 5; // 5 años atrás
+       
+
+        //  GENERAR SELECTOR DE AÑOS DINÁMICO
         const selectAnio = document.getElementById('reporte-anio');
         if (selectAnio) {
             const anioActual = new Date().getFullYear();
             selectAnio.innerHTML = '<option value="">Seleccione año...</option>';
             
-            // Desde el año actual hasta el año del usuario más antiguo
             for (let anio = anioActual; anio >= anioMinimo; anio--) {
                 const option = document.createElement('option');
                 option.value = anio;
@@ -4867,42 +4787,27 @@ async function inicializarReportes() {
                 if (anio === anioActual) option.selected = true;
                 selectAnio.appendChild(option);
             }
-            
-            console.log(`📅 [REPORTES] Años disponibles: ${anioActual} - ${anioMinimo}`);
+          
         }
-        
-        // ✅ SELECCIONAR MES ACTUAL
+
+        //  SELECCIONAR MES ACTUAL
         const selectMes = document.getElementById('reporte-mes');
         if (selectMes) {
             const mesActual = new Date().getMonth() + 1;
             selectMes.value = mesActual;
         }
-        
+
     } catch (error) {
-        console.error('❌ [REPORTES] Error al inicializar:', error);
-        
-        // Fallback: últimos 5 años
-        const selectAnio = document.getElementById('reporte-anio');
-        if (selectAnio) {
-            const anioActual = new Date().getFullYear();
-            selectAnio.innerHTML = '<option value="">Seleccione año...</option>';
-            for (let i = 0; i < 5; i++) {
-                const anio = anioActual - i;
-                const option = document.createElement('option');
-                option.value = anio;
-                option.textContent = anio;
-                if (i === 0) option.selected = true;
-                selectAnio.appendChild(option);
-            }
-        }
+        console.error(' [REPORTES] Error al inicializar:', error);
     }
 }
+
 
 async function generarReporte() {
     const mes = document.getElementById('reporte-mes').value;
     const anio = document.getElementById('reporte-anio').value;
     
-    console.log('📊 [REPORTE] Generando reporte para:', { mes, anio });
+    ('📊 [REPORTE] Generando reporte para:', { mes, anio });
     
     if (!mes || !anio) {
         alert('⚠️ Selecciona mes y año');
@@ -4917,10 +4822,10 @@ async function generarReporte() {
     document.getElementById('btn-exportar').style.display = 'none';
     
     try {
-        // ✅ FIX: Construir URL con parámetros correctos
+      
         const url = `/api/reporte/mensual?mes=${encodeURIComponent(mes)}&anio=${encodeURIComponent(anio)}`;
         
-        console.log('🌐 [REPORTE] URL completa:', url);
+        ('🌐 [REPORTE] URL completa:', url);
         
         const response = await fetch(url, {
             method: 'GET',
@@ -4931,7 +4836,7 @@ async function generarReporte() {
             credentials: 'same-origin'
         });
         
-        console.log('📡 [REPORTE] Response status:', response.status);
+        ('📡 [REPORTE] Response status:', response.status);
         
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -4940,20 +4845,20 @@ async function generarReporte() {
         const contentType = response.headers.get('content-type');
         if (!contentType || !contentType.includes('application/json')) {
             const text = await response.text();
-            console.error('❌ [REPORTE] Respuesta no es JSON:', text.substring(0, 500));
+            console.error(' [REPORTE] Respuesta no es JSON:', text.substring(0, 500));
             throw new Error('El servidor no devolvió JSON válido');
         }
         
         const data = await response.json();
-        console.log('📊 [REPORTE] Data recibida:', data);
+        ('📊 [REPORTE] Data recibida:', data);
         
         if (data.success) {
-            // ✅ Validar que los datos sean del período correcto
+            //  Validar que los datos sean del período correcto
             if (!data.reporte || !data.reporte.resumen) {
                 throw new Error('Estructura de datos inválida');
             }
             
-            console.log('✅ [REPORTE] Reporte válido para:', {
+            (' [REPORTE] Reporte válido para:', {
                 mes: data.reporte.periodo?.mes || mes,
                 anio: data.reporte.periodo?.anio || anio,
                 total_usuarios: data.reporte.resumen.total_usuarios
@@ -4962,22 +4867,22 @@ async function generarReporte() {
             reporteActual = data.reporte;
             mostrarReporte(data.reporte);
         } else {
-            alert('❌ ' + (data.message || 'Error al generar reporte'));
+            alert(' ' + (data.message || 'Error al generar reporte'));
             container.innerHTML = `<p style="text-align: center; padding: 40px; color: #dc3545;">${data.message || 'Error al generar reporte'}</p>`;
         }
     } catch (error) {
-        console.error('❌ [REPORTE] Error:', error);
-        alert('❌ Error al generar reporte: ' + error.message);
+        console.error(' [REPORTE] Error:', error);
+        alert(' Error al generar reporte: ' + error.message);
         container.innerHTML = `<p style="text-align: center; padding: 40px; color: #dc3545;">Error: ${error.message}</p>`;
     }
 }
 
 function mostrarReporte(reporte) {
-    console.log('📊 [MOSTRAR] Renderizando reporte...');
+    ('📊 [MOSTRAR] Renderizando reporte...');
     
     // Validar que tengamos datos
     if (!reporte || !reporte.resumen) {
-        alert('❌ Datos de reporte inválidos');
+        alert(' Datos de reporte inválidos');
         return;
     }
     
@@ -4986,10 +4891,10 @@ function mostrarReporte(reporte) {
     const anio = document.getElementById('reporte-anio').value;
     const nombreMes = obtenerNombreMes(mes);
     
-    console.log('📅 [MOSTRAR] Período:', `${nombreMes} ${anio}`);
-    console.log('👥 [MOSTRAR] Total usuarios:', reporte.resumen.total_usuarios);
+    ('📅 [MOSTRAR] Período:', `${nombreMes} ${anio}`);
+    ('👥 [MOSTRAR] Total usuarios:', reporte.resumen.total_usuarios);
     
-    // ✅ Actualizar estadísticas
+    //  Actualizar estadísticas
     document.getElementById('reporte-total-usuarios').textContent = reporte.resumen.total_usuarios || 0;
     document.getElementById('reporte-total-horas').textContent = 
         Math.round(reporte.resumen.total_horas_trabajadas || 0) + 'h';
@@ -4998,23 +4903,23 @@ function mostrarReporte(reporte) {
     document.getElementById('reporte-cumplimiento-promedio').textContent = 
         (reporte.resumen.promedio_cumplimiento || 0) + '%';
     
-    // ✅ Mostrar contenedores
+    //  Mostrar contenedores
     document.getElementById('reporte-resumen-container').style.display = 'block';
     document.getElementById('reporte-tabla-container').style.display = 'block';
     document.getElementById('btn-exportar').style.display = 'inline-block';
     
-    // ✅ Renderizar tabla
+    //  Renderizar tabla
     renderTablaReporte(reporte.usuarios);
     
-    console.log('✅ [MOSTRAR] Reporte renderizado correctamente');
+    (' [MOSTRAR] Reporte renderizado correctamente');
 }
 
 window.generarReporte = generarReporte;
 window.exportarReporteCSV = exportarReporteCSV;
 window.mostrarReporte = mostrarReporte;
 
-console.log('✅ [FIX REPORTES] Corrección aplicada');
-console.log('✅ [FIX REPORTES] Ahora los filtros de mes/año se aplican correctamente');
+(' [FIX REPORTES] Corrección aplicada');
+(' [FIX REPORTES] Ahora los filtros de mes/año se aplican correctamente');
 
 function renderTablaReporte(usuarios) {
     const container = document.getElementById('reporteTableContainer');
@@ -5155,16 +5060,16 @@ async function exportarReporteCSV() {
     const mes = document.getElementById('reporte-mes').value;
     const anio = document.getElementById('reporte-anio').value;
     
-    console.log('📥 [EXPORTAR] Exportando para:', { mes, anio });
+    ('📥 [EXPORTAR] Exportando para:', { mes, anio });
     
     if (!mes || !anio) {
         alert('⚠️ Selecciona mes y año');
         return;
     }
     
-    // ✅ Construir URL con parámetros correctos
+    //  Construir URL con parámetros correctos
     const url = `/api/reporte/exportar?mes=${encodeURIComponent(mes)}&anio=${encodeURIComponent(anio)}&formato=csv`;
-    console.log('🌐 [EXPORTAR] URL:', url);
+    ('🌐 [EXPORTAR] URL:', url);
     
     window.location.href = url;
 }
@@ -5174,20 +5079,20 @@ window.inicializarReportes = inicializarReportes;
 window.generarReporte = generarReporte;
 window.exportarReporteCSV = exportarReporteCSV;
 
-console.log('✅ Módulo de Reportes con CSS INLINE cargado');
+(' Módulo de Reportes con CSS INLINE cargado');
 
 // ==========================================
 // SISTEMA DE SOLICITUDES - ADMINISTRADOR
 // ==========================================
 
-console.log('🟢 Cargando módulo de solicitudes ADMIN');
+('🟢 Cargando módulo de solicitudes ADMIN');
 
 // ========== INICIALIZACIÓN ==========
 document.addEventListener('DOMContentLoaded', function() {
     const solicitudesMenuItem = document.querySelector('.menu li[data-section="solicitudes"]');
     if (solicitudesMenuItem) {
         solicitudesMenuItem.addEventListener('click', function() {
-            console.log('>>> Sección solicitudes ADMIN abierta');
+            ('>>> Sección solicitudes ADMIN abierta');
             loadAllSolicitudes();
             loadEstadisticasSolicitudes();
         });
@@ -5616,7 +5521,7 @@ async function submitRespuestaAdmin(event, solicitudId) {
         const data = await response.json();
 
         if (data.success) {
-            alert('✅ ' + data.message);
+            alert(' ' + data.message);
             cerrarModalResponderAdmin();
             loadAllSolicitudes();
             loadEstadisticasSolicitudes();
@@ -5660,7 +5565,7 @@ async function cambiarEstadoSolicitud(solicitudId, nuevoEstado) {
         const data = await response.json();
 
         if (data.success) {
-            alert('✅ ' + data.message);
+            alert(' ' + data.message);
             loadAllSolicitudes();
             loadEstadisticasSolicitudes();
         } else {
@@ -5713,34 +5618,17 @@ window.cerrarModalResponderAdmin = cerrarModalResponderAdmin;
 window.submitRespuestaAdmin = submitRespuestaAdmin;
 window.cambiarEstadoSolicitud = cambiarEstadoSolicitud;
 
-console.log('✅ Módulo de solicitudes ADMIN cargado completamente');
+(' Módulo de solicitudes ADMIN cargado completamente');
 
-// ==========================================
-// 🔧 FIX GLOBAL DE FECHAS - ZONA HORARIA URUGUAY
-// ==========================================
-// 📝 AGREGAR AL FINAL DE dashboardUsuario.js Y dashboardAdmin.js
-// ==========================================
 
-console.log('🌍 [FIX FECHAS] Iniciando configuración para Uruguay...');
 
-/**
- * PROBLEMA IDENTIFICADO:
- * - new Date('2025-01-15') → se interpreta como UTC medianoche
- * - Si estás en UTC-3 (Uruguay), muestra 14 de enero 21:00
- * - new Date('2025-01-15T00:00:00') → TAMBIÉN se interpreta como UTC
- * - Solución: Agregar EXPLÍCITAMENTE la zona horaria local
- */
+('🌍 [FIX FECHAS] Iniciando configuración para Uruguay...');
 
-// ========== FUNCIONES GLOBALES DE FORMATO DE FECHAS ==========
 
-/**
- * Parsear fecha SQL (YYYY-MM-DD) en zona horaria local de Uruguay
- * ✅ SOLUCIÓN: Agregar 'T00:00:00' para forzar medianoche local
- */
 function parseFechaLocal(fechaSQL) {
     if (!fechaSQL) return null;
     
-    // ✅ CORRECTO: Agregar T00:00:00 para interpretación local
+    
     return new Date(fechaSQL + 'T00:00:00');
 }
 
@@ -5779,7 +5667,7 @@ function formatearFechaHoraUY(fechaHora) {
 }
 
 /**
- * Formatear fecha en formato largo (ej: "15 de enero de 2025")
+ * Formatear fecha en formato largo 
  */
 function formatearFechaLargaUY(fecha) {
     if (!fecha) return '-';
@@ -5795,7 +5683,7 @@ function formatearFechaLargaUY(fecha) {
 }
 
 /**
- * Obtener fecha actual en formato SQL (YYYY-MM-DD) - Uruguay
+ * Obtener fecha actual en formato SQL 
  */
 function getFechaActualSQL() {
     const ahora = new Date();
@@ -5813,7 +5701,7 @@ function getFechaActualSQL() {
 }
 
 /**
- * Obtener hora actual en formato HH:MM:SS - Uruguay
+ * Obtener hora actual en formato HH:MM:SS 
  */
 function getHoraActualSQL() {
     const ahora = new Date();
@@ -5827,13 +5715,11 @@ function getHoraActualSQL() {
     });
 }
 
-// ========== APLICAR FIXES EN TODO EL SISTEMA ==========
 
-/**
- * Fix para dashboardUsuario.js - Tareas
- */
+
+
 function fixFechasTareas() {
-    console.log('🔧 Aplicando fix de fechas en tareas...');
+    ('🔧 Aplicando fix de fechas en tareas...');
     
     // Reemplazar en renderUserTasks
     window.renderUserTasks_ORIGINAL = window.renderUserTasks;
@@ -5847,7 +5733,7 @@ function fixFechasTareas() {
         }
 
         container.innerHTML = tareas.map(tarea => {
-            // ✅ FIX: Usar parseFechaLocal
+            //  FIX: Usar parseFechaLocal
             const fechaInicio = formatearFechaUY(tarea.fecha_inicio);
             const fechaFin = formatearFechaUY(tarea.fecha_fin);
             
@@ -5900,14 +5786,14 @@ function fixFechasTareas() {
         }).join('');
     };
     
-    console.log('✅ Fix de fechas en tareas aplicado');
+    (' Fix de fechas en tareas aplicado');
 }
 
 /**
- * Fix para dashboardAdmin.js - Tareas Admin
+ * Tareas Admin
  */
 function fixFechasTareasAdmin() {
-    console.log('🔧 Aplicando fix de fechas en tareas admin...');
+    ('🔧 Aplicando fix de fechas en tareas admin...');
     
     // Reemplazar en renderTasksList
     window.renderTasksList_ORIGINAL = window.renderTasksList;
@@ -5921,7 +5807,7 @@ function fixFechasTareasAdmin() {
         }
 
         container.innerHTML = tareas.map(tarea => {
-            // ✅ FIX: Usar formatearFechaUY
+          
             const fechaInicio = formatearFechaUY(tarea.fecha_inicio);
             const fechaFin = formatearFechaUY(tarea.fecha_fin);
             
@@ -5993,43 +5879,40 @@ function fixFechasTareasAdmin() {
         }).join('');
     };
     
-    console.log('✅ Fix de fechas en tareas admin aplicado');
+    (' Fix de fechas en tareas admin aplicado');
 }
 
 /**
- * Fix para Registro de Horas
+ *  Registro de Horas
  */
 function fixFechasRegistroHoras() {
-    console.log('🔧 Aplicando fix de fechas en registro de horas...');
+    ('🔧 Aplicando fix de fechas en registro de horas...');
     
-    // Reemplazar formatearFechaSimple si existe
+   
     window.formatearFechaSimple = formatearFechaUY;
     
-    console.log('✅ Fix de fechas en registro de horas aplicado');
+    (' Fix de fechas en registro de horas aplicado');
 }
 
 /**
- * Fix para Solicitudes
+ * Solicitudes
  */
 function fixFechasSolicitudes() {
-    console.log('🔧 Aplicando fix de fechas en solicitudes...');
+    ('🔧 Aplicando fix de fechas en solicitudes...');
+ 
     
-    // La función de renderizado de solicitudes ya usa toLocaleDateString
-    // pero podemos asegurarnos que use la zona horaria correcta
-    
-    console.log('✅ Fix de fechas en solicitudes aplicado');
+    (' Fix de fechas en solicitudes aplicado');
 }
 
 // ========== INICIALIZACIÓN AUTOMÁTICA ==========
 
-// NO usar DOMContentLoaded porque el script se ejecuta al final
-// Ejecutar inmediatamente
-console.log('🌍 [FIX FECHAS] Inicializando sistema de fechas para Uruguay...');
-console.log('📅 [FIX FECHAS] Zona horaria detectada:', Intl.DateTimeFormat().resolvedOptions().timeZone);
+
+('🌍 [FIX FECHAS] Inicializando sistema de fechas para Uruguay...');
+('📅 [FIX FECHAS] Zona horaria detectada:', Intl.DateTimeFormat().resolvedOptions().timeZone);
 
 try {
-    console.log('📅 [FIX FECHAS] Fecha actual SQL:', getFechaActualSQL());
-    console.log('⏰ [FIX FECHAS] Hora actual SQL:', getHoraActualSQL());
+    ('📅 [FIX FECHAS] Fecha actual SQL:', getFechaActualSQL());
+    ('⏰ [FIX FECHAS] Hora actual SQL:', getHoraActualSQL());
 } catch (e) {
     console.warn('⚠️ [FIX FECHAS] Funciones aún no definidas, se definirán a continuación');
 }
@@ -6043,29 +5926,29 @@ window.formatearFechaLargaUY = formatearFechaLargaUY;
 window.getFechaActualSQL = getFechaActualSQL;
 window.getHoraActualSQL = getHoraActualSQL;
 
-console.log('✅ [FIX FECHAS] Funciones exportadas:', {
+(' [FIX FECHAS] Funciones exportadas:', {
     parseFechaLocal: typeof window.parseFechaLocal,
     formatearFechaUY: typeof window.formatearFechaUY,
     getFechaActualSQL: typeof window.getFechaActualSQL
 });
 
-// ========== APLICAR FIXES AUTOMÁTICAMENTE ==========
 
-// Esperar un momento para que otras funciones se carguen
+
+
 setTimeout(function() {
-    console.log('🔧 [FIX FECHAS] Aplicando fixes automáticos...');
+    ('🔧 [FIX FECHAS] Aplicando fixes automáticos...');
     
     try {
         fixFechasTareas();
         fixFechasTareasAdmin();
         fixFechasRegistroHoras();
-        console.log('✅ [FIX FECHAS] Sistema de fechas configurado correctamente');
-        console.log('📅 [FIX FECHAS] Zona horaria:', Intl.DateTimeFormat().resolvedOptions().timeZone);
-        console.log('📅 [FIX FECHAS] Fecha actual SQL:', getFechaActualSQL());
-        console.log('⏰ [FIX FECHAS] Hora actual SQL:', getHoraActualSQL());
+        (' [FIX FECHAS] Sistema de fechas configurado correctamente');
+        ('📅 [FIX FECHAS] Zona horaria:', Intl.DateTimeFormat().resolvedOptions().timeZone);
+        ('📅 [FIX FECHAS] Fecha actual SQL:', getFechaActualSQL());
+        ('⏰ [FIX FECHAS] Hora actual SQL:', getHoraActualSQL());
         
-        // Prueba
-        console.log('🧪 [FIX FECHAS] Prueba: formatearFechaUY("2025-01-15") =', formatearFechaUY('2025-01-15'));
+        
+        (' [FIX FECHAS] Prueba: formatearFechaUY("2025-01-15") =', formatearFechaUY('2025-01-15'));
     } catch (error) {
         console.warn('⚠️ [FIX FECHAS] Error al aplicar fixes:', error);
     }
@@ -6074,21 +5957,21 @@ setTimeout(function() {
 // ========== HELPER: REEMPLAZAR FUNCIONES EXISTENTES ==========
 
 
-console.log('✅ [FIX FECHAS] Módulo cargado - Zona horaria: America/Montevideo');
+(' [FIX FECHAS] Módulo cargado - Zona horaria: America/Montevideo');
 
 // ==========================================
-// 🔧 OVERRIDE PERMANENTE - EJECUTAR SIEMPRE
+//  OVERRIDE PERMANENTE 
 // ==========================================
 
 (function() {
-    console.log('🔄 [OVERRIDE] Forzando renderTasksList correcto...');
+    ('🔄 [OVERRIDE] Forzando renderTasksList correcto...');
 
     // Guardar referencia a loadAllTasks original
     const loadAllTasks_ORIGINAL = window.loadAllTasks;
 
     // Sobrescribir loadAllTasks para usar SIEMPRE la versión correcta
     window.loadAllTasks = function() {
-        console.log('🔄 [OVERRIDE] loadAllTasks interceptado');
+        ('🔄 [OVERRIDE] loadAllTasks interceptado');
         
         const container = document.getElementById('tasksList');
         const filtro = document.getElementById('filtro-estado')?.value || '';
@@ -6104,7 +5987,7 @@ console.log('✅ [FIX FECHAS] Módulo cargado - Zona horaria: America/Montevideo
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // ✅ USAR VERSIÓN CORRECTA SIEMPRE
+                  
                     renderTasksListCorrecto(data.tareas, filtro);
                 } else {
                     container.innerHTML = '<p class="error">Error al cargar tareas</p>';
@@ -6116,11 +5999,11 @@ console.log('✅ [FIX FECHAS] Módulo cargado - Zona horaria: America/Montevideo
             });
     };
 
-    // Definir función correcta que SIEMPRE se usará
+   
     function renderTasksListCorrecto(tareas, filtroActivo = '') {
-        console.log('═══════════════════════════════════════');
-        console.log('🚀 [RENDER CORRECTO] Iniciando');
-        console.log('═══════════════════════════════════════');
+        ('═══════════════════════════════════════');
+        (' [RENDER CORRECTO] Iniciando');
+        ('═══════════════════════════════════════');
         
         const container = document.getElementById('tasksList');
 
@@ -6132,7 +6015,7 @@ console.log('✅ [FIX FECHAS] Módulo cargado - Zona horaria: America/Montevideo
         const hoy = new Date();
         hoy.setHours(0, 0, 0, 0);
 
-        // ✅ Analizar tareas
+        //  Analizar tareas
         const tareasConEstado = tareas.map(tarea => {
             const fechaFinObj = new Date(tarea.fecha_fin + 'T00:00:00');
             const esCompletada = tarea.estado === 'completada';
@@ -6140,13 +6023,13 @@ console.log('✅ [FIX FECHAS] Módulo cargado - Zona horaria: America/Montevideo
             const esVencida = !esCompletada && !esCancelada && fechaFinObj < hoy;
 
             if (esVencida) {
-                console.log(`🔴 VENCIDA: ${tarea.titulo}`);
+                (`🔴 VENCIDA: ${tarea.titulo}`);
             }
 
             return { ...tarea, esVencida, esCompletada, esCancelada };
         });
 
-        // ✅ Filtrar
+        //  Filtrar
         const tareasFiltradas = tareasConEstado.filter(tarea => {
             if (filtroActivo === 'vencida') return tarea.esVencida;
             if (filtroActivo && filtroActivo !== '') return tarea.estado === filtroActivo;
@@ -6164,7 +6047,7 @@ console.log('✅ [FIX FECHAS] Módulo cargado - Zona horaria: America/Montevideo
             return;
         }
 
-        // ✅ Renderizar
+        //  Renderizar
         container.innerHTML = tareasFiltradas.map(tarea => {
             const fechaInicio = formatearFechaUY(tarea.fecha_inicio);
             const fechaFin = formatearFechaUY(tarea.fecha_fin);
@@ -6181,7 +6064,7 @@ console.log('✅ [FIX FECHAS] Módulo cargado - Zona horaria: America/Montevideo
                 estadoTexto = '⏰ Vencida';
                 estadoBadgeClass = 'vencida';
                 claseVencida = 'tarea-vencida';
-                console.log(`✅ Badge VENCIDA: ${tarea.titulo}`);
+                (` Badge VENCIDA: ${tarea.titulo}`);
             } else if (tarea.esCompletada) {
                 estadoTexto = 'Completada';
                 estadoBadgeClass = 'completada';
@@ -6243,33 +6126,28 @@ console.log('✅ [FIX FECHAS] Módulo cargado - Zona horaria: America/Montevideo
             `;
         }).join('');
 
-        console.log('✅ [RENDER CORRECTO] Completado\n');
+        (' [RENDER CORRECTO] Completado\n');
     }
 
-    console.log('✅ [OVERRIDE] loadAllTasks sobrescrito permanentemente');
+    (' [OVERRIDE] loadAllTasks sobrescrito permanentemente');
 })();
 
 
 // ==========================================
-// 🔧 FIX: MODAL DE USUARIOS SE ABRE ABAJO DE LA TABLA
-// Agregar al FINAL de dashboardAdmin.js
+//  FIX: MODAL DE USUARIOS SE ABRE ABAJO DE LA TABLA
+//
 // ==========================================
 
-console.log('🔧 [FIX MODAL] Aplicando corrección de modal de usuarios...');
+(' [FIX MODAL] Aplicando corrección de modal de usuarios...');
 
-/**
- * ✅ PROBLEMA IDENTIFICADO:
- * - El modal se crea con onclick en el mismo div que contiene event.target
- * - Esto causa que el modal se inserte dentro de la tabla
- * - SOLUCIÓN: Limpiar modales antes de crear + insertar en body correctamente
- */
 
-// ========== SOBRESCRIBIR viewUserDetails ==========
+
+
 (function() {
-    console.log('🔄 [OVERRIDE] Sobrescribiendo viewUserDetails...');
+    ('🔄 [OVERRIDE] Sobrescribiendo viewUserDetails...');
 
     window.viewUserDetails = function(userId) {
-        console.log('👁️ [DETAILS] Cargando detalles de usuario:', userId);
+        ('👁️ [DETAILS] Cargando detalles de usuario:', userId);
 
         // 🧹 PASO 1: LIMPIAR TODOS LOS MODALES ANTERIORES
         limpiarModalesUsuarios();
@@ -6277,7 +6155,7 @@ console.log('🔧 [FIX MODAL] Aplicando corrección de modal de usuarios...');
         fetch(`/api/users/details?id_usuario=${userId}`)
             .then(response => response.json())
             .then(data => {
-                console.log('👁️ [DETAILS] Response:', data);
+                ('👁️ [DETAILS] Response:', data);
                 if (data.success) {
                     mostrarModalUsuarioCorrecto(data.user);
                 } else {
@@ -6290,12 +6168,12 @@ console.log('🔧 [FIX MODAL] Aplicando corrección de modal de usuarios...');
             });
     };
 
-    console.log('✅ [OVERRIDE] viewUserDetails reemplazado correctamente');
+    (' [OVERRIDE] viewUserDetails reemplazado correctamente');
 })();
 
 // ========== FUNCIÓN PARA LIMPIAR MODALES ==========
 function limpiarModalesUsuarios() {
-    console.log('🧹 [LIMPIEZA] Limpiando modales de usuarios...');
+    ('🧹 [LIMPIEZA] Limpiando modales de usuarios...');
     
     // Eliminar modales específicos de usuarios
     const selectores = [
@@ -6308,7 +6186,7 @@ function limpiarModalesUsuarios() {
     selectores.forEach(selector => {
         const modales = document.querySelectorAll(selector);
         modales.forEach(modal => {
-            console.log('🗑️ Eliminando modal:', selector);
+            ('🗑️ Eliminando modal:', selector);
             modal.remove();
         });
     });
@@ -6316,12 +6194,12 @@ function limpiarModalesUsuarios() {
 
 // ========== FUNCIÓN MEJORADA PARA MOSTRAR MODAL ==========
 function mostrarModalUsuarioCorrecto(user) {
-    console.log('📋 [MODAL] Mostrando modal para:', user.nombre_completo);
+    (' [MODAL] Mostrando modal para:', user.nombre_completo);
 
-    // 🧹 Limpiar por si acaso
+    //  Limpiar por si acaso
     limpiarModalesUsuarios();
 
-    // ✅ CREAR MODAL CON Z-INDEX ALTO Y POSITION FIXED
+    //  CREAR MODAL CON Z-INDEX ALTO Y POSITION FIXED
     const modalHTML = `
         <div class="user-detail-modal" 
              style="
@@ -6470,13 +6348,13 @@ function mostrarModalUsuarioCorrecto(user) {
         </div>
     `;
 
-    // ✅ INSERTAR DIRECTAMENTE EN BODY (no en la tabla)
+    //  INSERTAR DIRECTAMENTE EN BODY 
     document.body.insertAdjacentHTML('beforeend', modalHTML);
     
-    // 🔒 PREVENIR SCROLL DEL BODY
+    // PREVENIR SCROLL DEL BODY
     document.body.style.overflow = 'hidden';
     
-    console.log('✅ [MODAL] Modal insertado correctamente en body');
+    (' [MODAL] Modal insertado correctamente en body');
 }
 
 // ========== FUNCIÓN AUXILIAR ==========
@@ -6510,7 +6388,7 @@ limpiarModalesUsuarios = function() {
 
 // ========== SOBRESCRIBIR renderUserRow PARA QUITAR COLUMNA DE PAGO ==========
 (function() {
-    console.log('🔄 [OVERRIDE] Sobrescribiendo renderUserRow para quitar columna Pago...');
+    ('🔄 [OVERRIDE] Sobrescribiendo renderUserRow para quitar columna Pago...');
 
     window.renderUserRow = function(user) {
         const hasPayment = user.comprobante_archivo && user.estado === 'enviado';
@@ -6555,15 +6433,15 @@ limpiarModalesUsuarios = function() {
         `;
     };
 
-    console.log('✅ [OVERRIDE] renderUserRow actualizado sin columna Pago');
+    (' [OVERRIDE] renderUserRow actualizado sin columna Pago');
 })();
 
 // ========== SOBRESCRIBIR renderUsersTable PARA QUITAR HEADER DE PAGO ==========
 (function() {
-    console.log('🔄 [OVERRIDE] Sobrescribiendo renderUsersTable para quitar header Pago...');
+    ('🔄 [OVERRIDE] Sobrescribiendo renderUsersTable para quitar header Pago...');
 
     window.renderUsersTable = function(users) {
-        console.log('🎨 [RENDER] renderUsersTable INICIADA (sin columna Pago)');
+        ('🎨 [RENDER] renderUsersTable INICIADA (sin columna Pago)');
         
         const container = document.getElementById('usersTableContainer');
 
@@ -6595,34 +6473,34 @@ limpiarModalesUsuarios = function() {
         `;
 
         container.innerHTML = tableHTML;
-        console.log('✅ [RENDER] Tabla renderizada sin columna Pago');
+        (' [RENDER] Tabla renderizada sin columna Pago');
     };
 
-    console.log('✅ [OVERRIDE] renderUsersTable actualizado');
+    (' [OVERRIDE] renderUsersTable actualizado');
 })();
 
 // ========== EXPORTAR FUNCIONES GLOBALES ==========
 window.limpiarModalesUsuarios = limpiarModalesUsuarios;
 window.mostrarModalUsuarioCorrecto = mostrarModalUsuarioCorrecto;
 
-console.log('✅ [FIX MODAL] Fix aplicado completamente');
-console.log('✅ [FIX MODAL] Ahora el modal se abre sobre la tabla correctamente');
-console.log('✅ [FIX TABLA] Columna "Pago" eliminada de la tabla de usuarios');
+(' [FIX MODAL] Fix aplicado completamente');
+(' [FIX MODAL] Ahora el modal se abre sobre la tabla correctamente');
+(' [FIX TABLA] Columna "Pago" eliminada de la tabla de usuarios');
 
 // ==========================================
-// 🔧 PARCHE COMPLETO: TABLA DE USUARIOS CON TODOS LOS BOTONES
-// Agregar al FINAL de dashboardAdmin.js
+// TABLA DE USUARIOS CON TODOS LOS BOTONES
+// 
 // ==========================================
 
-console.log('🔧 [PARCHE] Aplicando corrección completa de tabla de usuarios...');
+(' [PARCHE] Aplicando corrección completa de tabla de usuarios...');
 
 // ========== 1. DEFINIR FUNCIONES FALTANTES ==========
 
 /**
- * ✅ Aprobar usuario (cambiar estado de pendiente a aceptado)
+ *  Aprobar usuario (cambiar estado de pendiente a aceptado)
  */
 window.aprobarUsuario = async function(userId, nombreUsuario) {
-    console.log('✅ [APROBAR] Aprobando usuario:', userId);
+    (' [APROBAR] Aprobando usuario:', userId);
     
     if (!confirm(`¿Aprobar el registro de ${nombreUsuario}?\n\nEl usuario podrá acceder al sistema.`)) {
         return;
@@ -6641,22 +6519,22 @@ window.aprobarUsuario = async function(userId, nombreUsuario) {
         const data = await response.json();
         
         if (data.success) {
-            alert('✅ Usuario aprobado correctamente');
+            alert(' Usuario aprobado correctamente');
             loadUsersForTable();
         } else {
-            alert('❌ Error: ' + data.message);
+            alert(' Error: ' + data.message);
         }
     } catch (error) {
         console.error('Error:', error);
-        alert('❌ Error de conexión');
+        alert(' Error de conexión');
     }
 };
 
 /**
- * ✅ Rechazar usuario
+ *  Rechazar usuario
  */
 window.rechazarUsuario = async function(userId, nombreUsuario) {
-    console.log('❌ [RECHAZAR] Rechazando usuario:', userId);
+    (' [RECHAZAR] Rechazando usuario:', userId);
     
     const motivo = prompt(`¿Por qué rechazas el registro de ${nombreUsuario}?\n\nMotivo (opcional):`);
     
@@ -6680,22 +6558,22 @@ window.rechazarUsuario = async function(userId, nombreUsuario) {
         const data = await response.json();
         
         if (data.success) {
-            alert('✅ Usuario rechazado');
+            alert(' Usuario rechazado');
             loadUsersForTable();
         } else {
-            alert('❌ Error: ' + data.message);
+            alert(' Error: ' + data.message);
         }
     } catch (error) {
         console.error('Error:', error);
-        alert('❌ Error de conexión');
+        alert(' Error de conexión');
     }
 };
 
 /**
- * ✅ Ver detalles de pago (modal con información completa)
+ *  Ver detalles de pago (modal con información completa)
  */
 window.verDetallesPago = async function(userId) {
-    console.log('💵 [PAGO] Cargando detalles de pago:', userId);
+    ('💵 [PAGO] Cargando detalles de pago:', userId);
     
     try {
         const response = await fetch(`/api/users/payment-details?id_usuario=${userId}`);
@@ -6704,16 +6582,16 @@ window.verDetallesPago = async function(userId) {
         if (data.success) {
             mostrarModalDetallesPago(data.pago, data.usuario);
         } else {
-            alert('❌ Error: ' + data.message);
+            alert(' Error: ' + data.message);
         }
     } catch (error) {
         console.error('Error:', error);
-        alert('❌ Error de conexión');
+        alert(' Error de conexión');
     }
 };
 
 /**
- * ✅ Mostrar modal con detalles de pago
+ *  Mostrar modal con detalles de pago
  */
 function mostrarModalDetallesPago(pago, usuario) {
     const modal = `
@@ -6789,7 +6667,7 @@ function mostrarModalDetallesPago(pago, usuario) {
 }
 
 /**
- * ✅ Aprobar pago desde el modal
+ *  Aprobar pago desde el modal
  */
 window.aprobarPagoDesdeModal = async function(pagoId, userId) {
     document.getElementById('detallesPagoModal').remove();
@@ -6797,7 +6675,7 @@ window.aprobarPagoDesdeModal = async function(pagoId, userId) {
 };
 
 /**
- * ✅ Rechazar pago desde el modal
+ *  Rechazar pago desde el modal
  */
 window.rechazarPagoDesdeModal = async function(pagoId, userId) {
     document.getElementById('detallesPagoModal').remove();
@@ -6827,14 +6705,14 @@ window.renderUserRow = function(user) {
             <td>
                 <div style="display: flex; gap: 5px; flex-wrap: wrap; justify-content: center;">
                     
-                    ${/* ✅ BOTÓN VER DETALLES DE USUARIO */ ''}
+                    ${/*  BOTÓN VER DETALLES DE USUARIO */ ''}
                     <button class="btn-icon btn-primary" 
                             onclick="viewUserDetails(${user.id_usuario})"
                             title="Ver detalles del usuario">
                         <i class="fas fa-eye"></i>
                     </button>
                     
-                    ${/* ✅ BOTÓN VER PAGO (siempre visible si hay comprobante) */ ''}
+                    ${/*  BOTÓN VER PAGO (siempre visible si hay comprobante) */ ''}
                     ${hasPayment ? `
                         <button class="btn-icon btn-info" 
                                 onclick="verDetallesPago(${user.id_usuario})"
@@ -6844,7 +6722,7 @@ window.renderUserRow = function(user) {
                         </button>
                     ` : ''}
                     
-                    ${/* ✅ BOTONES DE APROBACIÓN/RECHAZO DE USUARIO */ ''}
+                    ${/*  BOTONES DE APROBACIÓN/RECHAZO DE USUARIO */ ''}
                     ${isPending ? `
                         <button class="btn-icon btn-success" 
                                 onclick="aprobarUsuario(${user.id_usuario}, '${user.nombre_completo.replace(/'/g, "\\'")}')"
@@ -6860,7 +6738,7 @@ window.renderUserRow = function(user) {
                         </button>
                     ` : ''}
                     
-                    ${/* ✅ BOTONES DE APROBACIÓN/RECHAZO DE PAGO */ ''}
+                    ${/*  BOTONES DE APROBACIÓN/RECHAZO DE PAGO */ ''}
                     ${hasPaymentPending ? `
                         <button class="btn-icon btn-success" 
                                 onclick="approvePaymentFromTable(${user.id_usuario})"
@@ -6883,20 +6761,20 @@ window.renderUserRow = function(user) {
 
 // ========== 3. EXPORTAR FUNCIONES ==========
 
-console.log('✅ [PARCHE] Todas las funciones definidas:');
-console.log('  - aprobarUsuario:', typeof window.aprobarUsuario);
-console.log('  - rechazarUsuario:', typeof window.rechazarUsuario);
-console.log('  - verDetallesPago:', typeof window.verDetallesPago);
-console.log('  - approvePaymentFromTable:', typeof window.approvePaymentFromTable);
-console.log('  - rejectPaymentFromTable:', typeof window.rejectPaymentFromTable);
-console.log('✅ [PARCHE] Tabla de usuarios completamente funcional');
+(' [PARCHE] Todas las funciones definidas:');
+('  - aprobarUsuario:', typeof window.aprobarUsuario);
+('  - rechazarUsuario:', typeof window.rechazarUsuario);
+('  - verDetallesPago:', typeof window.verDetallesPago);
+('  - approvePaymentFromTable:', typeof window.approvePaymentFromTable);
+('  - rejectPaymentFromTable:', typeof window.rejectPaymentFromTable);
+(' [PARCHE] Tabla de usuarios completamente funcional');
 
 // ==========================================
-// 🔧 FIX FINAL: GESTIÓN DE USUARIOS ADMIN
-// Agregar AL FINAL de dashboardAdmin.js
+// GESTIÓN DE USUARIOS ADMIN
+// 
 // ==========================================
 
-console.log('🔧 [FIX USUARIOS] Aplicando corrección final...');
+(' [FIX USUARIOS] Aplicando corrección final...');
 
 // ========== 1. LIMPIAR FUNCIONES ANTERIORES ==========
 (function() {
@@ -6919,10 +6797,10 @@ console.log('🔧 [FIX USUARIOS] Aplicando corrección final...');
     // ========== 2. DEFINIR FUNCIONES PRINCIPALES ==========
 
     /**
-     * ✅ Ver detalles de pago
+     *  Ver detalles de pago
      */
     window.verDetallesPago = async function(userId) {
-        console.log('💵 [PAGO] Cargando detalles de pago:', userId);
+        ('💵 [PAGO] Cargando detalles de pago:', userId);
         
         try {
             const response = await fetch(`/api/users/payment-details?id_usuario=${userId}`);
@@ -6936,19 +6814,19 @@ console.log('🔧 [FIX USUARIOS] Aplicando corrección final...');
             if (data.success) {
                 mostrarModalDetallesPago(data.pago, data.usuario);
             } else {
-                alert('❌ Error: ' + data.message);
+                alert(' Error: ' + data.message);
             }
         } catch (error) {
             console.error('Error:', error);
-            alert('❌ Error al cargar detalles de pago: ' + error.message);
+            alert(' Error al cargar detalles de pago: ' + error.message);
         }
     };
 
     /**
-     * ✅ Mostrar modal con detalles de pago
+     *  Mostrar modal con detalles de pago
      */
     function mostrarModalDetallesPago(pago, usuario) {
-        // Limpiar modales anteriores
+       
         const modalAnterior = document.getElementById('detallesPagoModal');
         if (modalAnterior) modalAnterior.remove();
 
@@ -7064,7 +6942,7 @@ console.log('🔧 [FIX USUARIOS] Aplicando corrección final...');
     }
 
     /**
-     * ✅ Aprobar pago desde modal
+     *  Aprobar pago desde modal
      */
     window.aprobarPagoDesdeModal = async function(pagoId, userId) {
         document.getElementById('detallesPagoModal').remove();
@@ -7085,21 +6963,21 @@ console.log('🔧 [FIX USUARIOS] Aplicando corrección final...');
             const data = await response.json();
 
             if (data.success) {
-                alert('✅ Pago aprobado correctamente');
+                alert(' Pago aprobado correctamente');
                 if (typeof loadUsersForTable === 'function') {
                     loadUsersForTable();
                 }
             } else {
-                alert('❌ Error: ' + data.message);
+                alert(' Error: ' + data.message);
             }
         } catch (error) {
             console.error('Error:', error);
-            alert('❌ Error de conexión');
+            alert(' Error de conexión');
         }
     };
 
     /**
-     * ✅ Rechazar pago desde modal
+     *  Rechazar pago desde modal
      */
     window.rechazarPagoDesdeModal = async function(pagoId, userId) {
         document.getElementById('detallesPagoModal').remove();
@@ -7124,21 +7002,21 @@ console.log('🔧 [FIX USUARIOS] Aplicando corrección final...');
             const data = await response.json();
 
             if (data.success) {
-                alert('✅ Pago rechazado');
+                alert(' Pago rechazado');
                 if (typeof loadUsersForTable === 'function') {
                     loadUsersForTable();
                 }
             } else {
-                alert('❌ Error: ' + data.message);
+                alert(' Error: ' + data.message);
             }
         } catch (error) {
             console.error('Error:', error);
-            alert('❌ Error de conexión');
+            alert(' Error de conexión');
         }
     };
 
     /**
-     * ✅ Sobrescribir renderUserRow para manejar estados correctamente
+     *  Sobrescribir renderUserRow para manejar estados correctamente
      */
     window.renderUserRow = function(user) {
         const hasPayment = user.comprobante_archivo && user.comprobante_archivo !== '';
@@ -7163,14 +7041,14 @@ console.log('🔧 [FIX USUARIOS] Aplicando corrección final...');
                 <td>
                     <div style="display: flex; gap: 5px; flex-wrap: wrap; justify-content: center;">
                         
-                        ${/* ✅ BOTÓN VER DETALLES DE USUARIO */ ''}
+                        ${/*  BOTÓN VER DETALLES DE USUARIO */ ''}
                         <button class="btn-icon btn-primary" 
                                 onclick="viewUserDetails(${user.id_usuario})"
                                 title="Ver detalles del usuario">
                             <i class="fas fa-eye"></i>
                         </button>
                         
-                        ${/* ✅ BOTÓN VER PAGO - Solo visible si está pendiente */ ''}
+                        ${/*  BOTÓN VER PAGO - Solo visible si está pendiente */ ''}
                         ${hasPayment && isPending ? `
                             <button class="btn-icon btn-info" 
                                     onclick="verDetallesPago(${user.id_usuario})"
@@ -7180,7 +7058,7 @@ console.log('🔧 [FIX USUARIOS] Aplicando corrección final...');
                             </button>
                         ` : ''}
                         
-                        ${/* ✅ BOTONES DE APROBACIÓN/RECHAZO DE USUARIO */ ''}
+                        ${/*  BOTONES DE APROBACIÓN/RECHAZO DE USUARIO */ ''}
                         ${isPending ? `
                             <button class="btn-icon btn-success" 
                                     onclick="aprobarUsuario(${user.id_usuario}, '${user.nombre_completo.replace(/'/g, "\\'")}')"
@@ -7197,14 +7075,14 @@ console.log('🔧 [FIX USUARIOS] Aplicando corrección final...');
                             </button>
                         ` : ''}
                         
-                        ${/* ✅ BADGE DE APROBADO */ ''}
+                        ${/*  BADGE DE APROBADO */ ''}
                         ${isApproved ? `
                             <span class="badge badge-success" style="padding: 6px 12px;">
                                 <i class="fas fa-check-circle"></i> Aprobado
                             </span>
                         ` : ''}
                         
-                        ${/* ✅ BADGE DE RECHAZADO */ ''}
+                        ${/*  BADGE DE RECHAZADO */ ''}
                         ${isRejected ? `
                             <span class="badge badge-danger" style="padding: 6px 12px;">
                                 <i class="fas fa-times-circle"></i> Rechazado
@@ -7217,10 +7095,10 @@ console.log('🔧 [FIX USUARIOS] Aplicando corrección final...');
     };
 
     /**
-     * ✅ Aprobar usuario
+     *  Aprobar usuario
      */
     window.aprobarUsuario = async function(userId, nombreUsuario) {
-        console.log('✅ [APROBAR] Aprobando usuario:', userId);
+        (' [APROBAR] Aprobando usuario:', userId);
         
         if (!confirm(`¿Aprobar el registro de ${nombreUsuario}?\n\nEl usuario podrá acceder al sistema y su pago será validado automáticamente.`)) {
             return;
@@ -7239,24 +7117,24 @@ console.log('🔧 [FIX USUARIOS] Aplicando corrección final...');
             const data = await response.json();
             
             if (data.success) {
-                alert('✅ Usuario aprobado correctamente');
+                alert(' Usuario aprobado correctamente');
                 if (typeof loadUsersForTable === 'function') {
                     loadUsersForTable();
                 }
             } else {
-                alert('❌ Error: ' + data.message);
+                alert(' Error: ' + data.message);
             }
         } catch (error) {
             console.error('Error:', error);
-            alert('❌ Error de conexión');
+            alert(' Error de conexión');
         }
     };
 
     /**
-     * ✅ Rechazar usuario
+     *  Rechazar usuario
      */
     window.rechazarUsuario = async function(userId, nombreUsuario) {
-        console.log('❌ [RECHAZAR] Rechazando usuario:', userId);
+        (' [RECHAZAR] Rechazando usuario:', userId);
         
         const motivo = prompt(`¿Por qué rechazas el registro de ${nombreUsuario}?\n\nMotivo (opcional):`);
         
@@ -7280,16 +7158,16 @@ console.log('🔧 [FIX USUARIOS] Aplicando corrección final...');
             const data = await response.json();
             
             if (data.success) {
-                alert('✅ Usuario rechazado');
+                alert(' Usuario rechazado');
                 if (typeof loadUsersForTable === 'function') {
                     loadUsersForTable();
                 }
             } else {
-                alert('❌ Error: ' + data.message);
+                alert(' Error: ' + data.message);
             }
         } catch (error) {
             console.error('Error:', error);
-            alert('❌ Error de conexión');
+            alert(' Error de conexión');
         }
     };
 
@@ -7304,27 +7182,27 @@ console.log('🔧 [FIX USUARIOS] Aplicando corrección final...');
         return estados[estado] || estado;
     }
 
-    console.log('✅ [FIX USUARIOS] Todas las funciones definidas correctamente');
-    console.log('  - verDetallesPago:', typeof window.verDetallesPago);
-    console.log('  - aprobarUsuario:', typeof window.aprobarUsuario);
-    console.log('  - rechazarUsuario:', typeof window.rechazarUsuario);
+    (' [FIX USUARIOS] Todas las funciones definidas correctamente');
+    ('  - verDetallesPago:', typeof window.verDetallesPago);
+    ('  - aprobarUsuario:', typeof window.aprobarUsuario);
+    ('  - rechazarUsuario:', typeof window.rechazarUsuario);
 })();
 
-console.log('✅ [FIX USUARIOS] Módulo cargado completamente');
+(' [FIX USUARIOS] Módulo cargado completamente');
 
 
 // ==========================================
-// 🔧 FIX: ASIGNACIÓN DE VIVIENDA A NÚCLEO
-// Reemplazar la función submitAsignacion en dashboardAdmin.js
+// FIX: ASIGNACIÓN DE VIVIENDA A NÚCLEO
+// 
 // ==========================================
 
 // ==========================================
-// ✅ FIX FINAL: submitAsignacion() - CON RECARGA AUTOMÁTICA
+//  FIX FINAL: submitAsignacion() - CON RECARGA AUTOMÁTICA
 // ==========================================
 
 function submitAsignacion(event) {
     event.preventDefault();
-    console.log('📤 [ASIGNAR] Iniciando asignación de vivienda...');
+    ('📤 [ASIGNAR] Iniciando asignación de vivienda...');
 
     const viviendaId = document.getElementById('asignar-vivienda-id').value;
     const tipo = document.getElementById('asignar-tipo').value;
@@ -7332,7 +7210,7 @@ function submitAsignacion(event) {
     const nucleoId = document.getElementById('asignar-nucleo').value;
     const observaciones = document.getElementById('asignar-observaciones').value;
 
-    // ✅ VALIDACIÓN
+    //  VALIDACIÓN
     if (!tipo || (tipo === 'usuario' && !usuarioId) || (tipo === 'nucleo' && !nucleoId)) {
         alert('⚠️ Debe seleccionar un usuario o núcleo');
         return;
@@ -7349,7 +7227,7 @@ function submitAsignacion(event) {
     
     formData.append('observaciones', observaciones);
 
-    console.log('📤 [ASIGNAR] Enviando asignación...');
+    ('📤 [ASIGNAR] Enviando asignación...');
 
     fetch('/api/viviendas/asignar', {
         method: 'POST',
@@ -7358,37 +7236,37 @@ function submitAsignacion(event) {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert('✅ ' + data.message);
+                alert(' ' + data.message);
                 
-                // ✅ CERRAR MODAL
+                //  CERRAR MODAL
                 closeAsignarModal();
                 
-                // ✅ RECARGAR PÁGINA COMPLETA
-                console.log('🔄 [ASIGNAR] Recargando página...');
+                //  RECARGAR PÁGINA COMPLETA
+                ('🔄 [ASIGNAR] Recargando página...');
                 window.location.reload();
                 
             } else {
-                alert('❌ Error: ' + data.message);
+                alert(' Error: ' + data.message);
             }
         })
         .catch(error => {
-            console.error('❌ [ASIGNAR] Error:', error);
-            alert('❌ Error de conexión');
+            console.error(' [ASIGNAR] Error:', error);
+            alert(' Error de conexión');
         });
 }
 
-// ✅ EXPORTAR
+//  EXPORTAR
 window.submitAsignacion = submitAsignacion;
 
-console.log('✅ submitAsignacion con recarga automática aplicado');
+(' submitAsignacion con recarga automática aplicado');
 
 // ==========================================
-// 🔧 FIX: FUNCIÓN MEJORADA PARA MOSTRAR MODAL
-// También reemplazar showAsignarModal
+// FIX: FUNCIÓN MEJORADA PARA MOSTRAR MODAL
+// 
 // ==========================================
 
 function showAsignarModal(viviendaId, numeroVivienda) {
-    console.log('>>> Abriendo modal asignar:', viviendaId);
+    ('>>> Abriendo modal asignar:', viviendaId);
 
     // 🧹 LIMPIAR MODALES ANTERIORES
     limpiarModalesAnteriores();
@@ -7416,7 +7294,7 @@ function showAsignarModal(viviendaId, numeroVivienda) {
             document.getElementById('asignar-vivienda-info').textContent = `Vivienda: ${numeroVivienda}`;
             document.getElementById('asignar-vivienda-id').value = viviendaId;
             
-            // ✅ Resetear selects
+            //  Resetear selects
             document.getElementById('asignar-tipo').value = '';
             document.getElementById('asignar-usuario').value = '';
             document.getElementById('asignar-nucleo').value = '';
@@ -7428,7 +7306,7 @@ function showAsignarModal(viviendaId, numeroVivienda) {
             
             document.getElementById('asignarViviendaModal').style.display = 'flex';
             
-            console.log('✅ Modal abierto correctamente');
+            (' Modal abierto correctamente');
         }
     }).catch(error => {
         console.error('Error:', error);
@@ -7437,7 +7315,7 @@ function showAsignarModal(viviendaId, numeroVivienda) {
 }
 
 // ==========================================
-// 🔧 FUNCIÓN AUXILIAR: toggleAsignarTipo
+//  toggleAsignarTipo
 // ==========================================
 
 function toggleAsignarTipo() {
@@ -7445,18 +7323,18 @@ function toggleAsignarTipo() {
     const usuarioGroup = document.getElementById('asignar-usuario-group');
     const nucleoGroup = document.getElementById('asignar-nucleo-group');
 
-    console.log('🔄 [TOGGLE] Tipo seleccionado:', tipo);
+    ('🔄 [TOGGLE] Tipo seleccionado:', tipo);
 
     if (tipo === 'usuario') {
         usuarioGroup.style.display = 'block';
         nucleoGroup.style.display = 'none';
         document.getElementById('asignar-nucleo').value = ''; // Limpiar núcleo
-        console.log('✅ [TOGGLE] Mostrando selector de usuario');
+        (' [TOGGLE] Mostrando selector de usuario');
     } else if (tipo === 'nucleo') {
         usuarioGroup.style.display = 'none';
         nucleoGroup.style.display = 'block';
         document.getElementById('asignar-usuario').value = ''; // Limpiar usuario
-        console.log('✅ [TOGGLE] Mostrando selector de núcleo');
+        (' [TOGGLE] Mostrando selector de núcleo');
     } else {
         usuarioGroup.style.display = 'none';
         nucleoGroup.style.display = 'none';
@@ -7471,20 +7349,20 @@ window.submitAsignacion = submitAsignacion;
 window.showAsignarModal = showAsignarModal;
 window.toggleAsignarTipo = toggleAsignarTipo;
 
-console.log('✅ Fix de asignación de vivienda aplicado correctamente');
+(' Fix de asignación de vivienda aplicado correctamente');
 
 
 // ==========================================
-// 🏠 ASIGNACIÓN DIRECTA DE VIVIENDA (SIN MODAL)
+//  ASIGNACIÓN DIRECTA DE VIVIENDA (SIN MODAL)
 // ==========================================
 
-console.log('🏠 [VIVIENDA] Cargando sistema de asignación directa...');
+('[VIVIENDA] Cargando sistema de asignación directa...');
 
 /**
- * ✅ Asignar vivienda directamente con prompts
+ *  Asignar vivienda directamente con prompts
  */
 window.asignarViviendaDirecta = async function(viviendaId, numeroVivienda) {
-    console.log('🏠 [ASIGNAR] Iniciando asignación para vivienda:', numeroVivienda);
+    ('🏠 [ASIGNAR] Iniciando asignación para vivienda:', numeroVivienda);
     
     // PASO 1: Preguntar qué tipo de asignación
     const tipo = prompt(
@@ -7496,7 +7374,7 @@ window.asignarViviendaDirecta = async function(viviendaId, numeroVivienda) {
     );
     
     if (!tipo || (tipo !== '1' && tipo !== '2')) {
-        console.log('❌ [ASIGNAR] Cancelado por usuario');
+        (' [ASIGNAR] Cancelado por usuario');
         return;
     }
     
@@ -7527,7 +7405,7 @@ window.asignarViviendaDirecta = async function(viviendaId, numeroVivienda) {
         }
         
         if (opciones.length === 0) {
-            alert('❌ No hay ' + (esUsuario ? 'usuarios' : 'núcleos') + ' disponibles');
+            alert(' No hay ' + (esUsuario ? 'usuarios' : 'núcleos') + ' disponibles');
             return;
         }
         
@@ -7549,14 +7427,14 @@ window.asignarViviendaDirecta = async function(viviendaId, numeroVivienda) {
         const seleccion = prompt(mensaje);
         
         if (!seleccion) {
-            console.log('❌ [ASIGNAR] Cancelado por usuario');
+            (' [ASIGNAR] Cancelado por usuario');
             return;
         }
         
         const index = parseInt(seleccion) - 1;
         
         if (index < 0 || index >= opciones.length) {
-            alert('❌ Selección inválida');
+            alert(' Selección inválida');
             return;
         }
         
@@ -7581,7 +7459,7 @@ window.asignarViviendaDirecta = async function(viviendaId, numeroVivienda) {
             formData.append('nucleo_id', opcionSeleccionada.id_nucleo);
         }
         
-        console.log('📤 [ASIGNAR] Enviando asignación...');
+        ('📤 [ASIGNAR] Enviando asignación...');
         
         const response = await fetch('/api/viviendas/asignar', {
             method: 'POST',
@@ -7591,27 +7469,27 @@ window.asignarViviendaDirecta = async function(viviendaId, numeroVivienda) {
         const data = await response.json();
         
         if (data.success) {
-            alert('✅ ' + data.message);
+            alert(' ' + data.message);
             
             // Recargar tabla
             if (typeof loadViviendas === 'function') {
                 loadViviendas();
             }
         } else {
-            alert('❌ Error: ' + data.message);
+            alert(' Error: ' + data.message);
         }
         
     } catch (error) {
-        console.error('❌ [ASIGNAR] Error:', error);
-        alert('❌ Error: ' + error.message);
+        console.error(' [ASIGNAR] Error:', error);
+        alert(' Error: ' + error.message);
     }
 };
 
 /**
- * ✅ Desasignar vivienda
+ *  Desasignar vivienda
  */
 window.desasignarVivienda = async function(asignacionId, numeroVivienda) {
-    console.log('🏠 [DESASIGNAR] Iniciando desasignación:', asignacionId);
+    ('🏠 [DESASIGNAR] Iniciando desasignación:', asignacionId);
     
     if (!confirm(`¿Desasignar la vivienda ${numeroVivienda}?\n\nLos usuarios/núcleo quedarán sin vivienda asignada.`)) {
         return;
@@ -7629,22 +7507,22 @@ window.desasignarVivienda = async function(asignacionId, numeroVivienda) {
         const data = await response.json();
         
         if (data.success) {
-            alert('✅ ' + data.message);
+            alert(' ' + data.message);
             
             if (typeof loadViviendas === 'function') {
                 loadViviendas();
             }
         } else {
-            alert('❌ Error: ' + data.message);
+            alert(' Error: ' + data.message);
         }
         
     } catch (error) {
-        console.error('❌ [DESASIGNAR] Error:', error);
-        alert('❌ Error de conexión');
+        console.error(' [DESASIGNAR] Error:', error);
+        alert(' Error de conexión');
     }
 };
 
-console.log('✅ Sistema de asignación directa cargado');
-console.log('✅ Funciones disponibles:');
-console.log('  - asignarViviendaDirecta()');
-console.log('  - desasignarVivienda()');
+(' Sistema de asignación directa cargado');
+(' Funciones disponibles:');
+('  - asignarViviendaDirecta()');
+('  - desasignarVivienda()');

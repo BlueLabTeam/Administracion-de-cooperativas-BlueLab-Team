@@ -54,21 +54,21 @@ class Herramientas
 
            $currentURL = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
         
-        // ✅ Detectar admin por ROL o flag is_admin
+        //  Detectar admin por ROL o flag is_admin
         $isAdmin = ($_SESSION['is_admin'] ?? false) || ($_SESSION['rol'] ?? '') === 'admin';
         $estado = $_SESSION['estado'] ?? 'pendiente';
 
-        // ✅ ADMINISTRADORES: Acceso completo sin restricciones
+        //  ADMINISTRADORES: Acceso completo sin restricciones
         if ($isAdmin) {
             return;
         }
 
-        // ✅ USUARIOS ACEPTADOS: Acceso completo sin restricciones
+        //  USUARIOS ACEPTADOS: Acceso completo sin restricciones
         if ($estado === 'aceptado') {
             return;
         }
 
-        // ⚠️ Rutas permitidas para usuarios NO aceptados (pendiente/enviado)
+        //  Rutas permitidas para usuarios NO aceptados (pendiente/enviado)
         $rutasPermitidasSinAceptacion = [
             '/api/pay/firstPay',
             '/pagoPendiente',
@@ -79,7 +79,7 @@ class Herramientas
             return;
         }
 
-        // ❌ Para estados NO aceptados, redirigir según el estado
+        //  Para estados NO aceptados, redirigir según el estado
         if (isset(self::$estadoRutas[$estado])) {
             if (self::isApiRequest()) {
                 http_response_code(403);

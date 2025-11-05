@@ -25,7 +25,7 @@ class JustificacionHorasController
 
     /**
      * Crear justificación de horas
-     * ENDPOINT: POST /api/justificaciones/crear
+     * 
      */
     public function crearJustificacion()
     
@@ -42,7 +42,7 @@ class JustificacionHorasController
 
         // Verificar sesión
         if (!isset($_SESSION['user_id'])) {
-            error_log("❌ No hay user_id en sesión");
+            error_log(" No hay user_id en sesión");
             http_response_code(401);
             echo json_encode([
                 'success' => false,
@@ -55,7 +55,7 @@ class JustificacionHorasController
         $isAdmin = ($_SESSION['is_admin'] ?? false) || ($_SESSION['id_rol'] ?? 0) == 1;
         
         if (!$isAdmin) {
-            error_log("❌ Usuario no es admin. id_rol: " . ($_SESSION['id_rol'] ?? 'NO SET') . ", is_admin: " . ($_SESSION['is_admin'] ?? 'NO SET'));
+            error_log(" Usuario no es admin. id_rol: " . ($_SESSION['id_rol'] ?? 'NO SET') . ", is_admin: " . ($_SESSION['is_admin'] ?? 'NO SET'));
             http_response_code(403);
             echo json_encode([
                 'success' => false,
@@ -64,13 +64,13 @@ class JustificacionHorasController
             exit();
         }
 
-        error_log("✅ Permisos OK");
+        error_log(" Permisos OK");
 
             // Validar datos requeridos
             $requiredFields = ['id_usuario', 'mes', 'anio', 'horas_justificadas', 'motivo'];
             foreach ($requiredFields as $field) {
                 if (!isset($_POST[$field])) {
-                    error_log("❌ Campo faltante: $field");
+                    error_log(" Campo faltante: $field");
                     http_response_code(400);
                     echo json_encode([
                         'success' => false,
@@ -88,7 +88,7 @@ class JustificacionHorasController
             $observaciones = isset($_POST['observaciones']) ? trim($_POST['observaciones']) : null;
             $idAdmin = $_SESSION['user_id'];
 
-            error_log("✅ Datos validados: $horasJustificadas horas para usuario $idUsuario");
+            error_log(" Datos validados: $horasJustificadas horas para usuario $idUsuario");
 
             // Validar horas
             if ($horasJustificadas <= 0) {
@@ -115,7 +115,7 @@ class JustificacionHorasController
 
                 if (move_uploaded_file($_FILES['archivo']['tmp_name'], $rutaDestino)) {
                     $archivoAdjunto = 'justificaciones/' . $nombreArchivo;
-                    error_log("✅ Archivo guardado: $archivoAdjunto");
+                    error_log(" Archivo guardado: $archivoAdjunto");
                 }
             }
 
@@ -132,13 +132,13 @@ class JustificacionHorasController
                 $observaciones
             );
 
-            error_log("✅ Resultado: " . json_encode($resultado));
+            error_log(" Resultado: " . json_encode($resultado));
 
             http_response_code($resultado['success'] ? 200 : 400);
             echo json_encode($resultado);
 
         } catch (\Exception $e) {
-            error_log("❌ Exception: " . $e->getMessage());
+            error_log(" Exception: " . $e->getMessage());
             error_log("Stack: " . $e->getTraceAsString());
             http_response_code(500);
             echo json_encode([
@@ -190,7 +190,7 @@ class JustificacionHorasController
             ]);
 
         } catch (\Exception $e) {
-            error_log("❌ Error en getJustificacionesUsuario: " . $e->getMessage());
+            error_log(" Error en getJustificacionesUsuario: " . $e->getMessage());
             http_response_code(500);
             echo json_encode([
                 'success' => false,
@@ -202,7 +202,7 @@ class JustificacionHorasController
 
     /**
      * Eliminar justificación
-     * ENDPOINT: POST /api/justificaciones/eliminar
+     * 
      */
     public function eliminarJustificacion()
     {
@@ -238,7 +238,7 @@ class JustificacionHorasController
             echo json_encode($resultado);
 
         } catch (\Exception $e) {
-            error_log("❌ Error en eliminarJustificacion: " . $e->getMessage());
+            error_log(" Error en eliminarJustificacion: " . $e->getMessage());
             http_response_code(500);
             echo json_encode([
                 'success' => false,

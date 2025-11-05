@@ -15,7 +15,7 @@ class Material
         $this->conn = Database::getConnection();
     }
 
-    // ✅ OPTIMIZADO: Stock ahora está en Materiales.cantidad_disponible
+    //Stock ahora está en Materiales.cantidad_disponible
     public function create($nombre, $caracteristicas, $stockInicial = 0)
     {
         try {
@@ -34,7 +34,7 @@ class Material
         }
     }
 
-    // ✅ OPTIMIZADO: Obtener todos con stock integrado
+    //Obtener todos con stock integrado
     public function getAll()
     {
         try {
@@ -55,7 +55,8 @@ class Material
         }
     }
 
-    // ✅ OPTIMIZADO: Obtener por ID con stock integrado
+    // 
+    // Obtener por ID con stock integrado
     public function getById($id)
     {
         try {
@@ -94,7 +95,7 @@ class Material
         }
     }
 
-    // ✅ OPTIMIZADO: Actualizar stock directamente en Materiales
+    // Actualizar stock directamente en Materiales
     public function updateStock($id, $cantidad)
     {
         try {
@@ -111,7 +112,7 @@ class Material
         }
     }
 
-    // ✅ OPTIMIZADO: Eliminar sin tabla Stock_Materiales
+    //Eliminar sin tabla Stock_Materiales
     public function delete($id)
     {
         try {
@@ -137,7 +138,7 @@ class Material
         }
     }
 
-    // ✅ OPTIMIZADO: Buscar con stock integrado
+    //Buscar con stock integrado
     public function search($searchTerm)
     {
         try {
@@ -186,7 +187,7 @@ class Material
         }
     }
 
-    // ✅ OPTIMIZADO: Obtener materiales de tarea con stock integrado
+    //Obtener materiales de tarea con stock integrado
     public function getTaskMaterials($tareaId)
     {
         try {

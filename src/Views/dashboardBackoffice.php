@@ -6,7 +6,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<title>Gestcoop – Panel de Administrador</title>
 
-	   <!-- ✅ PRIMERO: Variables globales -->
+	 
     <link rel="stylesheet" href="/assets/css/dashboardVariables.css" />
 	
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -505,7 +505,7 @@
             </div>
             
             <div class="alert-warning" style="margin: 15px 0;">
-                <strong>⚠️ Importante:</strong>
+                <strong> Importante:</strong>
                 <p>Este cambio aplicará para las nuevas cuotas que se generen. Las cuotas ya existentes mantendrán su monto original.</p>
             </div>
             
@@ -526,7 +526,7 @@
     <div class="modal-content-large">
         <button class="modal-close-btn" onclick="closeValidarPagoModal()">×</button>
         
-        <h2 class="modal-title">✅ Validar Pago de Cuota</h2>
+        <h2 class="modal-title"> Validar Pago de Cuota</h2>
         
         <div id="pago-info-validar">
             <!-- Info se carga dinámicamente -->

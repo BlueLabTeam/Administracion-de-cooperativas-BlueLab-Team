@@ -196,7 +196,7 @@ class ViviendaController
     }
 
 /**
- * 🆕 Asignar vivienda - VERSIÓN CORREGIDA FINAL
+ * 
  * FIX: Maneja correctamente NULL para id_usuario o id_nucleo
  */
   public function asignar()
@@ -258,7 +258,7 @@ class ViviendaController
             exit();
         }
 
-        error_log("✅ [ASIGNAR] Vivienda: {$vivienda['numero_vivienda']} | Tipo: {$vivienda['tipo_vivienda']} | Monto: \${$vivienda['monto_mensual']}");
+        error_log(" [ASIGNAR] Vivienda: {$vivienda['numero_vivienda']} | Tipo: {$vivienda['tipo_vivienda']} | Monto: \${$vivienda['monto_mensual']}");
 
         // Verificar si está asignada
         $stmtCheck = $this->conn->prepare("
@@ -275,7 +275,7 @@ class ViviendaController
 
         // 🔧 SOLUCIÓN: SQL condicional según el tipo de asignación
         if ($idUsuario) {
-            // ✅ Asignar a USUARIO - Solo insertar columnas necesarias
+            //  Asignar a USUARIO - Solo insertar columnas necesarias
             error_log("👤 [ASIGNAR] Insertando asignación a USUARIO $idUsuario");
             
             $sql = "INSERT INTO Asignacion_Vivienda 
@@ -286,7 +286,7 @@ class ViviendaController
             $stmtAsignar->execute([$idVivienda, $idUsuario, $observaciones]);
             
         } else {
-            // ✅ Asignar a NÚCLEO - Solo insertar columnas necesarias
+            //  Asignar a NÚCLEO - Solo insertar columnas necesarias
             error_log("👨‍👩‍👧‍👦 [ASIGNAR] Insertando asignación a NÚCLEO $idNucleo");
             
             $sql = "INSERT INTO Asignacion_Vivienda 
@@ -298,7 +298,7 @@ class ViviendaController
         }
 
         $idAsignacion = $this->conn->lastInsertId();
-        error_log("✅ [ASIGNAR] INSERT exitoso! ID asignación: $idAsignacion");
+        error_log(" [ASIGNAR] INSERT exitoso! ID asignación: $idAsignacion");
 
         // Actualizar estado vivienda
         $stmtUpdate = $this->conn->prepare("UPDATE Viviendas SET estado = 'ocupada' WHERE id_vivienda = ?");
@@ -319,7 +319,7 @@ class ViviendaController
                     cm.observaciones = CONCAT(
                         COALESCE(cm.observaciones, ''),
                         IF(cm.observaciones IS NOT NULL AND cm.observaciones != '', '\n', ''),
-                        '✅ Vivienda ', ?, ' asignada el ', NOW()
+                        ' Vivienda ', ?, ' asignada el ', NOW()
                     )
                 WHERE cm.id_usuario = ?
                 AND cm.pendiente_asignacion = 1
@@ -391,7 +391,7 @@ class ViviendaController
                         cm.observaciones = CONCAT(
                             COALESCE(cm.observaciones, ''),
                             IF(cm.observaciones IS NOT NULL AND cm.observaciones != '', '\n', ''),
-                            '✅ Vivienda asignada a núcleo el ', NOW()
+                            ' Vivienda asignada a núcleo el ', NOW()
                         )
                     WHERE cm.id_usuario = ?
                     AND cm.pendiente_asignacion = 1
@@ -439,7 +439,7 @@ class ViviendaController
         }
 
         $this->conn->commit();
-        error_log("✅ [ASIGNAR] COMPLETADO - Cuotas actualizadas: $cuotasActualizadas");
+        error_log(" [ASIGNAR] COMPLETADO - Cuotas actualizadas: $cuotasActualizadas");
 
         echo json_encode([
             'success' => true,
@@ -456,7 +456,7 @@ class ViviendaController
             $this->conn->rollBack();
         }
         
-        error_log("❌ [ASIGNAR] ERROR PDO: " . $e->getMessage());
+        error_log(" [ASIGNAR] ERROR PDO: " . $e->getMessage());
         error_log("   Código: " . $e->getCode());
         error_log("   Stack: " . $e->getTraceAsString());
         
@@ -471,7 +471,7 @@ class ViviendaController
             $this->conn->rollBack();
         }
         
-        error_log("❌ [ASIGNAR] ERROR: " . $e->getMessage());
+        error_log(" [ASIGNAR] ERROR: " . $e->getMessage());
         
         http_response_code(500);
         echo json_encode([

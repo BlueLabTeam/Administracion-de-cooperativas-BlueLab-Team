@@ -107,7 +107,7 @@ class User
     }
 
     /**
-     * ✅ ACTUALIZADO: Obtener pagos pendientes desde Pagos_Cuotas
+     *  Obtener pagos pendientes desde Pagos_Cuotas
      */
     public function getPendingPayments()
 {
@@ -185,7 +185,7 @@ class User
     }
 
     /**
-     * ✅ ACTUALIZADO: Obtener teléfono desde tabla Telefonos
+     *   Obtener teléfono desde tabla Telefonos
      */
     public function getTelefonoByUserId($userId)
     {
@@ -207,7 +207,7 @@ class User
     }
 
     /**
-     * ✅ ACTUALIZADO: Actualizar teléfono en tabla Telefonos
+     *  A Actualizar teléfono en tabla Telefonos
      */
     public function updateTelefono($userId, $telefono)
     {
@@ -242,7 +242,7 @@ class User
     }
 
     /**
-     * ✅ ACTUALIZADO: Obtener todos los usuarios con pagos
+     *  Obtener todos los usuarios con pagos
      */
     public function getAllUsersWithPayments()
 {

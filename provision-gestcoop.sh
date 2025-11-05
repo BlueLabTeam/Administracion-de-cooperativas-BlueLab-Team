@@ -259,7 +259,7 @@ backups() {
 	# Reiniciar servicio cron
 	sudo service cron restart
 
-	echo "✅ Cron configurado correctamente."
+	echo " Cron configurado correctamente."
 	echo "   El backup se ejecutará todos los días a las $HORA:00 y se guardará en storage/backups/"
 }
 

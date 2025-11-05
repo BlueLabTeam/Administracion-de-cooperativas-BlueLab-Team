@@ -295,7 +295,7 @@ class Nucleo
     }
 
     /**
-     * Obtener solicitudes del usuario - ✅ USAR VISTA
+     * Obtener solicitudes del usuario -  USAR VISTA
      */
     public function getSolicitudesUsuario($idUsuario)
     {
@@ -314,7 +314,7 @@ class Nucleo
     }
 
     /**
-     * Obtener solicitudes pendientes (Admin) - ✅ USAR VISTA
+     * Obtener solicitudes pendientes (Admin) -  USAR VISTA
      */
     public function getSolicitudesPendientes()
     {
