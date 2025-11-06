@@ -2,25 +2,27 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pago pendiente</title>
-</head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Gestcoop – Panel de Usuario</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-<!DOCTYPE html>
-<html lang="es">
-
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Gestcoop – Panel de Usuario</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="/assets/css/dashboardBase.css" />
-    <link rel="stylesheet" href="/assets/css/dashboardHeader.css" />
-    <link rel="stylesheet" href="/assets/css/dashboardNotificaciones.css" />
-    <link rel="stylesheet" href="/assets/css/dashboardTareas.css" />
-    <link rel="stylesheet" href="/assets/css/dashboardUtils.css" />
+    <link rel="stylesheet" href="/assets/css/dashboardVariables.css" />
+	
+	<link rel="stylesheet" href="/assets/css/dashboardBase.css" />
+	<link rel="stylesheet" href="/assets/css/dashboardHeader.css" />
+	<link rel="stylesheet" href="/assets/css/justificacion.css" />
+	<link rel="stylesheet" href="/assets/css/dashboardTareas.css" />
+	<link rel="stylesheet" href="/assets/css/dashboardHoras.css" />
+	<link rel="stylesheet" href="/assets/css/dashboardDeudaHoras.css" />
+	<link rel="stylesheet" href="/assets/css/dashboardDeudaTotal.css" />
+	<link rel="stylesheet" href="/assets/css/dashboardUtils.css" />
+	<link rel="stylesheet" href="/assets/css/dashboardViviendas.css" />
+	<link rel="stylesheet" href="/assets/css/dashboardCuotas.css" />
+	<link rel="stylesheet" href="/assets/css/dashboardPagos.css" />
+	<link rel="stylesheet" href="/assets/css/dashboardSolicitudes.css" />
     <link rel="stylesheet" href="/assets/css/salaEspera.css" />
+	
 </head>
 
 <body>
