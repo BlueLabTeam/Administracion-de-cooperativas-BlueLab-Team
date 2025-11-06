@@ -42,21 +42,22 @@ public function generarReporteMensual()
         error_log("   anio (int): $anio");
         error_log("========================================");
 
-        // ✅ Validación con logs detallados
+        // ✅ Validación: Solo desde 2025 en adelante (máximo 5 años al futuro)
         $mesValido = ($mes >= 1 && $mes <= 12);
-        $anioValido = ($anio >= 2025 && $anio <= 2030);
+        $anioActual = intval(date('Y'));
+        $anioValido = ($anio >= 2025 && $anio <= ($anioActual + 5));
 
         error_log("🔍 VALIDACIONES:");
         error_log("   Mes válido (1-12)? " . ($mesValido ? 'SÍ' : 'NO'));
-        error_log("   Año válido (2025-2030)? " . ($anioValido ? 'SÍ' : 'NO'));
+        error_log("   Año válido (2025-" . ($anioActual + 5) . ")? " . ($anioValido ? 'SÍ' : 'NO'));
 
         if (!$mesValido || !$anioValido) {
             error_log("❌ VALIDACIÓN FALLÓ");
             error_log("   Condición 1: mes=$mes (debe ser 1-12)");
-            error_log("   Condición 2: anio=$anio (debe ser 2025-2030)");
+            error_log("   Condición 2: anio=$anio (debe ser 2020-" . ($anioActual + 5) . ")");
             
             Herramientas::jsonResponse(false, 
-                "Mes o año inválido. Mes: $mes (debe ser 1-12), Año: $anio (debe ser 2025-2030)", 
+                "Mes o año inválido. Mes: $mes (debe ser 1-12), Año: $anio (debe ser 2020-" . ($anioActual + 5) . ")", 
                 [
                     'debug' => [
                         'mes_recibido' => $_GET['mes'] ?? null,
@@ -64,7 +65,8 @@ public function generarReporteMensual()
                         'anio_recibido' => $_GET['anio'] ?? null,
                         'anio_procesado' => $anio,
                         'mes_valido' => $mesValido,
-                        'anio_valido' => $anioValido
+                        'anio_valido' => $anioValido,
+                        'rango_valido' => "2020-" . ($anioActual + 5)
                     ]
                 ], 
                 400

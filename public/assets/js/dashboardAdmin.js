@@ -1234,7 +1234,7 @@ function cancelTask(tareaId) {
 function viewTaskDetails(tareaId) {
 
 
-    const url = `/api/tasks/details?id_tarea=${tareaId}`; 
+    const url = `=${tareaId}`; 
  
 
     fetch(url)
@@ -4771,7 +4771,7 @@ async function inicializarReportes() {
 
     try {
         //  Simular año mínimo (sin pedirlo al servidor)
-        let anioMinimo = new Date().getFullYear() - 5; // 5 años atrás
+        let anioMinimo = new Date().getFullYear()  ; // 5 años atrás
        
 
         //  GENERAR SELECTOR DE AÑOS DINÁMICO
