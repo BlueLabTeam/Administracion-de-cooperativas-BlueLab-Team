@@ -268,18 +268,9 @@ switch ($uri) {
         (new App\controllers\TaskController())->updateProgress();
         break;
     case '/api/tasks/add-avance':
-        $tareaId = $_POST['id_tarea'] ?? null;
-        $userId = $_POST['id_usuario'] ?? null;
-        $comentario = $_POST['comentario'] ?? null;
-        $progreso = $_POST['progreso_reportado'] ?? 0;
-        $archivo = $_FILES['archivo']['name'] ?? null;
-        if ($tareaId && $userId && $comentario) {
-            (new App\controllers\TaskController())->addAvance($tareaId, $userId, $comentario, $progreso, $archivo);
-        } else {
-            http_response_code(400);
-            echo json_encode(['error' => 'Faltan parametros']);
-        }
-        break;
+    $taskController = new App\controllers\TaskController();
+    $taskController->addAvance();
+break;
     case '/api/tasks/details':
         (new App\controllers\TaskController())->getTaskDetails();
         break;

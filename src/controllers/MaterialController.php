@@ -245,12 +245,12 @@ class MaterialController
         try {
             $data = json_decode(file_get_contents('php://input'), true);
 
-            if (empty($data['tarea_id']) || empty($data['material_id']) || !isset($data['cantidad'])) {
+            if (empty($data['id_tarea']) || empty($data['material_id']) || !isset($data['cantidad'])) {
                 echo json_encode(['success' => false, 'message' => 'Tarea ID, Material ID y cantidad son requeridos']);
                 exit();
             }
 
-            $tareaId = $data['tarea_id'];
+            $tareaId = $data['id_tarea'];
             $materialId = $data['material_id'];
             $cantidad = $data['cantidad'];
 
@@ -282,7 +282,7 @@ class MaterialController
             exit();
         }
 
-        $tareaId = $_GET['tarea_id'] ?? null;
+        $tareaId = $_GET['id_tarea'] ?? null;
 
         if (!$tareaId) {
             echo json_encode(['success' => false, 'message' => 'ID de tarea requerido']);
@@ -314,12 +314,12 @@ class MaterialController
         try {
             $data = json_decode(file_get_contents('php://input'), true);
 
-            if (empty($data['tarea_id']) || empty($data['material_id'])) {
+            if (empty($data['id_tarea']) || empty($data['material_id'])) {
                 echo json_encode(['success' => false, 'message' => 'Tarea ID y Material ID son requeridos']);
                 exit();
             }
 
-            $this->materialModel->removeFromTask($data['tarea_id'], $data['material_id']);
+            $this->materialModel->removeFromTask($data['id_tarea'], $data['material_id']);
 
             echo json_encode(['success' => true, 'message' => 'Material removido de la tarea']);
         } catch (\Exception $e) {

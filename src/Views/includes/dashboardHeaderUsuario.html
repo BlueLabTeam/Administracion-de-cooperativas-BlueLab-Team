@@ -1,101 +1,85 @@
-<!DOCTYPE html>
-<html lang="es">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cooperativa de Viviendas</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="/assets/css/dashboardHeader.css?v=2" />
-</head>
 
-<body>
+<header class="header">
+    <div class="logo">
+        <h1 data-i18n="dashboardUser.title">Gestcoop – Panel de Usuario</h1>
+    </div>
 
-    <header class="header">
-        <div class="logo">
-            <h1>Cooperativa de Viviendas</h1>
-        </div>
-
-        <div class="user-controls">
-            <a href="/api/logout" class="logout-link">
-                <button class="btn-logout">Logout</button>
+    <div class="user-controls">
+        
+        
+        <a href="/api/logout" class="logout-link">
+            <button class="btn-logout">
+                <span data-i18n="dashboardUser.logout">Logout</span>
+            </button>
+        </a>
+        
+        <?php if (isset($_SESSION['is_admin']) && $_SESSION['is_admin']): ?>
+            <a href="/dashboard-admin" style="text-decoration: none;">
+                <button class="btn-admin" type="button">
+                    <i class="fas fa-user-shield"></i>
+                    <span data-i18n="dashboardUser.admin">Admin</span>
+                </button>
             </a>
-            
-           
-            <?php if (isset($_SESSION['is_admin']) && $_SESSION['is_admin']): ?>
-                <a href="/dashboard-admin" style="text-decoration: none;">
-                    <button class="btn-admin" type="button">
-                        <i class="fas fa-user-shield"></i> Admin
-                    </button>
-                </a>
-            <?php endif; ?>
-            
-            <span class="nombre"><?php echo htmlspecialchars($_SESSION['nombre_completo'] ?? 'Usuario'); ?></span>
-            <div class="icono-usuario">
-                <img src="https://cdn-icons-png.flaticon.com/512/847/847969.png" alt="Usuario">
-            </div>
+        <?php endif; ?>
+        
+        <span class="nombre"><?php echo htmlspecialchars($_SESSION['nombre_completo'] ?? 'Usuario'); ?></span>
+        <div class="icono-usuario">
+            <img src="https://cdn-icons-png.flaticon.com/512/847/847969.png" alt="Usuario">
         </div>
-    </header>
+    </div>
 
-   <nav class="menu">
+        <!-- Scripts i18n -->
+    <script src="/assets/js/translationsdashboard.js"></script>
+    <script src="/assets/js/i18n.js"></script>
+
+</header>
+
+<nav class="menu">
     <ul>
         <li data-section="inicio" class="activo">
-            <a href="#">
+            <a href="#" data-i18n-title="dashboardUser.sections.home" title="Inicio">
                 <i class="fas fa-house-user"></i>
-
             </a>
         </li>
         <li data-section="perfil">
-            <a href="#">
+            <a href="#" data-i18n-title="dashboardUser.sections.profile" title="Perfil">
                 <i class="fas fa-user"></i>
-
             </a>
         </li>
         <li data-section="solicitudes">
-            <a href="#">
+            <a href="#" data-i18n-title="dashboardUser.sections.requests" title="Solicitudes">
                 <i class="fas fa-file-alt"></i>
-  
             </a>
         </li>
         <li data-section="vivienda">
-            <a href="#">
+            <a href="#" data-i18n-title="dashboardUser.sections.housing" title="Vivienda">
                 <i class="fas fa-home"></i>
-               
             </a>
         </li>
         <li data-section="cuotas">
-            <a href="#">
+            <a href="#" data-i18n-title="dashboardUser.sections.billing" title="Facturación">
                 <i class="fas fa-file-invoice-dollar"></i>
-             
             </a>
         </li>
         <li data-section="horas">
-            <a href="#">
+            <a href="#" data-i18n-title="dashboardUser.sections.hours" title="Horas">
                 <i class="fas fa-clock"></i>
-              
             </a>
         </li>
         <li data-section="tareas">
-            <a href="#">
+            <a href="#" data-i18n-title="dashboardUser.sections.tasks" title="Tareas">
                 <i class="fas fa-tasks"></i>
-               
             </a>
         </li>
-        
     </ul>
 </nav>
 
-    <!-- Contenido de cada sección -->
-    <main>
-        <section id="inicio" class="seccion activa"></section>
-        <section id="perfil" class="seccion"></section>
-        <section id="solicitudes" class="seccion"></section>
-        <section id="vivienda" class="seccion"></section>
-        <section id="aportes" class="seccion"></section>
-        <section id="horas" class="seccion"></section>
-        <section id="tareas" class="seccion"></section>
-    </main>
-    <script src="/assets/js/dashboardHeaderUsuario.js?v=2"></script>
+<!-- Script para manejar la navegación -->
+<script src="/assets/js/dashboardHeaderUsuario.js?v=2"></script>
+
+
+
 
 </body>
 </html>

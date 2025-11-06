@@ -1,9 +1,10 @@
-// i18n.js - Sistema de internacionalización
+// i18n.js - Sistema de internacionalización mejorado
 (function() {
   'use strict';
 
   // Estado del idioma actual
   let currentLang = 'es';
+  let isInitialized = false;
   
   // Detectar idioma del navegador
   function detectBrowserLanguage() {
@@ -125,6 +126,8 @@
         element.title = translation;
       }
     });
+    
+    console.log('✅ Página traducida a:', currentLang);
   }
 
   // Actualizar el botón de idioma
@@ -143,7 +146,11 @@
   // Crear botón de cambio de idioma
   function createLanguageToggle() {
     const existingToggle = document.getElementById('language-toggle');
-    if (existingToggle) return; // Ya existe
+    if (existingToggle) {
+      // Si ya existe, solo actualizar
+      updateLanguageButton();
+      return;
+    }
 
     const toggle = document.createElement('div');
     toggle.id = 'language-toggle';
@@ -173,6 +180,7 @@
     toggle.querySelectorAll('.lang-btn').forEach(btn => {
       btn.addEventListener('click', function() {
         const lang = this.getAttribute('data-lang');
+        console.log('🌐 Cambiando idioma a:', lang);
         setLanguage(lang);
       });
     });
@@ -226,6 +234,20 @@
 
   // Inicializar cuando el DOM esté listo
   function init() {
+    if (isInitialized) {
+      console.log('⚠️  i18n ya está inicializado');
+      return;
+    }
+    
+    console.log('🚀 Inicializando i18n...');
+    
+    // Verificar que translations esté disponible
+    if (typeof translations === 'undefined') {
+      console.error('❌ translations.js no está cargado. Reintentando en 100ms...');
+      setTimeout(init, 100);
+      return;
+    }
+    
     // Inicializar idioma
     initLanguage();
     
@@ -234,6 +256,12 @@
     
     // Traducir página inicial
     translatePage();
+    
+    isInitialized = true;
+    console.log('✅ i18n inicializado correctamente en idioma:', currentLang);
+    
+    // Disparar evento de inicialización
+    window.dispatchEvent(new CustomEvent('i18nReady', { detail: { language: currentLang } }));
   }
 
   // Exportar funciones globalmente
@@ -243,13 +271,15 @@
     getLanguage: getLanguage,
     translatePage: translatePage,
     translateList: translateList,
-    init: init
+    init: init,
+    isInitialized: function() { return isInitialized; }
   };
 
   // Auto-inicializar cuando el DOM esté listo
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {
+    // DOM ya está listo, inicializar inmediatamente
     init();
   }
 

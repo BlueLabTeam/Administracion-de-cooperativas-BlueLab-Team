@@ -166,11 +166,11 @@ class Material
     {
         try {
             $query = "INSERT INTO Tarea_Material (id_tarea, id_material, cantidad_requerida) 
-                      VALUES (:tarea_id, :material_id, :cantidad)
+                      VALUES (:id_tarea, :material_id, :cantidad)
                       ON DUPLICATE KEY UPDATE cantidad_requerida = VALUES(cantidad_requerida)";
             
             $stmt = $this->conn->prepare($query);
-            $stmt->bindParam(':tarea_id', $tareaId, PDO::PARAM_INT);
+            $stmt->bindParam(':id_tarea', $tareaId, PDO::PARAM_INT);
             $stmt->bindParam(':material_id', $materialId, PDO::PARAM_INT);
             $stmt->bindParam(':cantidad', $cantidadRequerida, PDO::PARAM_INT);
             
@@ -199,11 +199,11 @@ class Material
                         m.cantidad_disponible as stock_disponible
                       FROM Tarea_Material tm
                       INNER JOIN Materiales m ON tm.id_material = m.id_material
-                      WHERE tm.id_tarea = :tarea_id
+                      WHERE tm.id_tarea = :id_tarea
                       ORDER BY m.nombre ASC";
             
             $stmt = $this->conn->prepare($query);
-            $stmt->bindParam(':tarea_id', $tareaId);
+            $stmt->bindParam(':id_tarea', $tareaId);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
@@ -215,9 +215,9 @@ class Material
     public function removeFromTask($tareaId, $materialId)
     {
         try {
-            $query = "DELETE FROM Tarea_Material WHERE id_tarea = :tarea_id AND id_material = :material_id";
+            $query = "DELETE FROM Tarea_Material WHERE id_tarea = :id_tarea AND id_material = :material_id";
             $stmt = $this->conn->prepare($query);
-            $stmt->bindParam(':tarea_id', $tareaId);
+            $stmt->bindParam(':id_tarea', $tareaId);
             $stmt->bindParam(':material_id', $materialId);
             return $stmt->execute();
         } catch (PDOException $e) {

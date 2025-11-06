@@ -191,66 +191,13 @@
   <?php include __DIR__ . '/includes/footer.html'; ?>
 
   <!-- Scripts i18n PRIMERO -->
-  <script src="/assets/js/translations.js"></script>
+  <script src="/assets/js/translationslandinpage.js"></script>
   <script src="/assets/js/i18n.js"></script>
   
   <!-- Luego los scripts específicos de la página -->
   <script src="/assets/js/home.js"></script>
 
-  <!-- Script personalizado para traducir listas dinámicas -->
-  <script>
-    // Traducir detalles de servicios cuando cambia el idioma
-    window.addEventListener('languageChanged', function() {
-      // Traducir detalles de servicios
-      const consultingDetails = document.querySelectorAll('.servicios ul > li:nth-child(1) .servicio-detalle ul li');
-      const proceduresDetails = document.querySelectorAll('.servicios ul > li:nth-child(2) .servicio-detalle ul li');
-      const financialDetails = document.querySelectorAll('.servicios ul > li:nth-child(3) .servicio-detalle ul li');
-      
-      const lang = window.i18n.getLanguage();
-      const t = translations[lang].home.services;
-      
-      consultingDetails.forEach((li, i) => {
-        if (t.consulting.details[i]) li.textContent = t.consulting.details[i];
-      });
-      
-      proceduresDetails.forEach((li, i) => {
-        if (t.procedures.details[i]) li.textContent = t.procedures.details[i];
-      });
-      
-      financialDetails.forEach((li, i) => {
-        if (t.financial.details[i]) li.textContent = t.financial.details[i];
-      });
-
-      // Traducir pasos de incorporación
-      const steps = document.querySelectorAll('.incorporacion ol li');
-      steps.forEach((step, i) => {
-        const stepData = translations[lang].home.incorporation.steps[i];
-        if (stepData) {
-          const title = step.querySelector('h3');
-          const desc = step.querySelector('p');
-          if (title) title.textContent = stepData.title;
-          if (desc) desc.textContent = stepData.description;
-        }
-      });
-
-      // Traducir FAQ
-      const faqItems = document.querySelectorAll('#faq-list li');
-      faqItems.forEach((item, i) => {
-        const faqData = translations[lang].home.faq.questions[i];
-        if (faqData) {
-          const question = item.querySelector('.faq-question');
-          const answer = item.querySelector('.pregunta-respuesta');
-          if (question) question.textContent = faqData.question;
-          if (answer) answer.textContent = faqData.answer;
-        }
-      });
-    });
-
-    // Ejecutar traducción inicial para las listas
-    window.addEventListener('DOMContentLoaded', function() {
-      window.dispatchEvent(new CustomEvent('languageChanged'));
-    });
-  </script>
+ 
 
 </body>
 

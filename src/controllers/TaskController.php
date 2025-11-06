@@ -138,7 +138,7 @@ class TaskController
         echo json_encode([
             'success' => true,
             'message' => 'Tarea creada y asignada exitosamente',
-            'tarea_id' => $tareaId
+            'id_tarea' => $tareaId
         ]);
 
     } catch (\Exception $e) {
@@ -246,63 +246,82 @@ class TaskController
         echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
     }
 }
-    public function addAvance()
-    {
-        header('Content-Type: application/json');
+   public function addAvance()
+{
+    header('Content-Type: application/json');
 
-        if (!isset($_SESSION['user_id'])) {
-            echo json_encode(['success' => false, 'message' => 'No autenticado']);
-            return;
-        }
+    // ✅ LOGS DE DEBUG
+    error_log("=== addAvance DEBUG ===");
+    error_log("POST completo: " . print_r($_POST, true));
+    error_log("FILES completo: " . print_r($_FILES, true));
 
-        try {
-            $tareaId = $_POST['tarea_id'] ?? '';
-            $comentario = $_POST['comentario'] ?? '';
-            $progresoReportado = intval($_POST['progreso_reportado'] ?? 0);
-
-            if (empty($tareaId) || empty($comentario)) {
-                echo json_encode(['success' => false, 'message' => 'Tarea y comentario requeridos']);
-                return;
-            }
-
-            $archivoPath = null;
-            if (isset($_FILES['archivo']) && $_FILES['archivo']['error'] === UPLOAD_ERR_OK) {
-                $uploadDir = __DIR__ . '/../../storage/avances/';
-                if (!is_dir($uploadDir)) {
-                    mkdir($uploadDir, 0755, true);
-                }
-
-                $extension = strtolower(pathinfo($_FILES['archivo']['name'], PATHINFO_EXTENSION));
-                $allowedExtensions = ['jpg', 'jpeg', 'png', 'pdf', 'doc', 'docx'];
-
-                if (in_array($extension, $allowedExtensions)) {
-                    $fileName = 'avance_' . time() . '_' . uniqid() . '.' . $extension;
-                    $targetPath = $uploadDir . $fileName;
-
-                    if (move_uploaded_file($_FILES['archivo']['tmp_name'], $targetPath)) {
-                        $archivoPath = 'avances/' . $fileName;
-                    }
-                }
-            }
-
-            $this->taskModel->addAvance(
-                $tareaId,
-                $_SESSION['user_id'],
-                $comentario,
-                $progresoReportado,
-                $archivoPath
-            );
-
-            echo json_encode([
-                'success' => true,
-                'message' => 'Avance registrado correctamente'
-            ]);
-
-        } catch (\Exception $e) {
-            error_log("Error al agregar avance: " . $e->getMessage());
-            echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
-        }
+    if (!isset($_SESSION['user_id'])) {
+        echo json_encode(['success' => false, 'message' => 'No autenticado']);
+        return;
     }
+
+    try {
+        $tareaId = $_POST['id_tarea'] ?? '';
+        $comentario = $_POST['comentario'] ?? '';
+        $progresoReportado = intval($_POST['progreso_reportado'] ?? 0);
+
+        // ✅ VALIDACIÓN CON DEBUG MEJORADO
+        if (empty($tareaId) || empty($comentario)) {
+            echo json_encode([
+                'success' => false, 
+                'message' => 'Tarea y comentario requeridos',
+                'error' => 'Faltan parametros',
+                'debug' => [
+                    'id_tarea' => $tareaId,
+                    'comentario' => $comentario,
+                    'progreso_reportado' => $progresoReportado,
+                    'post_keys' => array_keys($_POST)
+                ]
+            ]);
+            return;
+        } // ✅ ESTA LLAVE FALTABA - CIERRA EL IF DE VALIDACIÓN
+
+        // ✅ AHORA EL CÓDIGO DE ARCHIVO ESTÁ EN EL NIVEL CORRECTO
+        $archivoPath = null;
+        if (isset($_FILES['archivo']) && $_FILES['archivo']['error'] === UPLOAD_ERR_OK) {
+            $uploadDir = _DIR_ . '/../../storage/avances/';
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0755, true);
+            }
+
+            $extension = strtolower(pathinfo($_FILES['archivo']['name'], PATHINFO_EXTENSION));
+            $allowedExtensions = ['jpg', 'jpeg', 'png', 'pdf', 'doc', 'docx'];
+
+            if (in_array($extension, $allowedExtensions)) {
+                $fileName = 'avance_' . time() . '_' . uniqid() . '.' . $extension;
+                $targetPath = $uploadDir . $fileName;
+
+                if (move_uploaded_file($_FILES['archivo']['tmp_name'], $targetPath)) {
+                    $archivoPath = 'avances/' . $fileName;
+                }
+            }
+        }
+
+        // ✅ AHORA SÍ SE EJECUTA EL MODELO
+        $this->taskModel->addAvance(
+            $tareaId,
+            $_SESSION['user_id'],
+            $comentario,
+            $progresoReportado,
+            $archivoPath
+        );
+
+        echo json_encode([
+            'success' => true,
+            'message' => 'Avance registrado correctamente'
+        ]);
+
+    } catch (\Exception $e) {
+        error_log("Error al agregar avance: " . $e->getMessage());
+        echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+}
+}
+
 
     public function getAllTasks()
     {
@@ -396,12 +415,12 @@ class TaskController
     }
 
     try {
-        //  El parámetro viene como 'tarea_id' desde JavaScript
-        $tareaId = $_POST['tarea_id'] ?? null;
+        //  El parámetro viene como 'id_tarea' desde JavaScript
+        $tareaId = $_POST['id_tarea'] ?? null;
 
         error_log("=== cancelTask DEBUG ===");
         error_log("POST completo: " . print_r($_POST, true));
-        error_log("tarea_id recibido: " . $tareaId);
+        error_log("id_tarea recibido: " . $tareaId);
 
         if (empty($tareaId)) {
             echo json_encode([
@@ -443,12 +462,12 @@ class TaskController
     }
 
     try {
-        //  El parámetro viene como 'tarea_id' en GET
-        $tareaId = $_GET['tarea_id'] ?? null;
+        //  El parámetro viene como 'id_tarea' en GET
+        $tareaId = $_GET['id_tarea'] ?? null;
 
         error_log("=== getTaskDetails DEBUG ===");
         error_log("GET completo: " . print_r($_GET, true));
-        error_log("tarea_id recibido: " . $tareaId);
+        error_log("id_tarea recibido: " . $tareaId);
 
         if (empty($tareaId)) {
             echo json_encode([

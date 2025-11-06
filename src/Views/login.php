@@ -48,7 +48,7 @@
   <?php include __DIR__ . '/includes/footer.html'; ?>
 
   <!-- Scripts i18n PRIMERO -->
-  <script src="/assets/js/translations.js"></script>
+  <script src="/assets/js/translationslandinpage.js"></script>
   <script src="/assets/js/i18n.js"></script>
   
   <!-- Script de la página -->

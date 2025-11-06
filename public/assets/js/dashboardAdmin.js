@@ -1054,7 +1054,7 @@ function renderTasksList(tareas, filtroActivo = '') {
 function viewTaskMaterialsAdmin(tareaId) {
   
 
-    fetch(`/api/materiales/task-materials?tarea_id=${tareaId}`)
+    fetch(`/api/materiales/task-materials?id_tarea=${tareaId}`)
         .then(response => {
       
             return response.json();
@@ -1197,7 +1197,7 @@ function cancelTask(tareaId) {
 
 
     const formData = new FormData();
-    formData.append('tarea_id', tareaId);  
+    formData.append('id_tarea', tareaId);  
 
     // Log para verificar FormData
     for (let [key, value] of formData.entries()) {
@@ -1234,7 +1234,7 @@ function cancelTask(tareaId) {
 function viewTaskDetails(tareaId) {
 
 
-    const url = `/api/tasks/details?tarea_id=${tareaId}`; 
+    const url = `/api/tasks/details?id_tarea=${tareaId}`; 
  
 
     fetch(url)

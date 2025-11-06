@@ -214,9 +214,9 @@ class Task
     {
         try {
             // Obtener el tipo de asignación de la tarea
-            $queryTipo = "SELECT tipo_asignacion FROM Tareas WHERE id_tarea = :tarea_id";
+            $queryTipo = "SELECT tipo_asignacion FROM Tareas WHERE id_tarea = :id_tarea";
             $stmtTipo = $this->conn->prepare($queryTipo);
-            $stmtTipo->bindParam(':tarea_id', $tareaId, \PDO::PARAM_INT);
+            $stmtTipo->bindParam(':id_tarea', $tareaId, \PDO::PARAM_INT);
             $stmtTipo->execute();
             $tareaInfo = $stmtTipo->fetch(PDO::FETCH_ASSOC);
             
@@ -232,18 +232,18 @@ class Task
                                 COUNT(*) as total,
                                 SUM(CASE WHEN estado_usuario = 'completada' THEN 1 ELSE 0 END) as completadas
                                FROM Tarea_Usuario 
-                               WHERE id_tarea = :tarea_id";
+                               WHERE id_tarea = :id_tarea";
             } else {
                 // Verificar si todos los núcleos completaron
                 $queryCheck = "SELECT 
                                 COUNT(*) as total,
                                 SUM(CASE WHEN estado_nucleo = 'completada' THEN 1 ELSE 0 END) as completadas
                                FROM Tarea_Nucleo 
-                               WHERE id_tarea = :tarea_id";
+                               WHERE id_tarea = :id_tarea";
             }
             
             $stmtCheck = $this->conn->prepare($queryCheck);
-            $stmtCheck->bindParam(':tarea_id', $tareaId, \PDO::PARAM_INT);
+            $stmtCheck->bindParam(':id_tarea', $tareaId, \PDO::PARAM_INT);
             $stmtCheck->execute();
             $result = $stmtCheck->fetch(PDO::FETCH_ASSOC);
             
@@ -251,9 +251,9 @@ class Task
             if ($result['total'] > 0 && $result['total'] == $result['completadas']) {
                 $queryUpdate = "UPDATE Tareas 
                                 SET estado = 'completada' 
-                                WHERE id_tarea = :tarea_id";
+                                WHERE id_tarea = :id_tarea";
                 $stmtUpdate = $this->conn->prepare($queryUpdate);
-                $stmtUpdate->bindParam(':tarea_id', $tareaId, \PDO::PARAM_INT);
+                $stmtUpdate->bindParam(':id_tarea', $tareaId, \PDO::PARAM_INT);
                 $stmtUpdate->execute();
                 
                 error_log(" Tarea $tareaId marcada como completada (todos los asignados terminaron)");
@@ -270,9 +270,9 @@ class Task
     {
         try {
             // Obtener tipo de asignación
-            $queryTipo = "SELECT tipo_asignacion FROM Tareas WHERE id_tarea = :tarea_id";
+            $queryTipo = "SELECT tipo_asignacion FROM Tareas WHERE id_tarea = :id_tarea";
             $stmtTipo = $this->conn->prepare($queryTipo);
-            $stmtTipo->bindParam(':tarea_id', $tareaId);
+            $stmtTipo->bindParam(':id_tarea', $tareaId);
             $stmtTipo->execute();
             $tareaInfo = $stmtTipo->fetch(PDO::FETCH_ASSOC);
             
@@ -286,18 +286,18 @@ class Task
                             AVG(progreso) as progreso_promedio,
                             SUM(CASE WHEN estado_usuario = 'completada' THEN 1 ELSE 0 END) as completadas
                           FROM Tarea_Usuario 
-                          WHERE id_tarea = :tarea_id";
+                          WHERE id_tarea = :id_tarea";
             } else {
                 $query = "SELECT 
                             COUNT(*) as total_asignados,
                             AVG(progreso) as progreso_promedio,
                             SUM(CASE WHEN estado_nucleo = 'completada' THEN 1 ELSE 0 END) as completadas
                           FROM Tarea_Nucleo 
-                          WHERE id_tarea = :tarea_id";
+                          WHERE id_tarea = :id_tarea";
             }
             
             $stmt = $this->conn->prepare($query);
-            $stmt->bindParam(':tarea_id', $tareaId);
+            $stmt->bindParam(':id_tarea', $tareaId);
             $stmt->execute();
             
             return $stmt->fetch(PDO::FETCH_ASSOC);
@@ -311,18 +311,31 @@ class Task
     // Agregar avance/comentario
     public function addAvance($tareaId, $userId, $comentario, $progresoReportado, $archivo = null)
     {
-        try {
-            $query = "INSERT INTO Tarea_Avances (id_tarea, id_usuario, comentario, progreso_reportado, archivo) 
-                      VALUES (:id_tarea, :id_usuario, :comentario, :progreso_reportado, :archivo)";
-            
-            $stmt = $this->conn->prepare($query);
-            $stmt->bindParam(':id_tarea', $tareaId);
-            $stmt->bindParam(':id_usuario', $userId);
-            $stmt->bindParam(':comentario', $comentario);
-            $stmt->bindParam(':progreso_reportado', $progresoReportado);
-            $stmt->bindParam(':archivo', $archivo);
-            
-            return $stmt->execute();
+          try {
+        // ✅ AGREGAR LOG
+        error_log("=== Task Model addAvance ===");
+        error_log("tareaId: $tareaId");
+        error_log("userId: $userId");
+        error_log("comentario: " . substr($comentario, 0, 50));
+        error_log("progresoReportado: $progresoReportado");
+        error_log("archivo: " . ($archivo ?? 'NULL'));
+        
+        $query = "INSERT INTO Tarea_Avances (id_tarea, id_usuario, comentario, progreso_reportado, archivo) 
+                  VALUES (:id_tarea, :id_usuario, :comentario, :progreso_reportado, :archivo)";
+        
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id_tarea', $tareaId);
+        $stmt->bindParam(':id_usuario', $userId);
+        $stmt->bindParam(':comentario', $comentario);
+        $stmt->bindParam(':progreso_reportado', $progresoReportado);
+        $stmt->bindParam(':archivo', $archivo);
+        
+        $result = $stmt->execute();
+        
+        error_log("Resultado: " . ($result ? 'SUCCESS' : 'FAILED'));
+        
+        return $result;
+
         } catch (\PDOException $e) {
             error_log("Error al agregar avance: " . $e->getMessage());
             throw $e;
@@ -342,11 +355,11 @@ class Task
                         u.nombre_completo
                       FROM Tarea_Avances ta
                       INNER JOIN Usuario u ON ta.id_usuario = u.id_usuario
-                      WHERE ta.id_tarea = :tarea_id
+                      WHERE ta.id_tarea = :id_tarea
                       ORDER BY ta.fecha_avance DESC";
             
             $stmt = $this->conn->prepare($query);
-            $stmt->bindParam(':tarea_id', $tareaId);
+            $stmt->bindParam(':id_tarea', $tareaId);
             $stmt->execute();
             
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -421,10 +434,10 @@ class Task
                         u.nombre_completo as creador
                       FROM Tareas t
                       INNER JOIN Usuario u ON t.id_creador = u.id_usuario
-                      WHERE t.id_tarea = :tarea_id";
+                      WHERE t.id_tarea = :id_tarea";
             
             $stmt = $this->conn->prepare($query);
-            $stmt->bindParam(':tarea_id', $tareaId);
+            $stmt->bindParam(':id_tarea', $tareaId);
             $stmt->execute();
             
             return $stmt->fetch(PDO::FETCH_ASSOC);
@@ -462,9 +475,9 @@ class Task
     public function cancelTask($tareaId)
     {
         try {
-            $query = "UPDATE Tareas SET estado = 'cancelada' WHERE id_tarea = :tarea_id";
+            $query = "UPDATE Tareas SET estado = 'cancelada' WHERE id_tarea = :id_tarea";
             $stmt = $this->conn->prepare($query);
-            $stmt->bindParam(':tarea_id', $tareaId);
+            $stmt->bindParam(':id_tarea', $tareaId);
             
             return $stmt->execute();
         } catch (\PDOException $e) {

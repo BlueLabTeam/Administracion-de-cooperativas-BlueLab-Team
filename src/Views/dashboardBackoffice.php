@@ -4,7 +4,7 @@
 <head>
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title data-i18n="dashboardAdmin.pageTitle">Gestcoop – Panel de Administrador</title>
+	
 
 	<link rel="stylesheet" href="/assets/css/dashboardVariables.css" />
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -23,8 +23,11 @@
 	<link rel="stylesheet" href="/assets/css/dashboardSolicitudesAdmin.css" />
 	<link rel="stylesheet" href="/assets/css/dashboardReportes.css" />
 	<link rel="stylesheet" href="/assets/css/i18n.css" />
-</head>
 
+
+	<script src="/assets/js/translationsdashboard.js"></script>
+	<script src="/assets/js/i18n.js"></script>
+</head>
 <body>
 	<?php include __DIR__ . '/includes/dashboardHeaderAdmin.html'; ?>
 
@@ -853,9 +856,7 @@
 		</section>
 	</main>
 
-	<!-- Scripts i18n -->
-	<script src="/assets/js/translations.js"></script>
-	<script src="/assets/js/i18n.js"></script>
+	
 	<script src="/assets/js/dashboardAdmin.js"></script>
 </body>
 </html>

@@ -1,5 +1,7 @@
 <?php
 
+
+
 if (!isset($_SESSION['user_id'])) {
     header('Location: /login');
     exit();
@@ -11,7 +13,7 @@ if (!isset($_SESSION['user_id'])) {
 <head>
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>Gestcoop – Panel de Usuario</title>
+	<title data-i18n="dashboardUser.title">Gestcoop — Panel de Usuario</title>
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <link rel="stylesheet" href="/assets/css/dashboardVariables.css" />
@@ -22,6 +24,7 @@ if (!isset($_SESSION['user_id'])) {
 	<link rel="stylesheet" href="/assets/css/dashboardTareas.css" />
 	<link rel="stylesheet" href="/assets/css/dashboardHoras.css" />
 	<link rel="stylesheet" href="/assets/css/dashboardDeudaHoras.css" />
+	<link rel="stylesheet" href="/assets/css/i18n.css" />
 	<link rel="stylesheet" href="/assets/css/dashboardDeudaTotal.css" />
 	<link rel="stylesheet" href="/assets/css/dashboardUtils.css" />
 	<link rel="stylesheet" href="/assets/css/dashboardViviendas.css" />
@@ -29,6 +32,9 @@ if (!isset($_SESSION['user_id'])) {
 	<link rel="stylesheet" href="/assets/css/dashboardPagos.css" />
 	<link rel="stylesheet" href="/assets/css/dashboardSolicitudes.css" />
 	
+	 <script src="/assets/js/translationsdashboard.js"></script>
+    <script src="/assets/js/i18n.js"></script>
+
 </head>
 
 <body>
@@ -37,38 +43,38 @@ if (!isset($_SESSION['user_id'])) {
 	<main class="content-area">
 		<!-- INICIO -->
 		<section id="inicio-section" class="section-content active">
-			<h2 class="section-title">🏠 Inicio</h2>
+			<h2 class="section-title" data-i18n="dashboardUser.home.title">🏠 Inicio</h2>
 			
 			<div class="info-card">
-				<h3>Bienvenido/a <?php echo htmlspecialchars($_SESSION['nombre_completo'] ?? 'Usuario'); ?></h3>
-				<p>Este es tu panel de usuario de la Cooperativa de Viviendas.</p>
+				<h3><span data-i18n="dashboardUser.home.welcome">Bienvenido/a</span> <?php echo htmlspecialchars($_SESSION['nombre_completo'] ?? 'Usuario'); ?></h3>
+				<p data-i18n="dashboardUser.home.description">Este es tu panel de usuario de la Cooperativa de Viviendas.</p>
 			</div>
 
 			<!-- Notificaciones -->
 			<div class="notifications-container">
 				<div class="notifications-header">
-					<h3>🔔 Notificaciones</h3>
-					<span class="notifications-badge" id="notificationsBadge">0</span>
+					<h3 data-i18n="dashboardUser.home.notifications">🔔 Notificaciones</h3>
+					<span class="notifications-badge" id="notificationsBadge" data-i18n="dashboardUser.home.notificationsBadge">0</span>
 				</div>
 				<div id="notificationsList" class="notifications-list">
-					<div class="loading">Cargando notificaciones...</div>
+					<div class="loading" data-i18n="dashboardUser.home.loadingNotifications">Cargando notificaciones...</div>
 				</div>
 			</div>
 
 			<div class="stats-grid">
 				<div class="stat-card">
 					<i class="fas fa-hand-holding-usd"></i>
-					<h4>Aportes al Día</h4>
+					<h4 data-i18n="dashboardUser.home.stats.contributions">Aportes al Día</h4>
 					<p>$0</p>
 				</div>
 				<div class="stat-card">
 					<i class="fas fa-clock"></i>
-					<h4>Horas Trabajadas</h4>
+					<h4 data-i18n="dashboardUser.home.stats.hours">Horas Trabajadas</h4>
 					<p>0h</p>
 				</div>
 				<div class="stat-card">
 					<i class="fas fa-tasks"></i>
-					<h4>Tareas Pendientes</h4>
+					<h4 data-i18n="dashboardUser.home.stats.tasks">Tareas Pendientes</h4>
 					<p>0</p>
 				</div>
 			</div>
@@ -76,13 +82,13 @@ if (!isset($_SESSION['user_id'])) {
 
 		<!-- MI PERFIL -->
 <section id="perfil-section" class="section-content">
-	<h2 class="section-title">👤 Mi Perfil</h2>
+	<h2 class="section-title" data-i18n="dashboardUser.profile.title">👤 Mi Perfil</h2>
 	
 	<div class="info-card">
 		<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-			<h3>Información Personal</h3>
+			<h3 data-i18n="dashboardUser.profile.personalInfo">Información Personal</h3>
 			<button class="btn btn-primary" onclick="toggleEditProfile()">
-				<i class="fas fa-edit"></i> <span id="btn-edit-text">Editar Perfil</span>
+				<i class="fas fa-edit"></i> <span id="btn-edit-text" data-i18n="dashboardUser.profile.editProfile">Editar Perfil</span>
 			</button>
 		</div>
 
@@ -90,23 +96,23 @@ if (!isset($_SESSION['user_id'])) {
 		<div id="profile-view">
     <div class="profile-info-grid">
         <div class="profile-info-item">
-            <strong><i class="fas fa-user"></i> Nombre Completo:</strong>
+            <strong><i class="fas fa-user"></i> <span data-i18n="dashboardUser.profile.fullName">Nombre Completo</span>:</strong>
             <p id="display-nombre"><?php echo htmlspecialchars($_SESSION['nombre_completo'] ?? 'Usuario'); ?></p>
         </div>
         <div class="profile-info-item">
-            <strong><i class="fas fa-envelope"></i> Email:</strong>
+            <strong><i class="fas fa-envelope"></i> <span data-i18n="dashboardUser.profile.email">Email</span>:</strong>
             <p id="display-email"><?php echo htmlspecialchars($_SESSION['email'] ?? 'No disponible'); ?></p>
         </div>
         <div class="profile-info-item">
-            <strong><i class="fas fa-map-marker-alt"></i> Dirección:</strong>
+            <strong><i class="fas fa-map-marker-alt"></i> <span data-i18n="dashboardUser.profile.address">Dirección</span>:</strong>
             <p id="display-direccion"><?php echo htmlspecialchars($_SESSION['direccion'] ?? 'No especificada'); ?></p>
         </div>
         <div class="profile-info-item">
-            <strong><i class="fas fa-birthday-cake"></i> Fecha de Nacimiento:</strong>
+            <strong><i class="fas fa-birthday-cake"></i> <span data-i18n="dashboardUser.profile.birthDate">Fecha de Nacimiento</span>:</strong>
             <p id="display-fecha-nacimiento"><?php echo htmlspecialchars($_SESSION['fecha_nacimiento'] ?? 'No disponible'); ?></p>
         </div>
         <div class="profile-info-item">
-            <strong><i class="fas fa-info-circle"></i> Estado:</strong>
+            <strong><i class="fas fa-info-circle"></i> <span data-i18n="dashboardUser.profile.status">Estado</span>:</strong>
             <p><span class="badge badge-<?php echo htmlspecialchars($_SESSION['estado'] ?? 'pendiente'); ?>">
                 <?php echo ucfirst(htmlspecialchars($_SESSION['estado'] ?? 'pendiente')); ?>
             </span></p>
@@ -119,62 +125,80 @@ if (!isset($_SESSION['user_id'])) {
 			<form id="editProfileForm" onsubmit="submitProfileEdit(event)">
 				<div class="form-row">
 					<div class="form-group">
-						<label for="edit-nombre">Nombre Completo *</label>
+						<label for="edit-nombre" data-i18n="dashboardUser.profile.fullName">
+							Nombre Completo *
+						</label>
 						<input type="text" id="edit-nombre" required>
 					</div>
 					<div class="form-group">
-						<label for="edit-cedula">Cédula *</label>
-						<input type="text" id="edit-cedula" required readonly title="La cédula no se puede modificar">
+						<label for="edit-cedula" data-i18n="dashboardUser.profile.idCard">
+							Cédula *
+						</label>
+						<input type="text" id="edit-cedula" required readonly data-i18n-title="dashboardUser.profile.idCardReadonly">
 					</div>
 				</div>
 
 				<div class="form-row">
 					<div class="form-group">
-						<label for="edit-email">Email *</label>
+						<label for="edit-email" data-i18n="dashboardUser.profile.email">
+							Email *
+						</label>
 						<input type="email" id="edit-email" required autocomplete="username">
 					</div>
 					<div class="form-group">
-						<label for="edit-fecha-nacimiento">Fecha de Nacimiento</label>
+						<label for="edit-fecha-nacimiento" data-i18n="dashboardUser.profile.birthDate">
+							Fecha de Nacimiento
+						</label>
 						<input type="date" id="edit-fecha-nacimiento">
 					</div>
 				</div>
 
 				<div class="form-group">
-					<label for="edit-direccion">Dirección</label>
+					<label for="edit-direccion" data-i18n="dashboardUser.profile.address">
+						Dirección
+					</label>
 					<input type="text" id="edit-direccion">
 				</div>
 
 				<div class="form-group">
-					<label for="edit-telefono">Teléfono</label>
+					<label for="edit-telefono" data-i18n="dashboardUser.profile.phone">
+						Teléfono
+					</label>
 					<input type="tel" id="edit-telefono" placeholder="Ej: 099123456">
-					<small style="color: #666;">Opcional - Puedes agregar un número de contacto</small>
+					<small style="color: #666;" data-i18n="dashboardUser.profile.phoneOptional">Opcional - Puedes agregar un número de contacto</small>
 				</div>
 
 				<hr style="margin: 20px 0;">
 
-				<h4 style="margin-bottom: 15px;">Cambiar Contraseña (Opcional)</h4>
+				<h4 style="margin-bottom: 15px;" data-i18n="dashboardUser.profile.changePassword">Cambiar Contraseña (Opcional)</h4>
 				<div class="form-group">
-					<label for="edit-password-actual">Contraseña Actual</label>
-					<input type="password" id="edit-password-actual" placeholder="Dejar en blanco si no deseas cambiarla" autocomplete="current-password">
+					<label for="edit-password-actual" data-i18n="dashboardUser.profile.currentPassword">
+						Contraseña Actual
+					</label>
+					<input type="password" id="edit-password-actual" data-i18n-placeholder="dashboardUser.profile.currentPasswordPlaceholder" autocomplete="current-password">
 				</div>
 
 				<div class="form-row">
 					<div class="form-group">
-						<label for="edit-password-nueva">Nueva Contraseña</label>
-						<input type="password" id="edit-password-nueva" minlength="6" autocomplete="current-password">
+						<label for="edit-password-nueva" data-i18n="dashboardUser.profile.newPassword">
+							Nueva Contraseña
+						</label>
+						<input type="password" id="edit-password-nueva" minlength="6" autocomplete="new-password">
 					</div>
 					<div class="form-group">
-						<label for="edit-password-confirmar">Confirmar Nueva Contraseña</label>
-						<input type="password" id="edit-password-confirmar" minlength="6" autocomplete="current-password">
+						<label for="edit-password-confirmar" data-i18n="dashboardUser.profile.confirmPassword">
+							Confirmar Nueva Contraseña
+						</label>
+						<input type="password" id="edit-password-confirmar" minlength="6" autocomplete="new-password">
 					</div>
 				</div>
 
 				<div class="form-actions">
 					<button type="button" class="btn btn-secondary" onclick="toggleEditProfile()">
-						<i class="fas fa-times"></i> Cancelar
+						<i class="fas fa-times"></i> <span data-i18n="dashboardUser.profile.cancelEdit">Cancelar</span>
 					</button>
 					<button type="submit" class="btn btn-primary">
-						<i class="fas fa-save"></i> Guardar Cambios
+						<i class="fas fa-save"></i> <span data-i18n="dashboardUser.profile.saveChanges">Guardar Cambios</span>
 					</button>
 				</div>
 			</form>
@@ -184,17 +208,17 @@ if (!isset($_SESSION['user_id'])) {
 
 		<!-- SOLICITUDES -->
 <section id="solicitudes-section" class="section-content">
-    <h2 class="section-title">📩 Mis Solicitudes</h2>
+    <h2 class="section-title" data-i18n="dashboardUser.requests.title">📩 Mis Solicitudes</h2>
 
     <!-- Botón Nueva Solicitud -->
     <div class="info-card">
         <div style="display: flex; justify-content: space-between; align-items: center;">
             <div>
-                <h3>Gestiona tus Solicitudes</h3>
-                <p>Envía consultas, justificaciones o reporta problemas al administrador</p>
+                <h3 data-i18n="dashboardUser.requests.manage">Gestiona tus Solicitudes</h3>
+                <p data-i18n="dashboardUser.requests.description">Envía consultas, justificaciones o reporta problemas al administrador</p>
             </div>
             <button class="btn btn-primary" onclick="abrirModalNuevaSolicitud()">
-                <i class="fas fa-plus"></i> Nueva Solicitud
+                <i class="fas fa-plus"></i> <span data-i18n="dashboardUser.requests.newRequest">Nueva Solicitud</span>
             </button>
         </div>
     </div>
@@ -206,7 +230,7 @@ if (!isset($_SESSION['user_id'])) {
                 <i class="fas fa-clock"></i>
             </div>
             <div class="stat-info">
-                <span class="stat-label">Pendientes</span>
+                <span class="stat-label" data-i18n="dashboardUser.requests.stats.pending">Pendientes</span>
                 <span class="stat-value" id="solicitudes-pendientes-count">0</span>
             </div>
         </div>
@@ -216,7 +240,7 @@ if (!isset($_SESSION['user_id'])) {
                 <i class="fas fa-eye"></i>
             </div>
             <div class="stat-info">
-                <span class="stat-label">En Revisión</span>
+                <span class="stat-label" data-i18n="dashboardUser.requests.stats.inReview">En Revisión</span>
                 <span class="stat-value" id="solicitudes-revision-count">0</span>
             </div>
         </div>
@@ -226,7 +250,7 @@ if (!isset($_SESSION['user_id'])) {
                 <i class="fas fa-check-circle"></i>
             </div>
             <div class="stat-info">
-                <span class="stat-label">Resueltas</span>
+                <span class="stat-label" data-i18n="dashboardUser.requests.stats.resolved">Resueltas</span>
                 <span class="stat-value" id="solicitudes-resueltas-count">0</span>
             </div>
         </div>
@@ -236,45 +260,45 @@ if (!isset($_SESSION['user_id'])) {
     <div class="filters-container">
         <div class="filter-group">
             <label for="filtro-estado-solicitudes">
-                <i class="fas fa-filter"></i> Estado:
+                <i class="fas fa-filter"></i> <span data-i18n="dashboardUser.requests.filters.status">Estado:</span>
             </label>
             <select id="filtro-estado-solicitudes" onchange="loadMisSolicitudes()">
-                <option value="">Todos los estados</option>
-                <option value="pendiente">Pendiente</option>
-                <option value="en_revision">En Revisión</option>
-                <option value="resuelta">Resuelta</option>
-                <option value="rechazada">Rechazada</option>
+                <option value="" data-i18n="dashboardUser.requests.filters.allStates">Todos los estados</option>
+                <option value="pendiente" data-i18n="dashboardUser.requests.filters.pending">Pendiente</option>
+                <option value="en_revision" data-i18n="dashboardUser.requests.filters.inReview">En Revisión</option>
+                <option value="resuelta" data-i18n="dashboardUser.requests.filters.resolved">Resuelta</option>
+                <option value="rechazada" data-i18n="dashboardUser.requests.filters.rejected">Rechazada</option>
             </select>
         </div>
 
         <div class="filter-group">
             <label for="filtro-tipo-solicitudes">
-                <i class="fas fa-tag"></i> Tipo:
+                <i class="fas fa-tag"></i> <span data-i18n="dashboardUser.requests.filters.type">Tipo:</span>
             </label>
             <select id="filtro-tipo-solicitudes" onchange="loadMisSolicitudes()">
-                <option value="">Todos los tipos</option>
-                <option value="horas">Registro de Horas</option>
-                <option value="pago">Pagos/Cuotas</option>
-                <option value="vivienda">Vivienda</option>
-                <option value="general">Consulta General</option>
-                <option value="otro">Otro</option>
+                <option value="" data-i18n="dashboardUser.requests.filters.allTypes">Todos los tipos</option>
+                <option value="horas" data-i18n="dashboardUser.requests.types.hours">Registro de Horas</option>
+                <option value="pago" data-i18n="dashboardUser.requests.types.payment">Pagos/Cuotas</option>
+                <option value="vivienda" data-i18n="dashboardUser.requests.types.housing">Vivienda</option>
+                <option value="general" data-i18n="dashboardUser.requests.types.general">Consulta General</option>
+                <option value="otro" data-i18n="dashboardUser.requests.types.other">Otro</option>
             </select>
         </div>
     </div>
 
     <!-- Lista de Solicitudes -->
     <div id="misSolicitudesContainer" class="solicitudes-container">
-        <p class="loading">Cargando solicitudes...</p>
+        <p class="loading" data-i18n="dashboardUser.requests.loading">Cargando solicitudes...</p>
     </div>
 </section>
 
 		<!-- MI VIVIENDA -->
 		<section id="vivienda-section" class="section-content">
-			<h2 class="section-title">🏡 Mi Vivienda</h2>
+			<h2 class="section-title" data-i18n="dashboardUser.housing.title">🏡 Mi Vivienda</h2>
 			<div class="info-card">
-				<h3>Información de tu Vivienda</h3>
+				<h3 data-i18n="dashboardUser.housing.subtitle">Información de tu Vivienda</h3>
 				<div id="myViviendaContainer">
-					<p class="loading">Cargando...</p>
+					<p class="loading" data-i18n="dashboardUser.housing.loading">Cargando...</p>
 				</div>
 			</div>
 		</section>
@@ -282,8 +306,8 @@ if (!isset($_SESSION['user_id'])) {
 		<!-- APORTES -->
 		<div id="cuotas-section" class="section-content">
     <div class="section-header">
-        <h2>💳 Mis Cuotas Mensuales</h2>
-        <p>Gestiona tus pagos de vivienda y deuda de horas</p>
+        <h2 data-i18n="dashboardUser.billing.title">💳 Mis Cuotas Mensuales</h2>
+        <p data-i18n="dashboardUser.billing.description">Gestiona tus pagos de vivienda y deuda de horas</p>
     </div>
 
     <!-- Estadísticas Rápidas -->
@@ -293,7 +317,7 @@ if (!isset($_SESSION['user_id'])) {
                 <i class="fas fa-clock"></i>
             </div>
             <div class="stat-info">
-                <span class="stat-label">Pendientes</span>
+                <span class="stat-label" data-i18n="dashboardUser.billing.stats.pending">Pendientes</span>
                 <span class="stat-value" id="cuotas-pendientes-count">0</span>
             </div>
         </div>
@@ -303,7 +327,7 @@ if (!isset($_SESSION['user_id'])) {
                 <i class="fas fa-check-circle"></i>
             </div>
             <div class="stat-info">
-                <span class="stat-label">Pagadas</span>
+                <span class="stat-label" data-i18n="dashboardUser.billing.stats.paid">Pagadas</span>
                 <span class="stat-value" id="cuotas-pagadas-count">0</span>
             </div>
         </div>
@@ -313,76 +337,70 @@ if (!isset($_SESSION['user_id'])) {
                 <i class="fas fa-exclamation-triangle"></i>
             </div>
             <div class="stat-info">
-                <span class="stat-label">Vencidas</span>
+                <span class="stat-label" data-i18n="dashboardUser.billing.stats.overdue">Vencidas</span>
                 <span class="stat-value" id="cuotas-vencidas-count">0</span>
             </div>
         </div>
     </div>
 
-
-
     <!-- Filtros -->
     <div class="filters-container">
         <div class="filter-group">
             <label for="filtro-mes-cuotas">
-                <i class="fas fa-calendar"></i> Mes:
+                <i class="fas fa-calendar"></i> <span data-i18n="dashboardUser.billing.filters.month">Mes:</span>
             </label>
             <select id="filtro-mes-cuotas" onchange="loadMisCuotas()">
-                <option value="">Todos los meses</option>
-                <option value="1">Enero</option>
-                <option value="2">Febrero</option>
-                <option value="3">Marzo</option>
-                <option value="4">Abril</option>
-                <option value="5">Mayo</option>
-                <option value="6">Junio</option>
-                <option value="7">Julio</option>
-                <option value="8">Agosto</option>
-                <option value="9">Septiembre</option>
-                <option value="10">Octubre</option>
-                <option value="11">Noviembre</option>
-                <option value="12">Diciembre</option>
+                <option value="" data-i18n="dashboardUser.billing.filters.allMonths">Todos los meses</option>
+                <option value="1" data-i18n="months.january">Enero</option>
+                <option value="2" data-i18n="months.february">Febrero</option>
+                <option value="3" data-i18n="months.march">Marzo</option>
+                <option value="4" data-i18n="months.april">Abril</option>
+                <option value="5" data-i18n="months.may">Mayo</option>
+                <option value="6" data-i18n="months.june">Junio</option>
+                <option value="7" data-i18n="months.july">Julio</option>
+                <option value="8" data-i18n="months.august">Agosto</option>
+                <option value="9" data-i18n="months.september">Septiembre</option>
+                <option value="10" data-i18n="months.october">Octubre</option>
+                <option value="11" data-i18n="months.november">Noviembre</option>
+                <option value="12" data-i18n="months.december">Diciembre</option>
             </select>
         </div>
 
         <div class="filter-group">
             <label for="filtro-anio-cuotas">
-                <i class="fas fa-calendar-alt"></i> Año:
+                <i class="fas fa-calendar-alt"></i> <span data-i18n="dashboardUser.billing.filters.year">Año:</span>
             </label>
             <select id="filtro-anio-cuotas" onchange="loadMisCuotas()">
-                <option value="">Todos los años</option>
-             
+                <option value="" data-i18n="dashboardUser.billing.filters.allYears">Todos los años</option>
             </select>
         </div>
 
         <div class="filter-group">
             <label for="filtro-estado-cuotas">
-                <i class="fas fa-filter"></i> Estado:
+                <i class="fas fa-filter"></i> <span data-i18n="dashboardUser.billing.filters.status">Estado:</span>
             </label>
             <select id="filtro-estado-cuotas" onchange="loadMisCuotas()">
-                <option value="">Todos los estados</option>
-                <option value="pendiente">Pendiente</option>
-                <option value="pagada">Pagada</option>
-                <option value="vencida">Vencida</option>
+                <option value="" data-i18n="dashboardUser.billing.filters.allStates">Todos los estados</option>
+                <option value="pendiente" data-i18n="dashboardUser.billing.filters.pending">Pendiente</option>
+                <option value="pagada" data-i18n="dashboardUser.billing.filters.paid">Pagada</option>
+                <option value="vencida" data-i18n="dashboardUser.billing.filters.overdue">Vencida</option>
             </select>
         </div>
     </div>
 
     <!-- Lista de Cuotas -->
     <div id="misCuotasContainer" class="cuotas-container">
-        <p class="loading">Cargando cuotas...</p>
+        <p class="loading" data-i18n="dashboardUser.billing.loading">Cargando cuotas...</p>
     </div>
 </div>
 
-<!-- ==========================================
-     MODAL: PAGAR CUOTA
-     ========================================== -->
-
+<!-- MODAL: PAGAR CUOTA -->
 <div id="pagarCuotaModal" class="modal-overlay" style="display: none;">
     <div class="modal-content-large">
         <button class="modal-close-btn" onclick="closePagarCuotaModal()">×</button>
         
         <h2 class="modal-title">
-            <i class="fas fa-credit-card"></i> Realizar Pago
+            <i class="fas fa-credit-card"></i> <span data-i18n="dashboardUser.billing.paymentModal.title">Realizar Pago</span>
         </h2>
 
         <!-- Información de la cuota -->
@@ -397,32 +415,32 @@ if (!isset($_SESSION['user_id'])) {
 
             <div class="form-group">
                 <label for="pagar-metodo">
-                    <i class="fas fa-money-check-alt"></i> Método de Pago *
+                    <i class="fas fa-money-check-alt"></i> <span data-i18n="dashboardUser.billing.paymentModal.paymentMethod">Método de Pago</span> *
                 </label>
                 <select id="pagar-metodo" name="metodo_pago" required>
-                    <option value="transferencia">Transferencia Bancaria</option>
-                    <option value="deposito">Depósito en Efectivo</option>
-                    <option value="cheque">Cheque</option>
-                    <option value="efectivo">Efectivo</option>
+                    <option value="transferencia" data-i18n="dashboardUser.billing.paymentModal.methods.transfer">Transferencia Bancaria</option>
+                    <option value="deposito" data-i18n="dashboardUser.billing.paymentModal.methods.deposit">Depósito en Efectivo</option>
+                    <option value="cheque" data-i18n="dashboardUser.billing.paymentModal.methods.check">Cheque</option>
+                    <option value="efectivo" data-i18n="dashboardUser.billing.paymentModal.methods.cash">Efectivo</option>
                 </select>
             </div>
 
             <div class="form-group">
                 <label for="pagar-numero-comprobante">
-                    <i class="fas fa-hashtag"></i> Número de Comprobante
+                    <i class="fas fa-hashtag"></i> <span data-i18n="dashboardUser.billing.paymentModal.voucherNumber">Número de Comprobante</span>
                 </label>
                 <input 
                     type="text" 
                     id="pagar-numero-comprobante" 
                     name="numero_comprobante"
-                    placeholder="Ej: 123456789"
+                    data-i18n-placeholder="dashboardUser.billing.paymentModal.voucherNumberPlaceholder"
                     maxlength="50">
-                <small class="form-help">Opcional: Número de referencia o transacción</small>
+                <small class="form-help" data-i18n="dashboardUser.billing.paymentModal.voucherNumberHelp">Opcional: Número de referencia o transacción</small>
             </div>
 
             <div class="form-group">
                 <label for="pagar-comprobante">
-                    <i class="fas fa-file-upload"></i> Comprobante de Pago *
+                    <i class="fas fa-file-upload"></i> <span data-i18n="dashboardUser.billing.paymentModal.uploadVoucher">Comprobante de Pago</span> *
                 </label>
                 <input 
                     type="file" 
@@ -430,35 +448,33 @@ if (!isset($_SESSION['user_id'])) {
                     name="comprobante"
                     accept="image/*,.pdf"
                     required>
-                <small class="form-help">Sube una foto o PDF del comprobante (máx. 5MB)</small>
+                <small class="form-help" data-i18n="dashboardUser.billing.paymentModal.uploadHelp">Sube una foto o PDF del comprobante (máx. 5MB)</small>
             </div>
 
             <div class="alert-warning" style="margin: 20px 0;">
-                <strong>⚠️ Importante:</strong>
+                <strong data-i18n="dashboardUser.billing.paymentModal.importantTitle">⚠️ Importante:</strong>
                 <ul style="margin: 10px 0 0 20px; padding-left: 0;">
-                    <li>Asegúrate de que el comprobante sea legible</li>
-                    <li>El pago será revisado por un administrador</li>
-                    <li>Recibirás una notificación cuando sea validado</li>
+                    <li data-i18n="dashboardUser.billing.paymentModal.important1">Asegúrate de que el comprobante sea legible</li>
+                    <li data-i18n="dashboardUser.billing.paymentModal.important2">El pago será revisado por un administrador</li>
+                    <li data-i18n="dashboardUser.billing.paymentModal.important3">Recibirás una notificación cuando sea validado</li>
                 </ul>
             </div>
 
             <div class="form-actions">
                 <button type="button" class="btn btn-secondary" onclick="closePagarCuotaModal()">
-                    <i class="fas fa-times"></i> Cancelar
+                    <i class="fas fa-times"></i> <span data-i18n="dashboardUser.billing.paymentModal.cancel">Cancelar</span>
                 </button>
                 <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-paper-plane"></i> Enviar Pago
+                    <i class="fas fa-paper-plane"></i> <span data-i18n="dashboardUser.billing.paymentModal.submit">Enviar Pago</span>
                 </button>
             </div>
         </form>
     </div>
 </div>
 
-
-
 		<!-- HORAS -->
 <section id="horas-section" class="section-content">
-	<h2 class="section-title"> Registro de Horas</h2>
+	<h2 class="section-title" data-i18n="dashboardUser.hours.title">⏰ Registro de Horas</h2>
 	
 	<!-- Botones de Entrada/Salida -->
 	<div class="info-card">
@@ -470,21 +486,19 @@ if (!isset($_SESSION['user_id'])) {
 			
 			<div id="clock-buttons" class="clock-buttons">
 				<button class="btn btn-primary btn-clock" id="btn-entrada" onclick="marcarEntrada()">
-					<i class="fas fa-sign-in-alt"></i> Marcar Entrada
+					<i class="fas fa-sign-in-alt"></i> <span data-i18n="dashboardUser.hours.clockIn">Marcar Entrada</span>
 				</button>
 				<button class="btn btn-danger btn-clock" id="btn-salida" onclick="marcarSalida()" style="display: none;">
-					<i class="fas fa-sign-out-alt"></i> Marcar Salida
+					<i class="fas fa-sign-out-alt"></i> <span data-i18n="dashboardUser.hours.clockOut">Marcar Salida</span>
 				</button>
 			</div>
-
-			
 			
 			<div id="registro-activo-info" style="display: none; margin-top: 15px; padding: 15px; background: #e3f2fd; border-radius: 8px; text-align: center;">
 				<p style="margin: 0; font-weight: bold; color: #1976d2;">
-					<i class="fas fa-briefcase"></i> Jornada en curso
+					<i class="fas fa-briefcase"></i> <span data-i18n="dashboardUser.hours.activeSession">Jornada en curso</span>
 				</p>
 				<p style="margin: 5px 0 0 0; color: #666;">
-					Entrada: <strong id="hora-entrada-activa">--:--</strong>
+					<span data-i18n="dashboardUser.hours.entryTime">Entrada:</span> <strong id="hora-entrada-activa">--:--</strong>
 				</p>
 			</div>
 		</div>
@@ -494,17 +508,17 @@ if (!isset($_SESSION['user_id'])) {
 	<div class="stats-grid">
 		<div class="stat-card">
 			<i class="fas fa-clock"></i>
-			<h4>Horas esta Semana</h4>
+			<h4 data-i18n="dashboardUser.hours.stats.weekHours">Horas esta Semana</h4>
 			<p id="horas-semana">0h</p>
 		</div>
 		<div class="stat-card">
 			<i class="fas fa-calendar-week"></i>
-			<h4>Días Trabajados</h4>
+			<h4 data-i18n="dashboardUser.hours.stats.daysWorked">Días Trabajados</h4>
 			<p id="dias-semana">0</p>
 		</div>
 		<div class="stat-card">
 			<i class="fas fa-calendar-alt"></i>
-			<h4>Horas Este Mes</h4>
+			<h4 data-i18n="dashboardUser.hours.stats.monthHours">Horas Este Mes</h4>
 			<p id="horas-mes">0h</p>
 		</div>
 	</div>
@@ -512,66 +526,63 @@ if (!isset($_SESSION['user_id'])) {
 	<!-- Resumen Semanal -->
 	<div class="info-card">
 		<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-			<h3><i class="fas fa-calendar-week"></i> Resumen de la Semana</h3>
+			<h3><i class="fas fa-calendar-week"></i> <span data-i18n="dashboardUser.hours.weeklySummary.title">Resumen de la Semana</span></h3>
 			<button class="btn btn-secondary" onclick="loadResumenSemanal()">
-				<i class="fas fa-sync-alt"></i> Actualizar
+				<i class="fas fa-sync-alt"></i> <span data-i18n="dashboardUser.hours.weeklySummary.refresh">Actualizar</span>
 			</button>
 		</div>
 		
 		<div id="resumen-semanal-container">
-			<p class="loading">Cargando resumen...</p>
+			<p class="loading" data-i18n="dashboardUser.hours.weeklySummary.loading">Cargando resumen...</p>
 		</div>
 	</div>
 
 <!-- DEUDA DE HORAS - WIDGET PRINCIPAL -->
 <div class="info-card">
-    <h3>💳 Estado de Deuda de Horas</h3>
+    <h3 data-i18n="dashboardUser.billing.debtStatus.title">💳 Estado de Deuda de Horas</h3>
     <div id="deuda-actual-container">
-        <p class="loading">Calculando deuda...</p>
+        <p class="loading" data-i18n="dashboardUser.billing.debtStatus.calculating">Calculando deuda...</p>
     </div>
 </div>
-
 
 	<!-- Historial de Registros -->
 	<div class="info-card">
 		<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-			<h3><i class="fas fa-history"></i> Historial de Registros</h3>
+			<h3><i class="fas fa-history"></i> <span data-i18n="dashboardUser.hours.history.title">Historial de Registros</span></h3>
 			<div style="display: flex; gap: 10px;">
 				<input type="date" id="filtro-fecha-inicio" class="date-input">
 				<input type="date" id="filtro-fecha-fin" class="date-input">
 				<button class="btn btn-secondary" onclick="filtrarRegistros()">
-					<i class="fas fa-filter"></i> Filtrar
+					<i class="fas fa-filter"></i> <span data-i18n="dashboardUser.hours.history.filter">Filtrar</span>
 				</button>
 			</div>
 		</div>
 		
 		<div id="historial-registros-container">
-			<p class="loading">Cargando registros...</p>
+			<p class="loading" data-i18n="dashboardUser.hours.history.loading">Cargando registros...</p>
 		</div>
 	</div>
 </section>
 
-
-
 		<!-- TAREAS -->
 		<section id="tareas-section" class="section-content">
-			<h2 class="section-title"> Mis Tareas</h2>
+			<h2 class="section-title" data-i18n="dashboardUser.tasks.title">📋 Mis Tareas</h2>
 			
 			<!-- Resumen de Tareas -->
 			<div class="stats-grid" style="margin-bottom: 20px;">
 				<div class="stat-card">
 					<i class="fas fa-clock"></i>
-					<h4>Pendientes</h4>
+					<h4 data-i18n="dashboardUser.tasks.stats.pending">Pendientes</h4>
 					<p id="pending-count">0</p>
 				</div>
 				<div class="stat-card">
 					<i class="fas fa-spinner"></i>
-					<h4>En Progreso</h4>
+					<h4 data-i18n="dashboardUser.tasks.stats.inProgress">En Progreso</h4>
 					<p id="progress-count">0</p>
 				</div>
 				<div class="stat-card">
 					<i class="fas fa-check-circle"></i>
-					<h4>Completadas</h4>
+					<h4 data-i18n="dashboardUser.tasks.stats.completed">Completadas</h4>
 					<p id="completed-count">0</p>
 				</div>
 			</div>
@@ -579,52 +590,52 @@ if (!isset($_SESSION['user_id'])) {
 			<!-- Filtros -->
 			<div class="info-card">
 				<div class="task-filter-header">
-					<h3>Mis Tareas Asignadas</h3>
+					<h3 data-i18n="dashboardUser.tasks.assignedTasks">Mis Tareas Asignadas</h3>
 					<label class="filter-checkbox-label">
 						<input type="checkbox" id="mostrar-completadas" onchange="loadUserTasks()">
-						Mostrar completadas
+						<span data-i18n="dashboardUser.tasks.showCompleted">Mostrar completadas</span>
 					</label>
 				</div>
 			</div>
 
 			<!-- Tareas personales -->
 			<div class="info-card">
-				<h3>📋 Tareas Individuales</h3>
+				<h3 data-i18n="dashboardUser.tasks.individual">📋 Tareas Individuales</h3>
 				<div id="tareasUsuarioList">
-					<p class="loading">Cargando tareas...</p>
+					<p class="loading" data-i18n="dashboardUser.tasks.loading">Cargando tareas...</p>
 				</div>
 			</div>
 
 			<!-- Tareas del núcleo familiar -->
 			<div class="info-card">
-				<h3>👨‍👩‍👧‍👦 Tareas del Núcleo Familiar</h3>
+				<h3 data-i18n="dashboardUser.tasks.family">👨‍👩‍👧‍👦 Tareas del Núcleo Familiar</h3>
 				<div id="tareasNucleoList">
-					<p class="loading">Cargando tareas...</p>
+					<p class="loading" data-i18n="dashboardUser.tasks.loading">Cargando tareas...</p>
 				</div>
 			</div>
 		</section>
 
 		<!-- DOCUMENTOS -->
 		<section id="documentos-section" class="section-content">
-			<h2 class="section-title">📄 Mis Documentos</h2>
+			<h2 class="section-title" data-i18n="dashboardUser.documents.title">📄 Mis Documentos</h2>
 			<div class="info-card">
-				<h3>Documentación</h3>
-				<p>Accede a todos tus documentos relacionados con la cooperativa.</p>
+				<h3 data-i18n="dashboardUser.documents.subtitle">Documentación</h3>
+				<p data-i18n="dashboardUser.documents.description">Accede a todos tus documentos relacionados con la cooperativa.</p>
 			</div>
 			<div class="stats-grid">
 				<div class="stat-card">
 					<i class="fas fa-file-alt"></i>
-					<h4>Documentos</h4>
+					<h4 data-i18n="dashboardUser.documents.stats.documents">Documentos</h4>
 					<p>0</p>
 				</div>
 				<div class="stat-card">
 					<i class="fas fa-file-contract"></i>
-					<h4>Contratos</h4>
+					<h4 data-i18n="dashboardUser.documents.stats.contracts">Contratos</h4>
 					<p>0</p>
 				</div>
 				<div class="stat-card">
 					<i class="fas fa-file-invoice"></i>
-					<h4>Facturas</h4>
+					<h4 data-i18n="dashboardUser.documents.stats.invoices">Facturas</h4>
 					<p>0</p>
 				</div>
 			</div>
@@ -633,5 +644,7 @@ if (!isset($_SESSION['user_id'])) {
 
 
 	<script src="/assets/js/dashboardUsuario.js"></script>
+
+	
 </body>
 </html>

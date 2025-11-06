@@ -25,6 +25,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
+
 // ========== CARGAR MIS SOLICITUDES==========
 async function loadMisSolicitudes() {
     ('==========================================');
@@ -532,6 +533,15 @@ function updateTaskProgress(asignacionId, tipoAsignacion, tareaId) {
 }
 
 function addTaskAvance(tareaId) {
+    console.log('🚀 addTaskAvance llamado con tareaId:', tareaId);
+    
+    // ✅ Validar que tareaId existe
+    if (!tareaId || tareaId === 'undefined') {
+        alert('❌ Error: ID de tarea inválido');
+        console.error('tareaId recibido:', tareaId);
+        return;
+    }
+
     const comentario = prompt('Describa el avance realizado:');
 
     if (!comentario || comentario.trim() === '') {
@@ -551,25 +561,46 @@ function addTaskAvance(tareaId) {
     }
 
     const formData = new FormData();
-    formData.append('tarea_id', tareaId);
-    formData.append('comentario', comentario);
+    // ✅ CAMBIO CRÍTICO: Usar 'id_tarea' en lugar de 'tarea_id'
+    formData.append('id_tarea', tareaId);
+    formData.append('comentario', comentario.trim());
     formData.append('progreso_reportado', progresoNum);
+
+    // ✅ DEBUG: Ver qué estamos enviando
+    console.log('📤 Enviando a /api/tasks/add-avance:');
+    console.log('   id_tarea:', tareaId);
+    console.log('   comentario:', comentario.trim());
+    console.log('   progreso_reportado:', progresoNum);
 
     fetch('/api/tasks/add-avance', {
         method: 'POST',
-        body: formData
+        body: formData,
+        credentials: 'same-origin'
     })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert(data.message);
-                loadUserTasks();
-            } else {
-                alert('Error: ' + data.message);
+        .then(response => {
+            console.log('📡 Response status:', response.status);
+            return response.text();
+        })
+        .then(text => {
+            console.log('📥 Response raw:', text);
+            
+            try {
+                const data = JSON.parse(text);
+                
+                if (data.success) {
+                    alert(data.message);
+                    loadUserTasks();
+                } else {
+                    alert('Error: ' + (data.message || data.error));
+                    console.error('Detalles del error:', data);
+                }
+            } catch (parseError) {
+                console.error('❌ Error parsing JSON:', parseError);
+                alert('Error del servidor: ' + text);
             }
         })
         .catch(error => {
-            console.error('Error:', error);
+            console.error('❌ Error:', error);
             alert('Error al reportar avance');
         });
 }
@@ -578,10 +609,10 @@ function addTaskAvance(tareaId) {
 
 async function viewUserTaskDetails(tareaId) {
     try {
-        const responseTask = await fetch(`/api/tasks/details?tarea_id=${tareaId}`);
+        const responseTask = await fetch(`/api/tasks/details?id_tarea=${tareaId}`);
         const dataTask = await responseTask.json();
 
-        const responseMaterials = await fetch(`/api/materiales/task-materials?tarea_id=${tareaId}`);
+        const responseMaterials = await fetch(`/api/materiales/task-materials?id_tarea=${tareaId}`);
         const dataMaterials = await responseMaterials.json();
 
         if (dataTask.success) {
@@ -598,7 +629,7 @@ async function viewUserTaskDetails(tareaId) {
 
 async function viewTaskMaterials(tareaId) {
     try {
-        const response = await fetch(`/api/materiales/task-materials?tarea_id=${tareaId}`);
+        const response = await fetch(`/api/materiales/task-materials?id_tarea=${tareaId}`);
         const data = await response.json();
 
         if (data.success) {
@@ -2378,20 +2409,7 @@ html += `
                             El período de pago para este mes aún no está disponible.
                         `}
                     </p>
-                    <div style="margin-top: 15px; padding: 15px; background: rgba(255, 255, 255, 0.1); border-radius: 8px;">
-                        <strong style="color: #fff;">📊 Progreso de Horas del Mes:</strong>
-                        <div style="margin-top: 10px;">
-                            <div class="progress-bar-container" style="background: rgba(0,0,0,0.3); height: 25px; border-radius: 12px; overflow: hidden;">
-                                <div class="progress-bar" style="width: ${Math.min((cuotaMasReciente.horas_cumplidas / cuotaMasReciente.horas_requeridas) * 100, 100)}%; 
-                                     background: linear-gradient(135deg, #69b2d5 0%, #1b1397 100%); 
-                                     height: 100%; 
-                                     display: flex; 
-                                     align-items: center; 
-                                     justify-content: center;
-                                     font-weight: bold;
-                                     color: white;">
-                                    ${cuotaMasReciente.horas_cumplidas || 0}h / ${cuotaMasReciente.horas_requeridas}h
-                                </div>
+                    
                             </div>
                         </div>
                     </div>
@@ -3024,21 +3042,7 @@ function renderMisCuotasOrganizadas(cuotas) {
                         </p>
                     </div>
                     
-                    <div style="margin-top: 15px; padding: 15px; background: rgba(255, 255, 255, 0.1); border-radius: 8px;">
-                        <strong style="color: #fff;">📊 Progreso de Horas del Mes:</strong>
-                        <div style="margin-top: 10px;">
-                            <div class="progress-bar-container" style="background: rgba(0,0,0,0.3); height: 25px; border-radius: 12px; overflow: hidden;">
-                                <div class="progress-bar" style="width: ${Math.min((cuotaMasReciente.horas_cumplidas / cuotaMasReciente.horas_requeridas) * 100, 100)}%; 
-                                     background: linear-gradient(135deg, #69b2d5 0%, #1b1397 100%); 
-                                     height: 100%; 
-                                     display: flex; 
-                                     align-items: center; 
-                                     justify-content: center;
-                                     font-weight: bold;
-                                     color: white;">
-                                    ${cuotaMasReciente.horas_cumplidas || 0}h / ${cuotaMasReciente.horas_requeridas}h
-                                </div>
-                            </div>
+                    
                         </div>
                     </div>
                 ` : `
@@ -5255,8 +5259,8 @@ function fixFechasTareas() {
                                 Actualizar Progreso
                             </button>
                             <button class="btn-small btn-avance" onclick="addTaskAvance(${tarea.id_tarea})">
-                                Reportar Avance
-                            </button>
+    Reportar Avance
+</button>
                             <button class="btn-small btn-materiales" onclick="viewTaskMaterials(${tarea.id_tarea})" title="Ver materiales necesarios">
                                 <i class="fas fa-boxes"></i> Materiales
                             </button>

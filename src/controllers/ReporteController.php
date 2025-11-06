@@ -22,40 +22,83 @@ class ReporteController
  */
 public function generarReporteMensual()
 {
+    error_log("========================================");
     error_log("=== INICIO generarReporteMensual ===");
-    error_log("GET params: " . print_r($_GET, true));
+    error_log("REQUEST_METHOD: " . $_SERVER['REQUEST_METHOD']);
+    error_log("GET params RAW: " . print_r($_GET, true));
+    error_log("========================================");
     
     try {
         Herramientas::validarAdmin();
 
-        $mes = $_GET['mes'] ?? date('n');
-        $anio = $_GET['anio'] ?? date('Y');
+        // ✅ Obtener y convertir a int
+        $mes = isset($_GET['mes']) ? intval($_GET['mes']) : intval(date('n'));
+        $anio = isset($_GET['anio']) ? intval($_GET['anio']) : intval(date('Y'));
 
-        error_log("Procesando: mes=$mes, anio=$anio");
+        error_log("📊 VALORES PROCESADOS:");
+        error_log("   mes (raw): " . var_export($_GET['mes'] ?? 'NOT_SET', true));
+        error_log("   mes (int): $mes");
+        error_log("   anio (raw): " . var_export($_GET['anio'] ?? 'NOT_SET', true));
+        error_log("   anio (int): $anio");
+        error_log("========================================");
 
-        // Validar mes y año
-        if ($mes < 1 || $mes > 12 || $anio < 2024 || $anio > 2030) {
-            error_log("ERROR: Mes o año inválido");
-            Herramientas::jsonResponse(false, 'Mes o año inválido', [], 400);
+        // ✅ Validación con logs detallados
+        $mesValido = ($mes >= 1 && $mes <= 12);
+        $anioValido = ($anio >= 2025 && $anio <= 2030);
+
+        error_log("🔍 VALIDACIONES:");
+        error_log("   Mes válido (1-12)? " . ($mesValido ? 'SÍ' : 'NO'));
+        error_log("   Año válido (2025-2030)? " . ($anioValido ? 'SÍ' : 'NO'));
+
+        if (!$mesValido || !$anioValido) {
+            error_log("❌ VALIDACIÓN FALLÓ");
+            error_log("   Condición 1: mes=$mes (debe ser 1-12)");
+            error_log("   Condición 2: anio=$anio (debe ser 2025-2030)");
+            
+            Herramientas::jsonResponse(false, 
+                "Mes o año inválido. Mes: $mes (debe ser 1-12), Año: $anio (debe ser 2025-2030)", 
+                [
+                    'debug' => [
+                        'mes_recibido' => $_GET['mes'] ?? null,
+                        'mes_procesado' => $mes,
+                        'anio_recibido' => $_GET['anio'] ?? null,
+                        'anio_procesado' => $anio,
+                        'mes_valido' => $mesValido,
+                        'anio_valido' => $anioValido
+                    ]
+                ], 
+                400
+            );
             return;
         }
+
+        error_log("✅ Validaciones OK - Llamando al modelo");
 
         $reporte = $this->reporteModel->generarReporteMensual($mes, $anio);
 
         if ($reporte) {
-            error_log(" Reporte generado exitosamente");
+            error_log("✅ Reporte generado exitosamente");
             Herramientas::jsonResponse(true, 'Reporte generado exitosamente', [
                 'reporte' => $reporte
             ]);
         } else {
-            error_log("ERROR: Reporte retornó null");
+            error_log("⚠ Reporte retornó null o vacío");
             Herramientas::jsonResponse(false, 'No se pudo generar el reporte', [], 500);
         }
     } catch (\Exception $e) {
-        error_log("💥 EXCEPCIÓN en generarReporteMensual: " . $e->getMessage());
-        error_log("Stack trace: " . $e->getTraceAsString());
-        Herramientas::jsonResponse(false, 'Error del servidor: ' . $e->getMessage(), [], 500);
-    }
+        error_log("💥 EXCEPCIÓN en generarReporteMensual:");
+        error_log("   Mensaje: " . $e->getMessage());
+        error_log("   Archivo: " . $e->getFile() . ":" . $e->getLine());
+        error_log("   Stack trace: " . $e->getTraceAsString());
+        
+        Herramientas::jsonResponse(false, 'Error del servidor: ' . $e->getMessage(), 
+            [
+                'error_file' => $e->getFile(),
+                'error_line' => $e->getLine()
+            ], 
+            500
+);
+}
 }
 
     /**
