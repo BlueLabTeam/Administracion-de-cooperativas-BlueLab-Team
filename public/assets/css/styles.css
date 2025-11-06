@@ -37,7 +37,7 @@
   --border-radius-large: 30px;
 }
 
-/* RESET Y BASE */
+
 * {
   box-sizing: border-box;
 }
@@ -82,10 +82,10 @@ main {
   overflow: hidden;
 }
 
-/* --- BOTÓN PRINCIPAL (Solicitar Ingreso) --- */
+
 .button--primary {
-  background-color: #fff; /* blanco */
-  color: var(--color-primary); /* azul */
+  background-color: #fff; 
+  color: var(--color-primary); 
   border: 2px solid #fff;
 }
 
@@ -96,7 +96,7 @@ main {
   box-shadow: var(--shadow-medium);
 }
 
-/* --- BOTÓN SECUNDARIO (Más info) --- */
+
 .button--secondary {
   background-color: transparent;
   color: #fff;
@@ -757,15 +757,3 @@ main {
     flex-direction: column;
   }
 }
-
-<<<<<<< HEAD
-/* UTILIDADES */
-.text-center { text-align: center; }
-.mb-0 { margin-bottom: 0; }
-.mb-1 { margin-bottom: 1rem; }
-.mb-2 { margin-bottom: 2rem; }
-.mt-0 { margin-top: 0; }
-.mt-1 { margin-top: 1rem; }
-.mt-2 { margin-top: 2rem; }
-=======
->>>>>>> 8fc8a4de417dd0df769a6a1448381c08e2c2275a

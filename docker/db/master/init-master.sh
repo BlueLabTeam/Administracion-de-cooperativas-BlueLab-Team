@@ -9,4 +9,4 @@ GRANT REPLICATION SLAVE ON *.* TO '${DB_REPLICATOR_USER}'@'%';
 FLUSH PRIVILEGES;
 "
 
-echo "✅ Master inicializado correctamente."
+echo " Master inicializado correctamente."

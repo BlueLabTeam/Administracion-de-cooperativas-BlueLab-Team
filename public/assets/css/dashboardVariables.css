@@ -1,27 +1,23 @@
-/* ==========================================
-   SISTEMA CSS UNIFICADO - VARIABLES GLOBALES
-   Paleta: Azul Marino (#003366), Azul (#0066CC), Blanco
-   ========================================== */
 
 :root {
-    /* === COLORES PRINCIPALES === */
-    --color-primary: #003366;           /* Azul Marino Oscuro */
-    --color-primary-light: #004d99;     /* Azul Marino Medio */
-    --color-secondary: #0066CC;         /* Azul Brillante */
-    --color-secondary-light: #3399FF;   /* Azul Claro */
-    --color-accent: #00509E;            /* Azul Intermedio */
+   
+    --color-primary: #003366;          
+    --color-primary-light: #004d99;     
+    --color-secondary: #0066CC;         
+    --color-secondary-light: #3399FF;   
+    --color-accent: #00509E;            
     
-    /* === COLORES DE ESTADO === */
-    --color-success: #2E7D32;           /* Verde Oscuro */
-    --color-success-light: #4CAF50;     /* Verde */
-    --color-warning: #F57C00;           /* Naranja Oscuro */
-    --color-warning-light: #FF9800;     /* Naranja */
-    --color-danger: #C62828;            /* Rojo Oscuro */
-    --color-danger-light: #E53935;      /* Rojo */
-    --color-info: #1976D2;              /* Azul Info */
-    --color-info-light: #2196F3;        /* Azul Info Claro */
+   
+    --color-success: #2E7D32;           
+    --color-success-light: #4CAF50;     
+    --color-warning: #F57C00;           
+    --color-warning-light: #FF9800;    
+    --color-danger: #C62828;            
+    --color-danger-light: #E53935;      
+    --color-info: #1976D2;              
+    --color-info-light: #2196F3;        
     
-    /* === ESCALA DE GRISES === */
+   
     --color-white: #FFFFFF;
     --color-gray-50: #F8FAFB;
     --color-gray-100: #F0F4F8;
@@ -34,20 +30,20 @@
     --color-gray-800: #1A202C;
     --color-gray-900: #171923;
     
-    /* === BACKGROUNDS === */
+    
     --bg-body: #F0F4F8;
     --bg-card: #FFFFFF;
     --bg-hover: #F8FAFB;
     --bg-gradient-primary: linear-gradient(135deg, #003366 0%, #0066CC 100%);
     --bg-gradient-secondary: linear-gradient(135deg, #0066CC 0%, #3399FF 100%);
     
-    /* === SOMBRAS === */
+    
     --shadow-sm: 0 2px 4px rgba(0, 51, 102, 0.08);
     --shadow-md: 0 4px 12px rgba(0, 51, 102, 0.12);
     --shadow-lg: 0 8px 24px rgba(0, 51, 102, 0.16);
     --shadow-xl: 0 12px 36px rgba(0, 51, 102, 0.20);
     
-    /* === BORDES === */
+    
     --border-color: #E2E8F0;
     --border-color-hover: #0066CC;
     --border-radius-sm: 8px;
@@ -55,7 +51,7 @@
     --border-radius-lg: 16px;
     --border-radius-xl: 20px;
     
-    /* === TIPOGRAFÍA === */
+  
     --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
     --font-size-xs: 12px;
     --font-size-sm: 13px;
@@ -67,7 +63,7 @@
     --font-size-3xl: 24px;
     --font-size-4xl: 28px;
     
-    /* === ESPACIADO === */
+  
     --spacing-xs: 4px;
     --spacing-sm: 8px;
     --spacing-md: 12px;
@@ -77,20 +73,18 @@
     --spacing-3xl: 32px;
     --spacing-4xl: 40px;
     
-    /* === TRANSICIONES === */
+  
     --transition-fast: 0.15s ease;
     --transition-base: 0.3s ease;
     --transition-slow: 0.5s ease;
     
-    /* === Z-INDEX === */
+
     --z-dropdown: 1000;
     --z-modal: 9999;
     --z-tooltip: 10000;
 }
 
-/* ==========================================
-   RESET Y CONFIGURACIÓN GLOBAL
-   ========================================== */
+
 
 * {
     margin: 0;
@@ -305,9 +299,7 @@ a:hover {
     margin: 0;
 }
 
-/* ==========================================
-   FORMULARIOS UNIFICADOS
-   ========================================== */
+
 
 .form-group {
     margin-bottom: var(--spacing-xl);
@@ -348,9 +340,7 @@ a:hover {
     min-height: 100px;
 }
 
-/* ==========================================
-   TABLAS UNIFICADAS
-   ========================================== */
+
 
 .table-container {
     overflow-x: auto;
@@ -395,9 +385,7 @@ table tbody td {
     color: var(--color-gray-700);
 }
 
-/* ==========================================
-   MODALES UNIFICADOS
-   ========================================== */
+
 
 .modal-overlay {
     position: fixed;
@@ -479,9 +467,7 @@ table tbody td {
     transform: rotate(90deg);
 }
 
-/* ==========================================
-   ALERTAS UNIFICADAS
-   ========================================== */
+
 
 .alert {
     padding: var(--spacing-lg) var(--spacing-xl);
@@ -517,9 +503,7 @@ table tbody td {
     color: var(--color-info);
 }
 
-/* ==========================================
-   UTILIDADES
-   ========================================== */
+
 
 .loading {
     text-align: center;
@@ -550,9 +534,7 @@ table tbody td {
 .mb-lg { margin-bottom: var(--spacing-lg); }
 .mb-xl { margin-bottom: var(--spacing-xl); }
 
-/* ==========================================
-   RESPONSIVE
-   ========================================== */
+
 
 @media (max-width: 768px) {
     :root {
@@ -571,9 +553,7 @@ table tbody td {
     }
 }
 
-/* ==========================================
-   SCROLLBAR PERSONALIZADO
-   ========================================== */
+
 
 ::-webkit-scrollbar {
     width: 10px;

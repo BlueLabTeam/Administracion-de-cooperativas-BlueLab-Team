@@ -20,7 +20,7 @@ class UserController
     }
 
     /**
-     * ✅ CORREGIDO: Obtener todos los usuarios con sus datos completos
+     *  Obtener todos los usuarios con sus datos completos
      */
     public function getAllUsers()
     {
@@ -100,8 +100,26 @@ class UserController
         exit();
     }
 
+   public function getFechaMasAntigua()
+{
+    try {
+        $stmt = $this->pdo->query("SELECT MIN(fecha_creacion) as fecha_mas_antigua FROM usuarios");
+        $fecha = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        echo json_encode(["success" => true, "data" => $fecha]);
+    } catch (Exception $e) {
+        http_response_code(500);
+        echo json_encode([
+            "success" => false,
+            "error" => $e->getMessage()
+        ]);
+    }
+}
+
+
+
     /**
-     * ✅ CORREGIDO: Obtener perfil del usuario actual
+     *  Obtener perfil del usuario actual
      */
     public function getMyProfile()
     {
@@ -174,7 +192,7 @@ class UserController
     }
 
     /**
- * ✅ NUEVO: Obtener detalles de pago de un usuario
+ *  Obtener detalles de pago de un usuario
  */
 public function getPaymentDetails()
 {
@@ -253,7 +271,7 @@ public function getPaymentDetails()
 }
 
     /**
-     * ✅ CORREGIDO: Actualizar perfil del usuario
+     *   Actualizar perfil del usuario
      */
     public function updateProfile()
     {
@@ -397,7 +415,7 @@ public function getPaymentDetails()
     }
 
     /**
-     * ✅ CORREGIDO: Obtener usuario por ID
+     *   Obtener usuario por ID
      */
     public function getUserById()
     {
@@ -465,7 +483,7 @@ public function getPaymentDetails()
     }
 
     /**
-     * ✅✅ FIXED: Aprobar o rechazar usuario + validar primer pago
+     *  FIXED: Aprobar o rechazar usuario + validar primer pago
      */
     public function aprobarRechazar()
     {
@@ -586,7 +604,7 @@ public function getPaymentDetails()
             $this->conn->beginTransaction();
 
             if ($accion === 'aprobar') {
-                // ✅ APROBAR USUARIO
+                //  APROBAR USUARIO
                 
                 // 1. Actualizar estado del usuario
                 $sqlUpdate = "UPDATE Usuario 
@@ -641,7 +659,7 @@ public function getPaymentDetails()
 
                 $this->conn->commit();
 
-                error_log("✅ Usuario {$usuario['nombre_completo']} (ID: {$idUsuario}) aprobado correctamente");
+                error_log(" Usuario {$usuario['nombre_completo']} (ID: {$idUsuario}) aprobado correctamente");
 
                 echo json_encode([
                     'success' => true,
@@ -654,7 +672,7 @@ public function getPaymentDetails()
                 ], JSON_UNESCAPED_UNICODE);
 
             } else {
-                // ❌ RECHAZAR USUARIO
+                //  RECHAZAR USUARIO
                 
                 // 1. Actualizar estado del usuario
                 $sqlUpdate = "UPDATE Usuario 
@@ -700,7 +718,7 @@ public function getPaymentDetails()
                 
                 $stmtNotif = $this->conn->prepare($sqlNotif);
                 $stmtNotif->execute([
-                    ':titulo' => '❌ Solicitud de registro rechazada',
+                    ':titulo' => ' Solicitud de registro rechazada',
                     ':mensaje' => $mensajeRechazo
                 ]);
                 
@@ -718,7 +736,7 @@ public function getPaymentDetails()
 
                 $this->conn->commit();
 
-                error_log("❌ Usuario {$usuario['nombre_completo']} (ID: {$idUsuario}) rechazado");
+                error_log(" Usuario {$usuario['nombre_completo']} (ID: {$idUsuario}) rechazado");
 
                 echo json_encode([
                     'success' => true,
@@ -736,8 +754,8 @@ public function getPaymentDetails()
                 $this->conn->rollBack();
             }
             
-            error_log("❌ Error PDO en aprobarRechazar: " . $e->getMessage());
-            error_log("❌ Stack trace: " . $e->getTraceAsString());
+            error_log(" Error PDO en aprobarRechazar: " . $e->getMessage());
+            error_log(" Stack trace: " . $e->getTraceAsString());
             
             http_response_code(500);
             echo json_encode([
@@ -753,7 +771,7 @@ public function getPaymentDetails()
                 $this->conn->rollBack();
             }
             
-            error_log("❌ Error general en aprobarRechazar: " . $e->getMessage());
+            error_log(" Error general en aprobarRechazar: " . $e->getMessage());
             
             http_response_code(500);
             echo json_encode([

@@ -66,8 +66,8 @@ class CuotaController
             ], JSON_UNESCAPED_UNICODE);
 
         } catch (\Exception $e) {
-            error_log("❌ ERROR en getMisCuotas: " . $e->getMessage());
-            error_log("❌ Stack: " . $e->getTraceAsString());
+            error_log(" ERROR en getMisCuotas: " . $e->getMessage());
+            error_log(" Stack: " . $e->getTraceAsString());
             
             http_response_code(500);
             echo json_encode([
@@ -369,7 +369,7 @@ class CuotaController
             echo json_encode($resultado, JSON_UNESCAPED_UNICODE);
 
         } catch (\Exception $e) {
-            error_log("❌ Error en generarMiCuota: " . $e->getMessage());
+            error_log(" Error en generarMiCuota: " . $e->getMessage());
             http_response_code(500);
             echo json_encode([
                 'success' => false,

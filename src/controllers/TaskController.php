@@ -152,7 +152,7 @@ class TaskController
 {
     header('Content-Type: application/json');
     
-    // ✅ Obtener userId de la sesión (ya autenticado por middleware)
+    //  Obtener userId de la sesión (ya autenticado por middleware)
     if (!isset($_SESSION['user_id'])) {
         echo json_encode(['success' => false, 'message' => 'No autenticado']);
         return;
@@ -191,13 +191,13 @@ class TaskController
     }
 
     try {
-        // ✅ Extraer datos de POST
+        //  Extraer datos de POST
         $asignacionId = $_POST['asignacion_id'] ?? null;
         $tipoAsignacion = $_POST['tipo_asignacion'] ?? 'usuario';
         $progreso = isset($_POST['progreso']) ? intval($_POST['progreso']) : null;
         $estado = $_POST['estado'] ?? null;
 
-        // ✅ LOG para debug
+        //  LOG para debug
         error_log("=== updateProgress DEBUG ===");
         error_log("POST completo: " . print_r($_POST, true));
         error_log("asignacion_id: " . $asignacionId);
@@ -205,7 +205,7 @@ class TaskController
         error_log("progreso: " . $progreso);
         error_log("estado: " . $estado);
 
-        // ✅ Validaciones
+        //  Validaciones
         if (empty($asignacionId)) {
             echo json_encode(['success' => false, 'message' => 'ID de asignación requerido', 'error' => 'Falta asignacion_id']);
             return;
@@ -221,12 +221,12 @@ class TaskController
             return;
         }
 
-        // ✅ Si progreso es 100 y no hay estado, forzar 'completada'
+        //  Si progreso es 100 y no hay estado, forzar 'completada'
         if ($progreso === 100 && !$estado) {
             $estado = 'completada';
         }
 
-        // ✅ Actualizar en BD
+        //  Actualizar en BD
         $result = $this->taskModel->updateProgress($asignacionId, $tipoAsignacion, $progreso, $estado);
 
         if ($result) {
@@ -396,7 +396,7 @@ class TaskController
     }
 
     try {
-        // ✅ El parámetro viene como 'tarea_id' desde JavaScript
+        //  El parámetro viene como 'tarea_id' desde JavaScript
         $tareaId = $_POST['tarea_id'] ?? null;
 
         error_log("=== cancelTask DEBUG ===");
@@ -436,14 +436,14 @@ class TaskController
 {
     header('Content-Type: application/json');
 
-    // ✅ Usuarios también pueden ver detalles de sus propias tareas
+    //  Usuarios también pueden ver detalles de sus propias tareas
     if (!isset($_SESSION['user_id'])) {
         echo json_encode(['success' => false, 'message' => 'No autenticado']);
         return;
     }
 
     try {
-        // ✅ El parámetro viene como 'tarea_id' en GET
+        //  El parámetro viene como 'tarea_id' en GET
         $tareaId = $_GET['tarea_id'] ?? null;
 
         error_log("=== getTaskDetails DEBUG ===");

@@ -9,22 +9,17 @@ class DeudaHoras
 {
     private $conn;
 
-    // ⭐ CAMBIO: 21 horas SEMANALES = 84 horas MENSUALES
+    
     private $horas_semanales_requeridas = 21;
-    private $horas_mensuales_requeridas = 84; // 21h × 4 semanas
-    private $costo_hora_faltante = 160; // $160 por cada hora no trabajada
+    private $horas_mensuales_requeridas = 84; 
+    private $costo_hora_faltante = 160; 
 
     public function __construct()
     {
         $this->conn = Database::getConnection();
     }
 
-    /**
-     * Obtener deuda/estado de horas DEL MES ACTUAL
-     * Horas requeridas: 84h mensuales (21h semanales × 4 semanas)
-     * Horas cumplidas: las que tiene registradas (aprobadas o no)
-     * Deuda: (Horas faltantes) × $160
-     */
+   
     public function obtenerDeudaActual($id_usuario)
     {
         try {
@@ -55,7 +50,7 @@ class DeudaHoras
             $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
             $horas_trabajadas = (float)$resultado['total_horas'];
 
-            // ✅ OBTENER HORAS JUSTIFICADAS DEL MES ACTUAL
+            //  OBTENER HORAS JUSTIFICADAS DEL MES ACTUAL
             $stmt = $this->conn->prepare("
                 SELECT COALESCE(SUM(horas_justificadas), 0) as horas_justificadas,
                        COALESCE(SUM(monto_descontado), 0) as monto_descontado
@@ -81,13 +76,13 @@ class DeudaHoras
             error_log("Monto justificado: $" . $monto_justificado);
             error_log("Horas requeridas mensuales: " . $this->horas_mensuales_requeridas . "h (21h/semana × 4)");
 
-            // ✅ CALCULAR HORAS FALTANTES CONSIDERANDO JUSTIFICACIONES
-            // Horas faltantes = Requeridas - Trabajadas - Justificadas
+            //  CALCULAR HORAS FALTANTES CONSIDERANDO JUSTIFICACIONES
+   
             $horas_efectivas = $horas_trabajadas + $horas_justificadas;
             $horas_faltantes = max(0, $this->horas_mensuales_requeridas - $horas_efectivas);
             $horas_excedentes = max(0, $horas_efectivas - $this->horas_mensuales_requeridas);
 
-            // ✅ CALCULAR DEUDA EN PESOS: Solo las horas REALMENTE faltantes
+            //  CALCULAR DEUDA EN PESOS: Solo las horas REALMENTE faltantes
             $deuda_mes_actual = $horas_faltantes * $this->costo_hora_faltante;
 
             // Obtener deuda acumulada de meses anteriores
@@ -197,7 +192,7 @@ class DeudaHoras
             $deuda_acumulada = 0;
 
             foreach ($meses_anteriores as $periodo) {
-                // ✅ VERIFICAR SI YA FUE PAGADA
+                //  VERIFICAR SI YA FUE PAGADA
                 $stmtPagada = $this->conn->prepare("
                     SELECT COUNT(*) as pagada
                     FROM Pagos_Cuotas pc
@@ -317,7 +312,7 @@ class DeudaHoras
 
             $historial = [];
 
-            // 1️⃣ OBTENER REGISTROS DE HORAS MENSUALES
+            // 1️ OBTENER REGISTROS DE HORAS MENSUALES
             $stmt = $this->conn->prepare("
             SELECT 
                 YEAR(fecha) as anio,
@@ -373,7 +368,7 @@ class DeudaHoras
                 $horas_excedentes = max(0, $horas_efectivas - $this->horas_mensuales_requeridas);
                 $deuda_final = $horas_faltantes_real * $this->costo_hora_faltante;
 
-                // ✅ Verificar si fue pagada
+                //  Verificar si fue pagada
                 $stmtPagada = $this->conn->prepare("
                 SELECT COUNT(*) as pagada
                 FROM Pagos_Cuotas pc
@@ -410,11 +405,11 @@ class DeudaHoras
                     'deuda_generada' => round($deuda_final, 2),
                     'fue_pagada' => $fue_pagada,
                     'estado' => $fue_pagada ? 'pagado' : ($horas_efectivas >= $this->horas_mensuales_requeridas ? 'cumplido' : 'deuda'),
-                    'icono' => $fue_pagada ? '💰' : ($horas_efectivas >= $this->horas_mensuales_requeridas ? '✅' : '⚠')
+                    'icono' => $fue_pagada ? '💰' : ($horas_efectivas >= $this->horas_mensuales_requeridas ? '' : '⚠')
                 ];
             }
 
-            // 2️⃣ OBTENER JUSTIFICACIONES APROBADAS
+            // 2️ OBTENER JUSTIFICACIONES APROBADAS
             $stmtJustif = $this->conn->prepare("
             SELECT 
                 id_justificacion,
@@ -458,7 +453,7 @@ class DeudaHoras
                 ];
             }
 
-            // 3️⃣ OBTENER PAGOS RELACIONADOS CON DEUDA DE HORAS
+            // 3️ OBTENER PAGOS RELACIONADOS CON DEUDA DE HORAS
             $stmtPagos = $this->conn->prepare("
             SELECT 
                 pc.id_pago,
@@ -505,7 +500,7 @@ class DeudaHoras
                 ];
             }
 
-            // 4️⃣ ORDENAR TODO POR FECHA DESCENDENTE
+            // 4️ ORDENAR TODO POR FECHA DESCENDENTE
             usort($historial, function ($a, $b) {
                 return strtotime($b['fecha']) - strtotime($a['fecha']);
             });
@@ -523,9 +518,7 @@ class DeudaHoras
         }
     }
 
-    /**
-     * Obtener nombre del mes en español
-     */
+
     private function getNombreMes($num_mes)
     {
         $meses = [

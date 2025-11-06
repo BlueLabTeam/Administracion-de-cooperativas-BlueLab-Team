@@ -25,7 +25,7 @@ class DeudaHorasController
 
     /**
      * Obtener deuda actual del usuario
-     * ENDPOINT: GET /api/horas/deuda-actual
+     * 
      */
     public function getDeudaActual()
     {
@@ -68,7 +68,7 @@ class DeudaHorasController
 
     /**
  * Obtener historial mensual de horas
- * ENDPOINT: GET /api/horas/historial-mensual?meses=6
+ * 
  */
 public function getHistorialMensual()
 {
@@ -115,7 +115,7 @@ public function getHistorialMensual()
 
     /**
      * Obtener historial de cambios
-     * ENDPOINT: GET /api/horas/historial-deuda
+     * 
      */
     public function getHistorialDeuda()
     {

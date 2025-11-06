@@ -1,9 +1,6 @@
-/* ==========================================
-   SECCIÓN SOLICITUDES ADMIN - AZUL Y BLANCO
-   Coherente con dashboardAdmin.js
-   ========================================== */
 
-/* ========== VARIABLES (coinciden con COLORS en JS) ========== */
+
+
 :root {
     --primary: #005CB9;
     --primary-dark: #004494;
@@ -470,8 +467,7 @@
     margin: 0;
 }
 
-/* ========== MODAL DETALLE ADMIN (inline styles en JS) ========== */
-/* El JS usa estilos inline, pero dejamos estilos base por si acaso */
+
 .modal-detail-admin {
     position: fixed;
     top: 0;

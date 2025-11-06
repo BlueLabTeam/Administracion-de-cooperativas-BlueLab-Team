@@ -49,7 +49,7 @@ class ViewsController
         
         // Verificar que el usuario esté autenticado
         if (!isset($_SESSION['user_id'])) {
-            error_log("❌ NO HAY user_id - Redirigiendo a login");
+            error_log(" NO HAY user_id - Redirigiendo a login");
             header('Location: /login');
             exit();
         }
@@ -59,12 +59,12 @@ class ViewsController
         $user = $userModel->findById($_SESSION['user_id']);
         
         if (!$user || !$user->isAdmin()) {
-            error_log("❌ NO ES ADMIN - Redirigiendo a dashboard");
+            error_log(" NO ES ADMIN - Redirigiendo a dashboard");
             header('Location: /dashboard');
             exit();
         }
         
-        error_log("✅ ES ADMIN - Cargando dashboardBackoffice.php");
+        error_log(" ES ADMIN - Cargando dashboardBackoffice.php");
         
         // Actualizar sesión
         $_SESSION['is_admin'] = true;

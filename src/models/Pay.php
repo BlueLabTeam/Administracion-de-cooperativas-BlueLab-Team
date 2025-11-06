@@ -57,7 +57,7 @@ class Pay
             }
             
             $lastId = $this->conn->lastInsertId();
-            error_log("✅ Pago registrado exitosamente. ID: $lastId");
+            error_log(" Pago registrado exitosamente. ID: $lastId");
             
             return true;
             

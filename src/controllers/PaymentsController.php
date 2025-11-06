@@ -47,7 +47,7 @@ class PaymentsController
         error_log("Archivo tmp: " . $archivo['tmp_name']);
         error_log("Archivo error: " . $archivo['error']);
         
-        // ✅ VALIDAR ERRORES DE SUBIDA
+        //  VALIDAR ERRORES DE SUBIDA
         if ($archivo['error'] !== UPLOAD_ERR_OK) {
             $errorMessages = [
                 UPLOAD_ERR_INI_SIZE => 'El archivo excede upload_max_filesize en php.ini',
@@ -70,7 +70,7 @@ class PaymentsController
             exit;
         }
         
-        // ✅ VALIDAR EXTENSIÓN
+        //  VALIDAR EXTENSIÓN
         $extension = strtolower(pathinfo($archivo['name'], PATHINFO_EXTENSION));
         $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'pdf', 'webp'];
         
@@ -84,7 +84,7 @@ class PaymentsController
             exit;
         }
         
-        // ✅ VALIDAR TAMAÑO (5MB máximo)
+        //  VALIDAR TAMAÑO (5MB máximo)
         $maxSize = 5 * 1024 * 1024; // 5MB
         if ($archivo['size'] > $maxSize) {
             error_log("ERROR: Archivo muy grande: {$archivo['size']} bytes");
@@ -96,7 +96,7 @@ class PaymentsController
             exit;
         }
         
-        // ✅ GENERAR NOMBRE SEGURO (sin espacios ni caracteres raros)
+        //  GENERAR NOMBRE SEGURO 
         $nombreArchivo = time() . '_' . uniqid() . '.' . $extension;
 
         // Para que se guarde en storage
@@ -109,7 +109,7 @@ class PaymentsController
         // Ruta para guardarlo en la BD (relativa)
         $rutaRelativa = 'uploads/pagos/' . $nombreArchivo;
 
-        // ✅ CREAR DIRECTORIO SI NO EXISTE
+        //  CREAR DIRECTORIO SI NO EXISTE
         if (!is_dir($directorio)) {
             error_log("Creando directorio: $directorio");
             if (!mkdir($directorio, 0775, true)) {
@@ -125,7 +125,7 @@ class PaymentsController
             error_log("Directorio creado exitosamente");
         }
         
-        // ✅ VERIFICAR PERMISOS DE ESCRITURA
+        //  VERIFICAR PERMISOS DE ESCRITURA
         if (!is_writable($directorio)) {
             error_log("ERROR: Directorio sin permisos de escritura: $directorio");
             http_response_code(500);
@@ -140,7 +140,7 @@ class PaymentsController
             exit;
         }
 
-        // ✅ MOVER ARCHIVO
+        //  MOVER ARCHIVO
         if (!move_uploaded_file($archivo['tmp_name'], $destino)) {
             error_log("ERROR: No se pudo mover el archivo");
             error_log("Detalles del error: " . print_r(error_get_last(), true));
@@ -163,7 +163,7 @@ class PaymentsController
 
         error_log("Archivo movido exitosamente a: $destino");
         
-        // ✅ VERIFICAR QUE EL ARCHIVO SE GUARDÓ
+        //  VERIFICAR QUE EL ARCHIVO SE GUARDÓ
         if (!file_exists($destino)) {
             error_log("ERROR: El archivo no existe después de move_uploaded_file");
             http_response_code(500);
@@ -174,14 +174,14 @@ class PaymentsController
             exit;
         }
 
-        // ✅ GUARDAR EN BASE DE DATOS
+        //  GUARDAR EN BASE DE DATOS
         $pay = new Pay();
         $resultado = $pay->addPay($usuario_id, $rutaRelativa);
 
         error_log("Resultado addPay BD: " . ($resultado ? 'true' : 'false'));
 
         if ($resultado) {
-            // ✅ ACTUALIZAR ESTADO DEL USUARIO
+            //  ACTUALIZAR ESTADO DEL USUARIO
             $userModel = new \App\models\User();
             $updateResult = $userModel->updateEstado($usuario_id, 'enviado');
             error_log("Resultado updateEstado: " . ($updateResult ? 'true' : 'false'));
@@ -195,7 +195,7 @@ class PaymentsController
                 'redirect' => '/pagoEnviado'
             ]);
         } else {
-            // ✅ ELIMINAR ARCHIVO SI FALLA LA BD
+            //  ELIMINAR ARCHIVO SI FALLA LA BD
             if (file_exists($destino)) {
                 unlink($destino);
                 error_log("Archivo eliminado por error en BD");
@@ -288,7 +288,7 @@ class PaymentsController
         $resultado = $userModel->updateEstado($id_usuario, 'pendiente');
 
         if ($resultado) {
-            // TODO: Opcional - Guardar el motivo del rechazo en una tabla de historial
+          
             error_log("Pago rechazado para usuario $id_usuario. Motivo: $motivo");
             echo json_encode(['success' => true, 'message' => 'Pago rechazado. El usuario podrá volver a intentarlo']);
         } else {

@@ -9,7 +9,7 @@ if (empty($path)) {
 }
 
 // Construir la ruta completa
-// Ajusta '../storage/' según tu estructura de carpetas
+
 $fullPath = __DIR__ . '/../storage/' . $path;
 
 // Normalizar la ruta para evitar ataques

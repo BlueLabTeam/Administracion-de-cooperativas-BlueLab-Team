@@ -30,7 +30,7 @@
     window.addEventListener('resize', handleResize);
   }
 
-  // Configurar eventos para móvil
+  
   function setupMobileEvents() {
     // Toggle con botón
     footerToggle.addEventListener('click', toggleFooter);
@@ -116,7 +116,7 @@
         animateClick(this);
 
         setTimeout(function () {
-          console.log('Abriendo ' + social + '...');
+          ('Abriendo ' + social + '...');
           // Aquí van los enlaces reales
         }, 200);
       });
@@ -168,4 +168,4 @@
   // Event listener para tocar fuera
   document.addEventListener('touchstart', handleOutsideTouch);
 
-})(); // IIFE para evitar variables globales
+})(); 

@@ -95,7 +95,7 @@
     transform: scale(1.1) !important;
   }
 
-  /* Animaciones móviles */
+ 
   @media (max-width: 768px) {
     .footer-mobile-toggle {
       display: flex !important;
@@ -175,7 +175,7 @@
     animation: footer-slideInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) !important;
   }
 
-  /* Efecto de ondas en mobile */
+
   @media (max-width: 768px) {
     .footer-cooperativa.footer-expanded::before {
       content: '' !important;
