@@ -378,7 +378,7 @@ CREATE TABLE IF NOT EXISTS Config_Cuotas (
     INDEX idx_tipo_activo (id_tipo, activo)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
-INSERT IGNORE INTO
+INSERT INTO
     Config_Cuotas (
         id_tipo,
         monto_mensual,
