@@ -4770,36 +4770,38 @@ async function inicializarReportes() {
   
 
     try {
-        //  Simular año mínimo (sin pedirlo al servidor)
-        let anioMinimo = new Date().getFullYear()  ; // 5 años atrás
-       
+    //  Año mínimo: 2025 (cuando inició el sistema)
+    const anioMinimo = 2025;
+    //  Permitir hasta 5 años en el futuro
+    const aniosFuturos = 5;
 
-        //  GENERAR SELECTOR DE AÑOS DINÁMICO
-        const selectAnio = document.getElementById('reporte-anio');
-        if (selectAnio) {
-            const anioActual = new Date().getFullYear();
-            selectAnio.innerHTML = '<option value="">Seleccione año...</option>';
-            
-            for (let anio = anioActual; anio >= anioMinimo; anio--) {
-                const option = document.createElement('option');
-                option.value = anio;
-                option.textContent = anio;
-                if (anio === anioActual) option.selected = true;
-                selectAnio.appendChild(option);
-            }
-          
+    //  GENERAR SELECTOR DE AÑOS DINÁMICO
+    const selectAnio = document.getElementById('reporte-anio');
+    if (selectAnio) {
+        const anioActual = new Date().getFullYear();
+        const anioMaximo = anioActual + aniosFuturos;
+        selectAnio.innerHTML = '<option value="">Seleccione año...</option>';
+        
+        // Desde el año máximo futuro hasta 2025 (hacia atrás)
+        for (let anio = anioMaximo; anio >= anioMinimo; anio--) {
+            const option = document.createElement('option');
+            option.value = anio;
+            option.textContent = anio;
+            if (anio === anioActual) option.selected = true;
+            selectAnio.appendChild(option);
         }
-
-        //  SELECCIONAR MES ACTUAL
-        const selectMes = document.getElementById('reporte-mes');
-        if (selectMes) {
-            const mesActual = new Date().getMonth() + 1;
-            selectMes.value = mesActual;
-        }
-
-    } catch (error) {
-        console.error(' [REPORTES] Error al inicializar:', error);
     }
+
+    //  SELECCIONAR MES ACTUAL
+    const selectMes = document.getElementById('reporte-mes');
+    if (selectMes) {
+        const mesActual = new Date().getMonth() + 1;
+        selectMes.value = mesActual;
+    }
+
+} catch (error) {
+    console.error(' [REPORTES] Error al inicializar:', error);
+}
 }
 
 
