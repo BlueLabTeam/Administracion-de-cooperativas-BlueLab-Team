@@ -595,6 +595,77 @@ class CuotaController
         exit();
     }
 
+    public function getResumenDeuda()
+{
+    while (ob_get_level() > 0) {
+        ob_end_clean();
+    }
+    
+    header('Content-Type: application/json; charset=utf-8');
+
+    if (!isset($_SESSION['user_id'])) {
+        http_response_code(401);
+        echo json_encode(['success' => false, 'message' => 'No autenticado']);
+        exit();
+    }
+
+    try {
+        $resultado = $this->cuotaModel->getResumenDeuda($_SESSION['user_id']);
+        echo json_encode($resultado, JSON_UNESCAPED_UNICODE);
+        
+    } catch (\Exception $e) {
+        error_log("Error en getResumenDeuda: " . $e->getMessage());
+        http_response_code(500);
+        echo json_encode([
+            'success' => false,
+            'message' => 'Error al obtener resumen de deuda'
+        ], JSON_UNESCAPED_UNICODE);
+    }
+    
+    exit();
+}
+
+
+public function recalcularDeuda()
+{
+    while (ob_get_level() > 0) {
+        ob_end_clean();
+    }
+    
+    header('Content-Type: application/json; charset=utf-8');
+
+    if (!isset($_SESSION['user_id']) || !$_SESSION['is_admin']) {
+        http_response_code(403);
+        echo json_encode(['success' => false, 'message' => 'No autorizado']);
+        exit();
+    }
+
+    try {
+        $idUsuario = $_POST['id_usuario'] ?? null;
+        
+        if (!$idUsuario) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'ID de usuario requerido'
+            ], JSON_UNESCAPED_UNICODE);
+            exit();
+        }
+        
+        $resultado = $this->cuotaModel->recalcularDeudaAcumulada($idUsuario);
+        echo json_encode($resultado, JSON_UNESCAPED_UNICODE);
+        
+    } catch (\Exception $e) {
+        error_log("Error en recalcularDeuda: " . $e->getMessage());
+        http_response_code(500);
+        echo json_encode([
+            'success' => false,
+            'message' => 'Error al recalcular deuda'
+        ], JSON_UNESCAPED_UNICODE);
+    }
+    
+    exit();
+}
+
     /**
      * Obtener precios actuales
      */

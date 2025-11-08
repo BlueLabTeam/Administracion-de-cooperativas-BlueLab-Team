@@ -303,13 +303,14 @@ if (!isset($_SESSION['user_id'])) {
 			</div>
 		</section>
 
-		<!-- APORTES -->
-		<div id="cuotas-section" class="section-content">
+	<!-- APORTES / CUOTAS -->
+<div id="cuotas-section" class="section-content">
     <div class="section-header">
         <h2 data-i18n="dashboardUser.billing.title">💳 Mis Cuotas Mensuales</h2>
         <p data-i18n="dashboardUser.billing.description">Gestiona tus pagos de vivienda y deuda de horas</p>
     </div>
 
+   
     <!-- Estadísticas Rápidas -->
     <div class="stats-grid">
         <div class="stat-card pendiente">
@@ -403,8 +404,6 @@ if (!isset($_SESSION['user_id'])) {
             <i class="fas fa-credit-card"></i> <span data-i18n="dashboardUser.billing.paymentModal.title">Realizar Pago</span>
         </h2>
 
-      
-
         <!-- Formulario de Pago -->
         <form id="pagarCuotaForm" onsubmit="submitPagarCuota(event)" enctype="multipart/form-data">
             <input type="hidden" id="pagar-cuota-id" name="cuota_id">
@@ -468,6 +467,8 @@ if (!isset($_SESSION['user_id'])) {
         </form>
     </div>
 </div>
+
+
 
 		<!-- HORAS -->
 <section id="horas-section" class="section-content">
@@ -630,6 +631,7 @@ if (!isset($_SESSION['user_id'])) {
 
 
 	<script src="/assets/js/dashboardUsuario.js"></script>
+
 
 	
 </body>

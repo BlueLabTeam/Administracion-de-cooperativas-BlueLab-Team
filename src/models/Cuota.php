@@ -205,6 +205,107 @@ class Cuota
         }
     }
 
+
+    public function recalcularDeudaAcumulada($idUsuario)
+{
+    try {
+        error_log("🔄 [recalcularDeudaAcumulada] Usuario: $idUsuario");
+        
+        // Obtener todas las cuotas NO pagadas ordenadas cronológicamente
+        $stmt = $this->conn->prepare("
+            SELECT 
+                id_cuota,
+                mes,
+                anio,
+                monto,
+                estado,
+                monto_pendiente_anterior
+            FROM Cuotas_Mensuales
+            WHERE id_usuario = ?
+            ORDER BY anio ASC, mes ASC
+        ");
+        $stmt->execute([$idUsuario]);
+        $cuotas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        $deudaAcumulada = 0;
+        $actualizaciones = 0;
+        
+        foreach ($cuotas as $cuota) {
+            if ($cuota['estado'] === 'pagada') {
+                // Si está pagada, no contribuye a la deuda acumulada
+                $deudaAcumulada = 0; // Resetear deuda
+            } else {
+                // Actualizar monto_pendiente_anterior de esta cuota
+                $stmtUpdate = $this->conn->prepare("
+                    UPDATE Cuotas_Mensuales
+                    SET monto_pendiente_anterior = ?
+                    WHERE id_cuota = ?
+                ");
+                $stmtUpdate->execute([$deudaAcumulada, $cuota['id_cuota']]);
+                
+                // Acumular deuda para la siguiente cuota
+                $deudaAcumulada += $cuota['monto'];
+                $actualizaciones++;
+                
+                error_log("  - Cuota {$cuota['mes']}/{$cuota['anio']}: deuda_anterior = {$cuota['monto_pendiente_anterior']} → $deudaAcumulada");
+            }
+        }
+        
+        error_log("✓ Recalculadas $actualizaciones cuotas");
+        
+        return [
+            'success' => true,
+            'cuotas_actualizadas' => $actualizaciones
+        ];
+        
+    } catch (\PDOException $e) {
+        error_log("💥 Error en recalcularDeudaAcumulada: " . $e->getMessage());
+        return [
+            'success' => false,
+            'message' => $e->getMessage()
+        ];
+    }
+}
+
+/**
+ * ✅ Obtener resumen de deuda del usuario
+ */
+public function getResumenDeuda($idUsuario)
+{
+    try {
+        $stmt = $this->conn->prepare("
+            SELECT 
+                COUNT(*) as total_cuotas_pendientes,
+                SUM(monto) as deuda_mensualidades,
+                SUM(monto_pendiente_anterior) as deuda_acumulada_anterior,
+                SUM(monto + monto_pendiente_anterior) as deuda_total
+            FROM Cuotas_Mensuales
+            WHERE id_usuario = ?
+            AND estado != 'pagada'
+        ");
+        
+        $stmt->execute([$idUsuario]);
+        $resumen = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        return [
+            'success' => true,
+            'resumen' => [
+                'cuotas_pendientes' => intval($resumen['total_cuotas_pendientes'] ?? 0),
+                'deuda_mensualidades' => floatval($resumen['deuda_mensualidades'] ?? 0),
+                'deuda_acumulada' => floatval($resumen['deuda_acumulada_anterior'] ?? 0),
+                'total_a_pagar' => floatval($resumen['deuda_total'] ?? 0)
+            ]
+        ];
+        
+    } catch (\PDOException $e) {
+        error_log("Error en getResumenDeuda: " . $e->getMessage());
+        return [
+            'success' => false,
+            'message' => $e->getMessage()
+        ];
+    }
+}
+
     /**
      * Generar cuota individual
      */
@@ -286,17 +387,31 @@ class Cuota
                 error_log("⚠️ Usuario sin vivienda - Cuota creada con monto = 0");
             }
 
-            // Calcular deuda acumulada
-            $stmtDeuda = $this->conn->prepare("
-                SELECT COALESCE(SUM(monto + monto_pendiente_anterior), 0) as deuda_anterior
-                FROM Cuotas_Mensuales
-                WHERE id_usuario = ?
-                AND estado != 'pagada'
-                AND (anio < ? OR (anio = ? AND mes < ?))
-            ");
-            $stmtDeuda->execute([$idUsuario, $anio, $anio, $mes]);
-            $deudaAnterior = floatval($stmtDeuda->fetchColumn());
-            error_log("💰 Deuda anterior: $$deudaAnterior");
+            // 💰 CALCULAR DEUDA ACUMULADA CORRECTAMENTE
+// Incluir TODAS las cuotas pendientes/vencidas de meses anteriores
+// INCLUYENDO la deuda por horas no trabajadas
+$stmtDeuda = $this->conn->prepare("
+    SELECT 
+        COALESCE(SUM(
+            monto + 
+            monto_pendiente_anterior + 
+            (GREATEST(0, horas_requeridas - horas_cumplidas - COALESCE(
+                (SELECT SUM(horas_justificadas) 
+                 FROM Justificaciones_Horas jh 
+                 WHERE jh.id_usuario = cm.id_usuario 
+                 AND jh.mes = cm.mes 
+                 AND jh.anio = cm.anio 
+                 AND jh.estado = 'aprobada'), 0
+            )) * 160)
+        ), 0) as deuda_anterior
+    FROM Cuotas_Mensuales cm
+    WHERE cm.id_usuario = ?
+    AND cm.estado != 'pagada'
+    AND (cm.anio < ? OR (cm.anio = ? AND cm.mes < ?))
+");
+$stmtDeuda->execute([$idUsuario, $anio, $anio, $mes]);
+$deudaAnterior = floatval($stmtDeuda->fetchColumn());
+error_log("💰 Deuda acumulada de meses anteriores: $$deudaAnterior");
 
             // Calcular horas cumplidas
             $horasCumplidas = $this->calcularHorasCumplidasMes($idUsuario, $mes, $anio);
@@ -637,7 +752,10 @@ class Cuota
                 }
             }
             
-            $sql .= " ORDER BY vcj.anio DESC, vcj.mes DESC";
+            $sql .= " ORDER BY 
+    CASE WHEN vcj.estado = 'pagada' THEN 1 ELSE 0 END ASC,
+    vcj.anio DESC, 
+    vcj.mes DESC";
             
             error_log("📋 SQL Query: " . $sql);
             error_log("📋 Params: " . json_encode($params));
@@ -873,12 +991,10 @@ public function validarPago($pagoId, $idAdmin, $accion, $observaciones = '')
         error_log("🔍 [validarPago] INICIO");
         error_log("Pago ID: $pagoId");
         error_log("Acción: $accion");
-        error_log("Admin ID: $idAdmin");
-        error_log("Observaciones: $observaciones");
         
         $this->conn->beginTransaction();
         
-        // ✅ PASO 1: Obtener información del pago
+        // Obtener información del pago
         $stmtInfo = $this->conn->prepare("
             SELECT pc.id_cuota, pc.id_usuario, cm.estado as estado_cuota
             FROM Pagos_Cuotas pc
@@ -896,7 +1012,7 @@ public function validarPago($pagoId, $idAdmin, $accion, $observaciones = '')
         
         $estadoValidacion = $accion === 'aprobar' ? 'aprobado' : 'rechazado';
         
-        // ✅ PASO 2: Actualizar SOLO los campos que existen en Pagos_Cuotas
+        // Actualizar pago
         $stmtPago = $this->conn->prepare("
             UPDATE Pagos_Cuotas 
             SET estado_validacion = ?,
@@ -905,45 +1021,32 @@ public function validarPago($pagoId, $idAdmin, $accion, $observaciones = '')
             WHERE id_pago = ?
         ");
         
-        $resultado = $stmtPago->execute([$estadoValidacion, $observaciones, $pagoId]);
-        
-        if (!$resultado) {
-            throw new \Exception("Error al actualizar pago");
-        }
-        
+        $stmtPago->execute([$estadoValidacion, $observaciones, $pagoId]);
         error_log("✓ Pago actualizado - Estado: $estadoValidacion");
         
-        // ✅ PASO 3: SI APRUEBA, actualizar la cuota a pagada
+        // Si aprueba
         if ($accion === 'aprobar') {
+            // Marcar cuota como pagada
             $stmtCuota = $this->conn->prepare("
                 UPDATE Cuotas_Mensuales 
                 SET estado = 'pagada'
                 WHERE id_cuota = ?
             ");
+            $stmtCuota->execute([$infoPago['id_cuota']]);
+            error_log("✓ Cuota marcada como pagada");
             
-            $resultadoCuota = $stmtCuota->execute([$infoPago['id_cuota']]);
-            
-            if (!$resultadoCuota) {
-                throw new \Exception("Error al actualizar estado de cuota");
-            }
-            
-            error_log("✓ Cuota actualizada a 'pagada'");
-            
-            // ✅ PASO 4: Actualizar estado del usuario a 'aceptado'
+            // Actualizar usuario a aceptado
             $stmtUsuario = $this->conn->prepare("
                 UPDATE Usuario 
                 SET estado = 'aceptado'
                 WHERE id_usuario = ?
                 AND estado = 'enviado'
             ");
+            $stmtUsuario->execute([$infoPago['id_usuario']]);
             
-            $resultadoUsuario = $stmtUsuario->execute([$infoPago['id_usuario']]);
-            
-            if ($resultadoUsuario && $stmtUsuario->rowCount() > 0) {
-                error_log("✓ Usuario actualizado a 'aceptado'");
-            } else {
-                error_log("⚠️ Usuario no actualizado (puede que ya esté aceptado)");
-            }
+            // 🔥 NUEVO: Recalcular deuda acumulada
+            $this->recalcularDeudaAcumulada($infoPago['id_usuario']);
+            error_log("✓ Deuda acumulada recalculada");
         }
         
         $this->conn->commit();
@@ -954,14 +1057,13 @@ public function validarPago($pagoId, $idAdmin, $accion, $observaciones = '')
         return [
             'success' => true,
             'mensaje' => $accion === 'aprobar' 
-                ? 'Pago aprobado exitosamente. Usuario y cuota actualizados.' 
+                ? 'Pago aprobado. Cuota marcada como pagada y deuda recalculada.' 
                 : 'Pago rechazado correctamente.'
         ];
         
     } catch (\Exception $e) {
         $this->conn->rollBack();
         error_log("💥 ERROR en validarPago: " . $e->getMessage());
-        error_log("Stack: " . $e->getTraceAsString());
         error_log("═══════════════════════════════════════");
         
         return [

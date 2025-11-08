@@ -1,29 +1,4 @@
 
-// 🧪 MODO TEST: Simular primer día de enero
-(function() {
-    const TEST_MODE = true; // Cambiar a false para volver a normal
-    
-    if (TEST_MODE) {
-        // Sobrescribir Date para simular 1 de enero
-        const fechaOriginal = Date;
-        const primerDiaEnero = new Date(2026, 0, 1); // Mes 0 = Enero, año 2026
-        
-        window.Date = function(...args) {
-            if (args.length === 0) {
-                return primerDiaEnero;
-            }
-            return new fechaOriginal(...args);
-        };
-        
-        // Copiar métodos estáticos
-        Object.setPrototypeOf(window.Date, fechaOriginal);
-        window.Date.prototype = fechaOriginal.prototype;
-        
-        console.log('🧪 TEST MODE: Fecha simulada =', primerDiaEnero.toLocaleDateString());
-    }
-})();
-
-
 // Sistema SPA - Navegación entre secciones
 document.addEventListener('DOMContentLoaded', function () {
 
@@ -668,61 +643,38 @@ function closeModal() {
     document.getElementById('imageModal').style.disable = 'none';
 }
 
-// En dashboardAdmin.js - función approvePaymentFromTable
+function approvePayment(userId) {
+    if (!confirm('¿Está seguro de aprobar este pago?')) return;
 
-async function approvePaymentFromTable(userId) {
-    if (!confirm('¿Está seguro de aprobar este pago?')) {
-        return;
-    }
+    const btn = event.target;
+    btn.disabled = true;
+    btn.textContent = 'Procesando...';
 
-    const approveBtn = document.getElementById(`approve-btn-${userId}`);
-    const rejectBtn = document.getElementById(`reject-btn-${userId}`);
-
-    if (approveBtn) {
-        approveBtn.disabled = true;
-        approveBtn.textContent = '...';
-    }
-    if (rejectBtn) rejectBtn.disabled = true;
-
-    try {
-        const response = await fetch('/api/payment/approve', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: `id_usuario=${userId}`
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-            alert('✅ ' + data.message);
-            
-            // 🔥 IMPORTANTE: Recargar usuarios Y cuotas
-            loadUsersForTable();
-            
-            // Si estamos en sección de cuotas, recargar también
-            const cuotasSection = document.getElementById('cuotas-section');
-            if (cuotasSection && cuotasSection.classList.contains('active')) {
-                if (typeof loadAllCuotasAdmin === 'function') {
-                    loadAllCuotasAdmin();
+    fetch('/api/payment/approve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `id_usuario=${userId}`
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                document.getElementById(`payment-${userId}`).remove();
+                if (document.querySelectorAll('.payment-card').length === 0) {
+                    location.reload();
                 }
+            } else {
+                alert('Error: ' + data.message);
+                btn.disabled = false;
+                btn.textContent = 'Aprobar Pago';
             }
-        } else {
-            alert('❌ Error: ' + data.message);
-            if (approveBtn) {
-                approveBtn.disabled = false;
-                approveBtn.textContent = '✓';
-            }
-            if (rejectBtn) rejectBtn.disabled = false;
-        }
-    } catch (error) {
-        console.error('❌ Error:', error);
-        alert('❌ Error al conectar con el servidor');
-        if (approveBtn) {
-            approveBtn.disabled = false;
-            approveBtn.textContent = '✓';
-        }
-        if (rejectBtn) rejectBtn.disabled = false;
-    }
+        })
+        .catch(error => {
+            console.error(error);
+            alert('Error al conectar con el servidor');
+            btn.disabled = false;
+            btn.textContent = 'Aprobar Pago';
+        });
 }
 
 function rejectPayment(userId) {
@@ -7070,26 +7022,14 @@ window.renderUserRow = function(user) {
         document.body.insertAdjacentHTML('beforeend', modal);
     }
 
-   /**
-     *  Aprobar pago desde modal - OPTIMIZADO
+    /**
+     *  Aprobar pago desde modal
      */
     window.aprobarPagoDesdeModal = async function(pagoId, userId) {
-        const modal = document.getElementById('detallesPagoModal');
+        document.getElementById('detallesPagoModal').remove();
         
         if (!confirm('¿Aprobar este pago?\n\nEl usuario será notificado.')) {
             return;
-        }
-
-        // Cerrar modal inmediatamente
-        if (modal) modal.remove();
-
-        // Mostrar indicador en la tabla
-        const row = document.querySelector(`tr.user-row[data-estado="enviado"]`);
-        if (row) {
-            const actionsCell = row.querySelector('td:last-child');
-            if (actionsCell) {
-                actionsCell.innerHTML = '<span style="color: #17a2b8;"><i class="fas fa-spinner fa-spin"></i> Procesando...</span>';
-            }
         }
 
         try {
@@ -7104,54 +7044,16 @@ window.renderUserRow = function(user) {
             const data = await response.json();
 
             if (data.success) {
-                // Actualizar solo la fila afectada
-                if (row) {
-                    row.querySelector('.estado-badge').textContent = 'Aceptado';
-                    row.querySelector('.estado-badge').className = 'estado-badge estado-aceptado';
-                    row.querySelector('td:last-child').innerHTML = `
-                        <button class="btn-icon btn-primary" onclick="viewUserDetails(${userId})">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                        <span class="badge badge-success" style="padding: 6px 12px;">
-                            <i class="fas fa-check-circle"></i> Aprobado
-                        </span>
-                    `;
-                }
-                
-                // Mostrar notificación sin bloquear
-                const notification = document.createElement('div');
-                notification.innerHTML = `
-                    <div style="
-                        position: fixed;
-                        top: 20px;
-                        right: 20px;
-                        background: #4CAF50;
-                        color: white;
-                        padding: 15px 20px;
-                        border-radius: 8px;
-                        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-                        z-index: 10000;
-                        animation: slideIn 0.3s ease;
-                    ">
-                        <i class="fas fa-check-circle"></i> Pago aprobado correctamente
-                    </div>
-                `;
-                document.body.appendChild(notification);
-                setTimeout(() => notification.remove(), 3000);
-                
-            } else {
-                alert('❌ Error: ' + data.message);
-                // Recargar solo si hay error
+                alert(' Pago aprobado correctamente');
                 if (typeof loadUsersForTable === 'function') {
                     loadUsersForTable();
                 }
+            } else {
+                alert(' Error: ' + data.message);
             }
         } catch (error) {
             console.error('Error:', error);
-            alert('❌ Error de conexión');
-            if (typeof loadUsersForTable === 'function') {
-                loadUsersForTable();
-            }
+            alert(' Error de conexión');
         }
     };
 

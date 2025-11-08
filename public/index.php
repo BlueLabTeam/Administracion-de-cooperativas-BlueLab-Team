@@ -158,6 +158,8 @@ $privateRoutes = [
     '/api/cuotas/precios',
     '/api/cuotas/verificar-auto',
     '/api/cuotas/actualizar-precio',
+    '/api/cuotas/resumen-deuda',        // ✅ NUEVO
+    '/api/cuotas/recalcular-deuda',     // ✅ NUEVO
     '/api/solicitudes/create',
     '/api/solicitudes/mis-solicitudes',
     '/api/solicitudes/detalle',
@@ -268,9 +270,9 @@ switch ($uri) {
         (new App\controllers\TaskController())->updateProgress();
         break;
     case '/api/tasks/add-avance':
-    $taskController = new App\controllers\TaskController();
-    $taskController->addAvance();
-break;
+        $taskController = new App\controllers\TaskController();
+        $taskController->addAvance();
+        break;
     case '/api/tasks/details':
         (new App\controllers\TaskController())->getTaskDetails();
         break;
@@ -306,13 +308,12 @@ break;
     case '/api/users/aprobar-rechazar':
         (new App\controllers\UserController())->aprobarRechazar();
         break;
-        case '/api/users/payment-details':
-    (new App\controllers\UserController())->getPaymentDetails();
-    break;
-    
+    case '/api/users/payment-details':
+        (new App\controllers\UserController())->getPaymentDetails();
+        break;
     case '/api/users/fecha-mas-antigua':
-    (new App\controllers\UserController())->getFechaMasAntigua();
-    break;
+        (new App\controllers\UserController())->getFechaMasAntigua();
+        break;
 
     // API NUCLEOS
     case '/api/nucleos/create':
@@ -490,6 +491,9 @@ break;
     case '/api/cuotas/verificar-auto':
         (new App\controllers\CuotaController())->verificarYGenerarCuotaAuto();
         break;
+    case '/api/cuotas/resumen-deuda':
+        (new App\controllers\CuotaController())->getResumenDeuda();
+        break;
 
     // API CUOTAS - ADMIN
     case '/api/cuotas/all':
@@ -509,6 +513,9 @@ break;
         break;
     case '/api/cuotas/actualizar-precio':
         (new App\controllers\CuotaController())->actualizarPrecio();
+        break;
+    case '/api/cuotas/recalcular-deuda':
+        (new App\controllers\CuotaController())->recalcularDeuda();
         break;
 
     // API SOLICITUDES - USUARIO
@@ -566,10 +573,6 @@ break;
     case '/api/reporte/exportar':
         (new App\controllers\ReporteController())->exportarReporteMensual();
         break;
-
-    
-
-
 
     default:
         http_response_code(404);
