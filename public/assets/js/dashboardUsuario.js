@@ -1,3 +1,28 @@
+// 🧪 MODO TEST: Simular último día del mes
+(function() {
+    const TEST_MODE = true; // Cambiar a false para volver a normal
+    
+    if (TEST_MODE) {
+        // Sobrescribir Date para simular último día del mes
+        const fechaOriginal = Date;
+        const ultimoDiaMes = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0);
+        
+        window.Date = function(...args) {
+            if (args.length === 0) {
+                return ultimoDiaMes;
+            }
+            return new fechaOriginal(...args);
+        };
+        
+        // Copiar métodos estáticos
+        Object.setPrototypeOf(window.Date, fechaOriginal);
+        window.Date.prototype = fechaOriginal.prototype;
+        
+        console.log('🧪 TEST MODE: Fecha simulada =', ultimoDiaMes.toLocaleDateString());
+    }
+})();
+
+
 document.addEventListener('DOMContentLoaded', function () {
     const menuItems = document.querySelectorAll('.menu li');
 
@@ -2612,49 +2637,7 @@ async function abrirPagarDeudaTotal(cuotaId, montoTotal) {
         const mes = obtenerNombreMes(cuota.mes);
         const montoCuota = parseFloat(cuota.monto);
         
-        const infoContainer = document.getElementById('cuota-info-modal');
         
-        infoContainer.innerHTML = `
-            <div class="cuota-detalle-modal">
-                <h4>📋 Detalle del Pago Total</h4>
-                
-                <div class="pago-total-breakdown">
-                    <div class="breakdown-section">
-                        <h5><i class="fas fa-home"></i> Cuota de Vivienda</h5>
-                        <div class="detalle-grid">
-                            <div><strong>Período:</strong> ${mes} ${cuota.anio}</div>
-                            <div><strong>Vivienda:</strong> ${cuota.numero_vivienda}</div>
-                            <div><strong>Tipo:</strong> ${cuota.tipo_vivienda}</div>
-                            <div><strong>Monto Cuota:</strong> $${montoCuota.toLocaleString('es-UY', {minimumFractionDigits: 2})}</div>
-                        </div>
-                    </div>
-                    
-                    <div class="breakdown-divider">+</div>
-                    
-                    <div class="breakdown-section deuda-section">
-                        <h5><i class="fas fa-clock"></i> Deuda por Horas No Trabajadas</h5>
-                        <div class="alert-warning" style="margin: 10px 0;">
-                            <p><strong>Monto por horas faltantes:</strong> $${deudaHorasActual.toLocaleString('es-UY', {minimumFractionDigits: 2})}</p>
-                            <small>Tarifa: $160 por cada hora no trabajada</small>
-                        </div>
-                    </div>
-                    
-                    <div class="breakdown-divider">=</div>
-                    
-                    <div class="breakdown-section total-section">
-                        <h5><i class="fas fa-calculator"></i> Total a Pagar</h5>
-                        <div class="monto-total-grande">
-                            $${montoTotal.toLocaleString('es-UY', {minimumFractionDigits: 2})}
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="alert-info" style="margin-top: 20px;">
-                    <strong>ℹ️ Importante:</strong>
-                    <p>Este pago incluye tanto la cuota mensual de tu vivienda como la deuda acumulada por horas no trabajadas.</p>
-                </div>
-            </div>
-        `;
         
         document.getElementById('pagar-cuota-id').value = cuotaId;
         document.getElementById('pagar-monto').value = montoTotal;
@@ -2888,7 +2871,6 @@ function diasHastaPago() {
     return ultimoDia - diaActual;
 }
 
-// ========== RENDERIZAR CUOTAS CON NUEVO SISTEMA ==========
 
 function renderMisCuotasOrganizadas(cuotas) {
     const container = document.getElementById('misCuotasContainer');
@@ -2908,14 +2890,37 @@ function renderMisCuotasOrganizadas(cuotas) {
     // CUOTA DEL MES ACTUAL
     const cuotaMasReciente = cuotas[0];
     
+    console.log('🔍 [RENDER] Cuota más reciente:', {
+        id: cuotaMasReciente.id_cuota,
+        estado: cuotaMasReciente.estado,
+        estado_actual: cuotaMasReciente.estado_actual,
+        estado_pago: cuotaMasReciente.estado_pago,
+        estado_usuario: cuotaMasReciente.estado_usuario,
+        id_pago: cuotaMasReciente.id_pago
+    });
+    
     // Calcular deuda total
     const montoCuota = parseFloat(cuotaMasReciente.monto_base || cuotaMasReciente.monto || 0);
     const montoTotal = montoCuota + deudaHorasActual;
     
-    // Verificar estado de pago
+    // ✅ VERIFICACIÓN MEJORADA DEL ESTADO
     const estadoFinal = cuotaMasReciente.estado_actual || cuotaMasReciente.estado;
-    const tienePagoPendiente = cuotaMasReciente.id_pago && cuotaMasReciente.estado_pago === 'pendiente';
-    const estaPagada = estadoFinal === 'pagada';
+    const estadoPago = cuotaMasReciente.estado_pago || '';
+    const estadoUsuario = cuotaMasReciente.estado_usuario || '';
+    
+    // Pago aprobado si:
+    // 1. estado_usuario = 'aceptado' O
+    // 2. estado_pago = 'aprobado' Y estado = 'pagada'
+    const pagoAprobado = estadoUsuario === 'aceptado' || (estadoPago === 'aprobado' && estadoFinal === 'pagada');
+    
+    const tienePagoPendiente = cuotaMasReciente.id_pago && estadoPago === 'pendiente';
+    const estaPagada = estadoFinal === 'pagada' || pagoAprobado;
+    
+    console.log('🔍 [RENDER] Estados calculados:', {
+        pagoAprobado,
+        tienePagoPendiente,
+        estaPagada
+    });
     
     // Verificar si es el último día del mes
     const hoy = new Date();
@@ -2928,13 +2933,6 @@ function renderMisCuotasOrganizadas(cuotas) {
     
     // Calcular días restantes
     const diasRestantes = diasHastaPago();
-    
-    ('📅 Control de período:', {
-        esMesCuota,
-        esUltimoDia,
-        puedePagar,
-        diasRestantes
-    });
 
     html += `
         <div class="deuda-total-destacada ${estaPagada ? 'pagada-mes' : puedePagar ? '' : 'periodo-bloqueado'}">
@@ -2944,7 +2942,7 @@ function renderMisCuotasOrganizadas(cuotas) {
                     Resumen del Mes Actual
                 </h2>
                 <span class="deuda-total-badge ${estaPagada ? 'badge-pagada' : tienePagoPendiente ? 'badge-pendiente' : puedePagar ? 'badge-requerida' : 'badge-bloqueado'}">
-                    ${estaPagada ? ' PAGADA' : 
+                    ${estaPagada ? '✅ PAGADA' : 
                       tienePagoPendiente ? '⏳ EN VALIDACIÓN' : 
                       puedePagar ? '⚠️ ÚLTIMO DÍA - PAGAR HOY' : 
                       diasRestantes > 0 ? `🔒 ${diasRestantes} DÍA${diasRestantes !== 1 ? 'S' : ''} PARA PAGAR` :
@@ -2983,7 +2981,7 @@ function renderMisCuotasOrganizadas(cuotas) {
                         <i class="fas fa-calculator"></i>
                         <div>
                             <span class="deuda-label">TOTAL ${estaPagada ? 'PAGADO' : 'A PAGAR'}</span>
-                            <span class="deuda-monto-total" style="color: ${estaPagada ? '#ffffffff' : '#fff'};">
+                            <span class="deuda-monto-total" style="color: ${estaPagada ? '#4caf50' : '#fff'};">
                                 $${montoTotal.toLocaleString('es-UY', {minimumFractionDigits: 2})}
                             </span>
                         </div>
@@ -2993,7 +2991,7 @@ function renderMisCuotasOrganizadas(cuotas) {
                 ${estaPagada ? `
                     <!-- 🎉 CUOTA YA PAGADA -->
                     <div class="alert-success" style="margin-top: 20px; background: rgba(76, 175, 80, 0.2); border-color: rgba(76, 175, 80, 0.4);">
-                        <strong style="color: #ffffffff;">🎉 ¡Pago Completado!</strong>
+                        <strong style="color: #4caf50;">🎉 ¡Pago Completado!</strong>
                         <p style="color: rgba(255, 255, 255, 0.9); margin: 10px 0 0 0;">
                             Has pagado exitosamente tu cuota de ${obtenerNombreMes(cuotaMasReciente.mes)} ${cuotaMasReciente.anio}.
                             ${cuotaMasReciente.fecha_pago ? `<br>Fecha de pago: ${new Date(cuotaMasReciente.fecha_pago).toLocaleDateString('es-UY')}` : ''}
@@ -3015,6 +3013,7 @@ function renderMisCuotasOrganizadas(cuotas) {
                         <button class="btn-pagar-deuda-total btn-pagar-urgente" onclick="abrirPagarDeudaTotal(${cuotaMasReciente.id_cuota}, ${montoTotal})">
                             <i class="fas fa-exclamation-circle"></i>
                             ¡PAGAR HOY! (Último día)
+                        </button>
                     </div>
                     
                     <div class="alert-error" style="margin-top: 20px; background: rgba(244, 67, 54, 0.15); border-color: rgba(244, 67, 54, 0.3);">
@@ -3040,10 +3039,6 @@ function renderMisCuotasOrganizadas(cuotas) {
                             <br>Te quedan <strong>${diasRestantes} día${diasRestantes !== 1 ? 's' : ''}</strong> para completar tus <strong>84 horas mensuales</strong> (21h/semana).
                         </p>
                     </div>
-                    
-                    
-                        </div>
-                    </div>
                 ` : `
                     <!-- ❌ CUOTA VENCIDA -->
                     <div class="alert-error" style="margin-top: 20px;">
@@ -3058,8 +3053,6 @@ function renderMisCuotasOrganizadas(cuotas) {
         
         <hr style="margin: 40px 0; border: none; border-top: 2px solid #e0e0e0;">
     `;
-    
-
     
     container.innerHTML = html;
 }
@@ -3091,50 +3084,7 @@ async function abrirPagarDeudaTotal(cuotaId, montoTotal) {
         const mes = obtenerNombreMes(cuota.mes);
         const montoCuota = parseFloat(cuota.monto);
         
-        const infoContainer = document.getElementById('cuota-info-modal');
-        
-        infoContainer.innerHTML = `
-            <div class="cuota-detalle-modal">
-                <h4>📋 Detalle del Pago Total</h4>
-                
-                <div class="pago-total-breakdown">
-                    <div class="breakdown-section">
-                        <h5><i class="fas fa-home"></i> Cuota de Vivienda</h5>
-                        <div class="detalle-grid">
-                            <div><strong>Período:</strong> ${mes} ${cuota.anio}</div>
-                            <div><strong>Vivienda:</strong> ${cuota.numero_vivienda}</div>
-                            <div><strong>Tipo:</strong> ${cuota.tipo_vivienda}</div>
-                            <div><strong>Monto Cuota:</strong> $${montoCuota.toLocaleString('es-UY', {minimumFractionDigits: 2})}</div>
-                        </div>
-                    </div>
-                    
-                    <div class="breakdown-divider">+</div>
-                    
-                    <div class="breakdown-section deuda-section">
-                        <h5><i class="fas fa-clock"></i> Deuda por Horas No Trabajadas</h5>
-                        <div class="alert-warning" style="margin: 10px 0;">
-                            <p><strong>Monto por horas faltantes:</strong> $${deudaHorasActual.toLocaleString('es-UY', {minimumFractionDigits: 2})}</p>
-                            <small>Tarifa: $160 por cada hora no trabajada (Sistema: 21h semanales = 84h mensuales)</small>
-                        </div>
-                    </div>
-                    
-                    <div class="breakdown-divider">=</div>
-                    
-                    <div class="breakdown-section total-section">
-                        <h5><i class="fas fa-calculator"></i> Total a Pagar</h5>
-                        <div class="monto-total-grande">
-                            $${montoTotal.toLocaleString('es-UY', {minimumFractionDigits: 2})}
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="alert-info" style="margin-top: 20px;">
-                    <strong>ℹ️ Importante:</strong>
-                    <p>Este pago incluye tanto la cuota mensual de tu vivienda como la deuda acumulada por horas no trabajadas.</p>
-                    <p><strong>Sistema semanal:</strong> Debes completar 21 horas semanales (84h mensuales).</p>
-                </div>
-            </div>
-        `;
+       
         
         document.getElementById('pagar-cuota-id').value = cuotaId;
         document.getElementById('pagar-monto').value = montoTotal;
@@ -5770,3 +5720,349 @@ if (!document.getElementById('css-vencidas-usuario')) {
 
 (' [VENCIDAS] Fix de tareas vencidas aplicado completamente en usuario');
 (' [VENCIDAS] Sistema listo para detectar tareas vencidas');
+
+
+// ==========================================
+// 🔄 FIX: ACTUALIZACIÓN AUTOMÁTICA DE CUOTAS
+// Detecta cuando el admin aprueba un pago
+// ==========================================
+
+console.log('🔄 Iniciando sistema de actualización automática de cuotas');
+
+// Variable global para controlar el polling
+let pollingCuotasActivo = false;
+let pollingInterval = null;
+let ultimoCheckCuotas = null;
+
+/**
+ * Verificar cambios en el estado de las cuotas
+ */
+async function verificarCambiosCuotas() {
+    try {
+        const mesActual = new Date().getMonth() + 1;
+        const anioActual = new Date().getFullYear();
+        
+        const response = await fetch(`/api/cuotas/mis-cuotas?mes=${mesActual}&anio=${anioActual}`);
+        const data = await response.json();
+        
+        if (data.success && data.cuotas.length > 0) {
+            const cuotaActual = data.cuotas[0];
+            
+            // Crear checksum para detectar cambios
+            const checksum = `${cuotaActual.id_cuota}-${cuotaActual.estado}-${cuotaActual.estado_pago || 'none'}-${cuotaActual.estado_usuario || 'none'}`;
+            
+            console.log('🔍 [POLLING] Verificando cuota:', {
+                id: cuotaActual.id_cuota,
+                estado: cuotaActual.estado,
+                estado_pago: cuotaActual.estado_pago,
+                estado_usuario: cuotaActual.estado_usuario,
+                checksum_actual: checksum,
+                checksum_anterior: ultimoCheckCuotas
+            });
+            
+            // Primera vez
+            if (ultimoCheckCuotas === null) {
+                ultimoCheckCuotas = checksum;
+                console.log('✅ [POLLING] Checksum inicial guardado');
+                return;
+            }
+            
+            // Detectar cambio
+            if (ultimoCheckCuotas !== checksum) {
+                console.log('🔔 [POLLING] ¡CAMBIO DETECTADO EN CUOTA!');
+                console.log('   Checksum anterior:', ultimoCheckCuotas);
+                console.log('   Checksum nuevo:', checksum);
+                
+                // Actualizar checksum
+                ultimoCheckCuotas = checksum;
+                
+                // Verificar si estamos en la sección de cuotas
+                const cuotasSection = document.getElementById('cuotas-section');
+                if (cuotasSection && cuotasSection.classList.contains('active')) {
+                    console.log('✅ [POLLING] Usuario en sección cuotas, recargando...');
+                    await recargarSeccionCuotas();
+                    mostrarNotificacionActualizacion(cuotaActual);
+                } else {
+                    console.log('ℹ️ [POLLING] Usuario fuera de sección cuotas, no se recarga');
+                }
+            }
+        }
+    } catch (error) {
+        console.error('❌ [POLLING] Error verificando cambios:', error);
+    }
+}
+
+/**
+ * Recargar sección de cuotas completamente
+ */
+async function recargarSeccionCuotas() {
+    console.log('🔄 [RELOAD] Iniciando recarga completa de cuotas...');
+    
+    try {
+        // 1. Limpiar cache
+        ultimoCheckCuotas = null;
+        
+        // 2. Recargar deuda de horas
+        await loadDeudaHorasParaCuotas();
+        console.log('✅ [RELOAD] Deuda de horas recargada');
+        
+        // 3. Recargar cuotas
+        await loadMisCuotas();
+        console.log('✅ [RELOAD] Cuotas recargadas');
+        
+        // 4. Recargar info de vivienda
+        await loadInfoViviendaCuota();
+        console.log('✅ [RELOAD] Info vivienda recargada');
+        
+        console.log('✅ [RELOAD] Recarga completada exitosamente');
+        
+    } catch (error) {
+        console.error('❌ [RELOAD] Error en recarga:', error);
+    }
+}
+
+/**
+ * Mostrar notificación de actualización
+ */
+function mostrarNotificacionActualizacion(cuota) {
+    // Remover notificaciones anteriores
+    const notifAnterior = document.getElementById('notif-actualizacion-cuota');
+    if (notifAnterior) {
+        notifAnterior.remove();
+    }
+    
+    const estadoPago = cuota.estado_pago || cuota.estado;
+    const estadoUsuario = cuota.estado_usuario || '';
+    
+    let mensaje = '';
+    let icono = '';
+    let color = '';
+    
+    if (estadoUsuario === 'aceptado' || estadoPago === 'aprobado') {
+        mensaje = '¡Tu pago ha sido aprobado!';
+        icono = 'fa-check-circle';
+        color = '#4caf50';
+    } else if (estadoPago === 'rechazado') {
+        mensaje = 'Tu pago fue rechazado. Revisa las observaciones.';
+        icono = 'fa-times-circle';
+        color = '#f44336';
+    } else {
+        mensaje = 'Tu cuota ha sido actualizada';
+        icono = 'fa-sync-alt';
+        color = '#2196F3';
+    }
+    
+    const notif = document.createElement('div');
+    notif.id = 'notif-actualizacion-cuota';
+    notif.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: linear-gradient(135deg, ${color} 0%, ${color}dd 100%);
+        color: white;
+        padding: 20px 25px;
+        border-radius: 12px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+        z-index: 10000;
+        animation: slideInRight 0.5s ease-out;
+        min-width: 300px;
+        max-width: 400px;
+    `;
+    
+    notif.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <i class="fas ${icono}" style="font-size: 32px;"></i>
+            <div style="flex: 1;">
+                <strong style="display: block; font-size: 16px; margin-bottom: 5px;">
+                    ${mensaje}
+                </strong>
+                <p style="margin: 0; font-size: 13px; opacity: 0.9;">
+                    La información ha sido actualizada automáticamente
+                </p>
+            </div>
+            <button onclick="this.closest('#notif-actualizacion-cuota').remove()" 
+                    style="background: rgba(255,255,255,0.2); border: none; color: white; 
+                           width: 30px; height: 30px; border-radius: 50%; cursor: pointer; 
+                           font-size: 18px; line-height: 1;">
+                ×
+            </button>
+        </div>
+    `;
+    
+    // Agregar animación CSS
+    if (!document.getElementById('notif-animation-style')) {
+        const style = document.createElement('style');
+        style.id = 'notif-animation-style';
+        style.textContent = `
+            @keyframes slideInRight {
+                from {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            @keyframes slideOutRight {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+    
+    document.body.appendChild(notif);
+    
+    // Auto-remover después de 8 segundos
+    setTimeout(() => {
+        notif.style.animation = 'slideOutRight 0.5s ease-in';
+        setTimeout(() => notif.remove(), 500);
+    }, 8000);
+    
+    console.log('🔔 [NOTIF] Notificación mostrada:', mensaje);
+}
+
+/**
+ * Iniciar polling cuando se entra a sección cuotas
+ */
+function iniciarPollingCuotas() {
+    if (pollingCuotasActivo) {
+        console.log('ℹ️ [POLLING] Ya está activo, ignorando...');
+        return;
+    }
+    
+    console.log('▶️ [POLLING] Iniciando polling de cuotas (cada 15 segundos)');
+    pollingCuotasActivo = true;
+    
+    // Verificar inmediatamente
+    verificarCambiosCuotas();
+    
+    // Luego cada 15 segundos
+    pollingInterval = setInterval(verificarCambiosCuotas, 15000);
+}
+
+/**
+ * Detener polling cuando se sale de la sección
+ */
+function detenerPollingCuotas() {
+    if (!pollingCuotasActivo) {
+        return;
+    }
+    
+    console.log('⏸️ [POLLING] Deteniendo polling de cuotas');
+    pollingCuotasActivo = false;
+    
+    if (pollingInterval) {
+        clearInterval(pollingInterval);
+        pollingInterval = null;
+    }
+    
+    // Resetear checksum
+    ultimoCheckCuotas = null;
+}
+
+/**
+ * Override de inicializarSeccionCuotas para incluir polling
+ */
+const originalInicializarSeccionCuotas = window.inicializarSeccionCuotas;
+
+window.inicializarSeccionCuotas = async function() {
+    console.log('🔄 [OVERRIDE] inicializarSeccionCuotas con polling');
+    
+    try {
+        // Ejecutar función original
+        await originalInicializarSeccionCuotas();
+        
+        // Iniciar polling
+        iniciarPollingCuotas();
+        
+        console.log('✅ [OVERRIDE] Sección cuotas inicializada con polling activo');
+        
+    } catch (error) {
+        console.error('❌ [OVERRIDE] Error en inicialización:', error);
+    }
+};
+
+/**
+ * Listener para detectar cambio de sección
+ */
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('📋 [SETUP] Configurando listeners de sección cuotas');
+    
+    const menuItems = document.querySelectorAll('.menu li[data-section]');
+    
+    menuItems.forEach(item => {
+        item.addEventListener('click', function() {
+            const section = this.getAttribute('data-section');
+            
+            if (section === 'cuotas') {
+                console.log('➡️ [SECTION] Usuario entró a cuotas');
+                // Esperar un momento para que la sección se cargue
+                setTimeout(() => {
+                    iniciarPollingCuotas();
+                }, 500);
+            } else {
+                console.log('⬅️ [SECTION] Usuario salió de cuotas');
+                detenerPollingCuotas();
+            }
+        });
+    });
+    
+    console.log('✅ [SETUP] Listeners configurados correctamente');
+});
+
+/**
+ * Detener polling al salir de la página
+ */
+window.addEventListener('beforeunload', function() {
+    detenerPollingCuotas();
+});
+
+/**
+ * 🔒 Override renderCuotaCard para asegurar que se deshabilite correctamente
+ */
+const originalRenderCuotaCard = window.renderCuotaCard;
+
+window.renderCuotaCard = function(cuota) {
+    // Validación extra de estados
+    const estadoFinal = cuota.estado_actual || cuota.estado;
+    const estadoPago = cuota.estado_pago || '';
+    const estadoUsuario = cuota.estado_usuario || '';
+    const tienePagoPendiente = cuota.id_pago && estadoPago === 'pendiente';
+    const pagoAprobado = estadoPago === 'aprobado' || estadoUsuario === 'aceptado';
+    const esPagada = estadoFinal === 'pagada' || pagoAprobado;
+    
+    console.log('🎨 [RENDER CARD] Renderizando cuota:', {
+        id: cuota.id_cuota,
+        estado: estadoFinal,
+        estado_pago: estadoPago,
+        estado_usuario: estadoUsuario,
+        tiene_pago_pendiente: tienePagoPendiente,
+        pago_aprobado: pagoAprobado,
+        es_pagada: esPagada
+    });
+    
+    // Si está pagada o aprobada, asegurar que no se pueda pagar
+    if (esPagada || pagoAprobado) {
+        cuota.estado = 'pagada';
+        cuota.estado_actual = 'pagada';
+    }
+    
+    // Llamar a la función original
+    return originalRenderCuotaCard(cuota);
+};
+
+// Exportar funciones
+window.verificarCambiosCuotas = verificarCambiosCuotas;
+window.recargarSeccionCuotas = recargarSeccionCuotas;
+window.iniciarPollingCuotas = iniciarPollingCuotas;
+window.detenerPollingCuotas = detenerPollingCuotas;
+
+console.log('✅ Sistema de actualización automática de cuotas cargado completamente');

@@ -403,10 +403,7 @@ if (!isset($_SESSION['user_id'])) {
             <i class="fas fa-credit-card"></i> <span data-i18n="dashboardUser.billing.paymentModal.title">Realizar Pago</span>
         </h2>
 
-        <!-- Información de la cuota -->
-        <div id="cuota-info-modal" class="cuota-info-modal">
-            <!-- Se llena dinámicamente -->
-        </div>
+      
 
         <!-- Formulario de Pago -->
         <form id="pagarCuotaForm" onsubmit="submitPagarCuota(event)" enctype="multipart/form-data">

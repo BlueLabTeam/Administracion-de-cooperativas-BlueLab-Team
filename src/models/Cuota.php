@@ -426,90 +426,95 @@ class Cuota
     }
 
        private function getCuotasUsuarioDirecto($idUsuario, $filtros = [])
-    {
-        try {
-            error_log("🔄 [getCuotasUsuarioDirecto] Usando consulta sin vista");
-            
-            $params = ['id_usuario' => $idUsuario];
-            
-            $sql = "
-                SELECT 
-                    cm.id_cuota,
-                    cm.id_usuario,
-                    u.nombre_completo,
-                    u.email,
-                    cm.id_vivienda,
-                    CASE 
-                        WHEN cm.id_vivienda IS NULL THEN 'SIN ASIGNAR'
-                        ELSE v.numero_vivienda
-                    END as numero_vivienda,
-                    CASE 
-                        WHEN cm.id_vivienda IS NULL THEN 'Sin vivienda'
-                        ELSE tv.nombre
-                    END as tipo_vivienda,
-                    COALESCE(tv.habitaciones, 0) as habitaciones,
-                    cm.mes,
-                    cm.anio,
-                    cm.monto as monto_base,
-                    cm.monto,
-                    cm.monto_pendiente_anterior,
-                    cm.horas_requeridas,
-                    cm.horas_cumplidas,
-                    COALESCE(
-                        (SELECT SUM(horas_justificadas) 
-                         FROM Justificaciones_Horas jh 
-                         WHERE jh.id_usuario = cm.id_usuario 
-                         AND jh.mes = cm.mes 
-                         AND jh.anio = cm.anio 
-                         AND jh.estado = 'aprobada'), 0
-                    ) as horas_justificadas,
-                    GREATEST(0, cm.horas_requeridas - cm.horas_cumplidas - COALESCE(
-                        (SELECT SUM(horas_justificadas) 
-                         FROM Justificaciones_Horas jh 
-                         WHERE jh.id_usuario = cm.id_usuario 
-                         AND jh.mes = cm.mes 
-                         AND jh.anio = cm.anio 
-                         AND jh.estado = 'aprobada'), 0
-                    )) as horas_faltantes_real,
-                    GREATEST(0, cm.horas_requeridas - cm.horas_cumplidas - COALESCE(
-                        (SELECT SUM(horas_justificadas) 
-                         FROM Justificaciones_Horas jh 
-                         WHERE jh.id_usuario = cm.id_usuario 
-                         AND jh.mes = cm.mes 
-                         AND jh.anio = cm.anio 
-                         AND jh.estado = 'aprobada'), 0
-                    )) * 160 as deuda_horas_pesos,
-                    (cm.monto + cm.monto_pendiente_anterior + 
-                     (GREATEST(0, cm.horas_requeridas - cm.horas_cumplidas - COALESCE(
-                        (SELECT SUM(horas_justificadas) 
-                         FROM Justificaciones_Horas jh 
-                         WHERE jh.id_usuario = cm.id_usuario 
-                         AND jh.mes = cm.mes 
-                         AND jh.anio = cm.anio 
-                         AND jh.estado = 'aprobada'), 0
-                    )) * 160)) as monto_total,
-                    cm.estado,
-                    cm.fecha_vencimiento,
-                    cm.pendiente_asignacion,
-                    cm.observaciones,
-                    CASE 
-                        WHEN cm.pendiente_asignacion = 1 THEN 'sin_vivienda'
-                        WHEN cm.fecha_vencimiento < CURDATE() AND cm.estado = 'pendiente' THEN 'vencida'
-                        ELSE cm.estado
-                    END as estado_actual,
-                    pc.id_pago,
-                    pc.monto_pagado,
-                    pc.fecha_pago,
-                    pc.comprobante_archivo,
-                    pc.estado_validacion as estado_pago,
-                    pc.observaciones_validacion
-                FROM Cuotas_Mensuales cm
-                INNER JOIN Usuario u ON cm.id_usuario = u.id_usuario
-                LEFT JOIN Viviendas v ON cm.id_vivienda = v.id_vivienda
-                LEFT JOIN Tipo_Vivienda tv ON v.id_tipo = tv.id_tipo
-                LEFT JOIN Pagos_Cuotas pc ON cm.id_cuota = pc.id_cuota AND pc.estado_validacion != 'rechazado'
-                WHERE cm.id_usuario = :id_usuario
-            ";
+{
+    try {
+        error_log("🔄 [getCuotasUsuarioDirecto] Usando consulta sin vista");
+        
+        $params = ['id_usuario' => $idUsuario];
+        
+        $sql = "
+            SELECT 
+                cm.id_cuota,
+                cm.id_usuario,
+                u.nombre_completo,
+                u.email,
+                cm.id_vivienda,
+                CASE 
+                    WHEN cm.id_vivienda IS NULL THEN 'SIN ASIGNAR'
+                    ELSE v.numero_vivienda
+                END as numero_vivienda,
+                CASE 
+                    WHEN cm.id_vivienda IS NULL THEN 'Sin vivienda'
+                    ELSE tv.nombre
+                END as tipo_vivienda,
+                COALESCE(tv.habitaciones, 0) as habitaciones,
+                cm.mes,
+                cm.anio,
+                cm.monto as monto_base,
+                cm.monto,
+                cm.monto_pendiente_anterior,
+                cm.horas_requeridas,
+                cm.horas_cumplidas,
+                COALESCE(
+                    (SELECT SUM(horas_justificadas) 
+                     FROM Justificaciones_Horas jh 
+                     WHERE jh.id_usuario = cm.id_usuario 
+                     AND jh.mes = cm.mes 
+                     AND jh.anio = cm.anio 
+                     AND jh.estado = 'aprobada'), 0
+                ) as horas_justificadas,
+                GREATEST(0, cm.horas_requeridas - cm.horas_cumplidas - COALESCE(
+                    (SELECT SUM(horas_justificadas) 
+                     FROM Justificaciones_Horas jh 
+                     WHERE jh.id_usuario = cm.id_usuario 
+                     AND jh.mes = cm.mes 
+                     AND jh.anio = cm.anio 
+                     AND jh.estado = 'aprobada'), 0
+                )) as horas_faltantes_real,
+                GREATEST(0, cm.horas_requeridas - cm.horas_cumplidas - COALESCE(
+                    (SELECT SUM(horas_justificadas) 
+                     FROM Justificaciones_Horas jh 
+                     WHERE jh.id_usuario = cm.id_usuario 
+                     AND jh.mes = cm.mes 
+                     AND jh.anio = cm.anio 
+                     AND jh.estado = 'aprobada'), 0
+                )) * 160 as deuda_horas_pesos,
+                (cm.monto + cm.monto_pendiente_anterior + 
+                 (GREATEST(0, cm.horas_requeridas - cm.horas_cumplidas - COALESCE(
+                    (SELECT SUM(horas_justificadas) 
+                     FROM Justificaciones_Horas jh 
+                     WHERE jh.id_usuario = cm.id_usuario 
+                     AND jh.mes = cm.mes 
+                     AND jh.anio = cm.anio 
+                     AND jh.estado = 'aprobada'), 0
+                )) * 160)) as monto_total,
+                cm.estado,
+                cm.fecha_vencimiento,
+                cm.pendiente_asignacion,
+                cm.observaciones,
+                CASE 
+                    WHEN cm.pendiente_asignacion = 1 THEN 'sin_vivienda'
+                    WHEN cm.fecha_vencimiento < CURDATE() AND cm.estado = 'pendiente' THEN 'vencida'
+                    ELSE cm.estado
+                END as estado_actual,
+                pc.id_pago,
+                pc.monto_pagado,
+                pc.fecha_pago,
+                pc.comprobante_archivo,
+                pc.estado_validacion as estado_pago,
+                pc.observaciones_validacion,
+                CASE 
+                    WHEN pc.estado_validacion = 'aprobado' AND cm.estado = 'pagada' THEN 'aceptado'
+                    WHEN pc.estado_validacion = 'rechazado' THEN 'rechazado'
+                    ELSE NULL
+                END as estado_usuario
+            FROM Cuotas_Mensuales cm
+            INNER JOIN Usuario u ON cm.id_usuario = u.id_usuario
+            LEFT JOIN Viviendas v ON cm.id_vivienda = v.id_vivienda
+            LEFT JOIN Tipo_Vivienda tv ON v.id_tipo = tv.id_tipo
+            LEFT JOIN Pagos_Cuotas pc ON cm.id_cuota = pc.id_cuota AND pc.estado_validacion != 'rechazado'
+            WHERE cm.id_usuario = :id_usuario
+        ";
             
             if (!empty($filtros['mes'])) {
                 $sql .= " AND cm.mes = :mes";
@@ -858,48 +863,113 @@ class Cuota
     /**
      * Validar pago (Admin)
      */
-    public function validarPago($pagoId, $idAdmin, $accion, $observaciones = '')
-    {
-        try {
-            $this->conn->beginTransaction();
-            
-            $estadoValidacion = $accion === 'aprobar' ? 'aprobado' : 'rechazado';
-            
-            $stmt = $this->conn->prepare("
-                UPDATE Pagos_Cuotas 
-                SET estado_validacion = ?,
-                    observaciones_validacion = ?,
-                    fecha_validacion = NOW()
-                WHERE id_pago = ?
+    /**
+ * Validar pago (Admin)
+ */
+public function validarPago($pagoId, $idAdmin, $accion, $observaciones = '')
+{
+    try {
+        error_log("═══════════════════════════════════════");
+        error_log("🔍 [validarPago] INICIO");
+        error_log("Pago ID: $pagoId");
+        error_log("Acción: $accion");
+        error_log("Admin ID: $idAdmin");
+        error_log("Observaciones: $observaciones");
+        
+        $this->conn->beginTransaction();
+        
+        // ✅ PASO 1: Obtener información del pago
+        $stmtInfo = $this->conn->prepare("
+            SELECT pc.id_cuota, pc.id_usuario, cm.estado as estado_cuota
+            FROM Pagos_Cuotas pc
+            INNER JOIN Cuotas_Mensuales cm ON pc.id_cuota = cm.id_cuota
+            WHERE pc.id_pago = ?
+        ");
+        $stmtInfo->execute([$pagoId]);
+        $infoPago = $stmtInfo->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$infoPago) {
+            throw new \Exception("Pago no encontrado");
+        }
+        
+        error_log("✓ Pago encontrado - Cuota: {$infoPago['id_cuota']}, Usuario: {$infoPago['id_usuario']}");
+        
+        $estadoValidacion = $accion === 'aprobar' ? 'aprobado' : 'rechazado';
+        
+        // ✅ PASO 2: Actualizar SOLO los campos que existen en Pagos_Cuotas
+        $stmtPago = $this->conn->prepare("
+            UPDATE Pagos_Cuotas 
+            SET estado_validacion = ?,
+                observaciones_validacion = ?,
+                fecha_validacion = NOW()
+            WHERE id_pago = ?
+        ");
+        
+        $resultado = $stmtPago->execute([$estadoValidacion, $observaciones, $pagoId]);
+        
+        if (!$resultado) {
+            throw new \Exception("Error al actualizar pago");
+        }
+        
+        error_log("✓ Pago actualizado - Estado: $estadoValidacion");
+        
+        // ✅ PASO 3: SI APRUEBA, actualizar la cuota a pagada
+        if ($accion === 'aprobar') {
+            $stmtCuota = $this->conn->prepare("
+                UPDATE Cuotas_Mensuales 
+                SET estado = 'pagada'
+                WHERE id_cuota = ?
             ");
             
-            $stmt->execute([$estadoValidacion, $observaciones, $pagoId]);
+            $resultadoCuota = $stmtCuota->execute([$infoPago['id_cuota']]);
             
-            if ($accion === 'aprobar') {
-                $stmtCuota = $this->conn->prepare("
-                    UPDATE Cuotas_Mensuales 
-                    SET estado = 'pagada'
-                    WHERE id_cuota = (SELECT id_cuota FROM Pagos_Cuotas WHERE id_pago = ?)
-                ");
-                $stmtCuota->execute([$pagoId]);
+            if (!$resultadoCuota) {
+                throw new \Exception("Error al actualizar estado de cuota");
             }
             
-            $this->conn->commit();
+            error_log("✓ Cuota actualizada a 'pagada'");
             
-            return [
-                'success' => true,
-                'mensaje' => $accion === 'aprobar' ? 'Pago aprobado exitosamente' : 'Pago rechazado'
-            ];
+            // ✅ PASO 4: Actualizar estado del usuario a 'aceptado'
+            $stmtUsuario = $this->conn->prepare("
+                UPDATE Usuario 
+                SET estado = 'aceptado'
+                WHERE id_usuario = ?
+                AND estado = 'enviado'
+            ");
             
-        } catch (\PDOException $e) {
-            $this->conn->rollBack();
-            error_log("Error en validarPago: " . $e->getMessage());
-            return [
-                'success' => false,
-                'message' => 'Error al validar pago'
-            ];
+            $resultadoUsuario = $stmtUsuario->execute([$infoPago['id_usuario']]);
+            
+            if ($resultadoUsuario && $stmtUsuario->rowCount() > 0) {
+                error_log("✓ Usuario actualizado a 'aceptado'");
+            } else {
+                error_log("⚠️ Usuario no actualizado (puede que ya esté aceptado)");
+            }
         }
+        
+        $this->conn->commit();
+        
+        error_log("✅ Transacción completada exitosamente");
+        error_log("═══════════════════════════════════════");
+        
+        return [
+            'success' => true,
+            'mensaje' => $accion === 'aprobar' 
+                ? 'Pago aprobado exitosamente. Usuario y cuota actualizados.' 
+                : 'Pago rechazado correctamente.'
+        ];
+        
+    } catch (\Exception $e) {
+        $this->conn->rollBack();
+        error_log("💥 ERROR en validarPago: " . $e->getMessage());
+        error_log("Stack: " . $e->getTraceAsString());
+        error_log("═══════════════════════════════════════");
+        
+        return [
+            'success' => false,
+            'message' => 'Error al validar pago: ' . $e->getMessage()
+        ];
     }
+}
 
     /**
      * Obtener precios actuales
