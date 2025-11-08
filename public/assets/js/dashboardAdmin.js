@@ -1,6 +1,27 @@
 
-
-
+// 🧪 MODO TEST: Simular primer día de enero
+(function() {
+    const TEST_MODE = true; // Cambiar a false para volver a normal
+    
+    if (TEST_MODE) {
+        // Sobrescribir Date para simular 1 de enero
+        const fechaOriginal = Date;
+        const primerDiaEnero = new Date(2026, 0, 1); // Mes 0 = Enero, año 2026
+        
+        window.Date = function(...args) {
+            if (args.length === 0) {
+                return primerDiaEnero;
+            }
+            return new fechaOriginal(...args);
+        };
+        
+        // Copiar métodos estáticos
+        Object.setPrototypeOf(window.Date, fechaOriginal);
+        window.Date.prototype = fechaOriginal.prototype;
+        
+        console.log('🧪 TEST MODE: Fecha simulada =', primerDiaEnero.toLocaleDateString());
+    }
+})();
 
 
 // Sistema SPA - Navegación entre secciones
