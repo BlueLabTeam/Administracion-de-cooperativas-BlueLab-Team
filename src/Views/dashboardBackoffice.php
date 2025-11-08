@@ -402,26 +402,32 @@
 			</div>
 			
 			<div class="info-card">
-				<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-					<h3 data-i18n="dashboardAdmin.billing.priceConfig">⚙️ Configuración de Precios</h3>
-					<button class="btn btn-secondary" onclick="loadPreciosCuotas()">
-						<i class="fas fa-sync-alt"></i> <span data-i18n="common.update">Actualizar</span>
-					</button>
-				</div>
-				
-				<div id="preciosCuotasContainer">
-					<p class="loading" data-i18n="common.loading">Cargando precios...</p>
-				</div>
-			</div>
-			
-			<div class="info-card">
-				<h3 data-i18n="dashboardAdmin.billing.quickActions">🚀 Acciones Rápidas</h3>
-				<div style="display: flex; gap: 15px; flex-wrap: wrap; margin-top: 15px;">
-					<button class="btn btn-primary" onclick="generarCuotasMesActual()">
-						<i class="fas fa-calendar-plus"></i> <span data-i18n="dashboardAdmin.billing.generateCurrentMonth">Generar Cuotas del Mes Actual</span>
-					</button>
-				</div>
-			</div>
+	<!-- Encabezado -->
+	<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+		<h3 data-i18n="dashboardAdmin.billing.priceConfig">⚙️ Configuración de Precios</h3>
+		<button class="btn btn-secondary" onclick="loadPreciosCuotas()">
+			<i class="fas fa-sync-alt"></i> <span data-i18n="common.update">Actualizar</span>
+		</button>
+	</div>
+	
+	<!-- Contenedor de precios -->
+	<div id="preciosCuotasContainer" style="margin-bottom: 25px;">
+		<p class="loading" data-i18n="common.loading">Cargando precios...</p>
+	</div>
+
+	<!-- Separador visual -->
+	<hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+
+	<!-- Acciones rápidas -->
+	<h3 data-i18n="dashboardAdmin.billing.quickActions">🚀 Acciones Rápidas</h3>
+	<div style="display: flex; gap: 15px; flex-wrap: wrap; margin-top: 15px;">
+		<button class="btn btn-primary" onclick="generarCuotasMesActual()">
+			<i class="fas fa-calendar-plus"></i> 
+			<span data-i18n="dashboardAdmin.billing.generateCurrentMonth">Generar Cuotas del Mes Actual</span>
+		</button>
+	</div>
+</div>
+
 			
 			<div class="info-card">
 				<div class="cuotas-admin-filters">
@@ -469,46 +475,64 @@
 		</section>
 
 		<!-- Modal para editar precio -->
-		<div id="editarPrecioModal" class="modal-overlay" style="display: none;">
-			<div class="modal-content">
-				<button class="modal-close-btn" onclick="closeEditarPrecioModal()">×</button>
-				
-				<h2 class="modal-title" data-i18n="dashboardAdmin.billing.updatePrice">💵 Actualizar Precio de Cuota</h2>
-				
-				<form id="editarPrecioForm" onsubmit="submitEditarPrecio(event)">
-					<input type="hidden" id="precio-id-tipo">
-					
-					<div class="form-group">
-						<label id="precio-tipo-nombre" data-i18n="dashboardAdmin.billing.housingType">Tipo de Vivienda</label>
-					</div>
-					
-					<div class="form-group">
-						<label for="precio-monto" data-i18n="dashboardAdmin.billing.newMonthlyAmount">Nuevo Monto Mensual *</label>
-						<input type="number" 
-							   id="precio-monto" 
-							   step="0.01" 
-							   min="0" 
-							   required 
-							   data-i18n-placeholder="dashboardAdmin.billing.amountPlaceholder"
-							   placeholder="Ej: 7500.00">
-					</div>
-					
-					<div class="alert-warning" style="margin: 15px 0;">
-						<strong data-i18n="common.important">⚠ Importante:</strong>
-						<p data-i18n="dashboardAdmin.billing.priceChangeWarning">Este cambio aplicará para las nuevas cuotas que se generen. Las cuotas ya existentes mantendrán su monto original.</p>
-					</div>
-					
-					<div class="form-actions">
-						<button type="button" class="btn btn-secondary" onclick="closeEditarPrecioModal()" data-i18n="common.cancel">
-							Cancelar
-						</button>
-						<button type="submit" class="btn btn-primary">
-							<i class="fas fa-save"></i> <span data-i18n="common.saveChanges">Guardar Cambios</span>
-						</button>
-					</div>
-				</form>
-			</div>
+<div id="editarPrecioModal" class="material-modal" style="display: none;">
+	<div class="material-modal-content">
+		<div class="material-modal-header">
+			<h3 id="editarPrecioModalTitle" data-i18n="dashboardAdmin.billing.updatePrice">
+				💵 Actualizar Precio de Cuota
+			</h3>
+			<button class="close-material-modal" onclick="closeEditarPrecioModal()">&times;</button>
 		</div>
+
+		<form id="editarPrecioForm" onsubmit="submitEditarPrecio(event)">
+			<input type="hidden" id="precio-id-tipo">
+
+			<div class="material-form-group">
+				<label id="precio-tipo-nombre" data-i18n="dashboardAdmin.billing.housingType">
+					Tipo de Vivienda
+				</label>
+			</div>
+
+			<div class="material-form-group">
+				<label for="precio-monto" data-i18n="dashboardAdmin.billing.newMonthlyAmount">
+					Nuevo Monto Mensual *
+				</label>
+				<input 
+					type="number" 
+					id="precio-monto" 
+					step="0.01" 
+					min="0" 
+					required 
+					data-i18n-placeholder="dashboardAdmin.billing.amountPlaceholder"
+					placeholder="Ej: 7500.00"
+				>
+			</div>
+
+			<div class="alert-warning" style="margin: 15px 0;">
+				<strong data-i18n="common.important">⚠ Importante:</strong>
+				<p data-i18n="dashboardAdmin.billing.priceChangeWarning">
+					Este cambio aplicará para las nuevas cuotas que se generen. 
+					Las cuotas ya existentes mantendrán su monto original.
+				</p>
+			</div>
+
+			<div class="material-form-actions">
+				<button 
+					type="button" 
+					class="btn btn-secondary" 
+					onclick="closeEditarPrecioModal()" 
+					data-i18n="common.cancel">
+					Cancelar
+				</button>
+				<button type="submit" class="btn btn-primary">
+					<i class="fas fa-save"></i> 
+					<span data-i18n="common.saveChanges">Guardar Cambios</span>
+				</button>
+			</div>
+		</form>
+	</div>
+</div>
+
 
 		<!-- Modal para validar pago -->
 		<div id="validarPagoModal" class="modal-overlay" style="display: none;">
@@ -754,107 +778,116 @@
 		</section>
 
 		<!-- SECCIÓN SOLICITUDES ADMIN -->
-		<section id="solicitudes-section" class="section-content">
-			<h2 class="section-title" data-i18n="dashboardAdmin.requests.title">📩 Gestión de Solicitudes</h2>
+<section id="solicitudes-section" class="section-content">
+	<h2 class="section-title" data-i18n="dashboardAdmin.requests.title">📩 Gestión de Solicitudes</h2>
 
-			<div class="stats-grid">
-				<div class="stat-card">
-					<div class="stat-icon">
-						<i class="fas fa-inbox"></i>
-					</div>
-					<div class="stat-info">
-						<span class="stat-label" data-i18n="common.total">Total</span>
-						<span class="stat-value" id="solicitudes-total-admin">0</span>
-					</div>
-				</div>
-
-				<div class="stat-card pendiente">
-					<div class="stat-icon">
-						<i class="fas fa-clock"></i>
-					</div>
-					<div class="stat-info">
-						<span class="stat-label" data-i18n="common.statusPending">Pendientes</span>
-						<span class="stat-value" id="solicitudes-pendientes-admin">0</span>
-					</div>
-				</div>
-
-				<div class="stat-card warning">
-					<div class="stat-icon">
-						<i class="fas fa-eye"></i>
-					</div>
-					<div class="stat-info">
-						<span class="stat-label" data-i18n="dashboardAdmin.requests.inReview">En Revisión</span>
-						<span class="stat-value" id="solicitudes-revision-admin">0</span>
-					</div>
-				</div>
-
-				<div class="stat-card success">
-					<div class="stat-icon">
-						<i class="fas fa-check-circle"></i>
-					</div>
-					<div class="stat-info">
-						<span class="stat-label" data-i18n="dashboardAdmin.requests.resolved">Resueltas</span>
-						<span class="stat-value" id="solicitudes-resueltas-admin">0</span>
-					</div>
-				</div>
-
-				<div class="stat-card error">
-					<div class="stat-icon">
-						<i class="fas fa-exclamation-triangle"></i>
-					</div>
-					<div class="stat-info">
-						<span class="stat-label" data-i18n="dashboardAdmin.requests.highPriority">Prioridad Alta</span>
-						<span class="stat-value" id="solicitudes-altas-admin">0</span>
-					</div>
-				</div>
+	<div class="stats-grid">
+		<div class="stat-card">
+			<div class="stat-icon">
+				<i class="fas fa-inbox"></i>
 			</div>
-
-			<div class="filters-container-solicitudes-admin">
-				<div class="filter-group-solicitudes-admin">
-					<label for="filtro-estado-solicitudes-admin">
-						<i class="fas fa-filter"></i> <span data-i18n="common.status">Estado:</span>
-					</label>
-					<select id="filtro-estado-solicitudes-admin" onchange="loadAllSolicitudes()">
-						<option value="" data-i18n="dashboardAdmin.requests.filterAllStates">Todos los estados</option>
-						<option value="pendiente" data-i18n="common.statusPending">Pendiente</option>
-						<option value="en_revision" data-i18n="dashboardAdmin.requests.inReview">En Revisión</option>
-						<option value="resuelta" data-i18n="dashboardAdmin.requests.resolved">Resuelta</option>
-						<option value="rechazada" data-i18n="common.statusRejected">Rechazada</option>
-					</select>
-				</div>
-
-				<div class="filter-group-solicitudes-admin">
-					<label for="filtro-tipo-solicitudes-admin">
-						<i class="fas fa-tag"></i> <span data-i18n="common.type">Tipo:</span>
-					</label>
-					<select id="filtro-tipo-solicitudes-admin" onchange="loadAllSolicitudes()">
-						<option value="" data-i18n="dashboardAdmin.requests.filterAllTypes">Todos los tipos</option>
-						<option value="horas" data-i18n="dashboardAdmin.requests.typeHours">Registro de Horas</option>
-						<option value="pago" data-i18n="dashboardAdmin.requests.typePayment">Pagos/Cuotas</option>
-						<option value="vivienda" data-i18n="dashboardAdmin.requests.typeHousing">Vivienda</option>
-						<option value="general" data-i18n="dashboardAdmin.requests.typeGeneral">Consulta General</option>
-						<option value="otro" data-i18n="dashboardAdmin.requests.typeOther">Otro</option>
-					</select>
-				</div>
-
-				<div class="filter-group-solicitudes-admin">
-					<label for="filtro-prioridad-solicitudes-admin">
-						<i class="fas fa-exclamation-circle"></i> <span data-i18n="common.priority">Prioridad:</span>
-					</label>
-					<select id="filtro-prioridad-solicitudes-admin" onchange="loadAllSolicitudes()">
-						<option value="" data-i18n="dashboardAdmin.requests.filterAllPriorities">Todas las prioridades</option>
-						<option value="alta" data-i18n="common.priorityHigh">Alta</option>
-						<option value="media" data-i18n="common.priorityMedium">Media</option>
-						<option value="baja" data-i18n="common.priorityLow">Baja</option>
-					</select>
-				</div>
+			<div class="stat-info">
+				<span class="stat-label" data-i18n="common.total">Total</span>
+				<span class="stat-value" id="solicitudes-total-admin">0</span>
 			</div>
+		</div>
 
-			<div id="solicitudesAdminContainer" class="solicitudes-container">
-				<p class="loading" data-i18n="common.loading">Cargando solicitudes...</p>
+		<div class="stat-card pendiente">
+			<div class="stat-icon">
+				<i class="fas fa-clock"></i>
 			</div>
-		</section>
-	</main>
+			<div class="stat-info">
+				<span class="stat-label" data-i18n="common.statusPending">Pendientes</span>
+				<span class="stat-value" id="solicitudes-pendientes-admin">0</span>
+			</div>
+		</div>
+
+		<div class="stat-card warning">
+			<div class="stat-icon">
+				<i class="fas fa-eye"></i>
+			</div>
+			<div class="stat-info">
+				<span class="stat-label" data-i18n="dashboardAdmin.requests.inReview">En Revisión</span>
+				<span class="stat-value" id="solicitudes-revision-admin">0</span>
+			</div>
+		</div>
+
+		<div class="stat-card success">
+			<div class="stat-icon">
+				<i class="fas fa-check-circle"></i>
+			</div>
+			<div class="stat-info">
+				<span class="stat-label" data-i18n="dashboardAdmin.requests.resolved">Resueltas</span>
+				<span class="stat-value" id="solicitudes-resueltas-admin">0</span>
+			</div>
+		</div>
+
+		<div class="stat-card error">
+			<div class="stat-icon">
+				<i class="fas fa-exclamation-triangle"></i>
+			</div>
+			<div class="stat-info">
+				<span class="stat-label" data-i18n="dashboardAdmin.requests.highPriority">Prioridad Alta</span>
+				<span class="stat-value" id="solicitudes-altas-admin">0</span>
+			</div>
+		</div>
+	</div>
+
+	<div class="filters-container-solicitudes-admin">
+		<div class="filter-group-solicitudes-admin">
+			<label for="filtro-estado-solicitudes-admin">
+				<i class="fas fa-filter"></i> <span data-i18n="common.status">Estado:</span>
+			</label>
+			<select id="filtro-estado-solicitudes-admin" onchange="loadAllSolicitudes()">
+				<option value="" data-i18n="dashboardAdmin.requests.filterAllStates">Todos los estados</option>
+				<option value="pendiente" data-i18n="common.statusPending">Pendiente</option>
+				<option value="en_revision" data-i18n="dashboardAdmin.requests.inReview">En Revisión</option>
+				<option value="resuelta" data-i18n="dashboardAdmin.requests.resolved">Resuelta</option>
+				<option value="rechazada" data-i18n="common.statusRejected">Rechazada</option>
+			</select>
+		</div>
+
+		<div class="filter-group-solicitudes-admin">
+			<label for="filtro-tipo-solicitudes-admin">
+				<i class="fas fa-tag"></i> <span data-i18n="common.type">Tipo:</span>
+			</label>
+			<select id="filtro-tipo-solicitudes-admin" onchange="loadAllSolicitudes()">
+				<option value="" data-i18n="dashboardAdmin.requests.filterAllTypes">Todos los tipos</option>
+				<option value="horas" data-i18n="dashboardAdmin.requests.typeHours">Registro de Horas</option>
+				<option value="pago" data-i18n="dashboardAdmin.requests.typePayment">Pagos/Cuotas</option>
+				<option value="vivienda" data-i18n="dashboardAdmin.requests.typeHousing">Vivienda</option>
+				<option value="general" data-i18n="dashboardAdmin.requests.typeGeneral">Consulta General</option>
+				<option value="otro" data-i18n="dashboardAdmin.requests.typeOther">Otro</option>
+			</select>
+		</div>
+
+		<div class="filter-group-solicitudes-admin">
+			<label for="filtro-prioridad-solicitudes-admin">
+				<i class="fas fa-exclamation-circle"></i> <span data-i18n="common.priority">Prioridad:</span>
+			</label>
+			<select id="filtro-prioridad-solicitudes-admin" onchange="loadAllSolicitudes()">
+				<option value="" data-i18n="dashboardAdmin.requests.filterAllPriorities">Todas las prioridades</option>
+				<option value="alta" data-i18n="common.priorityHigh">Alta</option>
+				<option value="media" data-i18n="common.priorityMedium">Media</option>
+				<option value="baja" data-i18n="common.priorityLow">Baja</option>
+			</select>
+		</div>
+	</div>
+
+	
+	<div class="info-card">
+		<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+			<h3 data-i18n="dashboardAdmin.requests.tableTitle">📋 Todas las Solicitudes</h3>
+			<button class="btn btn-secondary" onclick="loadAllSolicitudes()">
+				<i class="fas fa-sync-alt"></i> <span data-i18n="common.update">Actualizar</span>
+			</button>
+		</div>
+
+		<div id="solicitudesAdminContainer" class="solicitudes-container">
+			<p class="loading" data-i18n="common.loading">Cargando solicitudes...</p>
+		</div>
+	</div>
+</section>
 
 	
 	<script src="/assets/js/dashboardAdmin.js"></script>

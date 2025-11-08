@@ -587,17 +587,6 @@ if (!isset($_SESSION['user_id'])) {
 				</div>
 			</div>
 			
-			<!-- Filtros -->
-			<div class="info-card">
-				<div class="task-filter-header">
-					<h3 data-i18n="dashboardUser.tasks.assignedTasks">Mis Tareas Asignadas</h3>
-					<label class="filter-checkbox-label">
-						<input type="checkbox" id="mostrar-completadas" onchange="loadUserTasks()">
-						<span data-i18n="dashboardUser.tasks.showCompleted">Mostrar completadas</span>
-					</label>
-				</div>
-			</div>
-
 			<!-- Tareas personales -->
 			<div class="info-card">
 				<h3 data-i18n="dashboardUser.tasks.individual">📋 Tareas Individuales</h3>

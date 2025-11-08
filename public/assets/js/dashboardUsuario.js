@@ -1,4 +1,3 @@
-
 document.addEventListener('DOMContentLoaded', function () {
     const menuItems = document.querySelectorAll('.menu li');
 
@@ -5201,15 +5200,12 @@ function getHoraActualSQL() {
     });
 }
 
-// ========== APLICAR FIXES EN TODO EL SISTEMA ==========
 
-/**
- * Fix para dashboardUsuario.js - Tareas
- */
+
 function fixFechasTareas() {
     ('🔧 Aplicando fix de fechas en tareas...');
     
-    // Reemplazar en renderUserTasks
+   
     window.renderUserTasks_ORIGINAL = window.renderUserTasks;
     
     window.renderUserTasks = function(tareas, containerId, esNucleo = false) {
@@ -5234,7 +5230,7 @@ function fixFechasTareas() {
                         <h4 class="user-task-title">${tarea.titulo}</h4>
                         <div class="user-task-badges">
                             <span class="task-badge badge-estado">${formatEstadoUsuario(tarea.estado_usuario)}</span>
-                            <span class="task-badge badge-prioridad ${tarea.prioridad}">${formatPrioridad(tarea.prioridad)}</span>
+                    
                             ${esNucleo ? '<span class="task-badge" style="background: #6f42c1; color: white;">Núcleo</span>' : ''}
                         </div>
                     </div>
@@ -5535,9 +5531,6 @@ setTimeout(function() {
                         <div class="user-task-badges">
                             <span class="task-badge badge-estado ${estadoBadgeClass}">
                                 ${estadoTexto}
-                            </span>
-                            <span class="task-badge badge-prioridad ${tarea.prioridad}">
-                                ${formatPrioridad(tarea.prioridad)}
                             </span>
                             ${esNucleo ? '<span class="task-badge" style="background: #6f42c1; color: white;">Núcleo</span>' : ''}
                         </div>

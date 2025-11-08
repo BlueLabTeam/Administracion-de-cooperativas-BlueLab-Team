@@ -1888,18 +1888,26 @@ function loadNucleosFamiliares() {
         });
 }
 
-// Renderizar tabla de núcleos
+// ========== RENDERIZAR TABLA DE NÚCLEOS ==========
 function renderNucleosTable(nucleos) {
     const container = document.getElementById('nucleosTableContainer');
 
     if (!nucleos || nucleos.length === 0) {
-        container.innerHTML = '<div class="no-data">No hay núcleos familiares creados. Haz clic en "Crear Nuevo Núcleo" para empezar.</div>';
+        container.innerHTML = `
+            <div style="text-align: center; padding: 40px;">
+                <i class="fas fa-users" style="font-size: 48px; color: #ddd; display: block; margin-bottom: 15px;"></i>
+                <p style="color: #999; margin-bottom: 20px;">No hay núcleos familiares registrados</p>
+                <button class="btn btn-primary" onclick="showCreateNucleoModal()">
+                    <i class="fas fa-plus"></i> Crear Nuevo Núcleo
+                </button>
+            </div>
+        `;
         return;
     }
 
-    const tableHTML = `
-        <div class="nucleos-table-wrapper">
-            <table class="nucleos-table">
+    let tableHTML = `
+        <div class="viviendas-table-container">
+            <table class="viviendas-table">
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -1911,37 +1919,47 @@ function renderNucleosTable(nucleos) {
                     </tr>
                 </thead>
                 <tbody>
-                    ${nucleos.map(nucleo => `
-                        <tr class="nucleo-row">
-                            <td>${nucleo.id_nucleo}</td>
-                            <td><strong>${nucleo.nombre_nucleo || 'Sin nombre'}</strong></td>
-                            <td>${nucleo.direccion || '-'}</td>
-                            <td class="text-center">
-                                <span class="badge-count">${nucleo.total_miembros}</span>
-                            </td>
-                            <td>
-                                <div class="miembros-list">
-                                    ${nucleo.miembros_nombres ?
-            nucleo.miembros_nombres.split(', ').slice(0, 3).join(', ') +
-            (nucleo.total_miembros > 3 ? ` y ${nucleo.total_miembros - 3} más...` : '')
-            : 'Sin miembros'}
-                                </div>
-                            </td>
-                            <td>
-                                <div class="action-buttons">
-                                    <button class="btn-small btn-view" onclick="viewNucleoDetails(${nucleo.id_nucleo})" title="Ver detalles">
-                                        Ver
-                                    </button>
-                                    <button class="btn-small btn-edit" onclick="editNucleo(${nucleo.id_nucleo})" title="Editar">
-                                        Editar
-                                    </button>
-                                    <button class="btn-small btn-delete" onclick="deleteNucleo(${nucleo.id_nucleo})" title="Eliminar">
-                                        Eliminar
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    `).join('')}
+    `;
+
+    nucleos.forEach(nucleo => {
+        const integrantes = nucleo.miembros_nombres
+            ? nucleo.miembros_nombres.split(', ').slice(0, 3).join(', ') +
+              (nucleo.total_miembros > 3 ? ` y ${nucleo.total_miembros - 3} más...` : '')
+            : 'Sin miembros';
+
+        tableHTML += `
+            <tr>
+                <td><strong>${nucleo.id_nucleo}</strong></td>
+                <td>${nucleo.nombre_nucleo || 'Sin nombre'}</td>
+                <td>${nucleo.direccion || '-'}</td>
+                <td class="text-center">
+                    <span class="badge-count">${nucleo.total_miembros || 0}</span>
+                </td>
+                <td>${integrantes}</td>
+                <td>
+                    <div class="vivienda-actions">
+                        <button class="btn-view-vivienda" 
+                                onclick="viewNucleoDetails(${nucleo.id_nucleo})" 
+                                title="Ver detalles">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="btn-edit-vivienda" 
+                                onclick="editNucleo(${nucleo.id_nucleo})" 
+                                title="Editar">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn-delete-vivienda" 
+                                onclick="deleteNucleo(${nucleo.id_nucleo})" 
+                                title="Eliminar">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    });
+
+    tableHTML += `
                 </tbody>
             </table>
         </div>
@@ -1949,6 +1967,46 @@ function renderNucleosTable(nucleos) {
 
     container.innerHTML = tableHTML;
 }
+
+// ========== RENDERIZAR FILA DE NÚCLEO ==========
+function renderNucleoRow(nucleo) {
+    const integrantes = nucleo.miembros_nombres
+        ? nucleo.miembros_nombres.split(', ').slice(0, 3).join(', ') +
+          (nucleo.total_miembros > 3 ? ` y ${nucleo.total_miembros - 3} más...` : '')
+        : 'Sin miembros';
+
+    return `
+        <tr class="nucleo-row" data-id="${nucleo.id_nucleo}">
+            <td>${nucleo.id_nucleo}</td>
+            <td><strong>${nucleo.nombre_nucleo || 'Sin nombre'}</strong></td>
+            <td>${nucleo.direccion || '-'}</td>
+            <td class="text-center">
+                <span class="badge-count">${nucleo.total_miembros || 0}</span>
+            </td>
+            <td>${integrantes}</td>
+            <td>
+                <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+                    <button class="btn-small btn-view" 
+                            onclick="viewNucleoDetails(${nucleo.id_nucleo})" 
+                            title="Ver detalles">
+                        Ver
+                    </button>
+                    <button class="btn-small btn-edit" 
+                            onclick="editNucleo(${nucleo.id_nucleo})" 
+                            title="Editar">
+                        Editar
+                    </button>
+                    <button class="btn-small btn-delete" 
+                            onclick="deleteNucleo(${nucleo.id_nucleo})" 
+                            title="Eliminar">
+                        Eliminar
+                    </button>
+                </div>
+            </td>
+        </tr>
+    `;
+}
+
 
 // Cargar usuarios disponibles para formulario
 function loadUsersForNucleo(nucleoId = null) {
@@ -2172,65 +2230,99 @@ function editNucleo(nucleoId) {
         fetch(`/api/nucleos/details?nucleo_id=${nucleoId}`).then(r => r.json()),
         loadUsersForNucleo(nucleoId)
     ])
-        .then(([detailsData, usuarios]) => {
-            if (!detailsData.success) throw new Error('Error al cargar datos');
+    .then(([detailsData, usuarios]) => {
+        if (!detailsData.success) throw new Error('Error al cargar datos');
 
-            const nucleo = detailsData.nucleo;
-            const miembrosActuales = detailsData.miembros.map(m => m.id_usuario);
+        const nucleo = detailsData.nucleo;
+        const miembrosActuales = detailsData.miembros.map(m => m.id_usuario);
 
-            const modalHTML = `
-            <div class="modal-overlay" onclick="if(event.target.classList.contains('modal-overlay')) this.remove()">
-                <div class="modal-content-large">
-                    <button class="modal-close-btn" onclick="this.closest('.modal-overlay').remove()">×</button>
-                    
-                    <h2 class="modal-title">Editar Núcleo Familiar</h2>
-                    
-                    <form id="editNucleoForm" onsubmit="submitEditNucleo(event, ${nucleoId})">
-                        <div class="form-group">
-                            <label for="edit_nombre_nucleo">Nombre del Núcleo *</label>
-                            <input type="text" id="edit_nombre_nucleo" name="nombre_nucleo" 
-                                   value="${nucleo.nombre_nucleo || ''}" required>
-                        </div>
+        const modalHTML = `
+        <div id="nucleoModal" class="material-modal" style="display: flex;">
+            <div class="material-modal-content">
+                <div class="material-modal-header">
+                    <h3 id="nucleoModalTitle">Editar Núcleo Familiar</h3>
+                    <button class="close-material-modal" onclick="closeNucleoModal()">&times;</button>
+                </div>
+                
+                <form id="editNucleoForm" onsubmit="submitEditNucleo(event, ${nucleoId})">
+                    <input type="hidden" id="edit_nucleo_id" value="${nucleoId}">
 
-                        <div class="form-group">
-                            <label for="edit_direccion_nucleo">Dirección</label>
-                            <input type="text" id="edit_direccion_nucleo" name="direccion" 
-                                   value="${nucleo.direccion || ''}">
-                        </div>
+                    <!-- Nombre -->
+                    <div class="material-form-group">
+                        <label for="edit_nombre_nucleo">Nombre del Núcleo *</label>
+                        <input type="text" id="edit_nombre_nucleo" name="nombre_nucleo"
+                               value="${nucleo.nombre_nucleo || ''}" required
+                               placeholder="Ej: Núcleo Pérez-García">
+                    </div>
 
-                        <div class="form-group">
-                            <label>Miembros del Núcleo *</label>
-                            <div class="user-selection-nucleo">
-                                <input type="text" id="search-users-nucleo-edit" 
-                                       placeholder="Buscar usuario..." 
-                                       onkeyup="filterUsersNucleoEdit()">
-                                <div id="usersListNucleoEdit" class="users-checkboxes-nucleo">
-                                    ${renderUsersCheckboxesEdit(usuarios, miembrosActuales, nucleoId)}
-                                </div>
+                    <!-- Dirección -->
+                    <div class="material-form-group">
+                        <label for="edit_direccion_nucleo">Dirección</label>
+                        <input type="text" id="edit_direccion_nucleo" name="direccion"
+                               value="${nucleo.direccion || ''}"
+                               placeholder="Ej: Calle 123, Bloque A">
+                    </div>
+
+                    <!-- Miembros -->
+                    <div class="material-form-group">
+                        <label>Miembros del Núcleo *</label>
+                        <div class="user-selection-nucleo" style="display: flex; flex-direction: column; gap: 10px;">
+                            <input type="text" id="search-users-nucleo-edit"
+                                   class="material-input"
+                                   placeholder="Buscar usuario..."
+                                   onkeyup="filterUsersNucleoEdit()">
+
+                            <div id="usersListNucleoEdit" class="users-checkboxes-nucleo" 
+                                 style="
+                                     display: flex;
+                                     flex-direction: column;
+                                     gap: 6px;
+                                     max-height: 180px;
+                                     overflow-y: auto;
+                                     border: 1px solid #ddd;
+                                     border-radius: 8px;
+                                     padding: 10px;
+                                     background: #fafafa;
+                                 ">
+                                ${renderUsersCheckboxesEdit(usuarios, miembrosActuales, nucleoId)}
                             </div>
                         </div>
+                    </div>
 
-                        <div class="form-actions">
-                            <button type="button" class="btn btn-secondary" 
-                                    onclick="this.closest('.modal-overlay').remove()">
-                                Cancelar
-                            </button>
-                            <button type="submit" class="btn btn-primary">
-                                Guardar Cambios
-                            </button>
-                        </div>
-                    </form>
-                </div>
+                    <!-- Botones -->
+                    <div class="material-form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="closeNucleoModal()">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            Guardar Cambios
+                        </button>
+                    </div>
+                </form>
             </div>
+        </div>
         `;
 
-            document.body.insertAdjacentHTML('beforeend', modalHTML);
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Error al cargar datos del núcleo');
-        });
+        // Eliminar modal previo si existía (para evitar duplicados)
+        const existing = document.getElementById("nucleoModal");
+        if (existing) existing.remove();
+
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error al cargar datos del núcleo');
+    });
 }
+
+// Cerrar modal
+function closeNucleoModal() {
+    const modal = document.getElementById("nucleoModal");
+    if (modal) modal.remove();
+}
+
+
+
 
 // Renderizar usuarios para edición
 function renderUsersCheckboxesEdit(usuarios, miembrosActuales, nucleoIdActual) {
@@ -2375,7 +2467,7 @@ function loadMateriales() {
         });
 }
 
-// ========== RENDERIZAR TABLA ==========
+// ========== RENDERIZAR TABLA MATERIAL ==========
 function renderMaterialesTable(materiales) {
     const container = document.getElementById('materialesTableContainer');
 
@@ -2393,8 +2485,8 @@ function renderMaterialesTable(materiales) {
     }
 
     let tableHTML = `
-        <div class="materiales-table-container">
-            <table class="materiales-table">
+        <div class="viviendas-table-container">
+            <table class="viviendas-table">
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -2426,14 +2518,20 @@ function renderMaterialesTable(materiales) {
                     <span class="stock-badge ${stockClass}">${stock}</span>
                 </td>
                 <td>
-                    <div class="material-actions">
-                        <button class="btn-stock-material" onclick="showStockModal(${material.id_material}, '${material.nombre.replace(/'/g, "\\'")}', ${stock})" title="Actualizar Stock">
+                    <div class="vivienda-actions">
+                        <button class="btn-view-vivienda" 
+                                onclick="showStockModal(${material.id_material}, '${material.nombre.replace(/'/g, "\\'")}', ${stock})" 
+                                title="Actualizar Stock">
                             <i class="fas fa-boxes"></i>
                         </button>
-                        <button class="btn-edit-material" onclick="editMaterial(${material.id_material})" title="Editar">
+                        <button class="btn-edit-vivienda" 
+                                onclick="editMaterial(${material.id_material})" 
+                                title="Editar">
                             <i class="fas fa-edit"></i>
                         </button>
-                        <button class="btn-delete-material" onclick="deleteMaterial(${material.id_material}, '${material.nombre.replace(/'/g, "\\'")}')">
+                        <button class="btn-delete-vivienda" 
+                                onclick="deleteMaterial(${material.id_material}, '${material.nombre.replace(/'/g, "\\'")}')" 
+                                title="Eliminar">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
@@ -2450,6 +2548,7 @@ function renderMaterialesTable(materiales) {
 
     container.innerHTML = tableHTML;
 }
+
 
 // ========== BUSCAR MATERIALES ==========
 let searchMaterialesTimeout;
@@ -5157,33 +5256,34 @@ async function loadAllSolicitudes() {
     }
 }
 
+
 // ========== RENDERIZAR SOLICITUDES ADMIN (TABLA) ==========
 function renderSolicitudesAdmin(solicitudes) {
     const container = document.getElementById('solicitudesAdminContainer');
 
     if (!solicitudes || solicitudes.length === 0) {
         container.innerHTML = `
-            <div style="text-align: center; padding: 60px 20px;">
-                <i class="fas fa-inbox" style="font-size: 48px; color: ${COLORS.gray100}; display: block; margin-bottom: 15px;"></i>
-                <p style="color: ${COLORS.gray500};">No hay solicitudes con los filtros seleccionados</p>
+            <div style="text-align: center; padding: 40px;">
+                <i class="fas fa-inbox" style="font-size: 48px; color: #ddd; display: block; margin-bottom: 15px;"></i>
+                <p style="color: #999; margin-bottom: 20px;">No hay solicitudes con los filtros seleccionados</p>
             </div>
         `;
         return;
     }
 
-    let html = `
-        <div style="overflow-x: auto; border-radius: 12px; box-shadow: ${COLORS.shadow};">
-            <table style="width: 100%; border-collapse: collapse; background: ${COLORS.white}; min-width: 1200px;">
+    let tableHTML = `
+        <div class="viviendas-table-container">
+            <table class="viviendas-table">
                 <thead>
-                    <tr style="background: linear-gradient(135deg, ${COLORS.primary} 0%, ${COLORS.primaryDark} 100%); color: ${COLORS.white};">
-                        <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px; width: 200px;">Usuario</th>
-                        <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px; width: 250px;">Asunto</th>
-                        <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px; width: 120px;">Tipo</th>
-                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px; width: 100px;">Estado</th>
-                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px; width: 100px;">Prioridad</th>
-                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px; width: 100px;">Fecha</th>
-                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px; width: 80px;">Respuestas</th>
-                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px; width: 180px;">Acciones</th>
+                    <tr>
+                        <th>Usuario</th>
+                        <th>Asunto</th>
+                        <th>Tipo</th>
+                        <th>Estado</th>
+                        <th>Prioridad</th>
+                        <th>Fecha</th>
+                        <th>Respuestas</th>
+                        <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -5196,70 +5296,44 @@ function renderSolicitudesAdmin(solicitudes) {
             year: 'numeric'
         });
 
-        html += `
-            <tr style="border-bottom: 1px solid ${COLORS.gray100}; transition: all 0.2s ease;" 
-                onmouseover="this.style.background='${COLORS.primaryLight}'" 
-                onmouseout="this.style.background='${COLORS.white}'">
-                
-                <td style="padding: 14px 12px; font-size: 13px;">
-                    <div style="font-weight: 600; color: ${COLORS.primary};">${sol.nombre_completo}</div>
-                    <div style="font-size: 11px; color: ${COLORS.gray500}; margin-top: 3px;">${sol.email}</div>
+        const estadoBadge = `<span class="estado-badge-vivienda ${sol.estado}">
+                                ${formatEstado(sol.estado)}
+                             </span>`;
+
+        const prioridadBadge = `<span class="estado-badge-vivienda prioridad-${sol.prioridad}">
+                                    ${formatPrioridad(sol.prioridad)}
+                                </span>`;
+
+        tableHTML += `
+            <tr>
+                <td>
+                    <strong>${sol.nombre_completo}</strong><br>
+                    <small style="color: #777;">${sol.email}</small>
                 </td>
-                
-                <td style="padding: 14px 12px; font-size: 13px; font-weight: 600; color: ${COLORS.gray700};">
-                    ${sol.asunto}
+                <td>${sol.asunto}</td>
+                <td>${formatTipoSolicitud(sol.tipo_solicitud)}</td>
+                <td>${estadoBadge}</td>
+                <td>${prioridadBadge}</td>
+                <td>${fecha}</td>
+                <td style="text-align: center;">
+                    <span class="badge-count">${sol.total_respuestas || 0}</span>
                 </td>
-                
-                <td style="padding: 14px 12px; font-size: 12px;">
-                    <span style="
-                        background: ${COLORS.primaryLight};
-                        color: ${COLORS.primary};
-                        padding: 4px 10px;
-                        border-radius: 15px;
-                        font-weight: 600;
-                        font-size: 11px;
-                    ">${formatTipoSolicitud(sol.tipo_solicitud)}</span>
-                </td>
-                
-                <td style="padding: 14px 12px; text-align: center;">
-                    <span class="badge badge-${sol.estado}">${formatEstado(sol.estado)}</span>
-                </td>
-                
-                <td style="padding: 14px 12px; text-align: center;">
-                    <span class="badge badge-prioridad-${sol.prioridad}">${formatPrioridad(sol.prioridad)}</span>
-                </td>
-                
-                <td style="padding: 14px 12px; text-align: center; font-size: 12px; color: ${COLORS.gray700};">
-                    ${fecha}
-                </td>
-                
-                <td style="padding: 14px 12px; text-align: center;">
-                    <span style="
-                        background: ${COLORS.primaryLight};
-                        color: ${COLORS.primary};
-                        padding: 6px 12px;
-                        border-radius: 20px;
-                        font-weight: 600;
-                        font-size: 12px;
-                    ">${sol.total_respuestas || 0}</span>
-                </td>
-                
-                <td style="padding: 14px 12px;">
-                    <div style="display: flex; gap: 5px; justify-content: center; flex-wrap: wrap;">
-                        <button class="btn-icon btn-secondary" 
-                                onclick="verDetalleSolicitudAdmin(${sol.id_solicitud})"
+                <td>
+                    <div class="vivienda-actions">
+                        <button class="btn-view-vivienda" 
+                                onclick="verDetalleSolicitudAdmin(${sol.id_solicitud})" 
                                 title="Ver detalle">
                             <i class="fas fa-eye"></i>
                         </button>
-                        <button class="btn-icon btn-primary" 
-                                onclick="responderSolicitudAdmin(${sol.id_solicitud})"
+                        <button class="btn-edit-vivienda" 
+                                onclick="responderSolicitudAdmin(${sol.id_solicitud})" 
                                 title="Responder">
                             <i class="fas fa-reply"></i>
                         </button>
                         ${sol.estado !== 'resuelta' && sol.estado !== 'rechazada' ? `
-                            <button class="btn-icon btn-success" 
-                                    onclick="cambiarEstadoSolicitud(${sol.id_solicitud}, 'resuelta')"
-                                    title="Resolver">
+                            <button class="btn-delete-vivienda"
+                                    onclick="cambiarEstadoSolicitud(${sol.id_solicitud}, 'resuelta')" 
+                                    title="Marcar como resuelta">
                                 <i class="fas fa-check"></i>
                             </button>
                         ` : ''}
@@ -5269,9 +5343,18 @@ function renderSolicitudesAdmin(solicitudes) {
         `;
     });
 
-    html += '</tbody></table></div>';
-    container.innerHTML = html;
+    tableHTML += `
+                </tbody>
+            </table>
+        </div>
+    `;
+
+    container.innerHTML = tableHTML;
 }
+
+
+
+
 
 // ========== CARGAR ESTADÍSTICAS ==========
 async function loadEstadisticasSolicitudes() {
