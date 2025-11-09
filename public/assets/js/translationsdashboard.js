@@ -158,7 +158,7 @@ const translations = {
 
       reports: {
         title: "📊 Reportes Mensuales",
-        selectPeriod: "⚙️ Seleccionar Período",
+        selectPeriod: " Seleccionar Período",
         selectMonth: "Seleccione mes...",
         selectYear: "Seleccione año...",
         generate: "Generar Reporte",
@@ -219,8 +219,8 @@ const translations = {
         paid: "Pagadas",
         pending: "Pendientes",
         amountCollected: "Monto Cobrado",
-        priceConfig: "⚙️ Configuración de Precios",
-        quickActions: "🚀 Acciones Rápidas",
+        priceConfig: " Configuración de Precios",
+        quickActions: " Acciones Rápidas",
         generateCurrentMonth: "Generar Cuotas del Mes Actual",
         filterAllYears: "Todos los años",
         filterAllMonths: "Todos los meses",
@@ -646,7 +646,7 @@ const translations = {
 
       reports: {
         title: "📊 Monthly Reports",
-        selectPeriod: "⚙️ Select Period",
+        selectPeriod: " Select Period",
         selectMonth: "Select month...",
         selectYear: "Select year...",
         generate: "Generate Report",
@@ -707,8 +707,8 @@ const translations = {
         paid: "Paid",
         pending: "Pending",
         amountCollected: "Amount Collected",
-        priceConfig: "⚙️ Price Configuration",
-        quickActions: "🚀 Quick Actions",
+        priceConfig: " Price Configuration",
+        quickActions: " Quick Actions",
         generateCurrentMonth: "Generate Current Month Fees",
         filterAllYears: "All years",
         filterAllMonths: "All months",

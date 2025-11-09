@@ -239,7 +239,7 @@
       return;
     }
     
-    console.log('🚀 Inicializando i18n...');
+    console.log(' Inicializando i18n...');
     
     // Verificar que translations esté disponible
     if (typeof translations === 'undefined') {

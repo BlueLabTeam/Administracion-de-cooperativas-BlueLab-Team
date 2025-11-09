@@ -61,23 +61,7 @@ if (!isset($_SESSION['user_id'])) {
 				</div>
 			</div>
 
-			<div class="stats-grid">
-				<div class="stat-card">
-					<i class="fas fa-hand-holding-usd"></i>
-					<h4 data-i18n="dashboardUser.home.stats.contributions">Aportes al Día</h4>
-					<p>$0</p>
-				</div>
-				<div class="stat-card">
-					<i class="fas fa-clock"></i>
-					<h4 data-i18n="dashboardUser.home.stats.hours">Horas Trabajadas</h4>
-					<p>0h</p>
-				</div>
-				<div class="stat-card">
-					<i class="fas fa-tasks"></i>
-					<h4 data-i18n="dashboardUser.home.stats.tasks">Tareas Pendientes</h4>
-					<p>0</p>
-				</div>
-			</div>
+			
 		</section>
 
 		<!-- MI PERFIL -->
@@ -93,30 +77,110 @@ if (!isset($_SESSION['user_id'])) {
 		</div>
 
 		<!-- Vista de solo lectura -->
-		<div id="profile-view">
-    <div class="profile-info-grid">
-        <div class="profile-info-item">
-            <strong><i class="fas fa-user"></i> <span data-i18n="dashboardUser.profile.fullName">Nombre Completo</span>:</strong>
-            <p id="display-nombre"><?php echo htmlspecialchars($_SESSION['nombre_completo'] ?? 'Usuario'); ?></p>
-        </div>
-        <div class="profile-info-item">
-            <strong><i class="fas fa-envelope"></i> <span data-i18n="dashboardUser.profile.email">Email</span>:</strong>
-            <p id="display-email"><?php echo htmlspecialchars($_SESSION['email'] ?? 'No disponible'); ?></p>
-        </div>
-        <div class="profile-info-item">
-            <strong><i class="fas fa-map-marker-alt"></i> <span data-i18n="dashboardUser.profile.address">Dirección</span>:</strong>
-            <p id="display-direccion"><?php echo htmlspecialchars($_SESSION['direccion'] ?? 'No especificada'); ?></p>
-        </div>
-        <div class="profile-info-item">
-            <strong><i class="fas fa-birthday-cake"></i> <span data-i18n="dashboardUser.profile.birthDate">Fecha de Nacimiento</span>:</strong>
-            <p id="display-fecha-nacimiento"><?php echo htmlspecialchars($_SESSION['fecha_nacimiento'] ?? 'No disponible'); ?></p>
-        </div>
-        <div class="profile-info-item">
-            <strong><i class="fas fa-info-circle"></i> <span data-i18n="dashboardUser.profile.status">Estado</span>:</strong>
-            <p><span class="badge badge-<?php echo htmlspecialchars($_SESSION['estado'] ?? 'pendiente'); ?>">
-                <?php echo ucfirst(htmlspecialchars($_SESSION['estado'] ?? 'pendiente')); ?>
-            </span></p>
-        </div>
+<div id="profile-view">
+    <div style="overflow-x: auto; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 92, 185, 0.12);">
+        <table style="width: 100%; border-collapse: collapse; background: #FFFFFF;">
+            <thead>
+                <tr style="background: linear-gradient(135deg, #005CB9 0%, #004494 100%); color: #FFFFFF;">
+                    <th style="padding: 15px 20px; text-align: left; font-weight: 600; font-size: 14px; width: 30%;">
+                        Campo
+                    </th>
+                    <th style="padding: 15px 20px; text-align: left; font-weight: 600; font-size: 14px; width: 70%;">
+                        Información
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Nombre Completo -->
+                <tr style="border-bottom: 1px solid #E8EBF0; transition: all 0.2s ease;" 
+                    onmouseover="this.style.background='#F5F7FA'" 
+                    onmouseout="this.style.background='#FFFFFF'">
+                    <td style="padding: 16px 20px; font-weight: 600; color: #495057; font-size: 13px;">
+                        <i class="fas fa-user" style="color: #005CB9; margin-right: 8px;"></i>
+                        <span data-i18n="dashboardUser.profile.fullName">Nombre Completo</span>
+                    </td>
+                    <td style="padding: 16px 20px; color: #495057; font-size: 14px;" id="display-nombre">
+                        <?php echo htmlspecialchars($_SESSION['nombre_completo'] ?? 'Usuario'); ?>
+                    </td>
+                </tr>
+
+                <!-- Email -->
+                <tr style="border-bottom: 1px solid #E8EBF0; transition: all 0.2s ease;" 
+                    onmouseover="this.style.background='#F5F7FA'" 
+                    onmouseout="this.style.background='#FFFFFF'">
+                    <td style="padding: 16px 20px; font-weight: 600; color: #495057; font-size: 13px;">
+                        <i class="fas fa-envelope" style="color: #005CB9; margin-right: 8px;"></i>
+                        <span data-i18n="dashboardUser.profile.email">Email</span>
+                    </td>
+                    <td style="padding: 16px 20px; color: #495057; font-size: 14px;" id="display-email">
+                        <?php echo htmlspecialchars($_SESSION['email'] ?? 'No disponible'); ?>
+                    </td>
+                </tr>
+
+                <!-- Dirección -->
+                <tr style="border-bottom: 1px solid #E8EBF0; transition: all 0.2s ease;" 
+                    onmouseover="this.style.background='#F5F7FA'" 
+                    onmouseout="this.style.background='#FFFFFF'">
+                    <td style="padding: 16px 20px; font-weight: 600; color: #495057; font-size: 13px;">
+                        <i class="fas fa-map-marker-alt" style="color: #005CB9; margin-right: 8px;"></i>
+                        <span data-i18n="dashboardUser.profile.address">Dirección</span>
+                    </td>
+                    <td style="padding: 16px 20px; color: #495057; font-size: 14px;" id="display-direccion">
+                        <?php echo htmlspecialchars($_SESSION['direccion'] ?? 'No especificada'); ?>
+                    </td>
+                </tr>
+
+                <!-- Fecha de Nacimiento -->
+                <tr style="border-bottom: 1px solid #E8EBF0; transition: all 0.2s ease;" 
+                    onmouseover="this.style.background='#F5F7FA'" 
+                    onmouseout="this.style.background='#FFFFFF'">
+                    <td style="padding: 16px 20px; font-weight: 600; color: #495057; font-size: 13px;">
+                        <i class="fas fa-birthday-cake" style="color: #005CB9; margin-right: 8px;"></i>
+                        <span data-i18n="dashboardUser.profile.birthDate">Fecha de Nacimiento</span>
+                    </td>
+                    <td style="padding: 16px 20px; color: #495057; font-size: 14px;" id="display-fecha-nacimiento">
+                        <?php echo htmlspecialchars($_SESSION['fecha_nacimiento'] ?? 'No disponible'); ?>
+                    </td>
+                </tr>
+
+                <!-- Estado -->
+                <tr style="border-bottom: 1px solid #E8EBF0; transition: all 0.2s ease;" 
+                    onmouseover="this.style.background='#F5F7FA'" 
+                    onmouseout="this.style.background='#FFFFFF'">
+                    <td style="padding: 16px 20px; font-weight: 600; color: #495057; font-size: 13px;">
+                        <i class="fas fa-info-circle" style="color: #005CB9; margin-right: 8px;"></i>
+                        <span data-i18n="dashboardUser.profile.status">Estado</span>
+                    </td>
+                    <td style="padding: 16px 20px;">
+                        <?php 
+                        $estado = $_SESSION['estado'] ?? 'pendiente';
+                        $estadoColor = '';
+                        $estadoText = ucfirst($estado);
+                        
+                        if ($estado === 'aprobado' || $estado === 'activo') {
+                            $estadoColor = '#4CAF50';
+                        } else if ($estado === 'pendiente' || $estado === 'enviado') {
+                            $estadoColor = '#FF9800';
+                        } else if ($estado === 'rechazado') {
+                            $estadoColor = '#F44336';
+                        } else {
+                            $estadoColor = '#6C757D';
+                        }
+                        ?>
+                        <span style="
+                            display: inline-block;
+                            padding: 6px 12px;
+                            border-radius: 20px;
+                            font-size: 11px;
+                            font-weight: 600;
+                            text-transform: uppercase;
+                            background: <?php echo $estadoColor; ?>;
+                            color: #FFFFFF;
+                        "><?php echo htmlspecialchars($estadoText); ?></span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 </div>
 
@@ -223,38 +287,6 @@ if (!isset($_SESSION['user_id'])) {
         </div>
     </div>
 
-    <!-- Estadísticas Rápidas -->
-    <div class="stats-grid">
-        <div class="stat-card pendiente">
-            <div class="stat-icon">
-                <i class="fas fa-clock"></i>
-            </div>
-            <div class="stat-info">
-                <span class="stat-label" data-i18n="dashboardUser.requests.stats.pending">Pendientes</span>
-                <span class="stat-value" id="solicitudes-pendientes-count">0</span>
-            </div>
-        </div>
-
-        <div class="stat-card warning">
-            <div class="stat-icon">
-                <i class="fas fa-eye"></i>
-            </div>
-            <div class="stat-info">
-                <span class="stat-label" data-i18n="dashboardUser.requests.stats.inReview">En Revisión</span>
-                <span class="stat-value" id="solicitudes-revision-count">0</span>
-            </div>
-        </div>
-
-        <div class="stat-card success">
-            <div class="stat-icon">
-                <i class="fas fa-check-circle"></i>
-            </div>
-            <div class="stat-info">
-                <span class="stat-label" data-i18n="dashboardUser.requests.stats.resolved">Resueltas</span>
-                <span class="stat-value" id="solicitudes-resueltas-count">0</span>
-            </div>
-        </div>
-    </div>
 
     <!-- Filtros -->
     <div class="filters-container">
@@ -304,13 +336,14 @@ if (!isset($_SESSION['user_id'])) {
 		</section>
 
 	<!-- APORTES / CUOTAS -->
-<div id="cuotas-section" class="section-content">
-    <div class="section-header">
-        <h2 data-i18n="dashboardUser.billing.title">💳 Mis Cuotas Mensuales</h2>
+<section id="cuotas-section" class="section-content">
+    <h2 class="section-title" data-i18n="dashboardUser.billing.title">💳 Mis Cuotas Mensuales</h2>
+    
+    <div class="info-card">
+        <h3 data-i18n="dashboardUser.billing.welcome">Gestión de Cuotas</h3>
         <p data-i18n="dashboardUser.billing.description">Gestiona tus pagos de vivienda y deuda de horas</p>
     </div>
 
-   
     <!-- Estadísticas Rápidas -->
     <div class="stats-grid">
         <div class="stat-card pendiente">
@@ -393,7 +426,7 @@ if (!isset($_SESSION['user_id'])) {
     <div id="misCuotasContainer" class="cuotas-container">
         <p class="loading" data-i18n="dashboardUser.billing.loading">Cargando cuotas...</p>
     </div>
-</div>
+</section>
 
 <!-- MODAL: PAGAR CUOTA -->
 <div id="pagarCuotaModal" class="modal-overlay" style="display: none;">
@@ -467,7 +500,6 @@ if (!isset($_SESSION['user_id'])) {
         </form>
     </div>
 </div>
-
 
 
 		<!-- HORAS -->

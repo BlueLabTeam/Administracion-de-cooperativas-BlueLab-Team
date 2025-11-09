@@ -1,3 +1,26 @@
+// 🧪 MODO TEST: Simular último día del mes
+(function() {
+    const TEST_MODE = true; // Cambiar a false para volver a normal
+    
+    if (TEST_MODE) {
+        // Sobrescribir Date para simular último día del mes
+        const fechaOriginal = Date;
+        const ultimoDiaMes = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0);
+        
+        window.Date = function(...args) {
+            if (args.length === 0) {
+                return ultimoDiaMes;
+            }
+            return new fechaOriginal(...args);
+        };
+        
+        // Copiar métodos estáticos
+        Object.setPrototypeOf(window.Date, fechaOriginal);
+        window.Date.prototype = fechaOriginal.prototype;
+        
+        console.log('🧪 TEST MODE: Fecha simulada =', ultimoDiaMes.toLocaleDateString());
+    }
+})();
 
 // Sistema SPA - Navegación entre secciones
 document.addEventListener('DOMContentLoaded', function () {
@@ -1397,58 +1420,57 @@ function loadUsersForTable() {
         });
 }
 
-// ========== RENDERIZAR TABLA ==========
+// ========== RENDERIZAR TABLA DE USUARIOS ==========
 function renderUsersTable(users) {
-
-
     const container = document.getElementById('usersTableContainer');
- 
 
     if (!users || users.length === 0) {
         console.warn('⚠️ [RENDER] No hay usuarios para mostrar');
-        container.innerHTML = '<p class="no-users">No hay usuarios disponibles</p>';
+        container.innerHTML = `
+            <div style="text-align: center; padding: 60px 20px;">
+                <i class="fas fa-user-friends" style="font-size: 48px; color: #E8EBF0; display: block; margin-bottom: 15px;"></i>
+                <p style="color: #6C757D;">No hay usuarios disponibles</p>
+            </div>
+        `;
         return;
     }
 
-
-
     try {
-        const tableHTML = `
-            <div class="users-table-wrapper">
-                <table class="users-table">
+        let html = `
+            <div style="overflow-x: auto; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 92, 185, 0.12);">
+                <table style="width: 100%; border-collapse: collapse; background: #FFFFFF; min-width: 1400px;">
                     <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Nombre</th>
-                            <th>Cédula</th>
-                            <th>Email</th>
-                            <th>Estado</th>
-                            <th>Rol</th>
-                            <th>Núcleo</th>
-                            <th>Pago</th>
-                            <th>Acciones</th>
+                        <tr style="background: linear-gradient(135deg, #005CB9 0%, #004494 100%); color: #FFFFFF;">
+                            <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">ID</th>
+                            <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;">Nombre</th>
+                            <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;">Cédula</th>
+                            <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;">Email</th>
+                            <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Estado</th>
+                            <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Rol</th>
+                            <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;">Núcleo</th>
+                            <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Pago</th>
+                            <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
-                        ${users.map((user, index) => {
-          
-            return renderUserRow(user);
-        }).join('')}
-                    </tbody>
-                </table>
-            </div>
         `;
 
-   
+        users.forEach(user => {
+            html += renderUserRow(user);
+        });
 
-        container.innerHTML = tableHTML;
-
-     
+        html += '</tbody></table></div>';
+        container.innerHTML = html;
 
     } catch (error) {
         console.error('💥 [RENDER ERROR]', error);
         console.error('💥 [RENDER ERROR] Stack:', error.stack);
-        container.innerHTML = `<p class="error">Error al renderizar tabla: ${error.message}</p>`;
+        container.innerHTML = `
+            <div style="text-align: center; padding: 40px; color: #F44336;">
+                <i class="fas fa-exclamation-triangle" style="font-size: 48px; margin-bottom: 15px;"></i>
+                <p>Error al renderizar tabla: ${error.message}</p>
+            </div>
+        `;
     }
 }
 
@@ -1456,49 +1478,122 @@ function renderUsersTable(users) {
 function renderUserRow(user) {
     const hasPayment = user.comprobante_archivo && user.estado === 'enviado';
 
+    // Colores según estado
+    let estadoColor = '';
+    let estadoText = '';
+    if (user.estado === 'enviado') {
+        estadoColor = '#FF9800';
+        estadoText = 'Pendiente';
+    } else if (user.estado === 'aprobado') {
+        estadoColor = '#4CAF50';
+        estadoText = 'Aprobado';
+    } else if (user.estado === 'rechazado') {
+        estadoColor = '#F44336';
+        estadoText = 'Rechazado';
+    } else if (user.estado === 'activo') {
+        estadoColor = '#4CAF50';
+        estadoText = 'Activo';
+    } else if (user.estado === 'inactivo') {
+        estadoColor = '#9E9E9E';
+        estadoText = 'Inactivo';
+    } else {
+        estadoColor = '#6C757D';
+        estadoText = formatEstadoUsuario(user.estado);
+    }
+
+    // Color del rol
+    const esAdmin = user.nombre_rol === 'Administrador' || user.nombre_rol === 'Admin';
+    const rolColor = esAdmin ? '#005CB9' : '#6C757D';
+
     return `
-        <tr class="user-row estado-${user.estado}" data-estado="${user.estado}">
-            <td>${user.id_usuario}</td>
-            <td>${user.nombre_completo}</td>
-            <td>${user.cedula}</td>
-            <td>${user.email}</td>
-            <td>
-                <span class="estado-badge estado-${user.estado}">
-                    ${formatEstadoUsuario(user.estado)}
-                </span>
+        <tr style="border-bottom: 1px solid #E8EBF0; transition: all 0.2s ease;" 
+            onmouseover="this.style.background='#F5F7FA'" 
+            onmouseout="this.style.background='#FFFFFF'"
+            data-estado="${user.estado}">
+            
+            <td style="padding: 14px 12px; text-align: center;">
+                <div style="font-weight: 600; color: #005CB9; font-size: 14px;">#${user.id_usuario}</div>
             </td>
-            <td>${user.nombre_rol || 'Sin rol'}</td>
-            <td>${user.nombre_nucleo || 'Sin núcleo'}</td>
-            <td>
+            
+            <td style="padding: 14px 12px; font-size: 13px;">
+                <div style="font-weight: 600; color: #495057;">${user.nombre_completo}</div>
+            </td>
+            
+            <td style="padding: 14px 12px; font-size: 13px; color: #495057;">
+                ${user.cedula}
+            </td>
+            
+            <td style="padding: 14px 12px; font-size: 13px;">
+                <div style="color: #6C757D;">${user.email}</div>
+            </td>
+            
+            <td style="padding: 14px 12px; text-align: center;">
+                <span style="
+                    display: inline-block;
+                    padding: 6px 12px;
+                    border-radius: 20px;
+                    font-size: 11px;
+                    font-weight: 600;
+                    text-transform: uppercase;
+                    background: ${estadoColor};
+                    color: #FFFFFF;
+                ">${estadoText}</span>
+            </td>
+            
+            <td style="padding: 14px 12px; text-align: center;">
+                <span style="
+                    font-weight: 600;
+                    color: ${rolColor};
+                    font-size: 13px;
+                ">${user.nombre_rol || 'Sin rol'}</span>
+            </td>
+            
+            <td style="padding: 14px 12px; font-size: 13px; color: #495057;">
+                ${user.nombre_nucleo || '<span style="color: #6C757D; font-style: italic;">Sin núcleo</span>'}
+            </td>
+            
+            <td style="padding: 14px 12px; text-align: center; font-size: 12px;">
                 ${hasPayment ? `
-                    <div style="font-size: 12px;">
-                        <div>${formatFecha(user.fecha_pago)}</div>
+                    <div>
+                        <div style="color: #495057; margin-bottom: 4px;">${formatFecha(user.fecha_pago)}</div>
                         <a href="/files/?path=${user.comprobante_archivo}" 
                            target="_blank" 
-                           style="color: #0066cc;">
-                            📄 Ver comprobante
+                           style="
+                               color: #005CB9;
+                               text-decoration: none;
+                               font-weight: 600;
+                           "
+                           onmouseover="this.style.textDecoration='underline'"
+                           onmouseout="this.style.textDecoration='none'">
+                            <i class="fas fa-file-alt"></i> Ver comprobante
                         </a>
                     </div>
                 ` : `
-                    <span style="color: #999; font-size: 12px;">Sin pago pendiente</span>
+                    <span style="color: #6C757D; font-style: italic;">Sin pago pendiente</span>
                 `}
             </td>
-            <td>
-                <div style="display: flex; gap: 5px; flex-wrap: wrap;">
-                    <button class="btn-small btn-view" 
-                            onclick="viewUserDetails(${user.id_usuario})">
-                        Ver
+            
+            <td style="padding: 14px 12px;">
+                <div style="display: flex; gap: 5px; justify-content: center; flex-wrap: wrap;">
+                    
+                    <button class="btn-small btn-secondary" 
+                            onclick="viewUserDetails(${user.id_usuario})"
+                            title="Ver detalles">
+                        <i class="fas fa-eye"></i>
                     </button>
+                    
                     ${hasPayment ? `
-                        <button class="btn-small btn-approve-small" 
+                        <button class="btn-small btn-success" 
                                 onclick="approvePaymentFromTable(${user.id_usuario})"
-                                id="approve-btn-${user.id_usuario}">
-                            ✓
+                                id="approve-btn-${user.id_usuario}"
+                                title="Aprobar pago">
+                            <i class="fas fa-check"></i>
                         </button>
-                        <button class="btn-small btn-reject-small" 
+                        <button class="btn-small btn-danger" 
                                 onclick="rejectPaymentFromTable(${user.id_usuario})"
-                                id="reject-btn-${user.id_usuario}">
-                            ✗
+                                id="reject-btn-${user.id_usuario}"
+                                title="Rechazar pago">
+                            <i class="fas fa-times"></i>
                         </button>
                     ` : ''}
                 </div>
@@ -1507,6 +1602,8 @@ function renderUserRow(user) {
     `;
 }
 
+console.log('✅ [USERS TABLE] Tabla con estilos de cuotas aplicados');
+console.log('🎨 [USERS TABLE] Diseño moderno y consistente');
 // ========== FUNCIONES AUXILIARES ==========
 function formatEstadoUsuario(estado) {
     const estados = {
@@ -1869,9 +1966,9 @@ function renderNucleosTable(nucleos) {
 
     if (!nucleos || nucleos.length === 0) {
         container.innerHTML = `
-            <div style="text-align: center; padding: 40px;">
-                <i class="fas fa-users" style="font-size: 48px; color: #ddd; display: block; margin-bottom: 15px;"></i>
-                <p style="color: #999; margin-bottom: 20px;">No hay núcleos familiares registrados</p>
+            <div style="text-align: center; padding: 60px 20px;">
+                <i class="fas fa-users" style="font-size: 48px; color: #E8EBF0; display: block; margin-bottom: 15px;"></i>
+                <p style="color: #6C757D; margin-bottom: 20px;">No hay núcleos familiares registrados</p>
                 <button class="btn btn-primary" onclick="showCreateNucleoModal()">
                     <i class="fas fa-plus"></i> Crear Nuevo Núcleo
                 </button>
@@ -1880,17 +1977,17 @@ function renderNucleosTable(nucleos) {
         return;
     }
 
-    let tableHTML = `
-        <div class="viviendas-table-container">
-            <table class="viviendas-table">
+    let html = `
+        <div style="overflow-x: auto; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 92, 185, 0.12);">
+            <table style="width: 100%; border-collapse: collapse; background: #FFFFFF; min-width: 1000px;">
                 <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Nombre del Núcleo</th>
-                        <th>Dirección</th>
-                        <th>Miembros</th>
-                        <th>Integrantes</th>
-                        <th>Acciones</th>
+                    <tr style="background: linear-gradient(135deg, #005CB9 0%, #004494 100%); color: #FFFFFF;">
+                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">ID</th>
+                        <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;">Nombre del Núcleo</th>
+                        <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;">Dirección</th>
+                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Miembros</th>
+                        <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;">Integrantes</th>
+                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -1902,28 +1999,59 @@ function renderNucleosTable(nucleos) {
               (nucleo.total_miembros > 3 ? ` y ${nucleo.total_miembros - 3} más...` : '')
             : 'Sin miembros';
 
-        tableHTML += `
-            <tr>
-                <td><strong>${nucleo.id_nucleo}</strong></td>
-                <td>${nucleo.nombre_nucleo || 'Sin nombre'}</td>
-                <td>${nucleo.direccion || '-'}</td>
-                <td class="text-center">
-                    <span class="badge-count">${nucleo.total_miembros || 0}</span>
+        const totalMiembros = nucleo.total_miembros || 0;
+
+        html += `
+            <tr style="border-bottom: 1px solid #E8EBF0; transition: all 0.2s ease;" 
+                onmouseover="this.style.background='#F5F7FA'" 
+                onmouseout="this.style.background='#FFFFFF'">
+                
+                <td style="padding: 14px 12px; text-align: center;">
+                    <div style="font-weight: 600; color: #005CB9; font-size: 14px;">#${nucleo.id_nucleo}</div>
                 </td>
-                <td>${integrantes}</td>
-                <td>
-                    <div class="vivienda-actions">
-                        <button class="btn-view-vivienda" 
+                
+                <td style="padding: 14px 12px; font-size: 13px;">
+                    <div style="font-weight: 600; color: #495057;">${nucleo.nombre_nucleo || 'Sin nombre'}</div>
+                </td>
+                
+                <td style="padding: 14px 12px; font-size: 13px; color: #495057;">
+                    ${nucleo.direccion || '-'}
+                </td>
+                
+                <td style="padding: 14px 12px; text-align: center;">
+                    <span style="
+                        display: inline-block;
+                        padding: 6px 12px;
+                        border-radius: 20px;
+                        font-size: 11px;
+                        font-weight: 600;
+                        background: ${totalMiembros > 0 ? '#4CAF50' : '#E8EBF0'};
+                        color: ${totalMiembros > 0 ? '#FFFFFF' : '#6C757D'};
+                    ">${totalMiembros} ${totalMiembros === 1 ? 'miembro' : 'miembros'}</span>
+                </td>
+                
+                <td style="padding: 14px 12px; font-size: 13px;">
+                    ${integrantes !== 'Sin miembros' 
+                        ? `<div style="color: #495057;">${integrantes}</div>` 
+                        : '<span style="color: #6C757D; font-style: italic;">Sin miembros</span>'}
+                </td>
+                
+                <td style="padding: 14px 12px;">
+                    <div style="display: flex; gap: 5px; justify-content: center; flex-wrap: wrap;">
+                        
+                        <button class="btn-small btn-secondary" 
                                 onclick="viewNucleoDetails(${nucleo.id_nucleo})" 
                                 title="Ver detalles">
                             <i class="fas fa-eye"></i>
                         </button>
-                        <button class="btn-edit-vivienda" 
+                        
+                        <button class="btn-small btn-primary" 
                                 onclick="editNucleo(${nucleo.id_nucleo})" 
                                 title="Editar">
                             <i class="fas fa-edit"></i>
                         </button>
-                        <button class="btn-delete-vivienda" 
+                        
+                        <button class="btn-small btn-danger" 
                                 onclick="deleteNucleo(${nucleo.id_nucleo})" 
                                 title="Eliminar">
                             <i class="fas fa-trash"></i>
@@ -1934,14 +2062,12 @@ function renderNucleosTable(nucleos) {
         `;
     });
 
-    tableHTML += `
-                </tbody>
-            </table>
-        </div>
-    `;
-
-    container.innerHTML = tableHTML;
+    html += '</tbody></table></div>';
+    container.innerHTML = html;
 }
+
+console.log('✅ [NÚCLEOS TABLE] Tabla con estilos de cuotas aplicados');
+console.log('🎨 [NÚCLEOS TABLE] Diseño moderno y consistente');
 
 // ========== RENDERIZAR FILA DE NÚCLEO ==========
 function renderNucleoRow(nucleo) {
@@ -2002,40 +2128,55 @@ function loadUsersForNucleo(nucleoId = null) {
 function showCreateNucleoForm() {
     loadUsersForNucleo().then(usuarios => {
         const modalHTML = `
-            <div class="modal-overlay" onclick="if(event.target.classList.contains('modal-overlay')) this.remove()">
-                <div class="modal-content-large">
-                    <button class="modal-close-btn" onclick="this.closest('.modal-overlay').remove()">×</button>
-                    
-                    <h2 class="modal-title">Crear Nuevo Núcleo Familiar</h2>
+            <div id="createNucleoModal" class="material-modal" style="display: flex;">
+                <div class="material-modal-content">
+                    <div class="material-modal-header">
+                        <h3>Crear Nuevo Núcleo Familiar</h3>
+                        <button class="close-material-modal" onclick="closeCreateNucleoModal()">&times;</button>
+                    </div>
                     
                     <form id="createNucleoForm" onsubmit="submitCreateNucleo(event)">
-                        <div class="form-group">
+                        <div class="material-form-group">
                             <label for="nombre_nucleo">Nombre del Núcleo *</label>
                             <input type="text" id="nombre_nucleo" name="nombre_nucleo" 
+                                   class="material-input"
                                    placeholder="Ej: Familia García" required>
                         </div>
 
-                        <div class="form-group">
+                        <div class="material-form-group">
                             <label for="direccion_nucleo">Dirección</label>
                             <input type="text" id="direccion_nucleo" name="direccion" 
+                                   class="material-input"
                                    placeholder="Ej: Av. Italia 2345">
                         </div>
 
-                        <div class="form-group">
+                        <div class="material-form-group">
                             <label>Seleccionar Miembros del Núcleo *</label>
-                            <div class="user-selection-nucleo">
+                            <div class="user-selection-nucleo" style="display: flex; flex-direction: column; gap: 10px;">
                                 <input type="text" id="search-users-nucleo" 
+                                       class="material-input"
                                        placeholder="Buscar usuario..." 
                                        onkeyup="filterUsersNucleo()">
-                                <div id="usersListNucleo" class="users-checkboxes-nucleo">
+                                <div id="usersListNucleo" class="users-checkboxes-nucleo"
+                                     style="
+                                         display: flex;
+                                         flex-direction: column;
+                                         gap: 6px;
+                                         max-height: 180px;
+                                         overflow-y: auto;
+                                         border: 1px solid #ddd;
+                                         border-radius: 8px;
+                                         padding: 10px;
+                                         background: #fafafa;
+                                     ">
                                     ${renderUsersCheckboxes(usuarios)}
                                 </div>
                             </div>
                         </div>
 
-                        <div class="form-actions">
+                        <div class="material-form-actions">
                             <button type="button" class="btn btn-secondary" 
-                                    onclick="this.closest('.modal-overlay').remove()">
+                                    onclick="closeCreateNucleoModal()">
                                 Cancelar
                             </button>
                             <button type="submit" class="btn btn-primary">
@@ -2047,12 +2188,31 @@ function showCreateNucleoForm() {
             </div>
         `;
 
+        // Eliminar modal previo si existe
+        const existing = document.getElementById('createNucleoModal');
+        if (existing) existing.remove();
+
         document.body.insertAdjacentHTML('beforeend', modalHTML);
+        
+        // Prevenir scroll del body
+        document.body.style.overflow = 'hidden';
     }).catch(error => {
         console.error('Error:', error);
         alert('Error al cargar usuarios');
     });
 }
+
+function closeCreateNucleoModal() {
+    const modal = document.getElementById('createNucleoModal');
+    if (modal) {
+        modal.remove();
+    }
+    
+    // Restaurar scroll del body
+    document.body.style.overflow = '';
+}
+
+console.log('✅ Modal crear núcleo corregido con material-modal');
 
 // Renderizar checkboxes de usuarios
 function renderUsersCheckboxes(usuarios) {
@@ -2442,15 +2602,15 @@ function loadMateriales() {
         });
 }
 
-// ========== RENDERIZAR TABLA MATERIAL ==========
+// ========== RENDERIZAR TABLA DE MATERIALES ==========
 function renderMaterialesTable(materiales) {
     const container = document.getElementById('materialesTableContainer');
 
     if (!materiales || materiales.length === 0) {
         container.innerHTML = `
-            <div style="text-align: center; padding: 40px;">
-                <i class="fas fa-box-open" style="font-size: 48px; color: #ddd; display: block; margin-bottom: 15px;"></i>
-                <p style="color: #999; margin-bottom: 20px;">No hay materiales registrados</p>
+            <div style="text-align: center; padding: 60px 20px;">
+                <i class="fas fa-box-open" style="font-size: 48px; color: #E8EBF0; display: block; margin-bottom: 15px;"></i>
+                <p style="color: #6C757D; margin-bottom: 20px;">No hay materiales registrados</p>
                 <button class="btn btn-primary" onclick="showCreateMaterialModal()">
                     <i class="fas fa-plus"></i> Crear Primer Material
                 </button>
@@ -2459,16 +2619,16 @@ function renderMaterialesTable(materiales) {
         return;
     }
 
-    let tableHTML = `
-        <div class="viviendas-table-container">
-            <table class="viviendas-table">
+    let html = `
+        <div style="overflow-x: auto; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 92, 185, 0.12);">
+            <table style="width: 100%; border-collapse: collapse; background: #FFFFFF; min-width: 900px;">
                 <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Material</th>
-                        <th>Características</th>
-                        <th>Stock</th>
-                        <th>Acciones</th>
+                    <tr style="background: linear-gradient(135deg, #005CB9 0%, #004494 100%); color: #FFFFFF;">
+                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">ID</th>
+                        <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;">Material</th>
+                        <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;">Características</th>
+                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Stock</th>
+                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -2476,35 +2636,81 @@ function renderMaterialesTable(materiales) {
 
     materiales.forEach(material => {
         const stock = parseInt(material.stock) || 0;
-        let stockClass = 'disponible';
-
+        
+        // Determinar color y estado del stock
+        let stockColor = '';
+        let stockText = '';
+        let stockIcon = '';
+        
         if (stock === 0) {
-            stockClass = 'agotado';
+            stockColor = '#F44336';
+            stockText = 'Agotado';
+            stockIcon = 'fa-times-circle';
         } else if (stock < 10) {
-            stockClass = 'bajo';
+            stockColor = '#FF9800';
+            stockText = 'Stock Bajo';
+            stockIcon = 'fa-exclamation-triangle';
+        } else {
+            stockColor = '#4CAF50';
+            stockText = 'Disponible';
+            stockIcon = 'fa-check-circle';
         }
 
-        tableHTML += `
-            <tr>
-                <td>${material.id_material}</td>
-                <td><strong>${material.nombre}</strong></td>
-                <td>${material.caracteristicas || '-'}</td>
-                <td>
-                    <span class="stock-badge ${stockClass}">${stock}</span>
+        html += `
+            <tr style="border-bottom: 1px solid #E8EBF0; transition: all 0.2s ease;" 
+                onmouseover="this.style.background='#F5F7FA'" 
+                onmouseout="this.style.background='#FFFFFF'">
+                
+                <td style="padding: 14px 12px; text-align: center;">
+                    <div style="font-weight: 600; color: #005CB9; font-size: 14px;">#${material.id_material}</div>
                 </td>
-                <td>
-                    <div class="vivienda-actions">
-                        <button class="btn-view-vivienda" 
+                
+                <td style="padding: 14px 12px; font-size: 13px;">
+                    <div style="font-weight: 600; color: #495057; font-size: 14px;">${material.nombre}</div>
+                </td>
+                
+                <td style="padding: 14px 12px; font-size: 13px; color: #495057;">
+                    ${material.caracteristicas || '<span style="color: #6C757D; font-style: italic;">Sin características</span>'}
+                </td>
+                
+                <td style="padding: 14px 12px; text-align: center;">
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                        <span style="
+                            display: inline-block;
+                            padding: 6px 12px;
+                            border-radius: 20px;
+                            font-size: 11px;
+                            font-weight: 600;
+                            text-transform: uppercase;
+                            background: ${stockColor};
+                            color: #FFFFFF;
+                        ">
+                            <i class="fas ${stockIcon}"></i> ${stockText}
+                        </span>
+                        <span style="
+                            font-weight: 700;
+                            font-size: 18px;
+                            color: ${stockColor};
+                        ">${stock}</span>
+                    </div>
+                </td>
+                
+                <td style="padding: 14px 12px;">
+                    <div style="display: flex; gap: 5px; justify-content: center; flex-wrap: wrap;">
+                        
+                        <button class="btn-small btn-primary" 
                                 onclick="showStockModal(${material.id_material}, '${material.nombre.replace(/'/g, "\\'")}', ${stock})" 
                                 title="Actualizar Stock">
                             <i class="fas fa-boxes"></i>
                         </button>
-                        <button class="btn-edit-vivienda" 
+                        
+                        <button class="btn-small btn-secondary" 
                                 onclick="editMaterial(${material.id_material})" 
                                 title="Editar">
                             <i class="fas fa-edit"></i>
                         </button>
-                        <button class="btn-delete-vivienda" 
+                        
+                        <button class="btn-small btn-danger" 
                                 onclick="deleteMaterial(${material.id_material}, '${material.nombre.replace(/'/g, "\\'")}')" 
                                 title="Eliminar">
                             <i class="fas fa-trash"></i>
@@ -2515,15 +2721,12 @@ function renderMaterialesTable(materiales) {
         `;
     });
 
-    tableHTML += `
-                </tbody>
-            </table>
-        </div>
-    `;
-
-    container.innerHTML = tableHTML;
+    html += '</tbody></table></div>';
+    container.innerHTML = html;
 }
 
+console.log('✅ [MATERIALES TABLE] Tabla con estilos de cuotas aplicados');
+console.log('🎨 [MATERIALES TABLE] Diseño moderno y consistente');
 
 // ========== BUSCAR MATERIALES ==========
 let searchMaterialesTimeout;
@@ -3040,15 +3243,15 @@ function loadViviendas() {
         });
 }
 
-// ========== RENDERIZAR TABLA ==========
+// ========== RENDERIZAR TABLA DE VIVIENDAS ==========
 function renderViviendasTable(viviendas) {
     const container = document.getElementById('viviendasTableContainer');
 
     if (!viviendas || viviendas.length === 0) {
         container.innerHTML = `
-            <div style="text-align: center; padding: 40px;">
-                <i class="fas fa-home" style="font-size: 48px; color: #ddd; display: block; margin-bottom: 15px;"></i>
-                <p style="color: #999; margin-bottom: 20px;">No hay viviendas registradas</p>
+            <div style="text-align: center; padding: 60px 20px;">
+                <i class="fas fa-home" style="font-size: 48px; color: #E8EBF0; display: block; margin-bottom: 15px;"></i>
+                <p style="color: #6C757D; margin-bottom: 20px;">No hay viviendas registradas</p>
                 <button class="btn btn-primary" onclick="showCreateViviendaModal()">
                     <i class="fas fa-plus"></i> Crear Primera Vivienda
                 </button>
@@ -3057,60 +3260,109 @@ function renderViviendasTable(viviendas) {
         return;
     }
 
-    let tableHTML = `
-        <div class="viviendas-table-container">
-            <table class="viviendas-table">
+    let html = `
+        <div style="overflow-x: auto; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 92, 185, 0.12);">
+            <table style="width: 100%; border-collapse: collapse; background: #FFFFFF; min-width: 1200px;">
                 <thead>
-                    <tr>
-                        <th>Número</th>
-                        <th>Dirección</th>
-                        <th>Tipo</th>
-                        <th>Estado</th>
-                        <th>Metros²</th>
-                        <th>Asignada a</th>
-                        <th>Acciones</th>
+                    <tr style="background: linear-gradient(135deg, #005CB9 0%, #004494 100%); color: #FFFFFF;">
+                        <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;">Número</th>
+                        <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;">Dirección</th>
+                        <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;">Tipo</th>
+                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Estado</th>
+                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Metros²</th>
+                        <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;">Asignada a</th>
+                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
     `;
 
     viviendas.forEach(vivienda => {
-        const estadoClass = vivienda.estado === 'disponible' ? 'disponible' :
-            vivienda.estado === 'ocupada' ? 'ocupada' : 'mantenimiento';
-
         const asignada = vivienda.usuario_asignado || vivienda.nucleo_asignado || '-';
         const tieneAsignacion = vivienda.id_asignacion && vivienda.activa == 1;
+        
+        // Colores según estado
+        let estadoColor = '';
+        let estadoText = '';
+        if (vivienda.estado === 'disponible') {
+            estadoColor = '#4CAF50';
+            estadoText = 'Disponible';
+        } else if (vivienda.estado === 'ocupada') {
+            estadoColor = '#005CB9';
+            estadoText = 'Ocupada';
+        } else if (vivienda.estado === 'mantenimiento') {
+            estadoColor = '#FF9800';
+            estadoText = 'Mantenimiento';
+        }
 
-        tableHTML += `
-            <tr data-estado="${vivienda.estado}" data-habitaciones="${vivienda.habitaciones}">
-                <td><strong>${vivienda.numero_vivienda}</strong></td>
-                <td>${vivienda.direccion || '-'}</td>
-                <td>${vivienda.tipo_nombre} (${vivienda.habitaciones} hab.)</td>
-                <td>
-                    <span class="estado-badge-vivienda ${estadoClass}">
-                        ${formatEstadoVivienda(vivienda.estado)}
-                    </span>
+        html += `
+            <tr style="border-bottom: 1px solid #E8EBF0; transition: all 0.2s ease;" 
+                onmouseover="this.style.background='#F5F7FA'" 
+                onmouseout="this.style.background='#FFFFFF'">
+                
+                <td style="padding: 14px 12px; font-size: 13px;">
+                    <div style="font-weight: 600; color: #005CB9; font-size: 14px;">${vivienda.numero_vivienda}</div>
                 </td>
-                <td>${vivienda.metros_cuadrados ? vivienda.metros_cuadrados + ' m²' : '-'}</td>
-                <td>${asignada}</td>
-                <td>
-                    <div class="vivienda-actions">
-                        <button class="btn-view-vivienda" onclick="viewViviendaDetails(${vivienda.id_vivienda})" title="Ver detalles">
+                
+                <td style="padding: 14px 12px; font-size: 13px; color: #495057;">
+                    ${vivienda.direccion || '-'}
+                </td>
+                
+                <td style="padding: 14px 12px; font-size: 13px; color: #495057;">
+                    <div style="font-weight: 600;">${vivienda.tipo_nombre}</div>
+                    <div style="font-size: 11px; color: #6C757D; margin-top: 3px;">${vivienda.habitaciones} habitaciones</div>
+                </td>
+                
+                <td style="padding: 14px 12px; text-align: center;">
+                    <span style="
+                        display: inline-block;
+                        padding: 6px 12px;
+                        border-radius: 20px;
+                        font-size: 11px;
+                        font-weight: 600;
+                        text-transform: uppercase;
+                        background: ${estadoColor};
+                        color: #FFFFFF;
+                    ">${estadoText}</span>
+                </td>
+                
+                <td style="padding: 14px 12px; text-align: center; font-size: 13px; color: #495057; font-weight: 600;">
+                    ${vivienda.metros_cuadrados ? vivienda.metros_cuadrados + ' m²' : '-'}
+                </td>
+                
+                <td style="padding: 14px 12px; font-size: 13px; color: #495057;">
+                    ${asignada !== '-' ? `<div style="font-weight: 600; color: #005CB9;">${asignada}</div>` : '<span style="color: #6C757D;">Sin asignar</span>'}
+                </td>
+                
+                <td style="padding: 14px 12px;">
+                    <div style="display: flex; gap: 5px; justify-content: center; flex-wrap: wrap;">
+                        
+                        <button class="btn-small btn-secondary" 
+                                onclick="viewViviendaDetails(${vivienda.id_vivienda})" 
+                                title="Ver detalles">
                             <i class="fas fa-eye"></i>
                         </button>
-                        <button class="btn-edit-vivienda" onclick="editVivienda(${vivienda.id_vivienda})" title="Editar">
+                        
+                        <button class="btn-small btn-primary" 
+                                onclick="editVivienda(${vivienda.id_vivienda})" 
+                                title="Editar">
                             <i class="fas fa-edit"></i>
                         </button>
+                        
                         ${!tieneAsignacion ? `
-                            <button class="btn-assign-vivienda" onclick="showAsignarModal(${vivienda.id_vivienda}, '${vivienda.numero_vivienda.replace(/'/g, "\\'")}')">
-                                <i class="fas fa-user-plus"></i>
+                            <button class="btn-small btn-success" 
+                                    onclick="showAsignarModal(${vivienda.id_vivienda}, '${vivienda.numero_vivienda.replace(/'/g, "\\'")}')">
+                                <i class="fas fa-user-plus"></i> Asignar
                             </button>
                         ` : `
-                            <button class="btn-unassign-vivienda" onclick="desasignarVivienda(${vivienda.id_asignacion})">
-                                <i class="fas fa-user-minus"></i>
+                            <button class="btn-small btn-warning" 
+                                    onclick="desasignarVivienda(${vivienda.id_asignacion})">
+                                <i class="fas fa-user-minus"></i> Desasignar
                             </button>
                         `}
-                        <button class="btn-delete-vivienda" onclick="deleteVivienda(${vivienda.id_vivienda}, '${vivienda.numero_vivienda.replace(/'/g, "\\'")}')">
+                        
+                        <button class="btn-small btn-danger" 
+                                onclick="deleteVivienda(${vivienda.id_vivienda}, '${vivienda.numero_vivienda.replace(/'/g, "\\'")}')">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
@@ -3119,14 +3371,12 @@ function renderViviendasTable(viviendas) {
         `;
     });
 
-    tableHTML += `
-                </tbody>
-            </table>
-        </div>
-    `;
-
-    container.innerHTML = tableHTML;
+    html += '</tbody></table></div>';
+    container.innerHTML = html;
 }
+
+console.log('✅ [VIVIENDAS TABLE] Tabla con estilos de cuotas aplicados');
+console.log('🎨 [VIVIENDAS TABLE] Diseño moderno y consistente');
 
 // ========== FORMATEAR ESTADO ==========
 function formatEstadoVivienda(estado) {
@@ -3990,14 +4240,9 @@ async function forzarPagoCuota(idCuota) {
     }
 }
 
-// Funciones de acción existentes (placeholders para evitar ReferenceError)
-function abrirValidarPagoModal(idPago, idCuota) { console.log(`[ADMIN] Abriendo modal para validar pago ID ${idPago} de cuota ${idCuota}`); }
-function verComprobanteAdmin(archivo) { console.log(`[ADMIN] Abriendo comprobante: ${archivo}`); }
-function abrirModalJustificarHoras(idCuota, idUsuario, nombre, mes, anio, horasFaltantes) { console.log(`[ADMIN] Abriendo modal para justificar ${horasFaltantes} horas para ${nombre}`); }
-window.abrirValidarPagoModal = function(idPago, idCuota) { console.log(`[ADMIN] Abriendo modal para validar pago ID ${idPago} de cuota ${idCuota}`); };
-window.verComprobanteAdmin = function(archivo) { console.log(`[ADMIN] Abriendo comprobante: ${archivo}`); };
-window.abrirModalJustificarHoras = function(idCuota, idUsuario, nombre, mes, anio, horasFaltantes) { console.log(`[ADMIN] Abriendo modal para justificar ${horasFaltantes} horas para ${nombre}`); };
-window.forzarPagoCuota = forzarPagoCuota; // Exportar para que el onclick lo encuentre
+window.abrirValidarPagoModal = abrirValidarPagoModal;
+window.verComprobanteAdmin = verComprobanteAdmin;
+window.abrirModalJustificarHoras = abrirModalJustificarHoras;
 
 
 // ========== VER COMPROBANTE ==========
@@ -4308,7 +4553,7 @@ async function verDetalleSolicitudAdmin(solicitudId) {
                     ` : '<p style="text-align: center; color: #999;">Sin respuestas aún</p>'}
 
                     <div class="modal-detail-section">
-                        <h3>⚙️ Acciones Rápidas</h3>
+                        <h3> Acciones Rápidas</h3>
                         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                             ${solicitud.estado !== 'en_revision' ? `
                                 <button onclick="cambiarEstadoSolicitud(${solicitudId}, 'en_revision'); this.closest('.modal-detail').remove();" class="btn btn-warning">
@@ -5914,7 +6159,7 @@ async function verDetalleSolicitudAdmin(solicitudId) {
                     ` : `<p style="text-align: center; color: ${COLORS.gray500}; padding: 20px; background: ${COLORS.gray50}; border-radius: 8px;">Sin respuestas aún</p>`}
 
                     <div style="background: ${COLORS.gray50}; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-                        <h3 style="color: ${COLORS.primary}; margin-bottom: 15px; font-size: 16px;">⚙️ Acciones Rápidas</h3>
+                        <h3 style="color: ${COLORS.primary}; margin-bottom: 15px; font-size: 16px;"> Acciones Rápidas</h3>
                         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                             ${solicitud.estado !== 'en_revision' ? `
                                 <button onclick="cambiarEstadoSolicitud(${solicitudId}, 'en_revision'); this.closest('.modal-detail-admin').remove();" class="btn-small btn-warning">

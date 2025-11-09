@@ -14,7 +14,7 @@ Aquí se desarrollan y testean componentes antes de ser integrados en la aplicac
 
 ---
 
-## ⚙️ Tecnologías Utilizadas
+##  Tecnologías Utilizadas
 
 - **PHP 8.x**
 - **Apache** (servidor web)
@@ -43,7 +43,7 @@ C:.
 
 ---
 
-## 🚀 Cómo Ejecutar el Proyecto
+##  Cómo Ejecutar el Proyecto
 
 1. Clonar el repositorio:
    ```bash

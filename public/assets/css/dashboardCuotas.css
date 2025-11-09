@@ -49,26 +49,7 @@
     flex-shrink: 0;
 }
 
-.stat-card.pendiente .stat-icon {
-    background: linear-gradient(135deg, #fff3e0, #ffe0b2);
-    color: var(--color-warning);
-}
 
-.stat-card.success .stat-icon {
-    background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
-    color: var(--color-success);
-}
-
-.stat-card.error .stat-icon {
-    background: linear-gradient(135deg, #fff3e0, #ffe0b2);
-    color: var(--color-warning);
-}
-
-.stat-info {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-xs);
-}
 
 .stat-label {
     font-size: var(--font-size-sm);

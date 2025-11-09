@@ -1,4 +1,26 @@
-
+// 🧪 MODO TEST: Simular último día del mes
+(function() {
+    const TEST_MODE = true; // Cambiar a false para volver a normal
+    
+    if (TEST_MODE) {
+        // Sobrescribir Date para simular último día del mes
+        const fechaOriginal = Date;
+        const ultimoDiaMes = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0);
+        
+        window.Date = function(...args) {
+            if (args.length === 0) {
+                return ultimoDiaMes;
+            }
+            return new fechaOriginal(...args);
+        };
+        
+        // Copiar métodos estáticos
+        Object.setPrototypeOf(window.Date, fechaOriginal);
+        window.Date.prototype = fechaOriginal.prototype;
+        
+        console.log('🧪 TEST MODE: Fecha simulada =', ultimoDiaMes.toLocaleDateString());
+    }
+})();
 
 document.addEventListener('DOMContentLoaded', function () {
     const menuItems = document.querySelectorAll('.menu li');
@@ -534,7 +556,7 @@ function updateTaskProgress(asignacionId, tipoAsignacion, tareaId) {
 }
 
 function addTaskAvance(tareaId) {
-    console.log('🚀 addTaskAvance llamado con tareaId:', tareaId);
+    console.log(' addTaskAvance llamado con tareaId:', tareaId);
     
     // ✅ Validar que tareaId existe
     if (!tareaId || tareaId === 'undefined') {
@@ -1235,7 +1257,7 @@ function mostrarBotonSalida(horaEntrada) {
 
 // ========== MARCAR ENTRADA ==========
 async function marcarEntrada() {
-    ('🚀 Iniciando marcación de entrada');
+    (' Iniciando marcación de entrada');
 
     const descripcion = prompt('Describe brevemente tu trabajo de hoy (opcional):');
     if (descripcion === null) {
@@ -1290,7 +1312,7 @@ async function marcarEntrada() {
 
 // ========== MARCAR SALIDA ==========
 async function marcarSalida() {
-    ('🚀 Iniciando marcación de salida');
+    (' Iniciando marcación de salida');
 
     if (!registroAbiertoId) {
         alert('❌ No hay registro activo para cerrar');
@@ -2478,16 +2500,16 @@ html += `
     
     
     ${deudaHoras > 0 ? `
-    <div class="deuda-breakdown-item deuda-horas">
-        <i class="fas fa-clock"></i>
-        <div>
-            <span class="deuda-label">Deuda por Horas No Trabajadas</span>
-            <span class="deuda-monto ${deudaHoras > 0 ? 'error' : 'success'}">$${deudaHoras.toLocaleString('es-UY', {minimumFractionDigits: 2})}</span>
-            <small style="color: ${deudaHoras > 0 ? '#ff8a80' : '#81c784'}; display: block; margin-top: 5px;">
-                ${deudaHoras > 0 ? '($160 por hora × horas faltantes)' : '¡Sin deuda de horas!'}
-            </small>
-        </div>
+   <div class="deuda-breakdown-item deuda-horas">
+    <i class="fas fa-clock"></i>
+    <div>
+        <span class="deuda-label">Deuda por Horas No Trabajadas</span>
+        <small style="color: ${deudaHoras > 0 ? '#ff8a80' : '#81c784'}; display: block; margin-top: 3px; margin-bottom: 5px;">
+            ${deudaHoras > 0 ? '($160 por hora × horas faltantes)' : '¡Sin deuda de horas!'}
+        </small>
+        <span class="deuda-monto ${deudaHoras > 0 ? 'error' : 'success'}">$${deudaHoras.toLocaleString('es-UY', {minimumFractionDigits: 2})}</span>
     </div>
+</div>
 ` : ''}
 
 
@@ -2562,12 +2584,33 @@ html += `
                 </div>
             ` : puedePagar ? `
                 <!-- ⚠️ PERÍODO DE PAGO ABIERTO -->
-                <div class="deuda-total-actions">
-                    <button class="btn-pagar-deuda-total" onclick="abrirPagarDeudaTotal(${cuotaMasReciente.id_cuota}, ${montoTotal})">
-                        <i class="fas fa-credit-card"></i>
-                        Pagar Ahora
-                    </button>
-                </div>
+                
+<div class="deuda-total-actions">
+    <button class="btn-pagar-deuda-total" 
+            onclick="abrirPagarDeudaTotal(${cuotaMasReciente.id_cuota}, ${montoTotal})"
+            style="
+                background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+                color: #FFFFFF;
+                border: none;
+                padding: 14px 28px;
+                border-radius: 8px;
+                font-size: 15px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+                display: inline-flex;
+                align-items: center;
+                gap: 10px;
+            "
+            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(76, 175, 80, 0.4)'"
+            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(76, 175, 80, 0.3)'"
+            onmousedown="this.style.transform='translateY(0px)'"
+            onmouseup="this.style.transform='translateY(-2px)'">
+        <i class="fas fa-credit-card"></i>
+        Pagar Ahora
+    </button>
+</div>
                 
                 <div class="alert-success" style="margin-top: 20px; background: rgba(76, 175, 80, 0.15); border-color: rgba(76, 175, 80, 0.3);">
                     <strong style="color: #4caf50;"> Período de Pago Habilitado</strong>
@@ -2577,12 +2620,33 @@ html += `
                 </div>
             ` : `
                 <!-- 🔒 PERÍODO DE TRABAJO (NO SE PUEDE PAGAR AÚN) -->
-                <div class="deuda-total-actions">
-                    <button class="btn-pagar-deuda-total" disabled style="opacity: 0.5; cursor: not-allowed;">
-                        <i class="fas fa-lock"></i>
-                        Pago Bloqueado
-                    </button>
-                </div>
+                
+<div class="deuda-total-actions">
+    <button class="btn-pagar-deuda-total" 
+            onclick="abrirPagarDeudaTotal(${cuotaMasReciente.id_cuota}, ${montoTotal})"
+            style="
+                background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+                color: #FFFFFF;
+                border: none;
+                padding: 14px 28px;
+                border-radius: 8px;
+                font-size: 15px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+                display: inline-flex;
+                align-items: center;
+                gap: 10px;
+            "
+            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(76, 175, 80, 0.4)'"
+            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(76, 175, 80, 0.3)'"
+            onmousedown="this.style.transform='translateY(0px)'"
+            onmouseup="this.style.transform='translateY(-2px)'">
+        <i class="fas fa-credit-card"></i>
+        Pagar Ahora
+    </button>
+</div>
                 
                 <div class="alert-warning" style="margin-top: 20px; background: rgba(255, 152, 0, 0.15); border-color: rgba(255, 152, 0, 0.3);">
                     <strong style="color: #ff9800;">🔒 Período de Trabajo en Curso</strong>
@@ -3202,14 +3266,15 @@ window.renderMisCuotasOrganizadas = function(cuotas) {
                     ${deudaHoras > 0 ? `
         <div class="deuda-breakdown-divider">+</div>
         <div class="deuda-breakdown-item deuda-horas">
-            <i class="fas fa-clock"></i>
-            <div>
-                <span class="deuda-label">Deuda por Horas No Trabajadas</span>
-                <span class="deuda-monto ${deudaHoras > 0 ? 'error' : 'success'}">$${deudaHoras.toLocaleString('es-UY', {minimumFractionDigits: 2})}</span>
-                <small style="color: ${deudaHoras > 0 ? '#ff8a80' : '#81c784'}; display: block; margin-top: 5px;">
-                    ${deudaHoras > 0 ? '($160 por hora × horas faltantes)' : '¡Sin deuda de horas!'}
-                </small>
-            </div>
+    <i class="fas fa-clock"></i>
+    <div>
+        <span class="deuda-label">Deuda por Horas No Trabajadas</span>
+        <small style="color: ${deudaHoras > 0 ? '#ff8a80' : '#81c784'}; display: block; margin-top: 3px; margin-bottom: 5px;">
+            ${deudaHoras > 0 ? '($160 por hora × horas faltantes)' : '¡Sin deuda de horas!'}
+        </small>
+        <span class="deuda-monto ${deudaHoras > 0 ? 'error' : 'success'}">$${deudaHoras.toLocaleString('es-UY', {minimumFractionDigits: 2})}</span>
+    </div>
+</div>
         </div>
     ` : ''}
 
@@ -3274,12 +3339,33 @@ window.renderMisCuotasOrganizadas = function(cuotas) {
                         </p>
                     </div>
                 ` : puedePagar ? `
-                    <div class="deuda-total-actions">
-                        <button class="btn-pagar-deuda-total" onclick="abrirPagarDeudaTotal(${cuotaMasReciente.id_cuota}, ${montoTotal})">
-                            <i class="fas fa-credit-card"></i>
-                            Pagar Ahora
-                        </button>
-                    </div>
+                   
+<div class="deuda-total-actions">
+    <button class="btn-pagar-deuda-total" 
+            onclick="abrirPagarDeudaTotal(${cuotaMasReciente.id_cuota}, ${montoTotal})"
+            style="
+                background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+                color: #FFFFFF;
+                border: none;
+                padding: 14px 28px;
+                border-radius: 8px;
+                font-size: 15px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+                display: inline-flex;
+                align-items: center;
+                gap: 10px;
+            "
+            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(76, 175, 80, 0.4)'"
+            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(76, 175, 80, 0.3)'"
+            onmousedown="this.style.transform='translateY(0px)'"
+            onmouseup="this.style.transform='translateY(-2px)'">
+        <i class="fas fa-credit-card"></i>
+        Pagar Ahora
+    </button>
+</div>
                     
                     <div class="alert-success" style="margin-top: 20px; background: rgba(76, 175, 80, 0.15); border-color: rgba(76, 175, 80, 0.3);">
                         <strong style="color: #4caf50;">✓ Periodo de Pago Habilitado</strong>
@@ -3289,12 +3375,33 @@ window.renderMisCuotasOrganizadas = function(cuotas) {
                         </p>
                     </div>
                 ` : diasParaPagar > 0 ? `
-                    <div class="deuda-total-actions">
-                        <button class="btn-pagar-deuda-total" disabled style="opacity: 0.5; cursor: not-allowed;">
-                            <i class="fas fa-lock"></i>
-                            Pago Bloqueado
-                        </button>
-                    </div>
+                   
+<div class="deuda-total-actions">
+    <button class="btn-pagar-deuda-total" 
+            onclick="abrirPagarDeudaTotal(${cuotaMasReciente.id_cuota}, ${montoTotal})"
+            style="
+                background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+                color: #FFFFFF;
+                border: none;
+                padding: 14px 28px;
+                border-radius: 8px;
+                font-size: 15px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+                display: inline-flex;
+                align-items: center;
+                gap: 10px;
+            "
+            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(76, 175, 80, 0.4)'"
+            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(76, 175, 80, 0.3)'"
+            onmousedown="this.style.transform='translateY(0px)'"
+            onmouseup="this.style.transform='translateY(-2px)'">
+        <i class="fas fa-credit-card"></i>
+        Pagar Ahora
+    </button>
+</div>
                     
                     <div class="alert-warning" style="margin-top: 20px; background: rgba(255, 152, 0, 0.15); border-color: rgba(255, 152, 0, 0.3);">
                         <strong style="color: #ff9800;">🔒 Periodo de Trabajo en Curso</strong>
@@ -3690,16 +3797,21 @@ function updateSolicitudesStats(solicitudes) {
     if (resueltasEl) resueltasEl.textContent = resueltas;
 }
 
-// ========== ABRIR MODAL NUEVA SOLICITUD ==========
 function abrirModalNuevaSolicitud() {
+    // Eliminar modal existente si hay uno
+    const modalExistente = document.getElementById('nuevaSolicitudModal');
+    if (modalExistente) {
+        modalExistente.remove();
+    }
+
     const modal = `
-        <div id="nuevaSolicitudModal" class="modal-overlay">
-            <div class="modal-content-large">
-                <button class="modal-close-btn" onclick="cerrarModalNuevaSolicitud()">×</button>
+        <div id="nuevaSolicitudModal" class="material-modal" style="display: flex;">
+            <div class="material-modal-content">
+                <div class="material-modal-header">
+                    <h3 id="solicitudModalTitle">Nueva Solicitud</h3>
+                    <button class="close-material-modal" onclick="cerrarModalNuevaSolicitud()">&times;</button>
+                </div>
                 
-                <h2 class="modal-title">
-                    <i class="fas fa-paper-plane"></i> Nueva Solicitud
-                </h2>
 
                 <form id="nuevaSolicitudForm" onsubmit="submitNuevaSolicitud(event)" enctype="multipart/form-data">
                     <div class="form-group">
@@ -3729,24 +3841,23 @@ function abrirModalNuevaSolicitud() {
                     </div>
 
                     <div class="form-group">
-    <label for="descripcion-solicitud">
-        <i class="fas fa-align-left"></i> Descripción *
-    </label>
-    <textarea 
-        id="descripcion-solicitud" 
-        name="descripcion"
-        rows="6"
-        maxlength="250"
-        placeholder="Describe detalladamente tu solicitud..."
-        required
-        style="resize: none; width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; font-size: 14px;"
-    ></textarea>
-    <small id="charCount" style="color: #666; display: block; text-align: right; margin-top: 4px;">
-     
-    </small>
-</div>
-
-
+                        <label for="descripcion-solicitud">
+                            <i class="fas fa-align-left"></i> Descripción *
+                        </label>
+                        <textarea 
+                            id="descripcion-solicitud" 
+                            name="descripcion"
+                            rows="6"
+                            maxlength="250"
+                            placeholder="Describe detalladamente tu solicitud..."
+                            required
+                            style="resize: vertical; width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; font-size: 14px;"
+                            oninput="actualizarContadorCaracteres(this)"
+                        ></textarea>
+                        <small id="charCount" style="color: #666; display: block; text-align: right; margin-top: 4px;">
+                            0 / 250 caracteres
+                        </small>
+                    </div>
 
                     <div class="form-group">
                         <label for="prioridad-solicitud">
@@ -3791,7 +3902,100 @@ function abrirModalNuevaSolicitud() {
     `;
 
     document.body.insertAdjacentHTML('beforeend', modal);
+    
+    // Prevenir scroll del body
+    document.body.style.overflow = 'hidden';
 }
+
+function cerrarModalNuevaSolicitud() {
+    const modal = document.getElementById('nuevaSolicitudModal');
+    if (modal) {
+        modal.remove();
+    }
+    
+    // Restaurar scroll del body
+    document.body.style.overflow = '';
+}
+
+function actualizarContadorCaracteres(textarea) {
+    const contador = document.getElementById('charCount');
+    const actual = textarea.value.length;
+    const maximo = 250;
+    
+    contador.textContent = `${actual} / ${maximo} caracteres`;
+    
+    // Cambiar color si se acerca al límite
+    if (actual > maximo * 0.9) {
+        contador.style.color = '#F44336';
+    } else if (actual > maximo * 0.7) {
+        contador.style.color = '#FF9800';
+    } else {
+        contador.style.color = '#666';
+    }
+}
+
+console.log('✅ Modal de solicitud corregido');
+console.log('🔧 Prevención de scroll y limpieza de modales duplicados');
+
+function cerrarModalNuevaSolicitud() {
+    const modal = document.getElementById('nuevaSolicitudModal');
+    if (modal) {
+        modal.remove();
+    }
+    
+    // Restaurar scroll del body
+    document.body.style.overflow = '';
+}
+
+function actualizarContadorCaracteres(textarea) {
+    const contador = document.getElementById('charCount');
+    const actual = textarea.value.length;
+    const maximo = 250;
+    
+    contador.textContent = `${actual} / ${maximo} caracteres`;
+    
+    // Cambiar color si se acerca al límite
+    if (actual > maximo * 0.9) {
+        contador.style.color = '#F44336';
+    } else if (actual > maximo * 0.7) {
+        contador.style.color = '#FF9800';
+    } else {
+        contador.style.color = '#666';
+    }
+}
+
+console.log('✅ Modal de solicitud corregido');
+console.log('🔧 Prevención de scroll y limpieza de modales duplicados');
+
+function cerrarModalNuevaSolicitud() {
+    const modal = document.getElementById('nuevaSolicitudModal');
+    if (modal) {
+        modal.remove();
+    }
+    
+    // Restaurar scroll del body
+    document.body.style.overflow = '';
+}
+
+function actualizarContadorCaracteres(textarea) {
+    const contador = document.getElementById('charCount');
+    const actual = textarea.value.length;
+    const maximo = 250;
+    
+    contador.textContent = `${actual} / ${maximo} caracteres`;
+    
+    // Cambiar color si se acerca al límite
+    if (actual > maximo * 0.9) {
+        contador.style.color = '#F44336';
+    } else if (actual > maximo * 0.7) {
+        contador.style.color = '#FF9800';
+    } else {
+        contador.style.color = '#666';
+    }
+}
+
+console.log('✅ Modal de solicitud corregido');
+console.log('🔧 Prevención de scroll y limpieza de modales duplicados');
 
 function cerrarModalNuevaSolicitud() {
     const modal = document.getElementById('nuevaSolicitudModal');
@@ -6891,14 +7095,14 @@ $${deudaAcumuladaAnterior.toLocaleString('es-UY', {minimumFractionDigits: 2})}
                     
                    ${deudaHoras > 0 ? `
     <div class="deuda-breakdown-item deuda-horas">
-        <i class="fas fa-clock"></i>
-        <div>
-            <span class="deuda-label">Deuda por Horas No Trabajadas</span>
-            <span class="deuda-monto ${deudaHoras > 0 ? 'error' : 'success'}">$${deudaHoras.toLocaleString('es-UY', {minimumFractionDigits: 2})}</span>
-            <small style="color: ${deudaHoras > 0 ? '#ff8a80' : '#81c784'}; display: block; margin-top: 5px;">
-                ${deudaHoras > 0 ? '($160 por hora × horas faltantes)' : '¡Sin deuda de horas!'}
-            </small>
-        </div>
+      <i class="fas fa-clock"></i>
+<div>
+    <span class="deuda-label">Deuda por Horas No Trabajadas</span>
+    <small style="color: ${deudaHoras > 0 ? '#ff8a80' : '#81c784'}; display: block; margin-top: 3px; margin-bottom: 5px;">
+        ${deudaHoras > 0 ? '($160 por hora × horas faltantes)' : '¡Sin deuda de horas!'}
+    </small>
+    <span class="deuda-monto ${deudaHoras > 0 ? 'error' : 'success'}">${deudaHoras.toLocaleString('es-UY', {minimumFractionDigits: 2})}</span>
+</div>
     </div>
 ` : ''}
 
@@ -6928,21 +7132,65 @@ $${deudaAcumuladaAnterior.toLocaleString('es-UY', {minimumFractionDigits: 2})}
                         <p style="color: rgba(255, 255, 255, 0.9); margin: 10px 0 0 0;">Tu pago está siendo validado.</p>
                     </div>
                 ` : puedePagar ? `
-                    <div class="deuda-total-actions">
-                        <button class="btn-pagar-deuda-total" onclick="abrirPagarDeudaTotal(${cuotaMasReciente.id_cuota}, ${montoTotal})">
-                            <i class="fas fa-credit-card"></i> Pagar Ahora
-                        </button>
-                    </div>
+                    
+<div class="deuda-total-actions">
+    <button class="btn-pagar-deuda-total" 
+            onclick="abrirPagarDeudaTotal(${cuotaMasReciente.id_cuota}, ${montoTotal})"
+            style="
+                background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+                color: #FFFFFF;
+                border: none;
+                padding: 14px 28px;
+                border-radius: 8px;
+                font-size: 15px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+                display: inline-flex;
+                align-items: center;
+                gap: 10px;
+            "
+            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(76, 175, 80, 0.4)'"
+            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(76, 175, 80, 0.3)'"
+            onmousedown="this.style.transform='translateY(0px)'"
+            onmouseup="this.style.transform='translateY(-2px)'">
+        <i class="fas fa-credit-card"></i>
+        Pagar Ahora
+    </button>
+</div>
                     <div class="alert-success" style="margin-top: 20px;">
                         <strong style="color: #4caf50;">✓ Periodo de Pago Habilitado</strong>
                         <p style="color: rgba(255, 255, 255, 0.9); margin: 10px 0 0 0;">Ya puedes realizar el pago.</p>
                     </div>
                 ` : diasParaPagar > 0 ? `
-                    <div class="deuda-total-actions">
-                        <button class="btn-pagar-deuda-total" disabled style="opacity: 0.5; cursor: not-allowed;">
-                            <i class="fas fa-lock"></i> Pago Bloqueado
-                        </button>
-                    </div>
+                    
+<div class="deuda-total-actions">
+    <button class="btn-pagar-deuda-total" 
+            onclick="abrirPagarDeudaTotal(${cuotaMasReciente.id_cuota}, ${montoTotal})"
+            style="
+                background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+                color: #FFFFFF;
+                border: none;
+                padding: 14px 28px;
+                border-radius: 8px;
+                font-size: 15px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+                display: inline-flex;
+                align-items: center;
+                gap: 10px;
+            "
+            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(76, 175, 80, 0.4)'"
+            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(76, 175, 80, 0.3)'"
+            onmousedown="this.style.transform='translateY(0px)'"
+            onmouseup="this.style.transform='translateY(-2px)'">
+        <i class="fas fa-credit-card"></i>
+        Pagar Ahora
+    </button>
+</div>
                     <div class="alert-warning" style="margin-top: 20px;">
                         <strong style="color: #ff9800;">🔒 Periodo de Trabajo en Curso</strong>
                         <p style="color: rgba(255, 255, 255, 0.9); margin: 10px 0 0 0;">

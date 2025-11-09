@@ -153,7 +153,7 @@
 			<h2 class="section-title" data-i18n="dashboardAdmin.reports.title">📊 Reportes Mensuales</h2>
 			
 			<div class="info-card">
-				<h3 data-i18n="dashboardAdmin.reports.selectPeriod">⚙️ Seleccionar Período</h3>
+				<h3 data-i18n="dashboardAdmin.reports.selectPeriod"> Seleccionar Período</h3>
 				<div class="reportes-filters">
 					<select id="reporte-mes">
 						<option value="" data-i18n="dashboardAdmin.reports.selectMonth">Seleccione mes...</option>
@@ -375,36 +375,32 @@
 		</div>
 
 		<!-- SECCIÓN FACTURACIÓN -->
-		<section id="cuotas-section" class="section-content">
-			<h2 class="section-title" data-i18n="dashboardAdmin.billing.title">💰 Gestión de Cuotas Mensuales</h2>
-			
-			<div class="stats-grid">
-				<div class="stat-card">
-					<i class="fas fa-file-invoice-dollar"></i>
-					<h4 data-i18n="dashboardAdmin.billing.totalQuotas">Total Cuotas</h4>
-					<p id="admin-total-cuotas">0</p>
-				</div>
-				<div class="stat-card">
-					<i class="fas fa-check-circle"></i>
-					<h4 data-i18n="dashboardAdmin.billing.paid">Pagadas</h4>
-					<p id="admin-cuotas-pagadas">0</p>
-				</div>
-				<div class="stat-card">
-					<i class="fas fa-clock"></i>
-					<h4 data-i18n="dashboardAdmin.billing.pending">Pendientes</h4>
-					<p id="admin-cuotas-pendientes">0</p>
-				</div>
-				<div class="stat-card">
-					<i class="fas fa-dollar-sign"></i>
-					<h4 data-i18n="dashboardAdmin.billing.amountCollected">Monto Cobrado</h4>
-					<p id="admin-monto-cobrado">$0</p>
-				</div>
-			</div>
-			
-			<div class="info-card">
+<section id="cuotas-section" class="section-content">
+	<h2 class="section-title" data-i18n="dashboardAdmin.billing.title">💰 Gestión de Cuotas Mensuales</h2>
+	
+	<div class="stats-grid">
+		<div class="stat-card">
+			<i class="fas fa-file-invoice-dollar"></i>
+			<h4 data-i18n="dashboardAdmin.billing.totalQuotas">Total Cuotas</h4>
+			<p id="admin-total-cuotas">0</p>
+		</div>
+		<div class="stat-card">
+			<i class="fas fa-check-circle"></i>
+			<h4 data-i18n="dashboardAdmin.billing.paid">Pagadas</h4>
+			<p id="admin-cuotas-pagadas">0</p>
+		</div>
+		<div class="stat-card">
+			<i class="fas fa-clock"></i>
+			<h4 data-i18n="dashboardAdmin.billing.pending">Pendientes</h4>
+			<p id="admin-cuotas-pendientes">0</p>
+		</div>
+	</div>
+
+	<div class="info-card">
+		
 	<!-- Encabezado -->
 	<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-		<h3 data-i18n="dashboardAdmin.billing.priceConfig">⚙️ Configuración de Precios</h3>
+		<h3 data-i18n="dashboardAdmin.billing.priceConfig"> Configuración de Precios</h3>
 		<button class="btn btn-secondary" onclick="loadPreciosCuotas()">
 			<i class="fas fa-sync-alt"></i> <span data-i18n="common.update">Actualizar</span>
 		</button>
@@ -419,7 +415,7 @@
 	<hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
 
 	<!-- Acciones rápidas -->
-	<h3 data-i18n="dashboardAdmin.billing.quickActions">🚀 Acciones Rápidas</h3>
+	<h3 data-i18n="dashboardAdmin.billing.quickActions"> Acciones Rápidas</h3>
 	<div style="display: flex; gap: 15px; flex-wrap: wrap; margin-top: 15px;">
 		<button class="btn btn-primary" onclick="generarCuotasMesActual()">
 			<i class="fas fa-calendar-plus"></i> 
@@ -429,36 +425,35 @@
 </div>
 
 			
-			<div class="info-card">
-				<div class="cuotas-admin-filters">
-					<select id="admin-filtro-anio" onchange="loadAllCuotasAdmin()">
-						<option value="" data-i18n="dashboardAdmin.billing.filterAllYears">Todos los años</option>
-					</select>
-					<select id="admin-filtro-mes" onchange="loadAllCuotasAdmin()">
-						<option value="" data-i18n="dashboardAdmin.billing.filterAllMonths">Todos los meses</option>
-						<option value="1" data-i18n="months.january">Enero</option>
-						<option value="2" data-i18n="months.february">Febrero</option>
-						<option value="3" data-i18n="months.march">Marzo</option>
-						<option value="4" data-i18n="months.april">Abril</option>
-						<option value="5" data-i18n="months.may">Mayo</option>
-						<option value="6" data-i18n="months.june">Junio</option>
-						<option value="7" data-i18n="months.july">Julio</option>
-						<option value="8" data-i18n="months.august">Agosto</option>
-						<option value="9" data-i18n="months.september">Septiembre</option>
-						<option value="10" data-i18n="months.october">Octubre</option>
-						<option value="11" data-i18n="months.november">Noviembre</option>
-						<option value="12" data-i18n="months.december">Diciembre</option>
-					</select>
-					<select id="admin-filtro-estado" onchange="loadAllCuotasAdmin()">
-						<option value="" data-i18n="dashboardAdmin.billing.filterAllStates">Todos los estados</option>
-						<option value="pendiente" data-i18n="dashboardAdmin.billing.filterPending">Pendientes</option>
-						<option value="pagada" data-i18n="dashboardAdmin.billing.filterPaid">Pagadas</option>
-					</select>
-					<button class="btn btn-secondary" onclick="loadAllCuotasAdmin()">
-						<i class="fas fa-filter"></i> <span data-i18n="common.filter">Filtrar</span>
-					</button>
-				</div>
-			</div>
+			<div class="cuotas-admin-filters">
+	<select id="admin-filtro-anio" onchange="loadAllCuotasAdmin()">
+		<option value="" data-i18n="dashboardAdmin.billing.filterAllYears">Todos los años</option>
+	</select>
+	<select id="admin-filtro-mes" onchange="loadAllCuotasAdmin()">
+		<option value="" data-i18n="dashboardAdmin.billing.filterAllMonths">Todos los meses</option>
+		<option value="1" data-i18n="months.january">Enero</option>
+		<option value="2" data-i18n="months.february">Febrero</option>
+		<option value="3" data-i18n="months.march">Marzo</option>
+		<option value="4" data-i18n="months.april">Abril</option>
+		<option value="5" data-i18n="months.may">Mayo</option>
+		<option value="6" data-i18n="months.june">Junio</option>
+		<option value="7" data-i18n="months.july">Julio</option>
+		<option value="8" data-i18n="months.august">Agosto</option>
+		<option value="9" data-i18n="months.september">Septiembre</option>
+		<option value="10" data-i18n="months.october">Octubre</option>
+		<option value="11" data-i18n="months.november">Noviembre</option>
+		<option value="12" data-i18n="months.december">Diciembre</option>
+	</select>
+	<select id="admin-filtro-estado" onchange="loadAllCuotasAdmin()">
+		<option value="" data-i18n="dashboardAdmin.billing.filterAllStates">Todos los estados</option>
+		<option value="pendiente" data-i18n="dashboardAdmin.billing.filterPending">Pendientes</option>
+		<option value="pagada" data-i18n="dashboardAdmin.billing.filterPaid">Pagadas</option>
+	</select>
+	<button class="btn btn-secondary" onclick="loadAllCuotasAdmin()">
+		<i class="fas fa-filter"></i> <span data-i18n="common.filter">Filtrar</span>
+	</button>
+</div>
+
 			
 			<div class="info-card">
 				<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
@@ -532,6 +527,8 @@
 		</form>
 	</div>
 </div>
+
+
 
 
 		<!-- Modal para validar pago -->
