@@ -135,23 +135,29 @@ const translations = {
       }
     },
     login: {
-      title: "Iniciar sesión",
-      email_label: "Correo electrónico",
-      password_label: "Contraseña",
-      remember: "Recordarme",
-      button: "Entrar",
-      no_account: "¿No tienes una cuenta?",
-      register_here: "Regístrate aquí"
+      title: "Cooperativa de Viviendas",
+      subtitle: "Sistema Administrativo",
+      email: "Correo",
+      emailPlaceholder: "Ingrese su correo",
+      password: "Contraseña",
+      passwordPlaceholder: "Ingrese su contraseña",
+      submit: "Ingresar",
+      noAccount: "¿No tienes una cuenta?",
+      register: "Regístrate aquí"
     },
     register: {
-      title: "Crear cuenta",
-      name_label: "Nombre completo",
-      email_label: "Correo electrónico",
-      password_label: "Contraseña",
-      confirm_label: "Confirmar contraseña",
-      button: "Registrarse",
-      have_account: "¿Ya tienes una cuenta?",
-      login_here: "Inicia sesión aquí"
+      title: "Solicitud de Registro",
+      subtitle: "Complete el formulario para enviar su solicitud de ingreso.",
+      fullName: "Nombre completo",
+      id: "Carnet de identidad",
+      phone: "Teléfono",
+      birthDate: "Fecha de nacimiento",
+      email: "Email",
+      address: "Dirección",
+      password: "Contraseña",
+      submit: "Enviar Solicitud",
+      hasAccount: "¿Ya tienes una cuenta?",
+      login: "Inicia sesión aquí"
     },
     panel: {
       title: "Panel de usuario",
@@ -307,23 +313,29 @@ const translations = {
       }
     },
     login: {
-      title: "Log In",
-      email_label: "Email address",
-      password_label: "Password",
-      remember: "Remember me",
-      button: "Sign In",
-      no_account: "Don’t have an account?",
-      register_here: "Sign up here"
+      title: "Housing Cooperative",
+      subtitle: "Administrative System",
+      email: "Email",
+      emailPlaceholder: "Enter your email",
+      password: "Password",
+      passwordPlaceholder: "Enter your password",
+      submit: "Sign In",
+      noAccount: "Don't have an account?",
+      register: "Register here"
     },
     register: {
-      title: "Create Account",
-      name_label: "Full name",
-      email_label: "Email address",
-      password_label: "Password",
-      confirm_label: "Confirm password",
-      button: "Sign Up",
-      have_account: "Already have an account?",
-      login_here: "Log in here"
+      title: "Registration Request",
+      subtitle: "Complete the form to submit your registration request.",
+      fullName: "Full name",
+      id: "ID Card",
+      phone: "Phone",
+      birthDate: "Birth date",
+      email: "Email",
+      address: "Address",
+      password: "Password",
+      submit: "Submit Request",
+      hasAccount: "Already have an account?",
+      login: "Log in here"
     },
     panel: {
       title: "User Panel",
