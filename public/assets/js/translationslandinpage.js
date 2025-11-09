@@ -20,23 +20,118 @@ const translations = {
         terms: "Términos y condiciones",
         contact: "Contáctanos"
       },
-      copy: "Todos los derechos reservados."
+      copy: "Todos los derechos reservados.",
+      contact: {
+        title: "Contacto",
+        address: "📍 Av. Principal 1234, Montevideo",
+        phone: "📞 094654987",
+        email: "✉️ cooperativa@gmail.com"
+      },
+      schedule: {
+        title: "Horarios",
+        weekdays: "Lunes a Viernes: 9:00 - 18:00",
+        saturday: "Sábados: 9:00 - 13:00",
+        sunday: "Domingos: Cerrados"
+      },
+      social: {
+        title: "Síguenos",
+        instagram: "📱 Instagram",
+        facebook: "📘 Facebook",
+        whatsapp: "💬 Whatsapp"
+      }
     },
     home: {
-      hero: {
+      welcome: {
         title: "Bienvenido a Conviconsu",
         subtitle: "Gestiona tus servicios y conecta con personas fácilmente.",
-        button: "Empezar ahora"
+        description: "Únete hoy y experimenta la mejor plataforma para gestionar tus servicios.",
+        requestButton: "Solicitar ingreso",
+        infoButton: "Más información"
       },
-      features: {
-        title: "Características principales",
-        f1: "Gestión rápida y segura",
-        f2: "Interfaz moderna e intuitiva",
-        f3: "Acceso desde cualquier dispositivo"
+      services: {
+        title: "Nuestros Servicios",
+        subtitle: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatum.",
+        consulting: {
+          title: "Consultoría Especializada",
+          description: "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Perspiciatis aliquid, non consequatur fugiat nisi odit excepturi dolor necessitatibus odio, ab, porro numquam.",
+          detailsTitle: "Detalles del servicio:",
+          details: [
+            "Asesoramiento personalizado",
+            "Análisis de viabilidad",
+            "Documentación completa",
+            "Seguimiento post-consulta"
+          ]
+        },
+        procedures: {
+          title: "Gestión de Trámites",
+          description: "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Perspiciatis aliquid, non consequatur fugiat nisi odit excepturi dolor necessitatibus odio, ab, porro numquam.",
+          detailsTitle: "Incluye:",
+          details: [
+            "Tramitación de permisos",
+            "Gestión documental",
+            "Coordinación con entidades",
+            "Seguimiento en tiempo real"
+          ]
+        },
+        financial: {
+          title: "Asesoría Financiera",
+          description: "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Perspiciatis aliquid, non consequatur fugiat nisi odit excepturi dolor necessitatibus odio, ab, porro numquam.",
+          detailsTitle: "Servicios financieros:",
+          details: [
+            "Evaluación de créditos",
+            "Planificación financiera",
+            "Opciones de financiamiento",
+            "Negociación con bancos"
+          ]
+        }
       },
-      about: {
-        title: "Sobre nosotros",
-        text: "Conviconsu nace con el objetivo de facilitar la conexión entre usuarios y servicios, brindando una experiencia ágil, segura y confiable."
+      incorporation: {
+        title: "Proceso de incorporación",
+        subtitle: "Para unirte a nuestro equipo, sigue estos pasos:",
+        steps: [
+          {
+            title: "Solicitud inicial",
+            description: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Hic veritatis, repellendus possimus delectus accusamus ad nam eius id aliquam eos, quam itaque explicabo, voluptatibus pariatur iusto voluptatum animi deleniti quis."
+          },
+          {
+            title: "Evaluación de documentos",
+            description: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Hic veritatis, repellendus possimus delectus accusamus ad nam eius id aliquam eos, quam itaque explicabo, voluptatibus pariatur iusto voluptatum animi deleniti quis."
+          },
+          {
+            title: "Entrevista personal",
+            description: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Hic veritatis, repellendus possimus delectus accusamus ad nam eius id aliquam eos, quam itaque explicabo, voluptatibus pariatur iusto voluptatum animi deleniti quis."
+          },
+          {
+            title: "Aprobación final",
+            description: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Hic veritatis, repellendus possimus delectus accusamus ad nam eius id aliquam eos, quam itaque explicabo, voluptatibus pariatur iusto voluptatum animi deleniti quis."
+          }
+        ]
+      },
+      faq: {
+        title: "Preguntas Frecuentes",
+        questions: [
+          {
+            question: "¿Cómo puedo solicitar un servicio?",
+            answer: "Puedes solicitar nuestros servicios a través del botón \"Solicitar ingreso\" o contactándonos directamente por teléfono. Nuestro equipo te guiará en todo el proceso."
+          },
+          {
+            question: "¿Cuáles son los métodos de pago aceptados?",
+            answer: "Aceptamos transferencias bancarias, pagos en efectivo, tarjetas de crédito y débito. También ofrecemos planes de pago flexibles según tus necesidades."
+          },
+          {
+            question: "¿Ofrecen soporte después de la consultoría?",
+            answer: "Sí, brindamos soporte continuo durante 6 meses después de completar la consultoría. Esto incluye consultas telefónicas y seguimiento de tu progreso."
+          },
+          {
+            question: "¿Puedo cancelar mi solicitud?",
+            answer: "Puedes cancelar tu solicitud en cualquier momento antes de la firma del contrato. Si ya iniciamos el trabajo, aplicarán las condiciones establecidas en el contrato."
+          }
+        ]
+      },
+      cta: {
+        title: "¡Comienza tu camino hacia la vivienda propia!",
+        description: "Contáctanos para más información sobre nuestros servicios de consultoría.",
+        button: "Solicitar ingreso"
       }
     },
     login: {
@@ -97,23 +192,118 @@ const translations = {
         terms: "Terms and Conditions",
         contact: "Contact Us"
       },
-      copy: "All rights reserved."
+      copy: "All rights reserved.",
+      contact: {
+        title: "Contact",
+        address: "📍 Main Ave. 1234, Montevideo",
+        phone: "📞 094654987",
+        email: "✉️ cooperativa@gmail.com"
+      },
+      schedule: {
+        title: "Opening Hours",
+        weekdays: "Monday to Friday: 9:00 AM - 6:00 PM",
+        saturday: "Saturday: 9:00 AM - 1:00 PM",
+        sunday: "Sunday: Closed"
+      },
+      social: {
+        title: "Follow Us",
+        instagram: "📱 Instagram",
+        facebook: "📘 Facebook",
+        whatsapp: "💬 Whatsapp"
+      }
     },
     home: {
-      hero: {
+      welcome: {
         title: "Welcome to Conviconsu",
         subtitle: "Manage your services and connect with people easily.",
-        button: "Get Started Now"
+        description: "Join us today and experience the best platform for managing your services.",
+        requestButton: "Request Access",
+        infoButton: "More Information"
       },
-      features: {
-        title: "Main Features",
-        f1: "Fast and secure management",
-        f2: "Modern and intuitive interface",
-        f3: "Access from any device"
+      services: {
+        title: "Our Services",
+        subtitle: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatum.",
+        consulting: {
+          title: "Specialized Consulting",
+          description: "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Perspiciatis aliquid, non consequatur fugiat nisi odit excepturi dolor necessitatibus odio, ab, porro numquam.",
+          detailsTitle: "Service details:",
+          details: [
+            "Personalized advisory",
+            "Viability analysis",
+            "Complete documentation",
+            "Post-consultation follow-up"
+          ]
+        },
+        procedures: {
+          title: "Procedures Management",
+          description: "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Perspiciatis aliquid, non consequatur fugiat nisi odit excepturi dolor necessitatibus odio, ab, porro numquam.",
+          detailsTitle: "Includes:",
+          details: [
+            "Permit processing",
+            "Document management",
+            "Entity coordination",
+            "Real-time tracking"
+          ]
+        },
+        financial: {
+          title: "Financial Advisory",
+          description: "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Perspiciatis aliquid, non consequatur fugiat nisi odit excepturi dolor necessitatibus odio, ab, porro numquam.",
+          detailsTitle: "Financial services:",
+          details: [
+            "Credit evaluation",
+            "Financial planning",
+            "Financing options",
+            "Bank negotiations"
+          ]
+        }
       },
-      about: {
-        title: "About Us",
-        text: "Conviconsu was created to make connecting users and services simple, providing a fast, secure, and reliable experience."
+      incorporation: {
+        title: "Incorporation Process",
+        subtitle: "To join our team, follow these steps:",
+        steps: [
+          {
+            title: "Initial Request",
+            description: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Hic veritatis, repellendus possimus delectus accusamus ad nam eius id aliquam eos, quam itaque explicabo, voluptatibus pariatur iusto voluptatum animi deleniti quis."
+          },
+          {
+            title: "Document Evaluation",
+            description: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Hic veritatis, repellendus possimus delectus accusamus ad nam eius id aliquam eos, quam itaque explicabo, voluptatibus pariatur iusto voluptatum animi deleniti quis."
+          },
+          {
+            title: "Personal Interview",
+            description: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Hic veritatis, repellendus possimus delectus accusamus ad nam eius id aliquam eos, quam itaque explicabo, voluptatibus pariatur iusto voluptatum animi deleniti quis."
+          },
+          {
+            title: "Final Approval",
+            description: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Hic veritatis, repellendus possimus delectus accusamus ad nam eius id aliquam eos, quam itaque explicabo, voluptatibus pariatur iusto voluptatum animi deleniti quis."
+          }
+        ]
+      },
+      faq: {
+        title: "Frequently Asked Questions",
+        questions: [
+          {
+            question: "How can I request a service?",
+            answer: "You can request our services through the \"Request Access\" button or by contacting us directly by phone. Our team will guide you through the process."
+          },
+          {
+            question: "What payment methods are accepted?",
+            answer: "We accept bank transfers, cash payments, credit and debit cards. We also offer flexible payment plans according to your needs."
+          },
+          {
+            question: "Do you offer support after consulting?",
+            answer: "Yes, we provide continuous support for 6 months after completing the consultation. This includes phone consultations and progress tracking."
+          },
+          {
+            question: "Can I cancel my request?",
+            answer: "You can cancel your request at any time before signing the contract. If we have already started work, the conditions established in the contract will apply."
+          }
+        ]
+      },
+      cta: {
+        title: "Start your path to home ownership!",
+        description: "Contact us for more information about our consulting services.",
+        button: "Request Access"
       }
     },
     login: {

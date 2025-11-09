@@ -7,3 +7,4 @@ composer.lock
 /storage/
 provision.sh
 provisionNoDocker.sh
+.warp/

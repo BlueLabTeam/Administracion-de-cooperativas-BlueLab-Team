@@ -16,10 +16,8 @@
     <div class="bienvenida fade-in">
       <h1 data-i18n="home.welcome.title">Bienvenido a Conviconsu</h1>
       <p data-i18n="home.welcome.description">
-        Lorem ipsum dolor sit amet consectetur, adipisicing elit. Odit aliquid
-        eum possimus saepe, soluta eos ea officia consequuntur deserunt
-        corrupti vitae reprehenderit veniam dolor quas dolores, sit vero
-        voluptatum cum.
+        Únete hoy y experimenta la mejor plataforma para gestionar tus
+        servicios.
       </p>
       <a href="/register">
         <button class="bienvenida__button button--primary" id="solicitar-btn" data-i18n="home.welcome.requestButton">
@@ -48,10 +46,10 @@
           <div class="servicio-detalle">
             <h4 data-i18n="home.services.consulting.detailsTitle">Detalles del servicio:</h4>
             <ul>
-              <li>Asesoramiento personalizado</li>
-              <li>Análisis de viabilidad</li>
-              <li>Documentación completa</li>
-              <li>Seguimiento post-consulta</li>
+              <li data-i18n="home.services.consulting.details.0">Asesoramiento personalizado</li>
+              <li data-i18n="home.services.consulting.details.1">Análisis de viabilidad</li>
+              <li data-i18n="home.services.consulting.details.2">Documentación completa</li>
+              <li data-i18n="home.services.consulting.details.3">Seguimiento post-consulta</li>
             </ul>
           </div>
         </li>
@@ -65,10 +63,10 @@
           <div class="servicio-detalle">
             <h4 data-i18n="home.services.procedures.detailsTitle">Incluye:</h4>
             <ul>
-              <li>Tramitación de permisos</li>
-              <li>Gestión documental</li>
-              <li>Coordinación con entidades</li>
-              <li>Seguimiento en tiempo real</li>
+              <li data-i18n="home.services.procedures.details.0">Tramitación de permisos</li>
+              <li data-i18n="home.services.procedures.details.1">Gestión documental</li>
+              <li data-i18n="home.services.procedures.details.2">Coordinación con entidades</li>
+              <li data-i18n="home.services.procedures.details.3">Seguimiento en tiempo real</li>
             </ul>
           </div>
         </li>
@@ -82,10 +80,10 @@
           <div class="servicio-detalle">
             <h4 data-i18n="home.services.financial.detailsTitle">Servicios financieros:</h4>
             <ul>
-              <li>Evaluación de créditos</li>
-              <li>Planificación financiera</li>
-              <li>Opciones de financiamiento</li>
-              <li>Negociación con bancos</li>
+              <li data-i18n="home.services.financial.details.0">Evaluación de créditos</li>
+              <li data-i18n="home.services.financial.details.1">Planificación financiera</li>
+              <li data-i18n="home.services.financial.details.2">Opciones de financiamiento</li>
+              <li data-i18n="home.services.financial.details.3">Negociación con bancos</li>
             </ul>
           </div>
         </li>
@@ -98,8 +96,8 @@
       <ol>
         <li onclick="togglePaso(0)">
           <div class="numero">1</div>
-          <h3>Solicitud inicial</h3>
-          <p>
+          <h3 data-i18n="home.incorporation.steps.0.title">Solicitud inicial</h3>
+          <p data-i18n="home.incorporation.steps.0.description">
             Lorem ipsum dolor sit amet consectetur adipisicing elit. Hic
             veritatis, repellendus possimus delectus accusamus ad nam eius id
             aliquam eos, quam itaque explicabo, voluptatibus pariatur iusto
@@ -108,8 +106,8 @@
         </li>
         <li onclick="togglePaso(1)">
           <div class="numero">2</div>
-          <h3>Evaluación de documentos</h3>
-          <p>
+          <h3 data-i18n="home.incorporation.steps.1.title">Evaluación de documentos</h3>
+          <p data-i18n="home.incorporation.steps.1.description">
             Lorem ipsum dolor sit amet consectetur adipisicing elit. Hic
             veritatis, repellendus possimus delectus accusamus ad nam eius id
             aliquam eos, quam itaque explicabo, voluptatibus pariatur iusto
@@ -118,8 +116,8 @@
         </li>
         <li onclick="togglePaso(2)">
           <div class="numero">3</div>
-          <h3>Entrevista personal</h3>
-          <p>
+          <h3 data-i18n="home.incorporation.steps.2.title">Entrevista personal</h3>
+          <p data-i18n="home.incorporation.steps.2.description">
             Lorem ipsum dolor sit amet consectetur adipisicing elit. Hic
             veritatis, repellendus possimus delectus accusamus ad nam eius id
             aliquam eos, quam itaque explicabo, voluptatibus pariatur iusto
@@ -128,8 +126,8 @@
         </li>
         <li onclick="togglePaso(3)">
           <div class="numero">4</div>
-          <h3>Aprobación final</h3>
-          <p>
+          <h3 data-i18n="home.incorporation.steps.3.title">Aprobación final</h3>
+          <p data-i18n="home.incorporation.steps.3.description">
             Lorem ipsum dolor sit amet consectetur adipisicing elit. Hic
             veritatis, repellendus possimus delectus accusamus ad nam eius id
             aliquam eos, quam itaque explicabo, voluptatibus pariatur iusto
@@ -143,29 +141,29 @@
       <h2 data-i18n="home.faq.title">Preguntas Frecuentes</h2>
       <ul id="faq-list">
         <li onclick="togglePregunta(0)">
-          <span class="faq-question">¿Cómo puedo solicitar un servicio?</span>
-          <div class="pregunta-respuesta">
+          <span class="faq-question" data-i18n="home.faq.questions.0.question">¿Cómo puedo solicitar un servicio?</span>
+          <div class="pregunta-respuesta" data-i18n="home.faq.questions.0.answer">
             Puedes solicitar nuestros servicios a través del botón "Solicitar ingreso" o contactándonos directamente por
             teléfono. Nuestro equipo te guiará en todo el proceso.
           </div>
         </li>
         <li onclick="togglePregunta(1)">
-          <span class="faq-question">¿Cuáles son los métodos de pago aceptados?</span>
-          <div class="pregunta-respuesta">
+          <span class="faq-question" data-i18n="home.faq.questions.1.question">¿Cuáles son los métodos de pago aceptados?</span>
+          <div class="pregunta-respuesta" data-i18n="home.faq.questions.1.answer">
             Aceptamos transferencias bancarias, pagos en efectivo, tarjetas de crédito y débito. También ofrecemos
             planes de pago flexibles según tus necesidades.
           </div>
         </li>
         <li onclick="togglePregunta(2)">
-          <span class="faq-question">¿Ofrecen soporte después de la consultoría?</span>
-          <div class="pregunta-respuesta">
+          <span class="faq-question" data-i18n="home.faq.questions.2.question">¿Ofrecen soporte después de la consultoría?</span>
+          <div class="pregunta-respuesta" data-i18n="home.faq.questions.2.answer">
             Sí, brindamos soporte continuo durante 6 meses después de completar la consultoría. Esto incluye consultas
             telefónicas y seguimiento de tu progreso.
           </div>
         </li>
         <li onclick="togglePregunta(3)">
-          <span class="faq-question">¿Puedo cancelar mi solicitud?</span>
-          <div class="pregunta-respuesta">
+          <span class="faq-question" data-i18n="home.faq.questions.3.question">¿Puedo cancelar mi solicitud?</span>
+          <div class="pregunta-respuesta" data-i18n="home.faq.questions.3.answer">
             Puedes cancelar tu solicitud en cualquier momento antes de la firma del contrato. Si ya iniciamos el
             trabajo, aplicarán las condiciones establecidas en el contrato.
           </div>
