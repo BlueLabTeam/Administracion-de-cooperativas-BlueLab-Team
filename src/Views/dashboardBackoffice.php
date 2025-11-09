@@ -615,12 +615,12 @@
 					
 					<div class="material-form-group">
 						<label for="material-nombre" data-i18n="dashboardAdmin.materials.materialName">Nombre del Material *</label>
-						<input type="text" id="material-nombre" required data-i18n-placeholder="dashboardAdmin.materials.materialNamePlaceholder" placeholder="Ej: Cemento, Ladrillos, Arena">
+						<input type="text" id="material-nombre" required data-i18n-placeholder="dashboardAdmin.materials.materialNamePlaceholder" placeholder="Ej: Cemento, Ladrillos, Arena"  maxlength="250">
 					</div>
 					
 					<div class="material-form-group">
 						<label for="material-caracteristicas" data-i18n="dashboardAdmin.materials.characteristics">Características / Descripción</label>
-						<textarea id="material-caracteristicas" data-i18n-placeholder="dashboardAdmin.materials.characteristicsPlaceholder" placeholder="Describe el material, sus especificaciones, etc."></textarea>
+						<textarea id="material-caracteristicas" data-i18n-placeholder="dashboardAdmin.materials.characteristicsPlaceholder" placeholder="Describe el material, sus especificaciones, etc."  maxlength="250"></textarea>
 					</div>
 					
 					<div class="material-form-actions">

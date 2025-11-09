@@ -294,6 +294,85 @@ class CuotaController
     }
 
     /**
+ * ✅ ENDPOINT: Liquidar deuda de una cuota (marcarla como pagada)
+ * Ruta: POST /api/cuotas/liquidar
+ */
+public function liquidarCuota()
+{
+    // Limpiar buffers de salida
+    while (ob_get_level() > 0) {
+        ob_end_clean();
+    }
+    
+    header('Content-Type: application/json; charset=utf-8');
+
+    // ✅ Verificar autenticación y rol de admin
+    if (!isset($_SESSION['user_id']) || !$_SESSION['is_admin']) {
+        http_response_code(403);
+        echo json_encode([
+            'success' => false, 
+            'message' => 'No autorizado. Solo administradores pueden liquidar cuotas.'
+        ], JSON_UNESCAPED_UNICODE);
+        exit();
+    }
+
+    try {
+        // 📥 Obtener ID de cuota del POST
+        $cuotaId = $_POST['id_cuota'] ?? null;
+
+        // ✅ Validar que se recibió el ID
+        if (!$cuotaId || !is_numeric($cuotaId)) {
+            http_response_code(400);
+            echo json_encode([
+                'success' => false,
+                'message' => 'ID de cuota requerido y debe ser numérico'
+            ], JSON_UNESCAPED_UNICODE);
+            exit();
+        }
+
+        error_log("🔵 [CONTROLLER] liquidarCuota iniciado");
+        error_log("🔵 [CONTROLLER] ID Cuota: $cuotaId");
+        error_log("🔵 [CONTROLLER] Admin ID: " . $_SESSION['user_id']);
+
+        // ✅ Llamar al método del modelo
+        $resultado = $this->cuotaModel->liquidarCuotaForzada(
+            intval($cuotaId), 
+            intval($_SESSION['user_id'])
+        );
+
+        error_log("🔵 [CONTROLLER] Resultado: " . json_encode($resultado));
+
+        // ✅ Establecer código de respuesta HTTP
+        if ($resultado['success']) {
+            http_response_code(200);
+        } else {
+            http_response_code(400);
+        }
+
+        // ✅ Enviar respuesta JSON
+        echo json_encode($resultado, JSON_UNESCAPED_UNICODE);
+
+    } catch (\Exception $e) {
+        error_log("❌ [CONTROLLER] Error en liquidarCuota: " . $e->getMessage());
+        error_log("❌ [CONTROLLER] Stack: " . $e->getTraceAsString());
+        
+        http_response_code(500);
+        echo json_encode([
+            'success' => false,
+            'message' => 'Error interno del servidor al liquidar cuota',
+            'error' => $e->getMessage()
+        ], JSON_UNESCAPED_UNICODE);
+    }
+    
+    exit();
+}
+
+
+
+  
+   
+
+    /**
      * Verificar si existe cuota del mes
      */
     public function verificarCuotaMes()

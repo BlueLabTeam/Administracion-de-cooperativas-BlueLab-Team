@@ -807,6 +807,235 @@ error_log("💰 Deuda acumulada de meses anteriores: $$deudaAnterior");
         }
     }
 
+
+public function liquidarCuotaForzada($cuotaId, $adminId)
+{
+    try {
+        error_log("===========================================");
+        error_log("💰 [MODELO] liquidarCuotaForzada iniciado");
+        error_log("🔑 Cuota ID: $cuotaId");
+        error_log("👤 Admin ID: $adminId");
+        error_log("🔍 Conexión BD: " . ($this->conn ? "OK" : "NULL"));
+        
+        // ✅ VALIDACIÓN: Verificar que tenemos conexión a BD
+        if (!$this->conn) {
+            error_log("❌ [MODELO] No hay conexión a base de datos");
+            return [
+                'success' => false,
+                'message' => 'Error: No hay conexión a base de datos'
+            ];
+        }
+        
+        // ✅ PASO 1: OBTENER INFORMACIÓN DE LA CUOTA
+        try {
+            $stmt = $this->conn->prepare("
+                SELECT 
+                    c.id_cuota,
+                    c.id_usuario,
+                    c.estado,
+                    c.mes,
+                    c.anio,
+                    c.monto as monto_base,
+                    c.horas_requeridas,
+                    c.horas_cumplidas,
+                    u.nombre_completo,
+                    u.email
+                FROM Cuotas_Mensuales c
+                INNER JOIN Usuario u ON c.id_usuario = u.id_usuario
+                WHERE c.id_cuota = ?
+            ");
+            
+            if (!$stmt) {
+                error_log("❌ [MODELO] Error al preparar statement");
+                error_log("❌ [MODELO] PDO Error: " . json_encode($this->conn->errorInfo()));
+                return [
+                    'success' => false,
+                    'message' => 'Error al preparar consulta SQL'
+                ];
+            }
+            
+            $executed = $stmt->execute([$cuotaId]);
+            
+            if (!$executed) {
+                error_log("❌ [MODELO] Error al ejecutar query");
+                error_log("❌ [MODELO] Error info: " . json_encode($stmt->errorInfo()));
+                return [
+                    'success' => false,
+                    'message' => 'Error al ejecutar consulta'
+                ];
+            }
+            
+            $cuota = $stmt->fetch(\PDO::FETCH_ASSOC);
+            
+        } catch (\PDOException $e) {
+            error_log("❌ [MODELO] PDOException en SELECT: " . $e->getMessage());
+            return [
+                'success' => false,
+                'message' => 'Error de base de datos: ' . $e->getMessage()
+            ];
+        }
+        
+        if (!$cuota) {
+            error_log("❌ [MODELO] Cuota no encontrada: $cuotaId");
+            return [
+                'success' => false,
+                'message' => 'Cuota no encontrada'
+            ];
+        }
+        
+        error_log("📊 [MODELO] Cuota encontrada: " . json_encode($cuota));
+        
+        // ✅ PASO 2: VALIDAR QUE NO ESTÉ YA PAGADA
+        if ($cuota['estado'] === 'pagada') {
+            error_log("⚠️ [MODELO] La cuota ya está pagada");
+            return [
+                'success' => false,
+                'message' => 'Esta cuota ya está marcada como pagada'
+            ];
+        }
+        
+        // ✅ PASO 3: VALIDAR QUE NO ESTÉ EXONERADA
+        if ($cuota['estado'] === 'exonerada') {
+            error_log("⚠️ [MODELO] La cuota está exonerada");
+            return [
+                'success' => false,
+                'message' => 'No se pueden liquidar cuotas exoneradas'
+            ];
+        }
+        
+        // ✅ PASO 4: CALCULAR DEUDA TOTAL
+        $horasFaltantes = max(0, $cuota['horas_requeridas'] - $cuota['horas_cumplidas']);
+        $deudaHoras = $horasFaltantes * 160; // $160 por hora
+        $montoCuota = floatval($cuota['monto_base']);
+        $deudaTotal = $montoCuota + $deudaHoras;
+        
+        error_log("💵 [MODELO] Cálculos:");
+        error_log("   - Cuota base: $$montoCuota");
+        error_log("   - Horas faltantes: {$horasFaltantes}h");
+        error_log("   - Deuda horas: $$deudaHoras");
+        error_log("   - TOTAL DEUDA: $$deudaTotal");
+  
+        // ✅ PASO 5: ACTUALIZAR ESTADO DE LA CUOTA
+$updateStmt = $this->conn->prepare("
+    UPDATE Cuotas_Mensuales 
+    SET 
+        estado = 'pagada',
+        observaciones = CONCAT(
+            COALESCE(observaciones, ''), 
+            '\n\n[LIQUIDACIÓN ADMINISTRATIVA]\n',
+            'Fecha: ', NOW(), '\n',
+            'Admin ID: ', ?, '\n',
+            'Cuota base: $', ?, '\n',
+            'Deuda horas: $', ?, ' (', ?, 'h × $160)\n',
+            'Total liquidado: $', ?
+        )
+    WHERE id_cuota = ?
+");
+
+$ejecutado = $updateStmt->execute([
+    $adminId,             // admin en observaciones
+    $montoCuota,          // cuota base
+    $deudaHoras,          // deuda_horas
+    $horasFaltantes,      // horas faltantes
+    $deudaTotal,          // total liquidado
+    $cuotaId              // WHERE
+]);
+        
+        if (!$ejecutado) {
+            error_log("❌ [MODELO] Error al actualizar cuota");
+            error_log("❌ [MODELO] Error SQL: " . json_encode($updateStmt->errorInfo()));
+            return [
+                'success' => false,
+                'message' => 'Error al actualizar la cuota en la base de datos'
+            ];
+        }
+        
+        $filasAfectadas = $updateStmt->rowCount();
+        error_log("✅ [MODELO] Update ejecutado. Filas afectadas: $filasAfectadas");
+        
+        if ($filasAfectadas === 0) {
+            error_log("⚠️ [MODELO] No se afectó ninguna fila");
+            return [
+                'success' => false,
+                'message' => 'No se pudo actualizar la cuota (puede que no haya cambiado)'
+            ];
+        }
+        
+        // ✅ PASO 6: RECALCULAR DEUDA ACUMULADA
+        try {
+            error_log("🔄 [MODELO] Recalculando deuda acumulada...");
+            $this->recalcularDeudaAcumulada($cuota['id_usuario']);
+            error_log("✅ [MODELO] Deuda acumulada recalculada");
+        } catch (\Exception $e) {
+            error_log("⚠️ [MODELO] Error al recalcular deuda (no crítico): " . $e->getMessage());
+        }
+        
+        // ✅ PASO 7: REGISTRAR EN LOG DE AUDITORÍA (Opcional)
+        try {
+            // Verificar si la tabla existe
+            $checkTable = $this->conn->query("SHOW TABLES LIKE 'log_admin_actions'");
+            
+            if ($checkTable && $checkTable->rowCount() > 0) {
+                $logStmt = $this->conn->prepare("
+                    INSERT INTO log_admin_actions 
+                    (id_admin, accion, tabla_afectada, id_registro, detalles, fecha)
+                    VALUES (?, 'liquidar_cuota', 'Cuotas_Mensuales', ?, ?, NOW())
+                ");
+                
+                $detalles = json_encode([
+                    'cuota_id' => $cuotaId,
+                    'usuario_id' => $cuota['id_usuario'],
+                    'usuario_nombre' => $cuota['nombre_completo'],
+                    'mes' => $cuota['mes'],
+                    'anio' => $cuota['anio'],
+                    'monto_liquidado' => $deudaTotal,
+                    'deuda_horas' => $deudaHoras,
+                    'horas_faltantes' => $horasFaltantes,
+                    'estado_anterior' => $cuota['estado']
+                ]);
+                
+                $logStmt->execute([$adminId, $cuotaId, $detalles]);
+                error_log("📝 [MODELO] Log de auditoría registrado");
+            } else {
+                error_log("⚠️ [MODELO] Tabla log_admin_actions no existe, omitiendo log");
+            }
+            
+        } catch (\Exception $e) {
+            // No es crítico si falla el log
+            error_log("⚠️ [MODELO] Error al registrar log (no crítico): " . $e->getMessage());
+        }
+        
+        // ✅ PASO 8: RESPUESTA EXITOSA
+        error_log("✅ [MODELO] Liquidación completada exitosamente");
+        error_log("===========================================");
+        
+        return [
+            'success' => true,
+            'message' => "Cuota liquidada exitosamente. Total: $" . number_format($deudaTotal, 2, ',', '.'),
+            'data' => [
+                'cuota_id' => $cuotaId,
+                'usuario' => $cuota['nombre_completo'],
+                'mes' => $cuota['mes'],
+                'anio' => $cuota['anio'],
+                'monto_total' => $deudaTotal,
+                'deuda_horas' => $deudaHoras,
+                'horas_faltantes' => $horasFaltantes,
+                'nuevo_estado' => 'pagada'
+            ]
+        ];
+        
+    } catch (\Exception $e) {
+        error_log("❌ [MODELO] Excepción en liquidarCuotaForzada: " . $e->getMessage());
+        error_log("❌ [MODELO] Stack: " . $e->getTraceAsString());
+        error_log("===========================================");
+        
+        return [
+            'success' => false,
+            'message' => 'Error al liquidar cuota: ' . $e->getMessage()
+        ];
+    }
+}
+
     /**
      * Obtener todas las cuotas (Admin)
      */

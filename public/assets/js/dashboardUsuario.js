@@ -1,27 +1,4 @@
-// 🧪 MODO TEST: Simular último día de DICIEMBRE
-(function() {
-    const TEST_MODE = true; // Cambiar a false para volver a normal
-    
-    if (TEST_MODE) {
-        // Sobrescribir Date para simular el 31 de diciembre
-        const fechaOriginal = Date;
-        // 🚨 CAMBIO: 11 es el índice de Diciembre, y 31 es el último día.
-        const ultimoDiaDiciembre = new Date(new Date().getFullYear(), 11, 31); 
-        
-        window.Date = function(...args) {
-            if (args.length === 0) {
-                return ultimoDiaDiciembre; // Devolvemos la fecha simulada
-            }
-            return new fechaOriginal(...args);
-        };
-        
-        // Copiar métodos estáticos
-        Object.setPrototypeOf(window.Date, fechaOriginal);
-        window.Date.prototype = fechaOriginal.prototype;
-        
-        console.log('🧪 TEST MODE: Fecha simulada =', ultimoDiaDiciembre.toLocaleDateString());
-    }
-})();
+
 
 document.addEventListener('DOMContentLoaded', function () {
     const menuItems = document.querySelectorAll('.menu li');
@@ -1543,7 +1520,7 @@ async function loadMisRegistros() {
 
         if (data.success && data.registros) {
             renderHistorialRegistros(data.registros);
-            (` ${data.registros.length} registros cargados`);
+            console.log(`✅ ${data.registros.length} registros cargados`);
         } else {
             container.innerHTML = '<p class="error">Error al cargar registros</p>';
         }
@@ -1559,62 +1536,78 @@ function renderHistorialRegistros(registros) {
 
     if (!registros || registros.length === 0) {
         container.innerHTML = `
-            <div class="no-data">
-                <i class="fas fa-inbox" style="font-size: 48px; color: #ddd; margin-bottom: 10px;"></i>
-                <p>No hay registros para mostrar</p>
+            <div style="text-align: center; padding: 40px; background: #f8f9fa; border-radius: 12px;">
+                <i class="fas fa-inbox" style="font-size: 48px; color: #ccc; margin-bottom: 15px;"></i>
+                <p style="color: #6c757d; margin: 0;">No hay registros para mostrar</p>
             </div>
         `;
         return;
     }
 
-    let html = `
-        <div class="registros-table-wrapper">
-            <table class="registros-table">
-                <thead>
-                    <tr>
-                        <th>Fecha</th>
-                        <th>Día</th>
-                        <th>Entrada</th>
-                        <th>Salida</th>
-                        <th>Total</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-    `;
+    // Agrupar por semanas
+    const semanas = agruparPorSemanas(registros);
+    
+    let html = '<div class="registros-accordion">';
 
-    registros.forEach(reg => {
-        const fecha = new Date(reg.fecha + 'T00:00:00');
-        const fechaFormateada = formatearFechaSimple(reg.fecha);
-        const diaSemana = obtenerDiaSemana(fecha);
-        const entrada = reg.hora_entrada ? reg.hora_entrada.substring(0, 5) : '--:--';
-        const salida = reg.hora_salida ? reg.hora_salida.substring(0, 5) : '<span class="en-curso">En curso</span>';
-        const horas = reg.total_horas || '0.00';
+    semanas.forEach((semana, index) => {
+        const isOpen = index === 0; // Solo la primera semana abierta
+        const totalHoras = semana.registros.reduce((sum, r) => sum + parseFloat(r.total_horas || 0), 0);
+        const promedioHoras = (totalHoras / semana.registros.length).toFixed(1);
 
         html += `
-            <tr class="registro-row">
-                <td><strong>${fechaFormateada}</strong></td>
-                <td>${diaSemana}</td>
-                <td><i class="fas fa-sign-in-alt"></i> ${entrada}</td>
-                <td><i class="fas fa-sign-out-alt"></i> ${salida}</td>
-                <td><strong>${horas}h</strong></td>
-                <td>
-                    ${reg.descripcion ? `
-                        <button class="btn-small btn-secondary" onclick="verDescripcionRegistro('${reg.descripcion.replace(/'/g, "\\'")}', '${fechaFormateada}')" title="Ver descripción">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                    ` : '-'}
-                </td>
-            </tr>
+            <div class="semana-card ${isOpen ? 'open' : ''}" data-semana="${index}">
+                <div class="semana-header" onclick="toggleSemana(${index})">
+                    <div class="semana-info">
+                        <div class="semana-icono">
+                            <i class="fas fa-calendar-week"></i>
+                        </div>
+                        <div class="semana-texto">
+                            <h4>${semana.titulo}</h4>
+                            <span class="semana-rango">${semana.rango}</span>
+                        </div>
+                    </div>
+                    <div class="semana-stats">
+                        <div class="stat-item">
+                            <span class="stat-valor">${semana.registros.length}</span>
+                            <span class="stat-label">días</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-valor">${totalHoras.toFixed(1)}h</span>
+                            <span class="stat-label">total</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-valor">${promedioHoras}h</span>
+                            <span class="stat-label">promedio</span>
+                        </div>
+                    </div>
+                    <div class="semana-toggle">
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
+                
+                <div class="semana-content ${isOpen ? 'show' : ''}">
+                    <table class="registros-mini-table">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Entrada</th>
+                                <th>Salida</th>
+                                <th>Horas</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${semana.registros.map(reg => renderRegistroRow(reg)).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         `;
     });
 
-    html += `
-                </tbody>
-            </table>
-        </div>
-    `;
-
+    html += '</div>';
+    html += getEstilosRegistros();
+    
     container.innerHTML = html;
 }
 
@@ -2189,7 +2182,7 @@ async function loadInfoViviendaCuota() {
 }
 
 // ========== CARGAR CUOTAS DEL USUARIO ==========
-// ========== CARGAR CUOTAS DEL USUARIO ==========
+
 async function loadMisCuotas() {
     const container = document.getElementById('misCuotasContainer');
     if (!container) return;
@@ -2696,11 +2689,15 @@ function renderCuotaCard(cuota) {
     
     return `
         <div class="cuota-card estado-${estadoFinal}">
-            <div class="cuota-card-header">
+             <div class="cuota-card-header">
                 <div>
                     <h4>${mes} ${cuota.anio}</h4>
                     <span class="cuota-vivienda">${cuota.numero_vivienda} - ${cuota.tipo_vivienda}</span>
                 </div>
+                <span class="cuota-badge badge-${esPagada ? 'pagada' : esVencida ? 'vencida' : estadoFinal}">
+                    ${esPagada ? '✅ Pagada' : formatEstadoCuota(estadoFinal)}
+                </span>
+            </div>
                 <span class="cuota-badge badge-${estadoFinal}">
                     ${formatEstadoCuota(estadoFinal)}
                 </span>
@@ -3079,8 +3076,8 @@ window.renderMisCuotasOrganizadas = function(cuotas) {
     
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     console.log('💰 [RENDER] DEUDA DE HORAS:');
-    console.log('   window.deudaHorasActual:', window.deudaHorasActual);
-    console.log('   deudaHoras (parseado):', deudaHoras);
+    console.log('    window.deudaHorasActual:', window.deudaHorasActual);
+    console.log('    deudaHoras (parseado):', deudaHoras);
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     
     // ✅ CALCULAR MONTO DE CUOTA
@@ -3095,23 +3092,23 @@ window.renderMisCuotasOrganizadas = function(cuotas) {
     const deudaAcumuladaAnterior = parseFloat(cuotaMasReciente.monto_pendiente_anterior || 0);
     
     // ✅ AÑADIR: Monto Base Pendiente (Cuota de vivienda + deuda anterior)
-const montoPendienteBase = montoCuota + deudaAcumuladaAnterior;
+    const montoPendienteBase = montoCuota + deudaAcumuladaAnterior;
 
     // 🔥 MONTO TOTAL
     const montoTotal = montoPendienteBase + deudaHoras;
     
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     console.log('💰 [RENDER] CÁLCULO COMPLETO:');
-    console.log('   monto_cuota:', montoCuota);
-    console.log('   deuda_meses_anteriores:', deudaAcumuladaAnterior);
-    console.log('   deuda_horas_actual:', deudaHoras);
-    console.log('   ✅ TOTAL A PAGAR:', montoTotal);
+    console.log('    monto_cuota:', montoCuota);
+    console.log('    deuda_meses_anteriores:', deudaAcumuladaAnterior);
+    console.log('    deuda_horas_actual:', deudaHoras);
+    console.log('    ✅ TOTAL A PAGAR:', montoTotal);
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     
     // ⚠️ VALIDACIÓN CRÍTICA
     if (deudaHoras === 0 && window.deudaHorasActual > 0) {
         console.error('❌ [ERROR] deudaHoras es 0 pero window.deudaHorasActual es:', window.deudaHorasActual);
-        console.error('   Esto indica un problema en el parseo. Forzando valor...');
+        console.error('    Esto indica un problema en el parseo. Forzando valor...');
         // NO hacer nada aquí, el parseFloat ya debería funcionar
     }
     
@@ -3121,12 +3118,14 @@ const montoPendienteBase = montoCuota + deudaAcumuladaAnterior;
     const estadoUsuario = cuotaMasReciente.estado_usuario || '';
     
     const tienePagoPendiente = cuotaMasReciente.id_pago && estadoPago === 'pendiente';
-    const pagoAprobado = estadoUsuario === 'aceptado' || (estadoPago === 'aprobado' && estadoFinal === 'pagada');
-    const estaPagada = estadoFinal === 'pagada' || pagoAprobado;
+    
+    // 💡 CORRECCIÓN APLICADA: La cuota es 'pagada' si el estado final lo dice, 
+    // O si el pago ha sido aprobado/aceptado por el administrador.
+    const estaPagada = estadoFinal === 'pagada' || estadoUsuario === 'aceptado' || estadoPago === 'aprobado'; 
     
     console.log('🔍 Estados:', {
         estado_final: estadoFinal,
-        esta_pagada: estaPagada,
+        esta_pagada: estaPagada, // Esta variable ahora es más robusta
         pago_pendiente: tienePagoPendiente
     });
     
@@ -3142,11 +3141,13 @@ const montoPendienteBase = montoCuota + deudaAcumuladaAnterior;
     
     const diasParaPagar = estaDentroPeriodoPago ? 0 : Math.max(0, 25 - diaActual);
     
-    console.log('📅 Periodo:', {
+   console.log('📅 Periodo:', {
         dia_actual: diaActual,
         mes_cuota: `${cuotaMasReciente.mes}/${cuotaMasReciente.anio}`,
         mes_actual: `${mesActual}/${anioActual}`,
         es_mes_cuota: esMesCuota,
+        esta_pagada: estaPagada,
+        pago_aprobado: pagoAprobado,
         puede_pagar: puedePagar,
         dias_para_pagar: diasParaPagar
     });
@@ -3163,14 +3164,14 @@ const montoPendienteBase = montoCuota + deudaAcumuladaAnterior;
                     ${estaPagada ? '✅ PAGADA' : 
                       tienePagoPendiente ? '⏳ EN VALIDACIÓN' : 
                       puedePagar ? '⚠️ PERIODO DE PAGO ABIERTO' : 
-                      diasParaPagar > 0 ? `🔒 ${diasParaPagar} DÍA${diasParaPagar !== 1 ? 'S' : ''} PARA PAGAR` :
+                      esMesCuota && diasParaPagar > 0 ? `🔒 ${diasParaPagar} DÍA${diasParaPagar !== 1 ? 'S' : ''} PARA PAGAR` :
+                      !esMesCuota ? '⏰ Mes cerrado' :
                       '❌ VENCIDA'}
                 </span>
             </div>
             
             <div class="deuda-total-body">
                 <div class="deuda-breakdown">
-                    <!-- 🏠 CUOTA DE VIVIENDA -->
                     <div class="deuda-breakdown-item">
                         <i class="fas fa-home"></i>
                         <div>
@@ -3182,6 +3183,7 @@ const montoPendienteBase = montoCuota + deudaAcumuladaAnterior;
                   ${deudaAcumuladaAnterior > 0 ? `
 
         
+        <div class="deuda-breakdown-divider">+</div>
         <div class="deuda-breakdown-item deuda-acumulada">
             <i class="fas fa-exclamation-triangle"></i>
             <div>
@@ -3198,23 +3200,23 @@ const montoPendienteBase = montoCuota + deudaAcumuladaAnterior;
 
                     
                     ${deudaHoras > 0 ? `
-    <div class="deuda-breakdown-item deuda-horas">
-        <i class="fas fa-clock"></i>
-        <div>
-            <span class="deuda-label">Deuda por Horas No Trabajadas</span>
-            <span class="deuda-monto ${deudaHoras > 0 ? 'error' : 'success'}">$${deudaHoras.toLocaleString('es-UY', {minimumFractionDigits: 2})}</span>
-            <small style="color: ${deudaHoras > 0 ? '#ff8a80' : '#81c784'}; display: block; margin-top: 5px;">
-                ${deudaHoras > 0 ? '($160 por hora × horas faltantes)' : '¡Sin deuda de horas!'}
-            </small>
+        <div class="deuda-breakdown-divider">+</div>
+        <div class="deuda-breakdown-item deuda-horas">
+            <i class="fas fa-clock"></i>
+            <div>
+                <span class="deuda-label">Deuda por Horas No Trabajadas</span>
+                <span class="deuda-monto ${deudaHoras > 0 ? 'error' : 'success'}">$${deudaHoras.toLocaleString('es-UY', {minimumFractionDigits: 2})}</span>
+                <small style="color: ${deudaHoras > 0 ? '#ff8a80' : '#81c784'}; display: block; margin-top: 5px;">
+                    ${deudaHoras > 0 ? '($160 por hora × horas faltantes)' : '¡Sin deuda de horas!'}
+                </small>
+            </div>
         </div>
-    </div>
-` : ''}
+    ` : ''}
 
 
                     
                     <div class="deuda-breakdown-divider">=</div>
                     
-                    <!-- 💰 TOTAL -->
                     <div class="deuda-breakdown-item deuda-total">
                         <i class="fas fa-calculator"></i>
                         <div>
@@ -3226,7 +3228,6 @@ const montoPendienteBase = montoCuota + deudaAcumuladaAnterior;
                     </div>
                 </div>
                 
-                <!-- 📊 ALERTAS Y ACCIONES -->
                 ${estaPagada ? `
                     <div class="alert-success" style="margin-top: 20px;">
                         <strong style="color: #4caf50;">🎉 ¡Pago Completado!</strong>
@@ -3234,7 +3235,6 @@ const montoPendienteBase = montoCuota + deudaAcumuladaAnterior;
                             Has pagado exitosamente tu cuota de ${obtenerNombreMes(cuotaMasReciente.mes)} ${cuotaMasReciente.anio}.
                             ${cuotaMasReciente.fecha_pago ? `<br>Fecha de pago: ${new Date(cuotaMasReciente.fecha_pago).toLocaleDateString('es-UY')}` : ''}
                             
-                            <!-- 📋 DESGLOSE DEL PAGO -->
                             <br><br>
                             <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; margin-top: 10px;">
                                 <strong style="display: block; margin-bottom: 10px;">📋 Desglose del Pago:</strong>
@@ -3388,16 +3388,17 @@ if (typeof obtenerNombreMes !== 'function') {
 
 console.log('✅ Fix de renderizado completo aplicado');
 console.log('📊 Ahora se muestra:');
-console.log('   ✓ Cuota de vivienda');
-console.log('   ✓ Deuda de meses anteriores (si existe)');
-console.log('   ✓ Deuda por horas del mes actual');
-console.log('   ✓ Total correcto');
+console.log('    ✓ Cuota de vivienda');
+console.log('    ✓ Deuda de meses anteriores (si existe)');
+console.log('    ✓ Deuda por horas del mes actual');
+console.log('    ✓ Total correcto');
 
 
 // Exportar funciones
-window.esUltimoDiaMes = esUltimoDiaMes;
-window.diasHastaPago = diasHastaPago;
-window.obtenerUltimoDiaMes = obtenerUltimoDiaMes;
+// Asumiendo que estas funciones se definen en alguna otra parte del código:
+// window.esUltimoDiaMes = esUltimoDiaMes; 
+// window.diasHastaPago = diasHastaPago;
+// window.obtenerUltimoDiaMes = obtenerUltimoDiaMes;
 
 (' Sistema actualizado: Pago solo último día del mes');
 
@@ -3728,16 +3729,24 @@ function abrirModalNuevaSolicitud() {
                     </div>
 
                     <div class="form-group">
-                        <label for="descripcion-solicitud">
-                            <i class="fas fa-align-left"></i> Descripción *
-                        </label>
-                        <textarea 
-                            id="descripcion-solicitud" 
-                            name="descripcion"
-                            rows="6"
-                            placeholder="Describe detalladamente tu solicitud..."
-                            required></textarea>
-                    </div>
+    <label for="descripcion-solicitud">
+        <i class="fas fa-align-left"></i> Descripción *
+    </label>
+    <textarea 
+        id="descripcion-solicitud" 
+        name="descripcion"
+        rows="6"
+        maxlength="250"
+        placeholder="Describe detalladamente tu solicitud..."
+        required
+        style="resize: none; width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; font-size: 14px;"
+    ></textarea>
+    <small id="charCount" style="color: #666; display: block; text-align: right; margin-top: 4px;">
+     
+    </small>
+</div>
+
+
 
                     <div class="form-group">
                         <label for="prioridad-solicitud">
@@ -6343,23 +6352,42 @@ window.addEventListener('beforeunload', function() {
 const originalRenderCuotaCard = window.renderCuotaCard;
 
 window.renderCuotaCard = function(cuota) {
-    // Validación extra de estados
     const estadoFinal = cuota.estado_actual || cuota.estado;
     const estadoPago = cuota.estado_pago || '';
     const estadoUsuario = cuota.estado_usuario || '';
-    const tienePagoPendiente = cuota.id_pago && estadoPago === 'pendiente';
-    const pagoAprobado = estadoPago === 'aprobado' || estadoUsuario === 'aceptado';
-    const esPagada = estadoFinal === 'pagada' || pagoAprobado;
     
-    console.log('🎨 [RENDER CARD] Renderizando cuota:', {
+    const mes = obtenerNombreMes(cuota.mes);
+    const fechaVenc = new Date(cuota.fecha_vencimiento + 'T00:00:00');
+    const fechaVencFormatted = fechaVenc.toLocaleDateString('es-UY');
+    
+    // 🔥 MISMA LÓGICA QUE EN renderMisCuotasOrganizadas
+    const pagoAprobado = estadoUsuario === 'aceptado' || estadoPago === 'aprobado';
+    const tienePagoPendiente = cuota.id_pago && estadoPago === 'pendiente' && !pagoAprobado;
+    const esPagada = estadoFinal === 'pagada' || pagoAprobado;
+    const esVencida = estadoFinal === 'vencida' && !esPagada;
+    
+    console.log('🎴 [CARD] Renderizando cuota:', {
         id: cuota.id_cuota,
-        estado: estadoFinal,
+        mes: `${cuota.mes}/${cuota.anio}`,
+        estado_final: estadoFinal,
         estado_pago: estadoPago,
         estado_usuario: estadoUsuario,
-        tiene_pago_pendiente: tienePagoPendiente,
         pago_aprobado: pagoAprobado,
-        es_pagada: esPagada
+        tiene_pago_pendiente: tienePagoPendiente,
+        es_pagada: esPagada,
+        es_vencida: esVencida
     });
+    
+    // Calcular montos
+    const montoCuota = obtenerPrecioActualizado(cuota);
+    const deudaAcumuladaAnterior = parseFloat(cuota.monto_pendiente_anterior || 0);
+    const deudaHorasMostrar = (!esPagada && !tienePagoPendiente) ? (window.deudaHorasActual || 0) : 0;
+    
+    // Monto total a mostrar
+    const montoMostrar = montoCuota + deudaAcumuladaAnterior + deudaHorasMostrar;
+    
+    // Si está pagada, obtener el monto realmente pagado
+    const montoPagado = esPagada && cuota.monto_pagado ? parseFloat(cuota.monto_pagado) : montoMostrar;
     
     // Si está pagada o aprobada, asegurar que no se pueda pagar
     if (esPagada || pagoAprobado) {
@@ -6781,13 +6809,28 @@ console.log('━━━━━━━━━━━━━━━━━━━━━━�
     }
     
     // ✅ VERIFICAR ESTADOS
+    // ✅ VERIFICAR ESTADOS - ORDEN DE PRIORIDAD CORRECTO
     const estadoFinal = cuotaMasReciente.estado_actual || cuotaMasReciente.estado;
     const estadoPago = cuotaMasReciente.estado_pago || '';
     const estadoUsuario = cuotaMasReciente.estado_usuario || '';
-    const tienePagoPendiente = cuotaMasReciente.id_pago && estadoPago === 'pendiente';
-    const pagoAprobado = estadoUsuario === 'aceptado' || (estadoPago === 'aprobado' && estadoFinal === 'pagada');
+    
+    // 🔥 PRIORIDAD 1: Si estado_usuario es 'aceptado' → PAGADA
+    const pagoAprobado = estadoUsuario === 'aceptado' || estadoPago === 'aprobado';
+    
+    // 🔥 PRIORIDAD 2: Si estado_pago es 'pendiente' → EN VALIDACIÓN
+    const tienePagoPendiente = cuotaMasReciente.id_pago && estadoPago === 'pendiente' && !pagoAprobado;
+    
+    // 🔥 PRIORIDAD 3: Si cualquiera de los estados indica pagada → PAGADA
     const estaPagada = estadoFinal === 'pagada' || pagoAprobado;
     
+    console.log('🔍 [ESTADOS] Verificación completa:', {
+        estado_final: estadoFinal,
+        estado_pago: estadoPago,
+        estado_usuario: estadoUsuario,
+        pago_aprobado: pagoAprobado,
+        tiene_pago_pendiente: tienePagoPendiente,
+        esta_pagada: estaPagada
+    });
     // ✅ VERIFICAR PERIODO DE PAGO
     const hoy = new Date();
     const diaActual = hoy.getDate();
@@ -6811,7 +6854,8 @@ console.log('━━━━━━━━━━━━━━━━━━━━━━�
                     ${estaPagada ? '✅ PAGADA' : 
                       tienePagoPendiente ? '⏳ EN VALIDACIÓN' : 
                       puedePagar ? '⚠️ PERIODO DE PAGO ABIERTO' : 
-                      diasParaPagar > 0 ? `🔒 ${diasParaPagar} DÍA${diasParaPagar !== 1 ? 'S' : ''} PARA PAGAR` :
+                      esMesCuota && diasParaPagar > 0 ? `🔒 ${diasParaPagar} DÍA${diasParaPagar !== 1 ? 'S' : ''} PARA PAGAR` :
+                      !esMesCuota ? '⏰ Mes cerrado' :
                       '❌ VENCIDA'}
                 </span>
             </div>

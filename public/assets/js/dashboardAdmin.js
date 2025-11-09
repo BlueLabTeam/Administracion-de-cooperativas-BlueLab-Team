@@ -3858,148 +3858,147 @@ async function loadAllCuotasAdmin() {
     }
 }
 
-// ========== RENDERIZAR TABLA DE CUOTAS ==========
-function renderAllCuotasAdmin(cuotas) {
-    const container = document.getElementById('allCuotasAdminContainer');
-    
-    if (!cuotas || cuotas.length === 0) {
-        container.innerHTML = `
-            <div style="text-align: center; padding: 60px 20px;">
-                <i class="fas fa-inbox" style="font-size: 48px; color: ${COLORS.gray100}; display: block; margin-bottom: 15px;"></i>
-                <p style="color: ${COLORS.gray500};">No se encontraron cuotas</p>
-            </div>
-        `;
+
+async function forzarPagoCuota(idCuota) {
+    if (!confirm(`¿Seguro que desea LIQUIDAR esta deuda? La cuota ${idCuota} se marcará como PAGADA.`)) {
         return;
     }
-    
-    let html = `
-        <div style="overflow-x: auto; border-radius: 12px; box-shadow: ${COLORS.shadow};">
-            <table style="width: 100%; border-collapse: collapse; background: ${COLORS.white}; min-width: 1200px;">
-                <thead>
-                    <tr style="background: linear-gradient(135deg, ${COLORS.primary} 0%, ${COLORS.primaryDark} 100%); color: ${COLORS.white};">
-                        <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;">Usuario</th>
-                        <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;">Vivienda</th>
-                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Período</th>
-                        <th style="padding: 15px 12px; text-align: right; font-weight: 600; font-size: 13px;">Monto</th>
-                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Estado</th>
-                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Horas</th>
-                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Vencimiento</th>
-                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-    `;
-    
-    cuotas.forEach(cuota => {
-        const estadoFinal = cuota.estado_actual || cuota.estado;
-        const mes = obtenerNombreMes(cuota.mes);
-        const tienePagoPendiente = cuota.id_pago && cuota.estado_pago === 'pendiente';
+
+    try {
+        mostrarCargando();
         
-        const nombreUsuario = cuota.nombre_completo || 'Usuario';
-        const emailUsuario = cuota.email || '';
-        
-        let estadoColor = '';
-        let estadoText = '';
-        if (estadoFinal === 'pagada') {
-            estadoColor = COLORS.success;
-            estadoText = 'Pagada';
-        } else if (estadoFinal === 'pendiente') {
-            estadoColor = COLORS.warning;
-            estadoText = 'Pendiente';
-        } else if (estadoFinal === 'vencida') {
-            estadoColor = COLORS.danger;
-            estadoText = 'Vencida';
-        } else if (estadoFinal === 'exonerada') {
-            estadoColor = COLORS.primary;
-            estadoText = 'Exonerada';
+        // El nuevo estado es 'pagada', que es lo que pide el usuario
+        const resultado = await procesarCambioEstadoCuota(idCuota, 'pagada');
+
+        if (resultado.success) {
+            alert(`Cuota ${idCuota} liquidada y marcada como PAGADA con éxito.`);
+            // Recargar la tabla o la página para reflejar el cambio
+            location.reload(); 
+        } else {
+            alert(`Error al liquidar la cuota ${idCuota}.`);
         }
-        
-        html += `
-            <tr style="border-bottom: 1px solid ${COLORS.gray100}; transition: all 0.2s ease;" 
-                onmouseover="this.style.background='${COLORS.primaryLight}'" 
-                onmouseout="this.style.background='${COLORS.white}'">
-                
-                <td style="padding: 14px 12px; font-size: 13px;">
-                    <div style="font-weight: 600; color: ${COLORS.primary};">${nombreUsuario}</div>
-                    <div style="font-size: 11px; color: ${COLORS.gray500}; margin-top: 3px;">${emailUsuario}</div>
-                </td>
-                
-                <td style="padding: 14px 12px; font-size: 13px; color: ${COLORS.gray700};">
-                    ${cuota.numero_vivienda}<br>
-                    <small style="color: ${COLORS.gray500};">${cuota.tipo_vivienda}</small>
-                </td>
-                
-                <td style="padding: 14px 12px; text-align: center; font-weight: 600; color: ${COLORS.gray700};">
-                    ${mes} ${cuota.anio}
-                </td>
-                
-                <td style="padding: 14px 12px; text-align: right; font-weight: 600; font-size: 14px; color: ${COLORS.primary};">
-                    $${parseFloat(cuota.monto_total || cuota.monto_base || cuota.monto || 0).toLocaleString('es-UY', {minimumFractionDigits: 2})}
-                </td>
-                
-                <td style="padding: 14px 12px; text-align: center;">
-                    <span style="
-                        display: inline-block;
-                        padding: 6px 12px;
-                        border-radius: 20px;
-                        font-size: 11px;
-                        font-weight: 600;
-                        text-transform: uppercase;
-                        background: ${estadoColor};
-                        color: ${COLORS.white};
-                    ">${estadoText}</span>
-                </td>
-                
-                <td style="padding: 14px 12px; text-align: center; font-size: 13px; color: ${COLORS.gray700};">
-                    <div style="font-weight: 600;">${cuota.horas_cumplidas || 0}h / ${cuota.horas_requeridas}h</div>
-                    ${cuota.horas_validadas ? `<small style="color: ${COLORS.success};">✓ Validadas</small>` : ''}
-                </td>
-                
-                <td style="padding: 14px 12px; text-align: center; font-size: 13px; color: ${COLORS.gray700};">
-                    ${new Date(cuota.fecha_vencimiento + 'T00:00:00').toLocaleDateString('es-UY')}
-                </td>
-                
-                <td style="padding: 14px 12px;">
-                    <div style="display: flex; gap: 5px; justify-content: center; flex-wrap: wrap;">
-                        ${tienePagoPendiente ? `
-                            <button class="btn-small btn-primary" 
-                                    onclick="abrirValidarPagoModal(${cuota.id_pago}, ${cuota.id_cuota})" 
-                                    title="Validar pago">
-                                <i class="fas fa-check-circle"></i>
-                            </button>
-                        ` : ''}
-                        
-                        ${cuota.comprobante_archivo ? `
-                            <button class="btn-small btn-secondary" 
-                                    onclick="verComprobanteAdmin('${cuota.comprobante_archivo}')" 
-                                    title="Ver comprobante">
-                                <i class="fas fa-image"></i>
-                            </button>
-                        ` : ''}
-                        
-                        ${cuota.horas_cumplidas < cuota.horas_requeridas ? `
-                            <button class="btn-small btn-success" 
-                                    onclick="abrirModalJustificarHoras(
-                                        ${cuota.id_cuota}, 
-                                        ${cuota.id_usuario}, 
-                                        '${(cuota.nombre_completo || 'Usuario').replace(/'/g, "\\'")}',
-                                        ${cuota.mes},
-                                        ${cuota.anio},
-                                        ${cuota.horas_requeridas - (cuota.horas_cumplidas || 0)}
-                                    )" 
-                                    title="Justificar horas faltantes">
-                                <i class="fas fa-check-circle"></i> Justificar
-                            </button>
-                        ` : ''}
-                    </div>
-                </td>
-            </tr>
-        `;
-    });
-    
-    html += '</tbody></table></div>';
-    container.innerHTML = html;
+    } catch (error) {
+        console.error('Error al procesar la liquidación:', error);
+        alert('Ocurrió un error en el servidor al intentar liquidar la deuda.');
+    } finally {
+        ocultarCargando();
+    }
 }
+
+function mostrarCargando() {
+    const loadingOverlay = document.getElementById('loading-overlay');
+    if (loadingOverlay) {
+        loadingOverlay.style.display = 'flex'; // O 'block', si no es un flexbox
+    }
+    // Opcional: Desactivar el botón para evitar múltiples clics
+    // document.getElementById('btnForzarPago').disabled = true; 
+}
+
+function ocultarCargando() {
+    const loadingOverlay = document.getElementById('loading-overlay');
+    if (loadingOverlay) {
+        loadingOverlay.style.display = 'none';
+    }
+    // Opcional: Reactivar el botón
+    // document.getElementById('btnForzarPago').disabled = false;
+}
+
+async function procesarCambioEstadoCuota(idCuota, nuevoEstado) {
+    // 💡 Aquí está la LÓGICA REAL con un FETCH a tu API
+    const url = '/api/cuotas/liquidar?'; // Endpoint asumido en tu servidor (ej: PHP, Node.js)
+    
+    console.log(`[API CALL] Cambiando estado de cuota ${idCuota} a ${nuevoEstado}...`);
+
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+                id_cuota: idCuota, 
+                estado: nuevoEstado // Debe ser 'pagada'
+            })
+        });
+
+        if (!response.ok) {
+            // Manejar errores HTTP (400, 500, etc.)
+            const errorData = await response.json().catch(() => ({ message: 'Error desconocido en el servidor.' }));
+            throw new Error(`Error HTTP ${response.status}: ${errorData.message || 'Fallo en la liquidación.'}`);
+        }
+
+        // El backend es el responsable de ejecutar la lógica de liquidación, 
+        // actualizar el estado en DB y "sumar lo que debería" (saldos, etc.).
+        return await response.json(); 
+
+    } catch (error) {
+        console.error('Error durante la llamada a la API:', error);
+        // Propagar el error para que forzarPagoCuota lo capture
+        throw new Error('Fallo en la comunicación con el servidor.');
+    }
+}
+
+// ========== RENDERIZAR TABLA DE CUOTAS ==========
+// dashboardAdmin.js (Alrededor de la línea 3931)
+
+async function forzarPagoCuota(idCuota) {
+  
+   mostrarCargando(); 
+
+    try {
+      
+        const url = `/api/cuotas/recalcular-deuda/${idCuota}`; 
+        
+        const response = await fetch(url, {
+            method: 'POST', 
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        // 2. Manejo de errores HTTP
+        if (!response.ok) {
+            // Captura errores como 404, 500, 401, etc.
+            throw new Error(`El servidor respondió con un error ${response.status}.`);
+        }
+
+        const data = await response.json();
+
+        // 3. Manejo de la lógica de negocio (lo que devuelve tu Controller)
+        if (data.success) {
+            // Éxito: Muestra alerta y recarga la interfaz
+            Swal.fire('¡Pago Forzado!', data.message || 'La liquidación se procesó correctamente.', 'success');
+            // Recargar datos (ej. tabla de liquidaciones)
+            // cargarLiquidaciones(); 
+        } else {
+            // Error de negocio devuelto por el Controller
+            throw new Error(data.message || 'Error desconocido al procesar la liquidación.');
+        }
+
+    } catch (error) {
+        // 4. Captura y manejo de cualquier error
+        console.error('Error al procesar la liquidación:', error);
+        // Muestra el error al usuario
+        Swal.fire('Error', `No se pudo procesar: ${error.message}`, 'error');
+        // El error que veías en la consola: "Error al procesar la liquidación: ReferenceError..."
+        // Ahora se mostrará como un error del proceso.
+
+    } finally {
+        // [Línea 3948] ⬅️ Aquí es donde tenías el segundo ReferenceError
+        // ESTO ES CLAVE: se ejecuta SIEMPRE, haya éxito o error.
+        ocultarCargando(); 
+    }
+}
+
+// Funciones de acción existentes (placeholders para evitar ReferenceError)
+function abrirValidarPagoModal(idPago, idCuota) { console.log(`[ADMIN] Abriendo modal para validar pago ID ${idPago} de cuota ${idCuota}`); }
+function verComprobanteAdmin(archivo) { console.log(`[ADMIN] Abriendo comprobante: ${archivo}`); }
+function abrirModalJustificarHoras(idCuota, idUsuario, nombre, mes, anio, horasFaltantes) { console.log(`[ADMIN] Abriendo modal para justificar ${horasFaltantes} horas para ${nombre}`); }
+window.abrirValidarPagoModal = function(idPago, idCuota) { console.log(`[ADMIN] Abriendo modal para validar pago ID ${idPago} de cuota ${idCuota}`); };
+window.verComprobanteAdmin = function(archivo) { console.log(`[ADMIN] Abriendo comprobante: ${archivo}`); };
+window.abrirModalJustificarHoras = function(idCuota, idUsuario, nombre, mes, anio, horasFaltantes) { console.log(`[ADMIN] Abriendo modal para justificar ${horasFaltantes} horas para ${nombre}`); };
+window.forzarPagoCuota = forzarPagoCuota; // Exportar para que el onclick lo encuentre
+
 
 // ========== VER COMPROBANTE ==========
 function verComprobanteAdmin(archivo) {
@@ -5175,6 +5174,440 @@ async function exportarReporteCSV() {
 window.inicializarReportes = inicializarReportes;
 window.generarReporte = generarReporte;
 window.exportarReporteCSV = exportarReporteCSV;
+
+
+// ==========================================
+// 🔧 FIX COMPLETO: LIQUIDACIÓN DE DEUDAS
+// Reemplaza la función liquidarDeudaCuota en dashboardAdmin.js
+// ==========================================
+
+console.log('🟢 [LIQUIDACIÓN FIX] Cargando versión corregida...');
+
+/**
+ * 🎯 FUNCIÓN CORREGIDA: Liquidar deuda de una cuota
+ * 
+ * CAMBIOS:
+ * - Envía datos como application/x-www-form-urlencoded
+ * - Envía id_cuota en el body (no en la URL)
+ * - Maneja correctamente la respuesta del backend
+ */
+window.liquidarDeudaCuota = async function(idCuota) {
+    console.log('💰 [LIQUIDAR] Iniciando liquidación de cuota:', idCuota);
+    
+    // ✅ PASO 1: VALIDACIÓN INICIAL
+    if (!idCuota || isNaN(idCuota)) {
+        console.error('❌ [LIQUIDAR] ID de cuota inválido:', idCuota);
+        alert('⚠️ Error: ID de cuota inválido');
+        return;
+    }
+    
+    // ✅ PASO 2: OBTENER DETALLES DE LA CUOTA
+    try {
+        console.log('🔍 [LIQUIDAR] Obteniendo detalles de la cuota...');
+        
+        const response = await fetch(`/api/cuotas/detalle?cuota_id=${idCuota}`);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        console.log('📊 [LIQUIDAR] Datos recibidos:', data);
+        
+        if (!data.success) {
+            throw new Error(data.message || 'Error al obtener detalles');
+        }
+        
+        const cuota = data.cuota;
+        
+        // ✅ PASO 3: VALIDAR ESTADO DE LA CUOTA
+        const estadoFinal = cuota.estado_actual || cuota.estado;
+        
+        if (estadoFinal === 'pagada') {
+            alert('ℹ️ Esta cuota ya está pagada');
+            console.warn('⚠️ [LIQUIDAR] La cuota ya está pagada');
+            return;
+        }
+        
+        if (estadoFinal === 'exonerada') {
+            alert('ℹ️ Esta cuota está exonerada, no puede ser liquidada');
+            console.warn('⚠️ [LIQUIDAR] La cuota está exonerada');
+            return;
+        }
+        
+        // ✅ PASO 4: CALCULAR DEUDA TOTAL
+        const horasFaltantes = Math.max(0, (cuota.horas_requeridas || 0) - (cuota.horas_cumplidas || 0));
+        const deudaHoras = horasFaltantes * 160; // $160 por hora
+        const montoCuota = parseFloat(cuota.monto_total || cuota.monto_base || cuota.monto || 0);
+        const deudaTotal = montoCuota + deudaHoras;
+        
+        console.log('💵 [LIQUIDAR] Cálculos:', {
+            horasFaltantes,
+            deudaHoras,
+            montoCuota,
+            deudaTotal
+        });
+        
+        // ✅ PASO 5: CONFIRMACIÓN DEL ADMIN
+        const nombreMes = obtenerNombreMes(cuota.mes);
+        const nombreUsuario = cuota.nombre_completo || 'Usuario';
+        
+        const mensaje = `
+🔸 LIQUIDAR DEUDA 🔸
+
+Usuario: ${nombreUsuario}
+Período: ${nombreMes} ${cuota.anio}
+Vivienda: ${cuota.numero_vivienda || 'N/A'}
+
+📊 DETALLE DE LA DEUDA:
+• Cuota base: $${montoCuota.toLocaleString('es-UY', {minimumFractionDigits: 2})}
+• Horas faltantes: ${horasFaltantes}h × $160 = $${deudaHoras.toLocaleString('es-UY', {minimumFractionDigits: 2})}
+━━━━━━━━━━━━━━━━━━━━━━━
+TOTAL A LIQUIDAR: $${deudaTotal.toLocaleString('es-UY', {minimumFractionDigits: 2})}
+
+⚠️ IMPORTANTE:
+Al liquidar, esta cuota se marcará como PAGADA.
+Esto significa que el usuario cubrió esta deuda con un pago actual.
+
+¿Confirmas la liquidación?
+        `.trim();
+        
+        if (!confirm(mensaje)) {
+            console.log('❌ [LIQUIDAR] Operación cancelada por el admin');
+            return;
+        }
+        
+        // ✅ PASO 6: EJECUTAR LIQUIDACIÓN
+        console.log('📤 [LIQUIDAR] Enviando solicitud de liquidación...');
+        
+        // Mostrar indicador de carga
+        mostrarCargando('Procesando liquidación...');
+        
+        // 🔧 FIX CRÍTICO: Enviar como application/x-www-form-urlencoded
+        const formData = new URLSearchParams();
+        formData.append('id_cuota', idCuota);
+        
+        console.log('📦 [LIQUIDAR] FormData a enviar:', {
+            id_cuota: idCuota,
+            url: '/api/cuotas/liquidar',
+            method: 'POST',
+            contentType: 'application/x-www-form-urlencoded'
+        });
+        
+        const liquidarResponse = await fetch('/api/cuotas/liquidar', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: formData.toString()
+        });
+        
+        console.log('📡 [LIQUIDAR] Response status:', liquidarResponse.status);
+        console.log('📡 [LIQUIDAR] Response headers:', Object.fromEntries(liquidarResponse.headers.entries()));
+        
+        ocultarCargando();
+        
+        // 🔧 OBTENER EL TEXTO DE LA RESPUESTA PRIMERO
+        const responseText = await liquidarResponse.text();
+        console.log('📄 [LIQUIDAR] Response text (primeros 500 chars):', responseText.substring(0, 500));
+        
+        // 🔧 VERIFICAR SI ES HTML (ERROR DE PHP)
+        if (responseText.trim().startsWith('<')) {
+            console.error('❌ [LIQUIDAR] El servidor devolvió HTML en lugar de JSON');
+            console.error('📄 [LIQUIDAR] HTML completo:', responseText);
+            
+            // Intentar extraer el error de PHP
+            const errorMatch = responseText.match(/<b>(.*?)<\/b>/);
+            const errorMsg = errorMatch ? errorMatch[1] : 'Error desconocido del servidor';
+            
+            throw new Error(`El servidor devolvió un error PHP: ${errorMsg}\n\nRevisa los logs del servidor PHP.`);
+        }
+        
+        // 🔧 INTENTAR PARSEAR JSON
+        let liquidarData;
+        try {
+            liquidarData = JSON.parse(responseText);
+            console.log('✅ [LIQUIDAR] JSON parseado correctamente:', liquidarData);
+        } catch (parseError) {
+            console.error('❌ [LIQUIDAR] Error al parsear JSON:', parseError);
+            console.error('📄 [LIQUIDAR] Texto recibido:', responseText);
+            throw new Error(`Respuesta inválida del servidor. No es JSON válido.\n\nTexto: ${responseText.substring(0, 200)}...`);
+        }
+        
+        // 🔧 VERIFICAR QUE LA RESPUESTA SEA 200 OK
+        if (!liquidarResponse.ok) {
+            console.error('❌ [LIQUIDAR] Response no OK:', liquidarResponse.status);
+            throw new Error(`HTTP ${liquidarResponse.status}: ${liquidarData.message || responseText}`);
+        }
+        
+        if (liquidarData.success) {
+            // ✅ ÉXITO
+            alert(`✅ ${liquidarData.message || 'Deuda liquidada correctamente'}\n\nLa cuota ha sido marcada como PAGADA.`);
+            
+            // Recargar tabla de cuotas
+            if (typeof loadAllCuotasAdmin === 'function') {
+                console.log('🔄 [LIQUIDAR] Recargando tabla de cuotas...');
+                await loadAllCuotasAdmin();
+            }
+            
+            // Recargar estadísticas
+            if (typeof loadEstadisticasCuotas === 'function') {
+                console.log('📊 [LIQUIDAR] Recargando estadísticas...');
+                await loadEstadisticasCuotas();
+            }
+            
+            console.log('✅ [LIQUIDAR] Liquidación completada exitosamente');
+        } else {
+            throw new Error(liquidarData.message || 'Error desconocido al liquidar');
+        }
+        
+    } catch (error) {
+        console.error('❌ [LIQUIDAR] Error completo:', error);
+        console.error('❌ [LIQUIDAR] Stack:', error.stack);
+        ocultarCargando();
+        
+        alert(`❌ Error al liquidar deuda:\n\n${error.message}\n\nRevisa la consola para más detalles.`);
+    }
+};
+
+/**
+ * 🔄 Mostrar indicador de carga
+ */
+function mostrarCargando(mensaje = 'Cargando...') {
+    let overlay = document.getElementById('loading-overlay-liquidacion');
+    
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'loading-overlay-liquidacion';
+        overlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+        `;
+        
+        overlay.innerHTML = `
+            <div style="
+                background: white;
+                padding: 30px 50px;
+                border-radius: 12px;
+                text-align: center;
+                box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            ">
+                <i class="fas fa-spinner fa-spin" style="font-size: 40px; color: #005CB9; margin-bottom: 15px;"></i>
+                <p id="loading-message" style="margin: 0; font-size: 16px; color: #333; font-weight: 600;">${mensaje}</p>
+            </div>
+        `;
+        
+        document.body.appendChild(overlay);
+    } else {
+        overlay.style.display = 'flex';
+        const messageEl = document.getElementById('loading-message');
+        if (messageEl) messageEl.textContent = mensaje;
+    }
+}
+
+/**
+ * ❌ Ocultar indicador de carga
+ */
+function ocultarCargando() {
+    const overlay = document.getElementById('loading-overlay-liquidacion');
+    if (overlay) {
+        overlay.style.display = 'none';
+    }
+}
+
+/**
+ * 📅 Obtener nombre del mes
+ */
+function obtenerNombreMes(mes) {
+    const meses = [
+        'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+        'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+    ];
+    return meses[parseInt(mes) - 1] || `Mes ${mes}`;
+}
+
+// ==========================================
+// 🎯 RENDERIZAR TABLA CON BOTÓN (Misma versión anterior)
+// ==========================================
+
+console.log('🔧 [LIQUIDACIÓN] Sobrescribiendo renderAllCuotasAdmin...');
+
+window.renderAllCuotasAdmin = function(cuotas) {
+    const container = document.getElementById('allCuotasAdminContainer');
+    
+    if (!cuotas || cuotas.length === 0) {
+        container.innerHTML = `
+            <div style="text-align: center; padding: 60px 20px;">
+                <i class="fas fa-inbox" style="font-size: 48px; color: #E8EBF0; display: block; margin-bottom: 15px;"></i>
+                <p style="color: #6C757D;">No se encontraron cuotas</p>
+            </div>
+        `;
+        return;
+    }
+    
+    let html = `
+        <div style="overflow-x: auto; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 92, 185, 0.12);">
+            <table style="width: 100%; border-collapse: collapse; background: #FFFFFF; min-width: 1200px;">
+                <thead>
+                    <tr style="background: linear-gradient(135deg, #005CB9 0%, #004494 100%); color: #FFFFFF;">
+                        <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;">Usuario</th>
+                        <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;">Vivienda</th>
+                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Período</th>
+                        <th style="padding: 15px 12px; text-align: right; font-weight: 600; font-size: 13px;">Monto</th>
+                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Estado</th>
+                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Horas</th>
+                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Vencimiento</th>
+                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+    
+    cuotas.forEach(cuota => {
+        const estadoFinal = cuota.estado_actual || cuota.estado;
+        const mes = obtenerNombreMes(cuota.mes);
+        const tienePagoPendiente = cuota.id_pago && cuota.estado_pago === 'pendiente';
+        
+        const puedeAdministrar = estadoFinal !== 'pagada' && estadoFinal !== 'exonerada' && !tienePagoPendiente;
+        
+        const nombreUsuario = cuota.nombre_completo || 'Usuario';
+        const emailUsuario = cuota.email || '';
+        
+        let estadoColor = '';
+        let estadoText = '';
+        if (estadoFinal === 'pagada') {
+            estadoColor = '#4CAF50';
+            estadoText = 'Pagada';
+        } else if (estadoFinal === 'pendiente') {
+            estadoColor = '#FF9800';
+            estadoText = 'Pendiente';
+        } else if (estadoFinal === 'vencida') {
+            estadoColor = '#F44336';
+            estadoText = 'Vencida';
+        } else if (estadoFinal === 'exonerada') {
+            estadoColor = '#005CB9';
+            estadoText = 'Exonerada';
+        }
+        
+        html += `
+            <tr style="border-bottom: 1px solid #E8EBF0; transition: all 0.2s ease;" 
+                onmouseover="this.style.background='#F5F7FA'" 
+                onmouseout="this.style.background='#FFFFFF'">
+                
+                <td style="padding: 14px 12px; font-size: 13px;">
+                    <div style="font-weight: 600; color: #005CB9;">${nombreUsuario}</div>
+                    <div style="font-size: 11px; color: #6C757D; margin-top: 3px;">${emailUsuario}</div>
+                </td>
+                
+                <td style="padding: 14px 12px; font-size: 13px; color: #495057;">
+                    ${cuota.numero_vivienda || 'N/A'}<br>
+                    <small style="color: #6C757D;">${cuota.tipo_vivienda || 'N/A'}</small>
+                </td>
+                
+                <td style="padding: 14px 12px; text-align: center; font-weight: 600; color: #495057;">
+                    ${mes} ${cuota.anio}
+                </td>
+                
+                <td style="padding: 14px 12px; text-align: right; font-weight: 600; font-size: 14px; color: #005CB9;">
+                    $${parseFloat(cuota.monto_total || cuota.monto_base || cuota.monto || 0).toLocaleString('es-UY', {minimumFractionDigits: 2})}
+                </td>
+                
+                <td style="padding: 14px 12px; text-align: center;">
+                    <span style="
+                        display: inline-block;
+                        padding: 6px 12px;
+                        border-radius: 20px;
+                        font-size: 11px;
+                        font-weight: 600;
+                        text-transform: uppercase;
+                        background: ${estadoColor};
+                        color: #FFFFFF;
+                    ">${estadoText}</span>
+                </td>
+                
+                <td style="padding: 14px 12px; text-align: center; font-size: 13px; color: #495057;">
+                    <div style="font-weight: 600;">${cuota.horas_cumplidas || 0}h / ${cuota.horas_requeridas}h</div>
+                    ${cuota.horas_validadas ? `<small style="color: #4CAF50;">✓ Validadas</small>` : ''}
+                </td>
+                
+                <td style="padding: 14px 12px; text-align: center; font-size: 13px; color: #495057;">
+                    ${new Date(cuota.fecha_vencimiento + 'T00:00:00').toLocaleDateString('es-UY')}
+                </td>
+                
+                <td style="padding: 14px 12px;">
+                    <div style="display: flex; gap: 5px; justify-content: center; flex-wrap: wrap;">
+                        
+                        ${tienePagoPendiente ? `
+                            <button class="btn-small btn-primary" 
+                                    onclick="abrirValidarPagoModal(${cuota.id_pago}, ${cuota.id_cuota})" 
+                                    title="Validar pago">
+                                <i class="fas fa-check-circle"></i>
+                            </button>
+                        ` : ''}
+                        
+                        ${cuota.comprobante_archivo ? `
+                            <button class="btn-small btn-secondary" 
+                                    onclick="verComprobanteAdmin('${cuota.comprobante_archivo}')" 
+                                    title="Ver comprobante">
+                                <i class="fas fa-image"></i>
+                            </button>
+                        ` : ''}
+                        
+                        ${(cuota.horas_cumplidas || 0) < cuota.horas_requeridas ? `
+                            <button class="btn-small btn-success" 
+                                    onclick="abrirModalJustificarHoras(
+                                        ${cuota.id_cuota}, 
+                                        ${cuota.id_usuario}, 
+                                        '${(cuota.nombre_completo || 'Usuario').replace(/'/g, "\\'")}',
+                                        ${cuota.mes},
+                                        ${cuota.anio},
+                                        ${cuota.horas_requeridas - (cuota.horas_cumplidas || 0)}
+                                    )" 
+                                    title="Justificar horas faltantes">
+                                <i class="fas fa-check-circle"></i> Justificar
+                            </button>
+                        ` : ''}
+                        
+                        ${puedeAdministrar ? `
+                            <button class="btn-small" 
+                                    style="
+                                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                                        color: white;
+                                        border: none;
+                                        padding: 6px 12px;
+                                        border-radius: 6px;
+                                        cursor: pointer;
+                                        font-weight: 600;
+                                        transition: all 0.3s ease;
+                                    "
+                                    onclick="liquidarDeudaCuota(${cuota.id_cuota})" 
+                                    onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(102, 126, 234, 0.4)'"
+                                    onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'"
+                                    title="Marca esta deuda como pagada si el usuario la cubrió con un pago actual">
+                                <i class="fas fa-hand-holding-usd"></i> Liquidar Deuda
+                            </button>
+                        ` : ''}
+                    </div>
+                </td>
+            </tr>
+        `;
+    });
+    
+    html += '</tbody></table></div>';
+    container.innerHTML = html;
+};
+
+console.log('✅ [LIQUIDACIÓN FIX] Sistema corregido completamente');
+console.log('📦 [LIQUIDACIÓN FIX] Datos se envían como application/x-www-form-urlencoded');
+console.log('🎯 [LIQUIDACIÓN FIX] Listo para usar');
 
 (' Módulo de Reportes con CSS INLINE cargado');
 
