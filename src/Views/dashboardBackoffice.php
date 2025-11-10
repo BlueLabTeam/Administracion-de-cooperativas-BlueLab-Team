@@ -137,15 +137,7 @@
 				</div>
 			</div>
 			
-			<div class="info-card">
-				<h3 data-i18n="dashboardAdmin.family.infoTitle">Información sobre Núcleos Familiares</h3>
-				<ul style="line-height: 1.8;">
-					<li><strong data-i18n="dashboardAdmin.family.infoWhat">¿Qué es un núcleo familiar?</strong> <span data-i18n="dashboardAdmin.family.infoWhatDesc">Grupo de usuarios que comparten vivienda o están relacionados</span></li>
-					<li><strong data-i18n="dashboardAdmin.family.infoTasks">Asignación de tareas:</strong> <span data-i18n="dashboardAdmin.family.infoTasksDesc">Las tareas pueden asignarse a núcleos completos</span></li>
-					<li><strong data-i18n="dashboardAdmin.family.infoUsers">Gestión de usuarios:</strong> <span data-i18n="dashboardAdmin.family.infoUsersDesc">Un usuario puede pertenecer a un solo núcleo</span></li>
-					<li><strong data-i18n="dashboardAdmin.family.infoDelete">Eliminación:</strong> <span data-i18n="dashboardAdmin.family.infoDeleteDesc">Al eliminar un núcleo, los usuarios NO se eliminan, solo se desvinculan</span></li>
-				</ul>
-			</div>
+			
 		</section>
 
 		<!-- SECCIÓN REPORTES -->
@@ -251,150 +243,157 @@
 				</div>
 			</div>
 			
-			<div class="info-card">
-				<h3 data-i18n="dashboardAdmin.housing.infoTitle">Información sobre Viviendas</h3>
-				<ul style="line-height: 1.8;">
-					<li><strong data-i18n="dashboardAdmin.housing.infoStates">Estados:</strong> <span data-i18n="dashboardAdmin.housing.infoStatesDesc">Disponible, Ocupada, En Mantenimiento</span></li>
-					<li><strong data-i18n="dashboardAdmin.housing.infoAssignment">Asignación:</strong> <span data-i18n="dashboardAdmin.housing.infoAssignmentDesc">Las viviendas se pueden asignar a usuarios individuales o núcleos familiares</span></li>
-					<li><strong data-i18n="dashboardAdmin.housing.infoTypes">Tipos:</strong> <span data-i18n="dashboardAdmin.housing.infoTypesDesc">1, 2 o 3 habitaciones según las necesidades</span></li>
-					<li><strong data-i18n="dashboardAdmin.housing.infoManagement">Gestión:</strong> <span data-i18n="dashboardAdmin.housing.infoManagementDesc">Puedes crear, editar, asignar y desasignar viviendas</span></li>
-				</ul>
-			</div>
+		
 		</section>
 
 		<!-- Modal para crear/editar vivienda -->
-		<div id="viviendaModal" class="material-modal" style="display: none;">
-			<div class="material-modal-content">
-				<div class="material-modal-header">
-					<h3 id="viviendaModalTitle" data-i18n="dashboardAdmin.housing.modalNew">Nueva Vivienda</h3>
-					<button class="close-material-modal" onclick="closeViviendaModal()">&times;</button>
-				</div>
-				
-				<form id="viviendaForm" onsubmit="saveVivienda(event)">
-					<input type="hidden" id="vivienda-id">
-					
-					<div class="material-form-group">
-						<label for="vivienda-numero" data-i18n="dashboardAdmin.housing.housingNumber">Número de Vivienda *</label>
-						<input type="text" id="vivienda-numero" required data-i18n-placeholder="dashboardAdmin.housing.housingNumberPlaceholder" placeholder="Ej: A-101">
-					</div>
-					
-					<div class="material-form-group">
-						<label for="vivienda-direccion" data-i18n="dashboardAdmin.housing.address">Dirección *</label>
-						<input type="text" id="vivienda-direccion" required data-i18n-placeholder="dashboardAdmin.housing.addressPlaceholder" placeholder="Ej: Bloque A, Planta Baja">
-					</div>
-					
-					<div class="material-form-group">
-						<label for="vivienda-tipo" data-i18n="dashboardAdmin.housing.housingType">Tipo de Vivienda *</label>
-						<select id="vivienda-tipo" required>
-							<option value="" data-i18n="common.select">Seleccione...</option>
-						</select>
-					</div>
-					
-					<div class="material-form-group">
-						<label for="vivienda-metros" data-i18n="dashboardAdmin.housing.squareMeters">Metros Cuadrados</label>
-						<input type="number" id="vivienda-metros" step="0.01" data-i18n-placeholder="dashboardAdmin.housing.squareMetersPlaceholder" placeholder="Ej: 55.50">
-					</div>
-					
-					<div class="material-form-group">
-						<label for="vivienda-fecha" data-i18n="dashboardAdmin.housing.constructionDate">Fecha de Construcción</label>
-						<input type="date" id="vivienda-fecha">
-					</div>
-					
-					<div class="material-form-group">
-						<label for="vivienda-estado" data-i18n="common.status">Estado</label>
-						<select id="vivienda-estado">
-							<option value="disponible" data-i18n="dashboardAdmin.housing.statusAvailable">Disponible</option>
-							<option value="ocupada" data-i18n="dashboardAdmin.housing.statusOccupied">Ocupada</option>
-							<option value="mantenimiento" data-i18n="dashboardAdmin.housing.statusMaintenance">Mantenimiento</option>
-						</select>
-					</div>
-					
-					<div class="material-form-group">
-						<label for="vivienda-observaciones" data-i18n="common.observations">Observaciones</label>
-						<textarea id="vivienda-observaciones" data-i18n-placeholder="dashboardAdmin.housing.observationsPlaceholder" placeholder="Notas adicionales..."></textarea>
-					</div>
-					
-					<div class="material-form-actions">
-						<button type="button" class="btn btn-secondary" onclick="closeViviendaModal()" data-i18n="common.cancel">Cancelar</button>
-						<button type="submit" class="btn btn-primary" data-i18n="dashboardAdmin.housing.saveHousing">Guardar Vivienda</button>
-					</div>
-				</form>
-			</div>
-		</div>
+<div id="viviendaModal" class="material-modal" style="display: none;">
+    <div class="material-modal-content" onclick="event.stopPropagation()">
+        <div class="material-modal-header">
+            <h3 id="viviendaModalTitle" data-i18n="dashboardAdmin.housing.modalNew">Nueva Vivienda</h3>
+            <button class="close-material-modal" onclick="closeViviendaModal()">&times;</button>
+        </div>
+        
+        <form id="viviendaForm" onsubmit="saveVivienda(event)">
+            <input type="hidden" id="vivienda-id">
+            
+            <div class="material-form-group">
+                <label for="vivienda-numero" data-i18n="dashboardAdmin.housing.housingNumber">Número de Vivienda *</label>
+                <input type="text" id="vivienda-numero" required data-i18n-placeholder="dashboardAdmin.housing.housingNumberPlaceholder" placeholder="Ej: A-101">
+            </div>
+            
+            <div class="material-form-group">
+                <label for="vivienda-direccion" data-i18n="dashboardAdmin.housing.address">Dirección *</label>
+                <input type="text" id="vivienda-direccion" required data-i18n-placeholder="dashboardAdmin.housing.addressPlaceholder" placeholder="Ej: Bloque A, Planta Baja">
+            </div>
+            
+            <div class="material-form-group">
+                <label for="vivienda-tipo" data-i18n="dashboardAdmin.housing.housingType">Tipo de Vivienda *</label>
+                <select id="vivienda-tipo" required>
+                    <option value="" data-i18n="common.select">Seleccione...</option>
+                </select>
+            </div>
+            
+            <div class="material-form-group">
+                <label for="vivienda-metros" data-i18n="dashboardAdmin.housing.squareMeters">Metros Cuadrados</label>
+                <input type="number" id="vivienda-metros" step="0.01" data-i18n-placeholder="dashboardAdmin.housing.squareMetersPlaceholder" placeholder="Ej: 55.50">
+            </div>
+            
+            <div class="material-form-group">
+                <label for="vivienda-fecha" data-i18n="dashboardAdmin.housing.constructionDate">Fecha de Construcción</label>
+                <input type="date" id="vivienda-fecha">
+            </div>
+            
+            <div class="material-form-group">
+                <label for="vivienda-estado" data-i18n="common.status">Estado</label>
+                <select id="vivienda-estado">
+                    <option value="disponible" data-i18n="dashboardAdmin.housing.statusAvailable">Disponible</option>
+                    <option value="ocupada" data-i18n="dashboardAdmin.housing.statusOccupied">Ocupada</option>
+                    <option value="mantenimiento" data-i18n="dashboardAdmin.housing.statusMaintenance">Mantenimiento</option>
+                </select>
+            </div>
+            
+            <div class="material-form-group">
+                <label for="vivienda-observaciones" data-i18n="common.observations">Observaciones</label>
+                <textarea id="vivienda-observaciones" data-i18n-placeholder="dashboardAdmin.housing.observationsPlaceholder" placeholder="Notas adicionales..."></textarea>
+            </div>
+            
+            <div class="material-form-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeViviendaModal()" data-i18n="common.cancel">Cancelar</button>
+                <button type="submit" class="btn btn-primary" data-i18n="dashboardAdmin.housing.saveHousing">Guardar Vivienda</button>
+            </div>
+        </form>
+    </div>
+</div>
 
-		<!-- Modal para asignar vivienda -->
-		<div id="asignarViviendaModal" class="material-modal" style="display: none;">
-			<div class="material-modal-content">
-				<div class="material-modal-header">
-					<h3 data-i18n="dashboardAdmin.housing.assignHousing">Asignar Vivienda</h3>
-					<button class="close-material-modal" onclick="closeAsignarModal()">&times;</button>
-				</div>
-				
-				<form id="asignarForm" onsubmit="submitAsignacion(event)">
-					<input type="hidden" id="asignar-vivienda-id">
-					
-					<div class="form-group">
-						<label data-i18n="dashboardAdmin.housing.housing">Vivienda</label>
-						<p id="asignar-vivienda-info" style="font-weight: bold; color: #005CB9;"></p>
-					</div>
+<!-- Modal para asignar vivienda -->
+<div id="asignarViviendaModal" class="material-modal" style="display: none;">
+    <div class="material-modal-content" onclick="event.stopPropagation()">
+        <div class="material-modal-header">
+            <h3 data-i18n="dashboardAdmin.housing.assignHousing">Asignar Vivienda</h3>
+            <button class="close-material-modal" onclick="closeAsignarModal()">&times;</button>
+        </div>
+        
+        <form id="asignarForm" onsubmit="submitAsignacion(event)">
+            <input type="hidden" id="asignar-vivienda-id">
+            
+            <div class="form-group">
+                <label data-i18n="dashboardAdmin.housing.housing">Vivienda</label>
+                <p id="asignar-vivienda-info" style="font-weight: bold; color: #005CB9;"></p>
+            </div>
 
-					<div class="form-group">
-						<label for="asignar-tipo" data-i18n="dashboardAdmin.housing.assignTo">Asignar a *</label>
-						<select id="asignar-tipo" required onchange="toggleAsignarTipo()">
-							<option value="" data-i18n="common.select">Seleccione...</option>
-							<option value="usuario" data-i18n="dashboardAdmin.housing.individualUser">Usuario Individual</option>
-							<option value="nucleo" data-i18n="dashboardAdmin.housing.familyNucleus">Núcleo Familiar</option>
-						</select>
-					</div>
+            <div class="form-group">
+                <label for="asignar-tipo" data-i18n="dashboardAdmin.housing.assignTo">Asignar a *</label>
+                <select id="asignar-tipo" required onchange="toggleAsignarTipo()">
+                    <option value="" data-i18n="common.select">Seleccione...</option>
+                    <option value="usuario" data-i18n="dashboardAdmin.housing.individualUser">Usuario Individual</option>
+                    <option value="nucleo" data-i18n="dashboardAdmin.housing.familyNucleus">Núcleo Familiar</option>
+                </select>
+            </div>
 
-					<div class="form-group" id="asignar-usuario-group" style="display: none;">
-						<label for="asignar-usuario" data-i18n="common.user">Usuario *</label>
-						<select id="asignar-usuario">
-							<option value="" data-i18n="common.loading">Cargando...</option>
-						</select>
-					</div>
+            <div class="form-group" id="asignar-usuario-group" style="display: none;">
+                <label for="asignar-usuario" data-i18n="common.user">Usuario *</label>
+                <select id="asignar-usuario">
+                    <option value="" data-i18n="common.loading">Cargando...</option>
+                </select>
+            </div>
 
-					<div class="form-group" id="asignar-nucleo-group" style="display: none;">
-						<label for="asignar-nucleo" data-i18n="dashboardAdmin.housing.familyNucleus">Núcleo Familiar *</label>
-						<select id="asignar-nucleo">
-							<option value="" data-i18n="common.loading">Cargando...</option>
-						</select>
-					</div>
+            <div class="form-group" id="asignar-nucleo-group" style="display: none;">
+                <label for="asignar-nucleo" data-i18n="dashboardAdmin.housing.familyNucleus">Núcleo Familiar *</label>
+                <select id="asignar-nucleo">
+                    <option value="" data-i18n="common.loading">Cargando...</option>
+                </select>
+            </div>
 
-					<div class="form-group">
-						<label for="asignar-observaciones" data-i18n="common.observations">Observaciones</label>
-						<textarea id="asignar-observaciones" rows="3"></textarea>
-					</div>
+            <div class="form-group">
+                <label for="asignar-observaciones" data-i18n="common.observations">Observaciones</label>
+                <textarea id="asignar-observaciones" rows="3"></textarea>
+            </div>
 
-					<div class="form-actions">
-						<button type="button" class="btn btn-secondary" onclick="closeAsignarModal()" data-i18n="common.cancel">Cancelar</button>
-						<button type="submit" class="btn btn-primary" data-i18n="dashboardAdmin.housing.assignHousing">Asignar Vivienda</button>
-					</div>
-				</form>
-			</div>
-		</div>
-
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeAsignarModal()" data-i18n="common.cancel">Cancelar</button>
+                <button type="submit" class="btn btn-primary" data-i18n="dashboardAdmin.housing.assignHousing">Asignar Vivienda</button>
+            </div>
+        </form>
+    </div>
+</div>
 		<!-- SECCIÓN FACTURACIÓN -->
 <section id="cuotas-section" class="section-content">
 	<h2 class="section-title" data-i18n="dashboardAdmin.billing.title">💰 Gestión de Cuotas Mensuales</h2>
 	
-	<div class="stats-grid">
-		<div class="stat-card">
-			<i class="fas fa-file-invoice-dollar"></i>
-			<h4 data-i18n="dashboardAdmin.billing.totalQuotas">Total Cuotas</h4>
-			<p id="admin-total-cuotas">0</p>
-		</div>
-		<div class="stat-card">
-			<i class="fas fa-check-circle"></i>
-			<h4 data-i18n="dashboardAdmin.billing.paid">Pagadas</h4>
-			<p id="admin-cuotas-pagadas">0</p>
-		</div>
-		<div class="stat-card">
-			<i class="fas fa-clock"></i>
-			<h4 data-i18n="dashboardAdmin.billing.pending">Pendientes</h4>
-			<p id="admin-cuotas-pendientes">0</p>
-		</div>
-	</div>
+
+<!-- Estadísticas Rápidas -->
+<div class="stats-grid-wide">
+    <div class="stat-card pendiente">
+        <div class="stat-icon">
+            <i class="fas fa-clock"></i>
+        </div>
+        <div class="stat-info">
+            <span class="stat-label" data-i18n="dashboardUser.billing.stats.pending">Pendientes</span>
+            <span class="stat-value" id="admin-cuotas-pendientes">0</span>
+        </div>
+    </div>
+
+    <div class="stat-card success">
+        <div class="stat-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="stat-info">
+            <span class="stat-label" data-i18n="dashboardUser.billing.stats.paid">Pagadas</span>
+            <span class="stat-value" id="cuotas-pagadas-count">0</span>
+        </div>
+    </div>
+
+    <div class="stat-card error">
+        <div class="stat-icon">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <div class="stat-info">
+            <span class="stat-label" data-i18n="dashboardUser.billing.stats.overdue">Vencidas</span>
+            <span class="stat-value" id="cuotas-vencidas-count">0</span>
+        </div>
+    </div>
+</div>
 
 	<div class="info-card">
 		
@@ -588,15 +587,7 @@
 				</div>
 			</div>
 			
-			<div class="info-card">
-				<h3 data-i18n="dashboardAdmin.materials.infoTitle">Información sobre Materiales</h3>
-				<ul style="line-height: 1.8;">
-					<li><strong data-i18n="dashboardAdmin.materials.infoWhat">¿Qué son los materiales?</strong> <span data-i18n="dashboardAdmin.materials.infoWhatDesc">Recursos necesarios para realizar las tareas de la cooperativa</span></li>
-					<li><strong data-i18n="dashboardAdmin.materials.infoStock">Stock:</strong> <span data-i18n="dashboardAdmin.materials.infoStockDesc">Control de cantidades disponibles de cada material</span></li>
-					<li><strong data-i18n="dashboardAdmin.materials.infoTaskAssignment">Asignación a tareas:</strong> <span data-i18n="dashboardAdmin.materials.infoTaskAssignmentDesc">Los materiales se pueden asignar a tareas específicas</span></li>
-					<li><strong data-i18n="dashboardAdmin.materials.infoRequests">Solicitudes:</strong> <span data-i18n="dashboardAdmin.materials.infoRequestsDesc">Los usuarios pueden solicitar materiales cuando los necesitan</span></li>
-				</ul>
-			</div>
+			
 		</section>
 
 		<!-- Modal para crear/editar material -->
@@ -657,13 +648,17 @@
 		</div>
 
 		<!-- SECCIÓN TAREAS -->
-		<section id="tareas-section" class="section-content">
-			<h2 class="section-title" data-i18n="dashboardAdmin.tasks.title">Gestión de Tareas</h2>
+<section id="tareas-section" class="section-content">
+	<h2 class="section-title" data-i18n="dashboardAdmin.tasks.title">Gestión de Tareas</h2>
 
-			<div class="info-card">
-				<h3 data-i18n="dashboardAdmin.tasks.createNew">Crear Nueva Tarea</h3>
-				
-				<form id="taskForm" onsubmit="createTask(event)">
+	<div class="info-card">
+		<h3 data-i18n="dashboardAdmin.tasks.createNew">Crear Nueva Tarea</h3>
+		
+		<form id="taskForm" onsubmit="createTask(event)">
+			<!-- Grid principal: título/descripción a la izquierda, campos pequeños a la derecha -->
+			<div class="task-form-main-grid">
+				<!-- Columna izquierda: Título y Descripción -->
+				<div class="task-form-left">
 					<div class="form-group">
 						<label for="titulo_tarea" data-i18n="dashboardAdmin.tasks.titleLabel">Título:</label>
 						<input type="text" id="titulo_tarea" name="titulo" required>
@@ -671,108 +666,110 @@
 
 					<div class="form-group">
 						<label for="descripcion_tarea" data-i18n="dashboardAdmin.tasks.descriptionLabel">Descripción:</label>
-						<textarea id="descripcion_tarea" name="descripcion" rows="4" required></textarea>
+						<textarea id="descripcion_tarea" name="descripcion" rows="8" required></textarea>
 					</div>
+				</div>
 
-					<div class="task-form-grid">
-						<div class="form-group">
-							<label for="fecha_inicio" data-i18n="dashboardAdmin.tasks.startDate">Fecha de Inicio:</label>
-							<input type="date" id="fecha_inicio" name="fecha_inicio" required>
-						</div>
-
-						<div class="form-group">
-							<label for="fecha_fin" data-i18n="dashboardAdmin.tasks.endDate">Fecha de Finalización:</label>
-							<input type="date" id="fecha_fin" name="fecha_fin" required>
-						</div>
-					</div>
-
-					<div class="task-form-grid">
-						<div class="form-group">
-							<label for="prioridad" data-i18n="common.priority">Prioridad:</label>
-							<select id="prioridad" name="prioridad">
-								<option value="baja" data-i18n="common.priorityLow">Baja</option>
-								<option value="media" selected data-i18n="common.priorityMedium">Media</option>
-								<option value="alta" data-i18n="common.priorityHigh">Alta</option>
-							</select>
-						</div>
-
-						<div class="form-group">
-							<label for="tipo_asignacion" data-i18n="dashboardAdmin.tasks.assignTo">Asignar a:</label>
-							<select id="tipo_asignacion" name="tipo_asignacion" onchange="toggleAsignacion()">
-								<option value="usuario" data-i18n="dashboardAdmin.tasks.individualUsers">Usuarios Individuales</option>
-								<option value="nucleo" data-i18n="dashboardAdmin.tasks.familyNuclei">Núcleos Familiares</option>
-							</select>
-						</div>
-					</div>
-
-					<div class="form-group" id="usuarios-selector">
-						<label data-i18n="dashboardAdmin.tasks.selectUsers">Seleccionar Usuarios:</label>
-						<div class="user-selection">
-							<button type="button" onclick="toggleAllTaskUsers()" class="btn-secondary" data-i18n="dashboardAdmin.tasks.selectAll">
-								Seleccionar Todos
-							</button>
-							<div id="taskUsersList" class="users-checkboxes">
-								<p class="loading" data-i18n="common.loading">Cargando usuarios...</p>
-							</div>
-						</div>
-					</div>
-
-					<div class="form-group" id="nucleos-selector" style="display: none;">
-						<label data-i18n="dashboardAdmin.tasks.selectNuclei">Seleccionar Núcleos Familiares:</label>
-						<div class="user-selection">
-							<button type="button" onclick="toggleAllNucleos()" class="btn-secondary" data-i18n="dashboardAdmin.tasks.selectAll">
-								Seleccionar Todos
-							</button>
-							<div id="taskNucleosList" class="users-checkboxes">
-								<p class="loading" data-i18n="common.loading">Cargando núcleos...</p>
-							</div>
-						</div>
+				<!-- Columna derecha: Fechas, Prioridad, Asignación -->
+				<div class="task-form-right">
+					<div class="form-group">
+						<label for="fecha_inicio" data-i18n="dashboardAdmin.tasks.startDate">Fecha de Inicio:</label>
+						<input type="date" id="fecha_inicio" name="fecha_inicio" required>
 					</div>
 
 					<div class="form-group">
-						<label data-i18n="dashboardAdmin.tasks.materialsNeeded">📦 Materiales necesarios para esta tarea:</label>
-						<div class="materiales-tarea-selector">
-							<div class="materiales-search-box">
-								<input type="text" 
-									   id="search-materiales-tarea" 
-									   data-i18n-placeholder="dashboardAdmin.tasks.searchMaterial"
-									   placeholder="Buscar material..."
-									   onkeyup="filterMaterialesTarea()">
-							</div>
-							
-							<div id="materiales-tarea-list" class="materiales-selector-list">
-								<p class="loading" data-i18n="common.loading">Cargando materiales...</p>
-							</div>
-							
-							<div id="materiales-asignados-list" class="materiales-asignados-container">
-								<p class="no-materials" data-i18n="dashboardAdmin.tasks.noMaterialsAssigned">No hay materiales asignados</p>
-							</div>
-						</div>
+						<label for="fecha_fin" data-i18n="dashboardAdmin.tasks.endDate">Fecha de Finalización:</label>
+						<input type="date" id="fecha_fin" name="fecha_fin" required>
 					</div>
 
-					<button type="submit" class="btn btn-primary" data-i18n="dashboardAdmin.tasks.createTask">Crear Tarea</button>
-				</form>
-			</div>
+					<div class="form-group">
+						<label for="prioridad" data-i18n="common.priority">Prioridad:</label>
+						<select id="prioridad" name="prioridad">
+							<option value="baja" data-i18n="common.priorityLow">Baja</option>
+							<option value="media" selected data-i18n="common.priorityMedium">Media</option>
+							<option value="alta" data-i18n="common.priorityHigh">Alta</option>
+						</select>
+					</div>
 
-			<div class="info-card">
-				<div class="task-list-header">
-					<h3 data-i18n="dashboardAdmin.tasks.createdTasks">Tareas Creadas</h3>
-					<div>
-						<select id="filtro-estado" onchange="loadAllTasks()">
-							<option value="" data-i18n="common.all">Todas</option>
-							<option value="pendiente" data-i18n="common.statusPending">Pendientes</option>
-							<option value="completada" data-i18n="common.statusCompleted">Completadas</option>
-							<option value="cancelada" data-i18n="common.statusCanceled">Canceladas</option>
-							<option value="vencida" data-i18n="common.statusExpired">Vencidas</option>
+					<div class="form-group">
+						<label for="tipo_asignacion" data-i18n="dashboardAdmin.tasks.assignTo">Asignar a:</label>
+						<select id="tipo_asignacion" name="tipo_asignacion" onchange="toggleAsignacion()">
+							<option value="usuario" data-i18n="dashboardAdmin.tasks.individualUsers">Usuarios Individuales</option>
+							<option value="nucleo" data-i18n="dashboardAdmin.tasks.familyNuclei">Núcleos Familiares</option>
 						</select>
 					</div>
 				</div>
-				
-				<div id="tasksList">
-					<p class="loading" data-i18n="common.loading">Cargando tareas...</p>
+			</div>
+
+			<!-- Resto del formulario (ancho completo) -->
+			<div class="form-group" id="usuarios-selector">
+				<label data-i18n="dashboardAdmin.tasks.selectUsers">Seleccionar Usuarios:</label>
+				<div class="user-selection">
+					<button type="button" onclick="toggleAllTaskUsers()" class="btn-secondary" data-i18n="dashboardAdmin.tasks.selectAll">
+						Seleccionar Todos
+					</button>
+					<div id="taskUsersList" class="users-checkboxes">
+						<p class="loading" data-i18n="common.loading">Cargando usuarios...</p>
+					</div>
 				</div>
 			</div>
-		</section>
+
+			<div class="form-group" id="nucleos-selector" style="display: none;">
+				<label data-i18n="dashboardAdmin.tasks.selectNuclei">Seleccionar Núcleos Familiares:</label>
+				<div class="user-selection">
+					<button type="button" onclick="toggleAllNucleos()" class="btn-secondary" data-i18n="dashboardAdmin.tasks.selectAll">
+						Seleccionar Todos
+					</button>
+					<div id="taskNucleosList" class="users-checkboxes">
+						<p class="loading" data-i18n="common.loading">Cargando núcleos...</p>
+					</div>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label data-i18n="dashboardAdmin.tasks.materialsNeeded">📦 Materiales necesarios para esta tarea:</label>
+				<div class="materiales-tarea-selector">
+					<div class="materiales-search-box">
+						<input type="text" 
+							   id="search-materiales-tarea" 
+							   data-i18n-placeholder="dashboardAdmin.tasks.searchMaterial"
+							   placeholder="Buscar material..."
+							   onkeyup="filterMaterialesTarea()">
+					</div>
+					
+					<div id="materiales-tarea-list" class="materiales-selector-list">
+						<p class="loading" data-i18n="common.loading">Cargando materiales...</p>
+					</div>
+					
+					<div id="materiales-asignados-list" class="materiales-asignados-container">
+						<p class="no-materials" data-i18n="dashboardAdmin.tasks.noMaterialsAssigned">No hay materiales asignados</p>
+					</div>
+				</div>
+			</div>
+
+			<button type="submit" class="btn btn-primary" data-i18n="dashboardAdmin.tasks.createTask">Crear Tarea</button>
+		</form>
+	</div>
+
+	<div class="info-card">
+		<div class="task-list-header">
+			<h3 data-i18n="dashboardAdmin.tasks.createdTasks">Tareas Creadas</h3>
+			<div>
+				<select id="filtro-estado" onchange="loadAllTasks()">
+					<option value="" data-i18n="common.all">Todas</option>
+					<option value="pendiente" data-i18n="common.statusPending">Pendientes</option>
+					<option value="completada" data-i18n="common.statusCompleted">Completadas</option>
+					<option value="cancelada" data-i18n="common.statusCanceled">Canceladas</option>
+					<option value="vencida" data-i18n="common.statusExpired">Vencidas</option>
+				</select>
+			</div>
+		</div>
+		
+		<div id="tasksList">
+			<p class="loading" data-i18n="common.loading">Cargando tareas...</p>
+		</div>
+	</div>
+</section>
 
 		<!-- SECCIÓN SOLICITUDES ADMIN -->
 <section id="solicitudes-section" class="section-content">

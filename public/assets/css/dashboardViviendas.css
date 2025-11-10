@@ -436,10 +436,11 @@
     z-index: 10000 !important;
     justify-content: center;
     align-items: center;
-    overflow-y: auto;
+    overflow-y: hidden; /* ✅ Cambiado de auto a hidden */
     padding: 20px;
     box-sizing: border-box;
     animation: fadeIn 0.3s ease;
+    /* El modal ya no necesita scroll, solo el contenido interno */
 }
 
 .material-modal-content {
@@ -453,6 +454,13 @@
     position: relative;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
     animation: slideUp 0.5s ease;
+    /* ✅ Mantener scrollbar oculta en el contenido */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.material-modal-content::-webkit-scrollbar {
+    display: none;
 }
 
 @keyframes slideUp {
@@ -463,6 +471,15 @@
     to {
         opacity: 1;
         transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
     }
 }
 
@@ -503,6 +520,16 @@
     background: var(--color-gray-100);
     color: var(--color-danger);
     transform: rotate(90deg);
+}
+
+/* Ocultar scrollbar en la lista de usuarios de núcleos */
+.users-checkboxes-nucleo {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.users-checkboxes-nucleo::-webkit-scrollbar {
+    display: none;
 }
 
 .material-form-group {

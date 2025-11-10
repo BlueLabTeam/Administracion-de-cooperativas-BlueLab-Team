@@ -24,12 +24,12 @@
         <form class="login__formulario" id="form-login" method="post">
           <label for="email" class="formulario__label" data-i18n="login.email">Correo</label>
           <input type="text" class="login__input input--usuario" name="email" 
-                 data-i18n-placeholder="login.emailPlaceholder" placeholder="Ingrese su correo" />
+                 data-i18n-placeholder="login.emailPlaceholder" />
           
           <label for="password" class="formulario__label" data-i18n="login.password">Contraseña</label>
           <div class="password-container">
             <input type="password" class="login__input input--contrasenia" name="password"
-              data-i18n-placeholder="login.passwordPlaceholder" placeholder="Ingrese su contraseña" id="password" />
+              data-i18n-placeholder="login.passwordPlaceholder" id="password" />
             <i class="fa-solid fa-eye"></i>
             <i class="fa-solid fa-eye-slash"></i>
           </div>

@@ -1,26 +1,4 @@
-// 🧪 MODO TEST: Simular último día del mes
-(function() {
-    const TEST_MODE = true; // Cambiar a false para volver a normal
-    
-    if (TEST_MODE) {
-        // Sobrescribir Date para simular último día del mes
-        const fechaOriginal = Date;
-        const ultimoDiaMes = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0);
-        
-        window.Date = function(...args) {
-            if (args.length === 0) {
-                return ultimoDiaMes;
-            }
-            return new fechaOriginal(...args);
-        };
-        
-        // Copiar métodos estáticos
-        Object.setPrototypeOf(window.Date, fechaOriginal);
-        window.Date.prototype = fechaOriginal.prototype;
-        
-        console.log('🧪 TEST MODE: Fecha simulada =', ultimoDiaMes.toLocaleDateString());
-    }
-})();
+
 
 document.addEventListener('DOMContentLoaded', function () {
     const menuItems = document.querySelectorAll('.menu li');
@@ -1014,7 +992,7 @@ function updateClockWithDate() {
 async function cargarDeudaHorasWidget() {
     const container = document.getElementById('deuda-actual-container');
     if (!container) {
-        ('⚠️ Container deuda-actual-container no encontrado');
+        console.log('⚠️ Container deuda-actual-container no encontrado');
         return;
     }
     
@@ -1024,7 +1002,7 @@ async function cargarDeudaHorasWidget() {
         const response = await fetch('/api/horas/deuda-actual');
         const data = await response.json();
         
-        ('💰 Deuda de horas recibida:', data);
+        console.log('💰 Deuda de horas recibida:', data);
         
         if (data.success && data.deuda) {
             renderDeudaHorasWidget(data.deuda);
@@ -1041,113 +1019,95 @@ async function cargarDeudaHorasWidget() {
 function renderDeudaHorasWidget(deuda) {
     const container = document.getElementById('deuda-actual-container');
     
-    const estado = deuda.estado || 'pendiente';
-    const colorEstado = estado === 'cumplido' ? 'success' : 
-                       estado === 'progreso' ? 'warning' : 'error';
-    
     const deudaMesActual = parseFloat(deuda.deuda_en_pesos || 0);
     const deudaAcumulada = parseFloat(deuda.deuda_acumulada || 0);
-    const totalAPagar = deudaMesActual + deudaAcumulada;  // ✅ SUMA CORRECTA
+    const totalAPagar = deudaMesActual + deudaAcumulada;
     const tieneDeuda = totalAPagar > 0;
     
     container.innerHTML = `
-        <div class="deuda-widget ${colorEstado}">
-            <div class="deuda-header">
-                <div class="deuda-icono">
+        <div class="deuda-widget-compacto ${tieneDeuda ? 'con-deuda' : 'sin-deuda'}">
+            <!-- VISTA COMPACTA (SIEMPRE VISIBLE) -->
+            <div class="deuda-resumen" onclick="toggleDeudaDetalle()">
+                <div class="deuda-resumen-left">
                     <i class="fas ${tieneDeuda ? 'fa-exclamation-triangle' : 'fa-check-circle'}"></i>
+                    <div>
+                        <h4>${tieneDeuda ? 'Deuda de Horas' : 'Sin Deuda de Horas'}</h4>
+                        <p>${getNombreMes(deuda.mes)} ${deuda.anio}</p>
+                    </div>
                 </div>
-                <div class="deuda-titulo">
-                    <h4>${tieneDeuda ? 'Tienes Deuda de Horas' : 'Sin Deuda de Horas'}</h4>
-                    <p>Período: ${getNombreMes(deuda.mes)} ${deuda.anio}</p>
+                <div class="deuda-resumen-right">
+                    <div class="deuda-monto-compacto">
+                        $${totalAPagar.toLocaleString('es-UY', {minimumFractionDigits: 2})}
+                    </div>
+                    <i class="fas fa-chevron-down toggle-icon" id="toggle-deuda-icon"></i>
                 </div>
             </div>
             
-            <div class="deuda-body">
-                <!-- ✅ MOSTRAR TOTAL A PAGAR (MES ACTUAL + ACUMULADA) -->
-                <div class="deuda-monto-principal ${tieneDeuda ? 'error' : 'success'}">
-                    $${totalAPagar.toLocaleString('es-UY', {minimumFractionDigits: 2})}
+            <!-- DETALLE EXPANDIBLE -->
+            <div class="deuda-detalle" id="deuda-detalle-content" style="display: none;">
+                <div class="deuda-stats-row">
+                    <div class="stat-box">
+                        <small>Trabajadas</small>
+                        <strong>${deuda.horas_trabajadas}h</strong>
+                    </div>
+                    <div class="stat-box">
+                        <small>Requeridas</small>
+                        <strong>${deuda.horas_requeridas_mensuales}h</strong>
+                    </div>
+                    <div class="stat-box ${tieneDeuda ? 'error' : 'success'}">
+                        <small>Faltantes</small>
+                        <strong>${deuda.horas_faltantes}h</strong>
+                    </div>
                 </div>
                 
-                <!-- ✅ AGREGAR DESGLOSE DE LA DEUDA TOTAL -->
-                ${totalAPagar > 0 ? `
-                    <div class="deuda-desglose-resumen" style="background: #fff3cd; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #ff9800;">
-                        <div style="display: grid; gap: 8px;">
-                            <div style="display: flex; justify-content: space-between;">
-                                <span>💰 Deuda mes actual:</span>
-                                <strong>$${deudaMesActual.toLocaleString('es-UY', {minimumFractionDigits: 2})}</strong>
-                            </div>
-                            ${deudaAcumulada > 0 ? `
-                                <div style="display: flex; justify-content: space-between; color: #d32f2f;">
-                                    <span>⚠ Deuda acumulada:</span>
-                                    <strong>$${deudaAcumulada.toLocaleString('es-UY', {minimumFractionDigits: 2})}</strong>
-                                </div>
-                                <hr style="margin: 8px 0; border: none; border-top: 1px dashed #ccc;">
-                                <div style="display: flex; justify-content: space-between; font-size: 1.1em;">
-                                    <span><strong>Total a pagar:</strong></span>
-                                    <strong style="color: #d32f2f;">$${totalAPagar.toLocaleString('es-UY', {minimumFractionDigits: 2})}</strong>
-                                </div>
-                            ` : ''}
+                ${totalAPagar > 0 && deudaAcumulada > 0 ? `
+                    <div class="deuda-breakdown-box">
+                        <div class="breakdown-item">
+                            <span>Mes actual:</span>
+                            <strong>$${deudaMesActual.toLocaleString('es-UY', {minimumFractionDigits: 2})}</strong>
+                        </div>
+                        <div class="breakdown-item error">
+                            <span>Acumulada:</span>
+                            <strong>$${deudaAcumulada.toLocaleString('es-UY', {minimumFractionDigits: 2})}</strong>
                         </div>
                     </div>
                 ` : ''}
                 
-                <div class="deuda-desglose">
-                    <div class="desglose-item">
-                        <span class="label">Horas Requeridas:</span>
-                        <span class="valor">${deuda.horas_requeridas_mensuales}h/mes</span>
-                    </div>
-                    <div class="desglose-item">
-                        <span class="label">Sistema Semanal:</span>
-                        <span class="valor">${deuda.horas_requeridas_semanales}h/semana</span>
-                    </div>
-                    <div class="desglose-item">
-                        <span class="label">Horas Trabajadas:</span>
-                        <span class="valor">${deuda.horas_trabajadas}h</span>
-                    </div>
-                    <div class="desglose-item">
-                        <span class="label">Promedio Semanal:</span>
-                        <span class="valor">${deuda.promedio_semanal}h/sem</span>
-                    </div>
-                    <div class="desglose-item ${tieneDeuda ? 'error' : 'success'}">
-                        <span class="label">Horas Faltantes:</span>
-                        <span class="valor">${deuda.horas_faltantes}h</span>
-                    </div>
-                    <div class="desglose-item">
-                        <span class="label">Costo por Hora:</span>
-                        <span class="valor">$${deuda.costo_por_hora}</span>
-                    </div>
-                </div>
-                
-                <div class="deuda-progreso">
-                    <div class="progreso-header">
+                <div class="progreso-bar-container">
+                    <div class="progreso-bar-header">
                         <span>Progreso Mensual</span>
-                        <span class="porcentaje">${deuda.porcentaje_cumplido}%</span>
+                        <span>${deuda.porcentaje_cumplido}%</span>
                     </div>
-                    <div class="barra-progreso">
-                        <div class="barra-fill" style="width: ${Math.min(deuda.porcentaje_cumplido, 100)}%; 
+                    <div class="progreso-bar">
+                        <div class="progreso-fill" style="width: ${Math.min(deuda.porcentaje_cumplido, 100)}%; 
                              background: ${deuda.porcentaje_cumplido >= 100 ? '#4caf50' : 
                                           deuda.porcentaje_cumplido >= 50 ? '#ff9800' : '#f44336'}">
                         </div>
                     </div>
                 </div>
-                
-                ${tieneDeuda ? `
-                    <div class="alert-warning" style="margin-top: 15px;">
-                        <strong>⚠ Información Importante:</strong>
-                        <p>Esta deuda ${deudaAcumulada > 0 ? '(incluye $' + deudaAcumulada.toLocaleString('es-UY', {minimumFractionDigits: 2}) + ' de meses anteriores) ' : ''}se sumará automáticamente a tu próxima cuota mensual de vivienda.</p>
-                        <p>Sistema: <strong>21 horas semanales</strong> (84h mensuales).</p>
-                    </div>
-                ` : `
-                    <div class="alert-success" style="margin-top: 15px;">
-                        <strong>🎉 ¡Excelente!</strong>
-                        <p>Has cumplido con tus horas requeridas. No tendrás cargos adicionales en tu cuota.</p>
-                    </div>
-                `}
             </div>
         </div>
     `;
 }
 
+// Función para expandir/colapsar
+function toggleDeudaDetalle() {
+    const detalle = document.getElementById('deuda-detalle-content');
+    const icon = document.getElementById('toggle-deuda-icon');
+    
+    if (detalle.style.display === 'none') {
+        detalle.style.display = 'block';
+        icon.classList.remove('fa-chevron-down');
+        icon.classList.add('fa-chevron-up');
+    } else {
+        detalle.style.display = 'none';
+        icon.classList.remove('fa-chevron-up');
+        icon.classList.add('fa-chevron-down');
+    }
+}
+
+// Exportar función
+window.toggleDeudaDetalle = toggleDeudaDetalle;
 
 function getNombreMes(mes) {
     const meses = [
@@ -1473,16 +1433,20 @@ function renderResumenSemanal(resumen) {
         const esHoy = fecha === new Date().toISOString().split('T')[0];
         const esFinDeSemana = index === 5 || index === 6; 
 
-        html += `
-            <div class="dia-card ${registro ? 'con-registro' : 'sin-registro'} ${esHoy ? 'dia-hoy' : ''} ${esFinDeSemana ? 'fin-de-semana' : ''}">
-                <div class="dia-header">
-                    <strong>${dia}</strong>
-                    <span class="dia-fecha">${fechaFormateada}</span>
-                    ${esHoy ? '<span class="badge-hoy">HOY</span>' : ''}
-                    ${esFinDeSemana ? '<span class="badge-finde">🏖️</span>' : ''}
-                </div>
-                <div class="dia-content">
-        `;
+       html += `
+    <div class="dia-card ${registro ? 'con-registro' : 'sin-registro'} ${esHoy ? 'dia-hoy' : ''} ${esFinDeSemana ? 'fin-de-semana' : ''}">
+        <div class="dia-header">
+            <div class="dia-info">
+                <strong>${dia}</strong>
+                <span class="dia-fecha">${fechaFormateada}</span>
+            </div>
+            <div class="dia-badges">
+                ${esHoy ? '<span class="badge-hoy">HOY</span>' : ''}
+                ${esFinDeSemana ? '<span class="badge-finde">🏖️</span>' : ''}
+            </div>
+        </div>
+        <div class="dia-content">
+`;
 
         if (registro) {
             const entrada = registro.hora_entrada ? registro.hora_entrada.substring(0, 5) : '--:--';
@@ -3805,8 +3769,8 @@ function abrirModalNuevaSolicitud() {
     }
 
     const modal = `
-        <div id="nuevaSolicitudModal" class="material-modal" style="display: flex;">
-            <div class="material-modal-content">
+         <div id="nuevaSolicitudModal" class="material-modal" style="display: flex;">
+            <div class="material-modal-content" onclick="event.stopPropagation()">
                 <div class="material-modal-header">
                     <h3 id="solicitudModalTitle">Nueva Solicitud</h3>
                     <button class="close-material-modal" onclick="cerrarModalNuevaSolicitud()">&times;</button>
@@ -4595,112 +4559,111 @@ function mostrarModalHistorialJustificaciones(justificaciones) {
 function renderDeudaHorasWidget(deuda) {
     const container = document.getElementById('deuda-actual-container');
     
-    const estado = deuda.estado || 'pendiente';
-    const colorEstado = estado === 'cumplido' ? 'success' : 
-                       estado === 'progreso' ? 'warning' : 'error';
-    
     const deudaMesActual = parseFloat(deuda.deuda_en_pesos || 0);
     const deudaAcumulada = parseFloat(deuda.deuda_acumulada || 0);
-    const totalAPagar = deudaMesActual + deudaAcumulada;  // ✅ SUMA CORRECTA
+    const totalAPagar = deudaMesActual + deudaAcumulada;
     const tieneDeuda = totalAPagar > 0;
     
     container.innerHTML = `
-        <div class="deuda-widget ${colorEstado}">
-            <div class="deuda-header">
-                <div class="deuda-icono">
+        <div class="deuda-widget-compacto ${tieneDeuda ? 'con-deuda' : 'sin-deuda'}">
+            <!-- VISTA COMPACTA (SIEMPRE VISIBLE) -->
+            <div class="deuda-resumen" onclick="toggleDeudaDetalle()">
+                <div class="deuda-resumen-left">
                     <i class="fas ${tieneDeuda ? 'fa-exclamation-triangle' : 'fa-check-circle'}"></i>
+                    <div>
+                        <h4>${tieneDeuda ? 'Deuda de Horas' : 'Sin Deuda de Horas'}</h4>
+                        <p>${getNombreMes(deuda.mes)} ${deuda.anio}</p>
+                    </div>
                 </div>
-                <div class="deuda-titulo">
-                    <h4>${tieneDeuda ? 'Tienes Deuda de Horas' : 'Sin Deuda de Horas'}</h4>
-                    <p>Período: ${getNombreMes(deuda.mes)} ${deuda.anio}</p>
+                <div class="deuda-resumen-right">
+                    <div class="deuda-monto-compacto">
+                        $${totalAPagar.toLocaleString('es-UY', {minimumFractionDigits: 2})}
+                    </div>
+                    <i class="fas fa-chevron-down toggle-icon" id="toggle-deuda-icon"></i>
                 </div>
             </div>
             
-            <div class="deuda-body">
-                <!-- ✅ MOSTRAR TOTAL A PAGAR (MES ACTUAL + ACUMULADA) -->
-                <div class="deuda-monto-principal ${tieneDeuda ? 'error' : 'success'}">
-                    $${totalAPagar.toLocaleString('es-UY', {minimumFractionDigits: 2})}
+            <!-- DETALLE EXPANDIBLE -->
+            <div class="deuda-detalle" id="deuda-detalle-content" style="display: none;">
+                <!-- Stats principales -->
+                <div class="deuda-stats-row">
+                    <div class="stat-box">
+                        <small>Trabajadas</small>
+                        <strong>${deuda.horas_trabajadas}h</strong>
+                    </div>
+                    <div class="stat-box">
+                        <small>Requeridas</small>
+                        <strong>${deuda.horas_requeridas_mensuales}h</strong>
+                    </div>
+                    <div class="stat-box ${tieneDeuda ? 'error' : 'success'}">
+                        <small>Faltantes</small>
+                        <strong>${deuda.horas_faltantes}h</strong>
+                    </div>
                 </div>
                 
-                <!-- ✅ AGREGAR DESGLOSE DE LA DEUDA TOTAL -->
-                ${totalAPagar > 0 ? `
-                    <div class="deuda-desglose-resumen" style="background: #fff3cd; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #ff9800;">
-                        <div style="display: grid; gap: 8px;">
-                            <div style="display: flex; justify-content: space-between;">
-                                <span>💰 Deuda mes actual:</span>
-                                <strong>$${deudaMesActual.toLocaleString('es-UY', {minimumFractionDigits: 2})}</strong>
-                            </div>
-                            ${deudaAcumulada > 0 ? `
-                                <div style="display: flex; justify-content: space-between; color: #d32f2f;">
-                                    <span>⚠ Deuda acumulada:</span>
-                                    <strong>$${deudaAcumulada.toLocaleString('es-UY', {minimumFractionDigits: 2})}</strong>
-                                </div>
-                                <hr style="margin: 8px 0; border: none; border-top: 1px dashed #ccc;">
-                                <div style="display: flex; justify-content: space-between; font-size: 1.1em;">
-                                    <span><strong>Total a pagar:</strong></span>
-                                    <strong style="color: #d32f2f;">$${totalAPagar.toLocaleString('es-UY', {minimumFractionDigits: 2})}</strong>
-                                </div>
-                            ` : ''}
+                <!-- Desglose de deuda si hay acumulada -->
+                ${totalAPagar > 0 && deudaAcumulada > 0 ? `
+                    <div class="deuda-breakdown-box">
+                        <div class="breakdown-item">
+                            <span>💰 Mes actual:</span>
+                            <strong>$${deudaMesActual.toLocaleString('es-UY', {minimumFractionDigits: 2})}</strong>
+                        </div>
+                        <div class="breakdown-item error">
+                            <span>⚠️ Acumulada:</span>
+                            <strong>$${deudaAcumulada.toLocaleString('es-UY', {minimumFractionDigits: 2})}</strong>
                         </div>
                     </div>
                 ` : ''}
                 
-                <div class="deuda-desglose">
-                    <div class="desglose-item">
-                        <span class="label">Horas Requeridas:</span>
-                        <span class="valor">${deuda.horas_requeridas_mensuales}h/mes</span>
-                    </div>
-                    <div class="desglose-item">
-                        <span class="label">Sistema Semanal:</span>
-                        <span class="valor">${deuda.horas_requeridas_semanales}h/semana</span>
-                    </div>
-                    <div class="desglose-item">
-                        <span class="label">Horas Trabajadas:</span>
-                        <span class="valor">${deuda.horas_trabajadas}h</span>
-                    </div>
-                    <div class="desglose-item">
-                        <span class="label">Promedio Semanal:</span>
-                        <span class="valor">${deuda.promedio_semanal}h/sem</span>
-                    </div>
-                    <div class="desglose-item ${tieneDeuda ? 'error' : 'success'}">
-                        <span class="label">Horas Faltantes:</span>
-                        <span class="valor">${deuda.horas_faltantes}h</span>
-                    </div>
-                    <div class="desglose-item">
-                        <span class="label">Costo por Hora:</span>
-                        <span class="valor">$${deuda.costo_por_hora}</span>
-                    </div>
-                </div>
-                
-                <div class="deuda-progreso">
-                    <div class="progreso-header">
+                <!-- Barra de progreso -->
+                <div class="progreso-bar-container">
+                    <div class="progreso-bar-header">
                         <span>Progreso Mensual</span>
-                        <span class="porcentaje">${deuda.porcentaje_cumplido}%</span>
+                        <span>${deuda.porcentaje_cumplido}%</span>
                     </div>
-                    <div class="barra-progreso">
-                        <div class="barra-fill" style="width: ${Math.min(deuda.porcentaje_cumplido, 100)}%; 
+                    <div class="progreso-bar">
+                        <div class="progreso-fill" style="width: ${Math.min(deuda.porcentaje_cumplido, 100)}%; 
                              background: ${deuda.porcentaje_cumplido >= 100 ? '#4caf50' : 
                                           deuda.porcentaje_cumplido >= 50 ? '#ff9800' : '#f44336'}">
                         </div>
                     </div>
                 </div>
                 
+                <!-- Mensaje informativo -->
                 ${tieneDeuda ? `
-                    <div class="alert-warning" style="margin-top: 15px;">
-                        <strong>⚠ Información Importante:</strong>
-                        <p>Esta deuda ${deudaAcumulada > 0 ? '(incluye $' + deudaAcumulada.toLocaleString('es-UY', {minimumFractionDigits: 2}) + ' de meses anteriores) ' : ''}se sumará automáticamente a tu próxima cuota mensual de vivienda.</p>
-                        <p>Sistema: <strong>21 horas semanales</strong> (84h mensuales).</p>
+                    <div class="alert-warning-compact">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Esta deuda se sumará a tu próxima cuota de vivienda.</span>
                     </div>
                 ` : `
-                    <div class="alert-success" style="margin-top: 15px;">
-                        <strong>🎉 ¡Excelente!</strong>
-                        <p>Has cumplido con tus horas requeridas. No tendrás cargos adicionales en tu cuota.</p>
+                    <div class="alert-success-compact">
+                        <i class="fas fa-check-circle"></i>
+                        <span>¡Has cumplido con tus horas requeridas!</span>
                     </div>
                 `}
             </div>
         </div>
     `;
 }
+
+// Función para expandir/colapsar
+function toggleDeudaDetalle() {
+    const detalle = document.getElementById('deuda-detalle-content');
+    const icon = document.getElementById('toggle-deuda-icon');
+    
+    if (detalle.style.display === 'none') {
+        detalle.style.display = 'block';
+        icon.classList.remove('fa-chevron-down');
+        icon.classList.add('fa-chevron-up');
+    } else {
+        detalle.style.display = 'none';
+        icon.classList.remove('fa-chevron-up');
+        icon.classList.add('fa-chevron-down');
+    }
+}
+
+// Exportar función globalmente
+window.toggleDeudaDetalle = toggleDeudaDetalle;
 
 // Exportar funciones
 window.cargarJustificacionesUsuario = cargarJustificacionesUsuario;

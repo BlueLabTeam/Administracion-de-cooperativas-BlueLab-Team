@@ -185,36 +185,40 @@ if (!isset($_SESSION['user_id'])) {
 </div>
 
 		<!-- Formulario de edición -->
-		<div id="profile-edit" style="display: none;">
-			<form id="editProfileForm" onsubmit="submitProfileEdit(event)">
-				<div class="form-row">
-					<div class="form-group">
-						<label for="edit-nombre" data-i18n="dashboardUser.profile.fullName">
-							Nombre Completo *
-						</label>
-						<input type="text" id="edit-nombre" required>
-					</div>
-					<div class="form-group">
-						<label for="edit-cedula" data-i18n="dashboardUser.profile.idCard">
-							Cédula *
-						</label>
-						<input type="text" id="edit-cedula" required readonly data-i18n-title="dashboardUser.profile.idCardReadonly">
-					</div>
+<div id="profile-edit" style="display: none;">
+	<form id="editProfileForm" onsubmit="submitProfileEdit(event)">
+		<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; position: relative;">
+			<!-- Línea divisoria vertical -->
+			<div style="position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: linear-gradient(to bottom, transparent, #005CB9 10%, #005CB9 90%, transparent); transform: translateX(-50%);"></div>
+			
+			<!-- COLUMNA IZQUIERDA: Datos personales -->
+			<div style="padding-right: 15px;">
+				<div class="form-group">
+					<label for="edit-nombre" data-i18n="dashboardUser.profile.fullName">
+						Nombre Completo *
+					</label>
+					<input type="text" id="edit-nombre" required>
 				</div>
 
-				<div class="form-row">
-					<div class="form-group">
-						<label for="edit-email" data-i18n="dashboardUser.profile.email">
-							Email *
-						</label>
-						<input type="email" id="edit-email" required autocomplete="username">
-					</div>
-					<div class="form-group">
-						<label for="edit-fecha-nacimiento" data-i18n="dashboardUser.profile.birthDate">
-							Fecha de Nacimiento
-						</label>
-						<input type="date" id="edit-fecha-nacimiento">
-					</div>
+				<div class="form-group">
+					<label for="edit-cedula" data-i18n="dashboardUser.profile.idCard">
+						Cédula *
+					</label>
+					<input type="text" id="edit-cedula" required readonly data-i18n-title="dashboardUser.profile.idCardReadonly">
+				</div>
+
+				<div class="form-group">
+					<label for="edit-email" data-i18n="dashboardUser.profile.email">
+						Email *
+					</label>
+					<input type="email" id="edit-email" required autocomplete="username">
+				</div>
+
+				<div class="form-group">
+					<label for="edit-fecha-nacimiento" data-i18n="dashboardUser.profile.birthDate">
+						Fecha de Nacimiento
+					</label>
+					<input type="date" id="edit-fecha-nacimiento">
 				</div>
 
 				<div class="form-group">
@@ -229,12 +233,13 @@ if (!isset($_SESSION['user_id'])) {
 						Teléfono
 					</label>
 					<input type="tel" id="edit-telefono" placeholder="Ej: 099123456">
-					<small style="color: #666;" data-i18n="dashboardUser.profile.phoneOptional">Opcional - Puedes agregar un número de contacto</small>
 				</div>
+			</div>
 
-				<hr style="margin: 20px 0;">
-
-				<h4 style="margin-bottom: 15px;" data-i18n="dashboardUser.profile.changePassword">Cambiar Contraseña (Opcional)</h4>
+			<!-- COLUMNA DERECHA: Contraseñas -->
+			<div style="padding-left: 15px;">
+				<h4 style="margin-bottom: 15px; margin-top: 0;" data-i18n="dashboardUser.profile.changePassword">Cambiar Contraseña (Opcional)</h4>
+				
 				<div class="form-group">
 					<label for="edit-password-actual" data-i18n="dashboardUser.profile.currentPassword">
 						Contraseña Actual
@@ -242,31 +247,39 @@ if (!isset($_SESSION['user_id'])) {
 					<input type="password" id="edit-password-actual" data-i18n-placeholder="dashboardUser.profile.currentPasswordPlaceholder" autocomplete="current-password">
 				</div>
 
-				<div class="form-row">
-					<div class="form-group">
-						<label for="edit-password-nueva" data-i18n="dashboardUser.profile.newPassword">
-							Nueva Contraseña
-						</label>
-						<input type="password" id="edit-password-nueva" minlength="6" autocomplete="new-password">
-					</div>
-					<div class="form-group">
-						<label for="edit-password-confirmar" data-i18n="dashboardUser.profile.confirmPassword">
-							Confirmar Nueva Contraseña
-						</label>
-						<input type="password" id="edit-password-confirmar" minlength="6" autocomplete="new-password">
-					</div>
+				<div class="form-group">
+					<label for="edit-password-nueva" data-i18n="dashboardUser.profile.newPassword">
+						Nueva Contraseña
+					</label>
+					<input type="password" id="edit-password-nueva" minlength="6" autocomplete="new-password">
 				</div>
 
-				<div class="form-actions">
-					<button type="button" class="btn btn-secondary" onclick="toggleEditProfile()">
-						<i class="fas fa-times"></i> <span data-i18n="dashboardUser.profile.cancelEdit">Cancelar</span>
-					</button>
-					<button type="submit" class="btn btn-primary">
-						<i class="fas fa-save"></i> <span data-i18n="dashboardUser.profile.saveChanges">Guardar Cambios</span>
-					</button>
+				<div class="form-group">
+					<label for="edit-password-confirmar" data-i18n="dashboardUser.profile.confirmPassword">
+						Confirmar Nueva Contraseña
+					</label>
+					<input type="password" id="edit-password-confirmar" minlength="6" autocomplete="new-password">
 				</div>
-			</form>
+
+				<div style="background: #E3F2FD; padding: 15px; border-radius: 8px; margin-top: 20px; border-left: 4px solid #005CB9;">
+					<small style="color: #004494; display: block; line-height: 1.5;">
+						<i class="fas fa-info-circle"></i> 
+						<strong>Nota:</strong> Solo completa estos campos si deseas cambiar tu contraseña. Si los dejas vacíos, tu contraseña actual se mantendrá.
+					</small>
+				</div>
+			</div>
 		</div>
+
+		<div class="form-actions" style="margin-top: 30px;">
+			<button type="button" class="btn btn-secondary" onclick="toggleEditProfile()">
+				<i class="fas fa-times"></i> <span data-i18n="dashboardUser.profile.cancelEdit">Cancelar</span>
+			</button>
+			<button type="submit" class="btn btn-primary">
+				<i class="fas fa-save"></i> <span data-i18n="dashboardUser.profile.saveChanges">Guardar Cambios</span>
+			</button>
+		</div>
+	</form>
+</div>
 	</div>
 </section>
 
@@ -339,43 +352,40 @@ if (!isset($_SESSION['user_id'])) {
 <section id="cuotas-section" class="section-content">
     <h2 class="section-title" data-i18n="dashboardUser.billing.title">💳 Mis Cuotas Mensuales</h2>
     
-    <div class="info-card">
-        <h3 data-i18n="dashboardUser.billing.welcome">Gestión de Cuotas</h3>
-        <p data-i18n="dashboardUser.billing.description">Gestiona tus pagos de vivienda y deuda de horas</p>
-    </div>
+    
 
-    <!-- Estadísticas Rápidas -->
-    <div class="stats-grid">
-        <div class="stat-card pendiente">
-            <div class="stat-icon">
-                <i class="fas fa-clock"></i>
-            </div>
-            <div class="stat-info">
-                <span class="stat-label" data-i18n="dashboardUser.billing.stats.pending">Pendientes</span>
-                <span class="stat-value" id="cuotas-pendientes-count">0</span>
-            </div>
+   <!-- Estadísticas Rápidas -->
+<div class="stats-grid-wide">
+    <div class="stat-card pendiente">
+        <div class="stat-icon">
+            <i class="fas fa-clock"></i>
         </div>
-
-        <div class="stat-card success">
-            <div class="stat-icon">
-                <i class="fas fa-check-circle"></i>
-            </div>
-            <div class="stat-info">
-                <span class="stat-label" data-i18n="dashboardUser.billing.stats.paid">Pagadas</span>
-                <span class="stat-value" id="cuotas-pagadas-count">0</span>
-            </div>
-        </div>
-
-        <div class="stat-card error">
-            <div class="stat-icon">
-                <i class="fas fa-exclamation-triangle"></i>
-            </div>
-            <div class="stat-info">
-                <span class="stat-label" data-i18n="dashboardUser.billing.stats.overdue">Vencidas</span>
-                <span class="stat-value" id="cuotas-vencidas-count">0</span>
-            </div>
+        <div class="stat-info">
+            <span class="stat-label" data-i18n="dashboardUser.billing.stats.pending">Pendientes</span>
+            <span class="stat-value" id="admin-cuotas-pendientes">0</span>
         </div>
     </div>
+
+    <div class="stat-card success">
+        <div class="stat-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="stat-info">
+            <span class="stat-label" data-i18n="dashboardUser.billing.stats.paid">Pagadas</span>
+            <span class="stat-value" id="cuotas-pagadas-count">0</span>
+        </div>
+    </div>
+
+    <div class="stat-card error">
+        <div class="stat-icon">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <div class="stat-info">
+            <span class="stat-label" data-i18n="dashboardUser.billing.stats.overdue">Vencidas</span>
+            <span class="stat-value" id="cuotas-vencidas-count">0</span>
+        </div>
+    </div>
+</div>
 
     <!-- Filtros -->
     <div class="filters-container">
@@ -535,23 +545,37 @@ if (!isset($_SESSION['user_id'])) {
 	</div>
 
 	<!-- Estadísticas Rápidas -->
-	<div class="stats-grid">
-		<div class="stat-card">
-			<i class="fas fa-clock"></i>
-			<h4 data-i18n="dashboardUser.hours.stats.weekHours">Horas esta Semana</h4>
-			<p id="horas-semana">0h</p>
-		</div>
-		<div class="stat-card">
-			<i class="fas fa-calendar-week"></i>
-			<h4 data-i18n="dashboardUser.hours.stats.daysWorked">Días Trabajados</h4>
-			<p id="dias-semana">0</p>
-		</div>
-		<div class="stat-card">
-			<i class="fas fa-calendar-alt"></i>
-			<h4 data-i18n="dashboardUser.hours.stats.monthHours">Horas Este Mes</h4>
-			<p id="horas-mes">0h</p>
-		</div>
-	</div>
+<div class="stats-grid-wide">
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fas fa-clock"></i>
+        </div>
+        <div class="stat-info">
+            <span class="stat-label" data-i18n="dashboardUser.hours.stats.weekHours">Horas esta Semana</span>
+            <span class="stat-value" id="horas-semana">0h</span>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fas fa-calendar-week"></i>
+        </div>
+        <div class="stat-info">
+            <span class="stat-label" data-i18n="dashboardUser.hours.stats.daysWorked">Días Trabajados</span>
+            <span class="stat-value" id="dias-semana">0</span>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fas fa-calendar-alt"></i>
+        </div>
+        <div class="stat-info">
+            <span class="stat-label" data-i18n="dashboardUser.hours.stats.monthHours">Horas Este Mes</span>
+            <span class="stat-value" id="horas-mes">0h</span>
+        </div>
+    </div>
+</div>
 
 	<!-- Resumen Semanal -->
 	<div class="info-card">
@@ -598,24 +622,38 @@ if (!isset($_SESSION['user_id'])) {
 		<section id="tareas-section" class="section-content">
 			<h2 class="section-title" data-i18n="dashboardUser.tasks.title">📋 Mis Tareas</h2>
 			
-			<!-- Resumen de Tareas -->
-			<div class="stats-grid" style="margin-bottom: 20px;">
-				<div class="stat-card">
-					<i class="fas fa-clock"></i>
-					<h4 data-i18n="dashboardUser.tasks.stats.pending">Pendientes</h4>
-					<p id="pending-count">0</p>
-				</div>
-				<div class="stat-card">
-					<i class="fas fa-spinner"></i>
-					<h4 data-i18n="dashboardUser.tasks.stats.inProgress">En Progreso</h4>
-					<p id="progress-count">0</p>
-				</div>
-				<div class="stat-card">
-					<i class="fas fa-check-circle"></i>
-					<h4 data-i18n="dashboardUser.tasks.stats.completed">Completadas</h4>
-					<p id="completed-count">0</p>
-				</div>
-			</div>
+		<!-- Resumen de Tareas -->
+<div class="stats-grid-wide" style="margin-bottom: 20px;">
+    <div class="stat-card pendiente">
+        <div class="stat-icon">
+            <i class="fas fa-clock"></i>
+        </div>
+        <div class="stat-info">
+            <span class="stat-label" data-i18n="dashboardUser.tasks.stats.pending">Pendientes</span>
+            <span class="stat-value" id="pending-count">0</span>
+        </div>
+    </div>
+    
+    <div class="stat-card warning">
+        <div class="stat-icon">
+            <i class="fas fa-spinner"></i>
+        </div>
+        <div class="stat-info">
+            <span class="stat-label" data-i18n="dashboardUser.tasks.stats.inProgress">En Progreso</span>
+            <span class="stat-value" id="progress-count">0</span>
+        </div>
+    </div>
+    
+    <div class="stat-card success">
+        <div class="stat-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="stat-info">
+            <span class="stat-label" data-i18n="dashboardUser.tasks.stats.completed">Completadas</span>
+            <span class="stat-value" id="completed-count">0</span>
+        </div>
+    </div>
+</div>
 			
 			<!-- Tareas personales -->
 			<div class="info-card">

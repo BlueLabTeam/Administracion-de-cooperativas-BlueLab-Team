@@ -131,18 +131,7 @@
     background: var(--color-white);
 }
 
-.table tbody tr:hover,
-.viviendas-table tbody tr:hover,
-.users-table tbody tr:hover,
-.nucleos-table tbody tr:hover,
-.materiales-table tbody tr:hover,
-.registros-table tbody tr:hover,
-.cuotas-admin-table tbody tr:hover,
-.solicitudes-admin-table tbody tr:hover {
-    background: linear-gradient(90deg, var(--color-gray-50) 0%, #e8f0ff 100%);
-    transform: translateX(4px);
-    box-shadow: var(--shadow-sm);
-}
+
 
 .table tbody tr:last-child,
 .viviendas-table tbody tr:last-child,
