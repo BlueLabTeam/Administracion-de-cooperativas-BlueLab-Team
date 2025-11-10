@@ -223,12 +223,86 @@
 }
 
 /* ==========================================
+    BOTÓN DE TOGGLE DEL MENÚ
+   ========================================== */
+.menu-container {
+    position: relative;
+}
+
+.menu .toggle-menu-btn {
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background-color: #007bff;
+    color: #fff;
+    font-size: 20px;
+    cursor: pointer;
+    z-index: 1001;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.mini-toggle-menu-btn {
+    display: none;
+    position: relative;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background-color: #007bff;
+    color: #fff;
+    font-size: 20px;
+    cursor: pointer;
+    z-index: 1001;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.mini-toggle-menu-btn:hover {
+    background-color: #0056b3;
+}
+
+.toggle-menu-btn {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+}
+
+.toggle-menu-btn:hover {
+    background-color: #0056b3;
+}
+
+body {
+    transition: margin-top 0.3s ease;
+}
+
+nav.menu {
+    transition: all 0.4s ease;
+    transform-origin: top center;
+    opacity: 1;
+    background-color: transparent;
+}
+
+/* ==========================================
    ÁREA DE CONTENIDO
    ========================================== */
 .content-area {
     max-width: 1200px;
     margin: var(--spacing-xl) auto;
     padding: var(--spacing-xl);
+    margin-top: 0px;
+    padding-top: 0px;
 }
 
 /* ==========================================
@@ -250,6 +324,7 @@
         opacity: 0;
         transform: translateY(10px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -352,7 +427,7 @@
     .stats-grid {
         grid-template-columns: repeat(2, 1fr);
     }
-    
+
     /* Grid wide en tablet */
     .stats-grid-wide {
         grid-template-columns: repeat(2, 1fr);
@@ -364,7 +439,7 @@
     .stats-grid {
         grid-template-columns: 1fr;
     }
-    
+
     /* Grid wide en móvil */
     .stats-grid-wide {
         grid-template-columns: 1fr;
@@ -494,7 +569,7 @@
 }
 
 /* Soporte para icono directo en stat-card (sin div stat-icon) */
-.stat-card > i {
+.stat-card>i {
     font-size: 20px;
     width: 48px;
     height: 48px;
@@ -508,19 +583,19 @@
     flex-shrink: 0;
 }
 
-.stat-card.pendiente > i {
+.stat-card.pendiente>i {
     background: linear-gradient(135deg, #FFC107 0%, #FFA000 100%);
 }
 
-.stat-card.warning > i {
+.stat-card.warning>i {
     background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
 }
 
-.stat-card.success > i {
+.stat-card.success>i {
     background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%);
 }
 
-.stat-card.error > i {
+.stat-card.error>i {
     background: linear-gradient(135deg, #DC3545 0%, #C82333 100%);
 }
 
@@ -571,8 +646,10 @@
     max-height: 500px;
     overflow-y: auto;
     /* Ocultar scrollbar pero mantener funcionalidad */
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* Internet Explorer y Edge */
+    scrollbar-width: none;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* Internet Explorer y Edge */
 }
 
 /* Ocultar scrollbar en Chrome, Safari y Opera */
