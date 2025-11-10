@@ -3868,7 +3868,7 @@ function abrirModalNuevaSolicitud() {
     document.body.insertAdjacentHTML('beforeend', modal);
     
     // Prevenir scroll del body
-    document.body.style.overflow = 'hidden';
+   
 }
 
 function cerrarModalNuevaSolicitud() {

@@ -325,8 +325,7 @@ function showCreateViviendaModal() {
         //  MOSTRAR EL MODAL
         modal.style.display = 'flex';
         
-        // ✅ PREVENIR SCROLL DEL BODY
-        document.body.style.overflow = 'hidden';
+ 
         
         // ✅ PREVENIR que se cierre al hacer clic fuera
         modal.onclick = null;
