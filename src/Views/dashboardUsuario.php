@@ -440,7 +440,7 @@ if (!isset($_SESSION['user_id'])) {
 
 <!-- MODAL: PAGAR CUOTA -->
 <div id="pagarCuotaModal" class="modal-overlay" style="display: none;">
-    <div class="modal-content-large">
+    <div class="material-modal-content">
         <button class="modal-close-btn" onclick="closePagarCuotaModal()">×</button>
         
         <h2 class="modal-title">
@@ -701,8 +701,6 @@ if (!isset($_SESSION['user_id'])) {
 
 
 	<script src="/assets/js/dashboardUsuario.js"></script>
-
-
 	
 </body>
 </html>

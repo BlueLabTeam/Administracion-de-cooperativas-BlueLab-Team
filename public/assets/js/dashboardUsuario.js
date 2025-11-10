@@ -2587,46 +2587,34 @@ html += `
                 
 <div class="deuda-total-actions">
     <button class="btn-pagar-deuda-total" 
-            onclick="abrirPagarDeudaTotal(${cuotaMasReciente.id_cuota}, ${montoTotal})"
+            disabled
+            title="El período de pago se habilitará el día 25 del mes"
             style="
-                background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+                background: linear-gradient(135deg, #9e9e9e 0%, #757575 100%);
                 color: #FFFFFF;
                 border: none;
                 padding: 14px 28px;
                 border-radius: 8px;
                 font-size: 15px;
                 font-weight: 600;
-                cursor: pointer;
-                transition: all 0.3s ease;
-                box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+                cursor: not-allowed;
+                opacity: 0.6;
+                box-shadow: none;
                 display: inline-flex;
                 align-items: center;
                 gap: 10px;
-            "
-            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(76, 175, 80, 0.4)'"
-            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(76, 175, 80, 0.3)'"
-            onmousedown="this.style.transform='translateY(0px)'"
-            onmouseup="this.style.transform='translateY(-2px)'">
-        <i class="fas fa-credit-card"></i>
-        Pagar Ahora
+            ">
+        <i class="fas fa-lock"></i>
+        Pago Bloqueado
     </button>
 </div>
-                
-                <div class="alert-warning" style="margin-top: 20px; background: rgba(255, 152, 0, 0.15); border-color: rgba(255, 152, 0, 0.3);">
-                    <strong style="color: #ff9800;">🔒 Período de Trabajo en Curso</strong>
-                    <p style="color: rgba(255, 255, 255, 0.9); margin: 10px 0 0 0;">
-                        ${diasParaPagar > 0 ? `
+                    <div class="alert-warning" style="margin-top: 20px;">
+                        <strong style="color: #ff9800;">🔒 Periodo de Trabajo en Curso</strong>
+                        <p style="color: rgba(255, 255, 255, 0.9); margin: 10px 0 0 0;">
                             El período de pago se habilitará en <strong>${diasParaPagar} día${diasParaPagar !== 1 ? 's' : ''}</strong> (desde el 25 del mes).
-                            <br>Por ahora, enfócate en cumplir tus <strong>21 horas mensuales</strong> para evitar cargos adicionales.
-                        ` : `
-                            El período de pago para este mes aún no está disponible.
-                        `}
-                    </p>
-                    
-                            </div>
-                        </div>
+                            <br>Por ahora, enfócate en cumplir tus <strong>21 horas semanales</strong> para evitar cargos adicionales.
+                        </p>
                     </div>
-                </div>
             `}
         </div>
     </div>
@@ -2800,11 +2788,13 @@ function renderCuotaCard(cuota) {
             </div>
             
             <div class="cuota-card-footer">
-                ${cuota.comprobante_archivo ? `
-                    <button class="btn btn-secondary btn-small" onclick="verComprobante('${cuota.comprobante_archivo}')">
-                        <i class="fas fa-image"></i> Ver Comprobante
-                    </button>
-                ` : ''}
+              ${estadoFinal === 'pendiente' || estadoFinal === 'vencida' ? `
+    <button class="btn-small btn-primary" 
+            onclick="abrirPagarCuotaModal(${cuota.id_cuota}, ${cuota.monto_total || cuota.monto_base || cuota.monto})"
+            title="Registrar pago">
+        <i class="fas fa-dollar-sign"></i> Pagar
+    </button>
+` : ''}
                 
                 ${estadoFinal !== 'pagada' && !tienePagoPendiente ? `
                     <button class="btn btn-primary btn-small" onclick="abrirPagarDeudaTotal(${cuota.id_cuota}, ${montoMostrar})">
@@ -2849,7 +2839,9 @@ async function abrirPagarDeudaTotal(cuotaId, montoTotal) {
         document.getElementById('pagar-cuota-id').value = cuotaId;
         document.getElementById('pagar-monto').value = montoTotal;
         
-        document.getElementById('pagarCuotaModal').style.display = 'flex';
+        const modal = document.getElementById('pagarCuotaModal');
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
         
     } catch (error) {
         console.error('Error:', error);
@@ -2863,6 +2855,7 @@ async function abrirPagarDeudaTotal(cuotaId, montoTotal) {
 function closePagarCuotaModal() {
     document.getElementById('pagarCuotaModal').style.display = 'none';
     document.getElementById('pagarCuotaForm').reset();
+    document.body.style.overflow = 'auto';
 }
 
 // ========== ENVIAR PAGO ==========
@@ -3302,87 +3295,83 @@ window.renderMisCuotasOrganizadas = function(cuotas) {
                             ${cuotaMasReciente.fecha_pago ? `<br>Enviado el: ${new Date(cuotaMasReciente.fecha_pago).toLocaleDateString('es-UY')}` : ''}
                         </p>
                     </div>
-                ` : puedePagar ? `
-                   
-<div class="deuda-total-actions">
-    <button class="btn-pagar-deuda-total" 
-            onclick="abrirPagarDeudaTotal(${cuotaMasReciente.id_cuota}, ${montoTotal})"
-            style="
-                background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
-                color: #FFFFFF;
-                border: none;
-                padding: 14px 28px;
-                border-radius: 8px;
-                font-size: 15px;
-                font-weight: 600;
-                cursor: pointer;
-                transition: all 0.3s ease;
-                box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
-                display: inline-flex;
-                align-items: center;
-                gap: 10px;
-            "
-            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(76, 175, 80, 0.4)'"
-            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(76, 175, 80, 0.3)'"
-            onmousedown="this.style.transform='translateY(0px)'"
-            onmouseup="this.style.transform='translateY(-2px)'">
-        <i class="fas fa-credit-card"></i>
-        Pagar Ahora
-    </button>
-</div>
-                    
-                    <div class="alert-success" style="margin-top: 20px; background: rgba(76, 175, 80, 0.15); border-color: rgba(76, 175, 80, 0.3);">
-                        <strong style="color: #4caf50;">✓ Periodo de Pago Habilitado</strong>
-                        <p style="color: rgba(255, 255, 255, 0.9); margin: 10px 0 0 0;">
-                            Ya puedes realizar el pago de tu cuota. El periodo de pago está activo hasta fin de mes.
-                            ${deudaAcumuladaAnterior > 0 ? `<br><br><strong>⚠️ Importante:</strong> Tienes $${deudaAcumuladaAnterior.toLocaleString('es-UY', {minimumFractionDigits: 2})} de deuda acumulada de meses anteriores que se incluye en el pago.` : ''}
-                        </p>
-                    </div>
-                ` : diasParaPagar > 0 ? `
-                   
-<div class="deuda-total-actions">
-    <button class="btn-pagar-deuda-total" 
-            onclick="abrirPagarDeudaTotal(${cuotaMasReciente.id_cuota}, ${montoTotal})"
-            style="
-                background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
-                color: #FFFFFF;
-                border: none;
-                padding: 14px 28px;
-                border-radius: 8px;
-                font-size: 15px;
-                font-weight: 600;
-                cursor: pointer;
-                transition: all 0.3s ease;
-                box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
-                display: inline-flex;
-                align-items: center;
-                gap: 10px;
-            "
-            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(76, 175, 80, 0.4)'"
-            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(76, 175, 80, 0.3)'"
-            onmousedown="this.style.transform='translateY(0px)'"
-            onmouseup="this.style.transform='translateY(-2px)'">
-        <i class="fas fa-credit-card"></i>
-        Pagar Ahora
-    </button>
-</div>
-                    
-                    <div class="alert-warning" style="margin-top: 20px; background: rgba(255, 152, 0, 0.15); border-color: rgba(255, 152, 0, 0.3);">
-                        <strong style="color: #ff9800;">🔒 Periodo de Trabajo en Curso</strong>
-                        <p style="color: rgba(255, 255, 255, 0.9); margin: 10px 0 0 0;">
-                            El periodo de pago se habilitará en <strong>${diasParaPagar} día${diasParaPagar !== 1 ? 's' : ''}</strong> (desde el 25 del mes).
-                            <br>Por ahora, enfócate en cumplir tus <strong>84 horas mensuales</strong> (21h/semana) para evitar cargos adicionales.
-                            ${deudaAcumuladaAnterior > 0 ? `<br><br><strong>⚠️ Atención:</strong> Tienes $${deudaAcumuladaAnterior.toLocaleString('es-UY', {minimumFractionDigits: 2})} de deuda acumulada que se sumará al pago.` : ''}
-                        </p>
-                    </div>
-                ` : `
-                    <div class="alert-error" style="margin-top: 20px;">
-                        <strong style="color: #f44336;">❌ Cuota Vencida</strong>
-                        <p style="color: rgba(255, 255, 255, 0.9); margin: 10px 0 0 0;">
-                            Esta cuota no fue pagada a tiempo. La deuda se acumulará al siguiente mes.
-                        </p>
-                    </div>
-                `}
+               ` : puedePagar ? `
+    <!-- ✅ PERÍODO DE PAGO ABIERTO - MOSTRAR BOTÓN -->
+    <div class="deuda-total-actions">
+        <button class="btn-pagar-deuda-total" 
+                onclick="abrirPagarDeudaTotal(${cuotaMasReciente.id_cuota}, ${montoTotal})"
+                style="
+                    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+                    color: #FFFFFF;
+                    border: none;
+                    padding: 14px 28px;
+                    border-radius: 8px;
+                    font-size: 15px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 10px;
+                "
+                onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(76, 175, 80, 0.4)'"
+                onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(76, 175, 80, 0.3)'"
+                onmousedown="this.style.transform='translateY(0px)'"
+                onmouseup="this.style.transform='translateY(-2px)'">
+            <i class="fas fa-credit-card"></i>
+            Pagar Ahora
+        </button>
+    </div>
+    
+    <div class="alert-success" style="margin-top: 20px; background: rgba(76, 175, 80, 0.15); border-color: rgba(76, 175, 80, 0.3);">
+        <strong style="color: #4caf50;">✅ Período de Pago Habilitado</strong>
+        <p style="color: rgba(255, 255, 255, 0.9); margin: 10px 0 0 0;">
+            Ya puedes realizar el pago de tu cuota. El período de pago está activo hasta fin de mes.
+        </p>
+    </div>
+` : diasParaPagar > 0 ? `
+    <!-- 🔒 PERÍODO DE TRABAJO (BLOQUEADO) -->
+    <div class="deuda-total-actions">
+        <button class="btn-pagar-deuda-total" 
+                disabled
+                title="El período de pago se habilitará el día 25 del mes"
+                style="
+                    background: linear-gradient(135deg, #9e9e9e 0%, #757575 100%);
+                    color: #FFFFFF;
+                    border: none;
+                    padding: 14px 28px;
+                    border-radius: 8px;
+                    font-size: 15px;
+                    font-weight: 600;
+                    cursor: not-allowed;
+                    opacity: 0.6;
+                    box-shadow: none;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 10px;
+                ">
+            <i class="fas fa-lock"></i>
+            Pago Bloqueado
+        </button>
+    </div>
+    
+    <div class="alert-warning" style="margin-top: 20px;">
+        <strong style="color: #ff9800;">🔒 Periodo de Trabajo en Curso</strong>
+        <p style="color: rgba(255, 255, 255, 0.9); margin: 10px 0 0 0;">
+            El período de pago se habilitará en <strong>${diasParaPagar} día${diasParaPagar !== 1 ? 's' : ''}</strong> (desde el 25 del mes).
+            <br>Por ahora, enfócate en cumplir tus <strong>21 horas semanales</strong> para evitar cargos adicionales.
+        </p>
+    </div>
+` : `
+    <!-- ❌ CUOTA VENCIDA -->
+    <div class="alert-error" style="margin-top: 20px;">
+        <strong style="color: #f44336;">❌ Cuota Vencida</strong>
+        <p style="color: rgba(255, 255, 255, 0.9); margin: 10px 0 0 0;">
+            Esta cuota no fue pagada a tiempo. La deuda se acumulará al siguiente mes.
+        </p>
+    </div>
+`}
             </div>
         </div>
         
@@ -6887,11 +6876,13 @@ window.renderCuotaCard = function(cuota) {
             </div>
             
             <div class="cuota-card-footer">
-                ${cuota.comprobante_archivo ? `
-                    <button class="btn btn-secondary btn-small" onclick="verComprobante('${cuota.comprobante_archivo}')">
-                        <i class="fas fa-image"></i> Ver Comprobante
-                    </button>
-                ` : ''}
+               ${estadoFinal === 'pendiente' || estadoFinal === 'vencida' ? `
+    <button class="btn-small btn-primary" 
+            onclick="abrirPagarCuotaModal(${cuota.id_cuota}, ${cuota.monto_total || cuota.monto_base || cuota.monto})"
+            title="Registrar pago">
+        <i class="fas fa-dollar-sign"></i> Pagar
+    </button>
+` : ''}
                 
                 ${estadoFinal !== 'pagada' && !tienePagoPendiente ? `
                     <button class="btn btn-primary btn-small" onclick="abrirPagarDeudaTotal(${cuota.id_cuota}, ${montoMostrar})">
@@ -7095,36 +7086,71 @@ $${deudaAcumuladaAnterior.toLocaleString('es-UY', {minimumFractionDigits: 2})}
                         <p style="color: rgba(255, 255, 255, 0.9); margin: 10px 0 0 0;">Tu pago está siendo validado.</p>
                     </div>
                 ` : puedePagar ? `
+                    <!-- ✅ PERÍODO DE PAGO ABIERTO - MOSTRAR BOTÓN VERDE -->
+    <div class="deuda-total-actions">
+        <button class="btn-pagar-deuda-total" 
+                onclick="abrirPagarDeudaTotal(${cuotaMasReciente.id_cuota}, ${montoTotal})"
+                style="
+                    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+                    color: #FFFFFF;
+                    border: none;
+                    padding: 14px 28px;
+                    border-radius: 8px;
+                    font-size: 15px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 10px;
+                "
+                onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(76, 175, 80, 0.4)'"
+                onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(76, 175, 80, 0.3)'"
+                onmousedown="this.style.transform='translateY(0px)'"
+                onmouseup="this.style.transform='translateY(-2px)'">
+            <i class="fas fa-credit-card"></i>
+            Pagar Ahora
+        </button>
+    </div>
+    
+    <div class="alert-success" style="margin-top: 20px; background: rgba(76, 175, 80, 0.15);">
+        <strong style="color: #4caf50;">✅ Período de Pago Habilitado</strong>
+        <p style="color: rgba(255, 255, 255, 0.9); margin: 10px 0 0 0;">
+            Ya puedes realizar el pago de tu cuota. El período de pago está activo hasta fin de mes.
+        </p>
+    </div>
+` : diasParaPagar > 0 ? `
                     
 <div class="deuda-total-actions">
     <button class="btn-pagar-deuda-total" 
-            onclick="abrirPagarDeudaTotal(${cuotaMasReciente.id_cuota}, ${montoTotal})"
+            disabled
+            title="El período de pago se habilitará el día 25 del mes"
             style="
-                background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+                background: linear-gradient(135deg, #9e9e9e 0%, #757575 100%);
                 color: #FFFFFF;
                 border: none;
                 padding: 14px 28px;
                 border-radius: 8px;
                 font-size: 15px;
                 font-weight: 600;
-                cursor: pointer;
-                transition: all 0.3s ease;
-                box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+                cursor: not-allowed;
+                opacity: 0.6;
+                box-shadow: none;
                 display: inline-flex;
                 align-items: center;
                 gap: 10px;
-            "
-            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(76, 175, 80, 0.4)'"
-            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(76, 175, 80, 0.3)'"
-            onmousedown="this.style.transform='translateY(0px)'"
-            onmouseup="this.style.transform='translateY(-2px)'">
-        <i class="fas fa-credit-card"></i>
-        Pagar Ahora
+            ">
+        <i class="fas fa-lock"></i>
+        Pago Bloqueado
     </button>
 </div>
-                    <div class="alert-success" style="margin-top: 20px;">
-                        <strong style="color: #4caf50;">✓ Periodo de Pago Habilitado</strong>
-                        <p style="color: rgba(255, 255, 255, 0.9); margin: 10px 0 0 0;">Ya puedes realizar el pago.</p>
+                    <div class="alert-warning" style="margin-top: 20px;">
+                        <strong style="color: #ff9800;">🔒 Periodo de Trabajo en Curso</strong>
+                        <p style="color: rgba(255, 255, 255, 0.9); margin: 10px 0 0 0;">
+                            El período de pago se habilitará en <strong>${diasParaPagar} día${diasParaPagar !== 1 ? 's' : ''}</strong> (desde el 25 del mes).
+                            <br>Por ahora, enfócate en cumplir tus <strong>21 horas semanales</strong> para evitar cargos adicionales.
+                        </p>
                     </div>
                 ` : diasParaPagar > 0 ? `
                     

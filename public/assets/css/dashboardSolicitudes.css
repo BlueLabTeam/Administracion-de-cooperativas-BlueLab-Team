@@ -241,28 +241,25 @@
 
 /* Botón cerrar */
 .modal-close-button {
-    position: sticky;
-    top: 15px;
-    right: 15px;
-    float: right;
-    background: #f5f5f5;
+  background: none;
     border: none;
-    width: 35px;
-    height: 35px;
-    border-radius: 50%;
-    font-size: 24px;
+    font-size: 36px;
+    color: var(--color-gray-400);
     cursor: pointer;
-    color: #666;
+    padding: 0;
+    width: 45px;
+    height: 45px;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.3s ease;
-    z-index: 1;
+    border-radius: 50%;
+    transition: all var(--transition-base);
+    line-height: 1;
 }
 
 .modal-close-button:hover {
-    background: #e0e0e0;
-    color: #333;
+      background: var(--color-white);
+    color: var(--color-primary);
     transform: rotate(90deg);
 }
 
