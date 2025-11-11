@@ -294,7 +294,7 @@ class CuotaController
     }
 
     /**
- * ✅ ENDPOINT: Liquidar deuda de una cuota (marcarla como pagada)
+ *  ENDPOINT: Liquidar deuda de una cuota (marcarla como pagada)
  * Ruta: POST /api/cuotas/liquidar
  */
 public function liquidarCuota()
@@ -306,7 +306,7 @@ public function liquidarCuota()
     
     header('Content-Type: application/json; charset=utf-8');
 
-    // ✅ Verificar autenticación y rol de admin
+    //  Verificar autenticación y rol de admin
     if (!isset($_SESSION['user_id']) || !$_SESSION['is_admin']) {
         http_response_code(403);
         echo json_encode([
@@ -320,7 +320,7 @@ public function liquidarCuota()
         // 📥 Obtener ID de cuota del POST
         $cuotaId = $_POST['id_cuota'] ?? null;
 
-        // ✅ Validar que se recibió el ID
+        //  Validar que se recibió el ID
         if (!$cuotaId || !is_numeric($cuotaId)) {
             http_response_code(400);
             echo json_encode([
@@ -334,7 +334,7 @@ public function liquidarCuota()
         error_log("🔵 [CONTROLLER] ID Cuota: $cuotaId");
         error_log("🔵 [CONTROLLER] Admin ID: " . $_SESSION['user_id']);
 
-        // ✅ Llamar al método del modelo
+        //  Llamar al método del modelo
         $resultado = $this->cuotaModel->liquidarCuotaForzada(
             intval($cuotaId), 
             intval($_SESSION['user_id'])
@@ -342,14 +342,14 @@ public function liquidarCuota()
 
         error_log("🔵 [CONTROLLER] Resultado: " . json_encode($resultado));
 
-        // ✅ Establecer código de respuesta HTTP
+        //  Establecer código de respuesta HTTP
         if ($resultado['success']) {
             http_response_code(200);
         } else {
             http_response_code(400);
         }
 
-        // ✅ Enviar respuesta JSON
+        //  Enviar respuesta JSON
         echo json_encode($resultado, JSON_UNESCAPED_UNICODE);
 
     } catch (\Exception $e) {

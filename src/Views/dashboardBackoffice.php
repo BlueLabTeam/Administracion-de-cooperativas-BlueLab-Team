@@ -140,75 +140,94 @@
 			
 		</section>
 
-		<!-- SECCIÓN REPORTES -->
-		<section id="reportes-section" class="section-content">
-			<h2 class="section-title" data-i18n="dashboardAdmin.reports.title">📊 Reportes Mensuales</h2>
+	<!-- SECCIÓN REPORTES -->
+<section id="reportes-section" class="section-content">
+	<h2 class="section-title" data-i18n="dashboardAdmin.reports.title">📊 Reportes Mensuales</h2>
+	
+	<div class="info-card">
+		<h3 data-i18n="dashboardAdmin.reports.selectPeriod"> Seleccionar Período</h3>
+		<div class="reportes-filters">
+			<select id="reporte-mes">
+				<option value="" data-i18n="dashboardAdmin.reports.selectMonth">Seleccione mes...</option>
+				<option value="1" data-i18n="months.january">Enero</option>
+				<option value="2" data-i18n="months.february">Febrero</option>
+				<option value="3" data-i18n="months.march">Marzo</option>
+				<option value="4" data-i18n="months.april">Abril</option>
+				<option value="5" data-i18n="months.may">Mayo</option>
+				<option value="6" data-i18n="months.june">Junio</option>
+				<option value="7" data-i18n="months.july">Julio</option>
+				<option value="8" data-i18n="months.august">Agosto</option>
+				<option value="9" data-i18n="months.september">Septiembre</option>
+				<option value="10" data-i18n="months.october">Octubre</option>
+				<option value="11" data-i18n="months.november">Noviembre</option>
+				<option value="12" data-i18n="months.december">Diciembre</option>
+			</select>
 			
-			<div class="info-card">
-				<h3 data-i18n="dashboardAdmin.reports.selectPeriod"> Seleccionar Período</h3>
-				<div class="reportes-filters">
-					<select id="reporte-mes">
-						<option value="" data-i18n="dashboardAdmin.reports.selectMonth">Seleccione mes...</option>
-						<option value="1" data-i18n="months.january">Enero</option>
-						<option value="2" data-i18n="months.february">Febrero</option>
-						<option value="3" data-i18n="months.march">Marzo</option>
-						<option value="4" data-i18n="months.april">Abril</option>
-						<option value="5" data-i18n="months.may">Mayo</option>
-						<option value="6" data-i18n="months.june">Junio</option>
-						<option value="7" data-i18n="months.july">Julio</option>
-						<option value="8" data-i18n="months.august">Agosto</option>
-						<option value="9" data-i18n="months.september">Septiembre</option>
-						<option value="10" data-i18n="months.october">Octubre</option>
-						<option value="11" data-i18n="months.november">Noviembre</option>
-						<option value="12" data-i18n="months.december">Diciembre</option>
-					</select>
-					
-					<select id="reporte-anio">
-						<option value="" data-i18n="dashboardAdmin.reports.selectYear">Seleccione año...</option>
-					</select>
-					
-					<button class="btn btn-primary" onclick="generarReporte()">
-						<i class="fas fa-chart-bar"></i> <span data-i18n="dashboardAdmin.reports.generate">Generar Reporte</span>
-					</button>
-					
-					<button class="btn btn-success" onclick="exportarReporteCSV()" id="btn-exportar" style="display: none;">
-						<i class="fas fa-file-excel"></i> <span data-i18n="dashboardAdmin.reports.exportCSV">Exportar CSV</span>
-					</button>
-				</div>
-			</div>
+			<select id="reporte-anio">
+				<option value="" data-i18n="dashboardAdmin.reports.selectYear">Seleccione año...</option>
+			</select>
 			
-			<div id="reporte-resumen-container" style="display: none;">
-				<div class="stats-grid">
-					<div class="stat-card">
-						<i class="fas fa-users"></i>
-						<h4 data-i18n="dashboardAdmin.reports.totalUsers">Total Usuarios</h4>
-						<p id="reporte-total-usuarios">0</p>
-					</div>
-					<div class="stat-card">
-						<i class="fas fa-clock"></i>
-						<h4 data-i18n="dashboardAdmin.reports.hoursWorked">Horas Trabajadas</h4>
-						<p id="reporte-total-horas">0</p>
-					</div>
-					<div class="stat-card">
-						<i class="fas fa-tasks"></i>
-						<h4 data-i18n="dashboardAdmin.reports.completedTasks">Tareas Completadas</h4>
-						<p id="reporte-tareas-completadas">0</p>
-					</div>
-					<div class="stat-card">
-						<i class="fas fa-percentage"></i>
-						<h4 data-i18n="dashboardAdmin.reports.avgCompliance">Cumplimiento Promedio</h4>
-						<p id="reporte-cumplimiento-promedio">0%</p>
-					</div>
-				</div>
-			</div>
+			<button class="btn btn-primary" onclick="generarReporte()">
+				<i class="fas fa-chart-bar"></i> <span data-i18n="dashboardAdmin.reports.generate">Generar Reporte</span>
+			</button>
 			
-			<div class="info-card" id="reporte-tabla-container" style="display: none;">
-				<h3 data-i18n="dashboardAdmin.reports.detailByUser">📋 Detalle por Usuario</h3>
-				<div class="table-responsive" id="reporteTableContainer">
-					<p class="loading" data-i18n="common.loading">Cargando reporte...</p>
-				</div>
+			<button class="btn btn-success" onclick="exportarReporteCSV()" id="btn-exportar" style="display: none;">
+				<i class="fas fa-file-excel"></i> <span data-i18n="dashboardAdmin.reports.exportCSV">Exportar CSV</span>
+			</button>
+		</div>
+	</div>
+	
+	<div id="reporte-resumen-container" style="display: none;">
+	<div class="stats-grid-compact">
+		<div class="stat-card">
+			<div class="stat-icon">
+				<i class="fas fa-users"></i>
 			</div>
-		</section>
+			<div class="stat-info">
+				<span class="stat-label" data-i18n="dashboardAdmin.reports.totalUsers">Total Usuarios</span>
+				<span class="stat-value" id="reporte-total-usuarios">0</span>
+			</div>
+		</div>
+
+		<div class="stat-card">
+			<div class="stat-icon">
+				<i class="fas fa-clock"></i>
+			</div>
+			<div class="stat-info">
+				<span class="stat-label" data-i18n="dashboardAdmin.reports.hoursWorked">Horas Trabajadas</span>
+				<span class="stat-value" id="reporte-total-horas">0</span>
+			</div>
+		</div>
+
+		<div class="stat-card">
+			<div class="stat-icon">
+				<i class="fas fa-tasks"></i>
+			</div>
+			<div class="stat-info">
+				<span class="stat-label" data-i18n="dashboardAdmin.reports.completedTasks">Tareas Completadas</span>
+				<span class="stat-value" id="reporte-tareas-completadas">0</span>
+			</div>
+		</div>
+
+		<div class="stat-card">
+			<div class="stat-icon">
+				<i class="fas fa-percentage"></i>
+			</div>
+			<div class="stat-info">
+				<span class="stat-label" data-i18n="dashboardAdmin.reports.avgCompliance">Cumplimiento Promedio</span>
+				<span class="stat-value" id="reporte-cumplimiento-promedio">0%</span>
+			</div>
+		</div>
+	</div>
+</div>
+	
+	<div class="info-card" id="reporte-tabla-container" style="display: none;">
+		<h3 data-i18n="dashboardAdmin.reports.detailByUser">📋 Detalle por Usuario</h3>
+		<div class="table-responsive" id="reporteTableContainer">
+			<p class="loading" data-i18n="common.loading">Cargando reporte...</p>
+		</div>
+	</div>
+</section>
 
 		<!-- SECCIÓN VIVIENDAS -->
 		<section id="viviendas-section" class="section-content">
@@ -535,7 +554,7 @@
 			<div class="modal-content-large">
 				<button class="modal-close-btn" onclick="closeValidarPagoModal()">×</button>
 				
-				<h2 class="modal-title" data-i18n="dashboardAdmin.billing.validatePayment">✅ Validar Pago de Cuota</h2>
+				<h2 class="modal-title" data-i18n="dashboardAdmin.billing.validatePayment"> Validar Pago de Cuota</h2>
 				
 				<div id="pago-info-validar">
 					<!-- Info se carga dinámicamente -->

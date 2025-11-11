@@ -416,6 +416,34 @@ nav.menu {
     font-size: 13px;
 }
 
+/* Grid de 4 columnas COMPACTAS - Para reportes */
+.stats-grid-compact {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin: 20px 0;
+}
+
+.stats-grid-compact .stat-card {
+    padding: 20px 16px;
+    min-height: 110px;
+}
+
+.stats-grid-compact .stat-icon {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    font-size: 22px;
+}
+
+.stats-grid-compact .stat-value {
+    font-size: 28px;
+}
+
+.stats-grid-compact .stat-label {
+    font-size: 12px;
+}
+
 /* Responsive para grid de 5 columnas */
 @media (max-width: 1400px) {
     .stats-grid {
@@ -433,6 +461,12 @@ nav.menu {
         grid-template-columns: repeat(2, 1fr);
         gap: 24px;
     }
+
+    /* Grid compact en tablet */
+    .stats-grid-compact {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -445,8 +479,13 @@ nav.menu {
         grid-template-columns: 1fr;
         gap: 20px;
     }
-}
 
+    /* Grid compact en móvil */
+    .stats-grid-compact {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+}
 /* Tarjetas de estadísticas */
 .stat-card {
     background: var(--white, #FFFFFF);

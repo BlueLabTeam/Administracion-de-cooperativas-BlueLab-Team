@@ -268,7 +268,7 @@ class Cuota
 }
 
 /**
- * ✅ Obtener resumen de deuda del usuario
+ *  Obtener resumen de deuda del usuario
  */
 public function getResumenDeuda($idUsuario)
 {
@@ -817,7 +817,7 @@ public function liquidarCuotaForzada($cuotaId, $adminId)
         error_log("👤 Admin ID: $adminId");
         error_log("🔍 Conexión BD: " . ($this->conn ? "OK" : "NULL"));
         
-        // ✅ VALIDACIÓN: Verificar que tenemos conexión a BD
+        //  VALIDACIÓN: Verificar que tenemos conexión a BD
         if (!$this->conn) {
             error_log("❌ [MODELO] No hay conexión a base de datos");
             return [
@@ -826,7 +826,7 @@ public function liquidarCuotaForzada($cuotaId, $adminId)
             ];
         }
         
-        // ✅ PASO 1: OBTENER INFORMACIÓN DE LA CUOTA
+        //  PASO 1: OBTENER INFORMACIÓN DE LA CUOTA
         try {
             $stmt = $this->conn->prepare("
                 SELECT 
@@ -885,7 +885,7 @@ public function liquidarCuotaForzada($cuotaId, $adminId)
         
         error_log("📊 [MODELO] Cuota encontrada: " . json_encode($cuota));
         
-        // ✅ PASO 2: VALIDAR QUE NO ESTÉ YA PAGADA
+        //  PASO 2: VALIDAR QUE NO ESTÉ YA PAGADA
         if ($cuota['estado'] === 'pagada') {
             error_log("⚠️ [MODELO] La cuota ya está pagada");
             return [
@@ -894,7 +894,7 @@ public function liquidarCuotaForzada($cuotaId, $adminId)
             ];
         }
         
-        // ✅ PASO 3: VALIDAR QUE NO ESTÉ EXONERADA
+        //  PASO 3: VALIDAR QUE NO ESTÉ EXONERADA
         if ($cuota['estado'] === 'exonerada') {
             error_log("⚠️ [MODELO] La cuota está exonerada");
             return [
@@ -903,7 +903,7 @@ public function liquidarCuotaForzada($cuotaId, $adminId)
             ];
         }
         
-        // ✅ PASO 4: CALCULAR DEUDA TOTAL
+        //  PASO 4: CALCULAR DEUDA TOTAL
         $horasFaltantes = max(0, $cuota['horas_requeridas'] - $cuota['horas_cumplidas']);
         $deudaHoras = $horasFaltantes * 160; // $160 por hora
         $montoCuota = floatval($cuota['monto_base']);
@@ -915,7 +915,7 @@ public function liquidarCuotaForzada($cuotaId, $adminId)
         error_log("   - Deuda horas: $$deudaHoras");
         error_log("   - TOTAL DEUDA: $$deudaTotal");
   
-        // ✅ PASO 5: ACTUALIZAR ESTADO DE LA CUOTA
+        //  PASO 5: ACTUALIZAR ESTADO DE LA CUOTA
 $updateStmt = $this->conn->prepare("
     UPDATE Cuotas_Mensuales 
     SET 
@@ -951,7 +951,7 @@ $ejecutado = $updateStmt->execute([
         }
         
         $filasAfectadas = $updateStmt->rowCount();
-        error_log("✅ [MODELO] Update ejecutado. Filas afectadas: $filasAfectadas");
+        error_log(" [MODELO] Update ejecutado. Filas afectadas: $filasAfectadas");
         
         if ($filasAfectadas === 0) {
             error_log("⚠️ [MODELO] No se afectó ninguna fila");
@@ -961,16 +961,16 @@ $ejecutado = $updateStmt->execute([
             ];
         }
         
-        // ✅ PASO 6: RECALCULAR DEUDA ACUMULADA
+        //  PASO 6: RECALCULAR DEUDA ACUMULADA
         try {
             error_log("🔄 [MODELO] Recalculando deuda acumulada...");
             $this->recalcularDeudaAcumulada($cuota['id_usuario']);
-            error_log("✅ [MODELO] Deuda acumulada recalculada");
+            error_log(" [MODELO] Deuda acumulada recalculada");
         } catch (\Exception $e) {
             error_log("⚠️ [MODELO] Error al recalcular deuda (no crítico): " . $e->getMessage());
         }
         
-        // ✅ PASO 7: REGISTRAR EN LOG DE AUDITORÍA (Opcional)
+        //  PASO 7: REGISTRAR EN LOG DE AUDITORÍA (Opcional)
         try {
             // Verificar si la tabla existe
             $checkTable = $this->conn->query("SHOW TABLES LIKE 'log_admin_actions'");
@@ -1005,8 +1005,8 @@ $ejecutado = $updateStmt->execute([
             error_log("⚠️ [MODELO] Error al registrar log (no crítico): " . $e->getMessage());
         }
         
-        // ✅ PASO 8: RESPUESTA EXITOSA
-        error_log("✅ [MODELO] Liquidación completada exitosamente");
+        //  PASO 8: RESPUESTA EXITOSA
+        error_log(" [MODELO] Liquidación completada exitosamente");
         error_log("===========================================");
         
         return [
@@ -1280,7 +1280,7 @@ public function validarPago($pagoId, $idAdmin, $accion, $observaciones = '')
         
         $this->conn->commit();
         
-        error_log("✅ Transacción completada exitosamente");
+        error_log(" Transacción completada exitosamente");
         error_log("═══════════════════════════════════════");
         
         return [

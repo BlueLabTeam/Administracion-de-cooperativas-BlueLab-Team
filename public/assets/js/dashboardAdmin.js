@@ -353,7 +353,7 @@ function showCreateViviendaModal() {
         
  
         
-        // ✅ PREVENIR que se cierre al hacer clic fuera
+        //  PREVENIR que se cierre al hacer clic fuera
         modal.onclick = null;
         const modalContent = modal.querySelector('.material-modal-content');
         if (modalContent) {
@@ -400,10 +400,10 @@ function editVivienda(id) {
             //  MOSTRAR EL MODAL
             modal.style.display = 'flex';
             
-            // ✅ PREVENIR SCROLL DEL BODY
+            //  PREVENIR SCROLL DEL BODY
             document.body.style.overflow = 'hidden';
             
-            // ✅ PREVENIR que se cierre al hacer clic fuera
+            //  PREVENIR que se cierre al hacer clic fuera
             modal.onclick = null;
             const modalContent = modal.querySelector('.material-modal-content');
             if (modalContent) {
@@ -428,7 +428,7 @@ function closeViviendaModal() {
         document.getElementById('viviendaForm').reset();
     }
     
-    // ✅ RESTAURAR SCROLL DEL BODY
+    //  RESTAURAR SCROLL DEL BODY
     document.body.style.overflow = 'auto';
    
     limpiarModalesAnteriores();
@@ -465,10 +465,10 @@ function showAsignarModal(viviendaId, numeroVivienda) {
             const modal = document.getElementById('asignarViviendaModal');
             modal.style.display = 'flex';
             
-            // ✅ PREVENIR SCROLL DEL BODY
+            //  PREVENIR SCROLL DEL BODY
             document.body.style.overflow = 'hidden';
             
-            // ✅ PREVENIR que se cierre al hacer clic fuera
+            //  PREVENIR que se cierre al hacer clic fuera
             modal.onclick = null;
             const modalContent = modal.querySelector('.material-modal-content');
             if (modalContent) {
@@ -492,7 +492,7 @@ function closeAsignarModal() {
         document.getElementById('asignar-nucleo-group').style.display = 'none';
     }
     
-    // ✅ RESTAURAR SCROLL DEL BODY
+    //  RESTAURAR SCROLL DEL BODY
     document.body.style.overflow = 'auto';
    
     limpiarModalesAnteriores();
@@ -1642,7 +1642,7 @@ function renderUserRow(user) {
     `;
 }
 
-console.log('✅ [USERS TABLE] Tabla con estilos de cuotas aplicados');
+console.log(' [USERS TABLE] Tabla con estilos de cuotas aplicados');
 console.log('🎨 [USERS TABLE] Diseño moderno y consistente');
 // ========== FUNCIONES AUXILIARES ==========
 function formatEstadoUsuario(estado) {
@@ -2106,7 +2106,7 @@ function renderNucleosTable(nucleos) {
     container.innerHTML = html;
 }
 
-console.log('✅ [NÚCLEOS TABLE] Tabla con estilos de cuotas aplicados');
+console.log(' [NÚCLEOS TABLE] Tabla con estilos de cuotas aplicados');
 console.log('🎨 [NÚCLEOS TABLE] Diseño moderno y consistente');
 
 // ========== RENDERIZAR FILA DE NÚCLEO ==========
@@ -2388,7 +2388,7 @@ function closeCreateNucleoModal() {
     document.body.style.overflow = '';
 }
 
-console.log('✅ Modal crear núcleo corregido con material-modal');
+console.log(' Modal crear núcleo corregido con material-modal');
 
 // Renderizar checkboxes de usuarios
 function renderUsersCheckboxes(usuarios) {
@@ -2905,7 +2905,7 @@ function renderMaterialesTable(materiales) {
     container.innerHTML = html;
 }
 
-console.log('✅ [MATERIALES TABLE] Tabla con estilos de cuotas aplicados');
+console.log(' [MATERIALES TABLE] Tabla con estilos de cuotas aplicados');
 console.log('🎨 [MATERIALES TABLE] Diseño moderno y consistente');
 
 // ========== BUSCAR MATERIALES ==========
@@ -3693,7 +3693,7 @@ function renderViviendasTable(viviendas) {
     container.innerHTML = html;
 }
 
-console.log('✅ [VIVIENDAS TABLE] Tabla con estilos de cuotas aplicados');
+console.log(' [VIVIENDAS TABLE] Tabla con estilos de cuotas aplicados');
 console.log('🎨 [VIVIENDAS TABLE] Diseño moderno y consistente');
 
 // ========== FORMATEAR ESTADO ==========
@@ -3784,8 +3784,8 @@ function editVivienda(id) {
 
             console.log('👁️ Mostrando modal...');
             modal.style.display = 'flex';
-            console.log('✅ Modal display después de mostrar:', modal.style.display);
-            console.log('✅ Modal de edición mostrado correctamente');
+            console.log(' Modal display después de mostrar:', modal.style.display);
+            console.log(' Modal de edición mostrado correctamente');
             
             // Prevenir cierre al hacer clic fuera
             setupModalNoCloseOutside(modal);
@@ -5762,14 +5762,14 @@ console.log('🟢 [LIQUIDACIÓN FIX] Cargando versión corregida...');
 window.liquidarDeudaCuota = async function(idCuota) {
     console.log('💰 [LIQUIDAR] Iniciando liquidación de cuota:', idCuota);
     
-    // ✅ PASO 1: VALIDACIÓN INICIAL
+    //  PASO 1: VALIDACIÓN INICIAL
     if (!idCuota || isNaN(idCuota)) {
         console.error('❌ [LIQUIDAR] ID de cuota inválido:', idCuota);
         alert('⚠️ Error: ID de cuota inválido');
         return;
     }
     
-    // ✅ PASO 2: OBTENER DETALLES DE LA CUOTA
+    //  PASO 2: OBTENER DETALLES DE LA CUOTA
     try {
         console.log('🔍 [LIQUIDAR] Obteniendo detalles de la cuota...');
         
@@ -5788,7 +5788,7 @@ window.liquidarDeudaCuota = async function(idCuota) {
         
         const cuota = data.cuota;
         
-        // ✅ PASO 3: VALIDAR ESTADO DE LA CUOTA
+        //  PASO 3: VALIDAR ESTADO DE LA CUOTA
         const estadoFinal = cuota.estado_actual || cuota.estado;
         
         if (estadoFinal === 'pagada') {
@@ -5803,7 +5803,7 @@ window.liquidarDeudaCuota = async function(idCuota) {
             return;
         }
         
-        // ✅ PASO 4: CALCULAR DEUDA TOTAL
+        //  PASO 4: CALCULAR DEUDA TOTAL
         const horasFaltantes = Math.max(0, (cuota.horas_requeridas || 0) - (cuota.horas_cumplidas || 0));
         const deudaHoras = horasFaltantes * 160; // $160 por hora
         const montoCuota = parseFloat(cuota.monto_total || cuota.monto_base || cuota.monto || 0);
@@ -5816,7 +5816,7 @@ window.liquidarDeudaCuota = async function(idCuota) {
             deudaTotal
         });
         
-        // ✅ PASO 5: CONFIRMACIÓN DEL ADMIN
+        //  PASO 5: CONFIRMACIÓN DEL ADMIN
         const nombreMes = obtenerNombreMes(cuota.mes);
         const nombreUsuario = cuota.nombre_completo || 'Usuario';
         
@@ -5845,7 +5845,7 @@ Esto significa que el usuario cubrió esta deuda con un pago actual.
             return;
         }
         
-        // ✅ PASO 6: EJECUTAR LIQUIDACIÓN
+        //  PASO 6: EJECUTAR LIQUIDACIÓN
         console.log('📤 [LIQUIDAR] Enviando solicitud de liquidación...');
         
         // Mostrar indicador de carga
@@ -5895,7 +5895,7 @@ Esto significa que el usuario cubrió esta deuda con un pago actual.
         let liquidarData;
         try {
             liquidarData = JSON.parse(responseText);
-            console.log('✅ [LIQUIDAR] JSON parseado correctamente:', liquidarData);
+            console.log(' [LIQUIDAR] JSON parseado correctamente:', liquidarData);
         } catch (parseError) {
             console.error('❌ [LIQUIDAR] Error al parsear JSON:', parseError);
             console.error('📄 [LIQUIDAR] Texto recibido:', responseText);
@@ -5909,8 +5909,8 @@ Esto significa que el usuario cubrió esta deuda con un pago actual.
         }
         
         if (liquidarData.success) {
-            // ✅ ÉXITO
-            alert(`✅ ${liquidarData.message || 'Deuda liquidada correctamente'}\n\nLa cuota ha sido marcada como PAGADA.`);
+            //  ÉXITO
+            alert(` ${liquidarData.message || 'Deuda liquidada correctamente'}\n\nLa cuota ha sido marcada como PAGADA.`);
             
             // Recargar tabla de cuotas
             if (typeof loadAllCuotasAdmin === 'function') {
@@ -5924,7 +5924,7 @@ Esto significa que el usuario cubrió esta deuda con un pago actual.
                 await loadEstadisticasCuotas();
             }
             
-            console.log('✅ [LIQUIDAR] Liquidación completada exitosamente');
+            console.log(' [LIQUIDAR] Liquidación completada exitosamente');
         } else {
             throw new Error(liquidarData.message || 'Error desconocido al liquidar');
         }
@@ -6173,7 +6173,7 @@ window.renderAllCuotasAdmin = function(cuotas) {
     container.innerHTML = html;
 };
 
-console.log('✅ [LIQUIDACIÓN FIX] Sistema corregido completamente');
+console.log(' [LIQUIDACIÓN FIX] Sistema corregido completamente');
 console.log('📦 [LIQUIDACIÓN FIX] Datos se envían como application/x-www-form-urlencoded');
 console.log('🎯 [LIQUIDACIÓN FIX] Listo para usar');
 

@@ -312,7 +312,7 @@ class Task
     public function addAvance($tareaId, $userId, $comentario, $progresoReportado, $archivo = null)
     {
           try {
-        // ✅ AGREGAR LOG
+        //  AGREGAR LOG
         error_log("=== Task Model addAvance ===");
         error_log("tareaId: $tareaId");
         error_log("userId: $userId");

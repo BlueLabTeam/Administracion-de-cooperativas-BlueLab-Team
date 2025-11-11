@@ -31,7 +31,7 @@ public function generarReporteMensual()
     try {
         Herramientas::validarAdmin();
 
-        // ✅ Obtener y convertir a int
+        //  Obtener y convertir a int
         $mes = isset($_GET['mes']) ? intval($_GET['mes']) : intval(date('n'));
         $anio = isset($_GET['anio']) ? intval($_GET['anio']) : intval(date('Y'));
 
@@ -42,7 +42,7 @@ public function generarReporteMensual()
         error_log("   anio (int): $anio");
         error_log("========================================");
 
-        // ✅ Validación: Solo desde 2025 en adelante (máximo 5 años al futuro)
+        //  Validación: Solo desde 2025 en adelante (máximo 5 años al futuro)
         $mesValido = ($mes >= 1 && $mes <= 12);
         $anioActual = intval(date('Y'));
         $anioValido = ($anio >= 2025 && $anio <= ($anioActual + 5));
@@ -74,12 +74,12 @@ public function generarReporteMensual()
             return;
         }
 
-        error_log("✅ Validaciones OK - Llamando al modelo");
+        error_log(" Validaciones OK - Llamando al modelo");
 
         $reporte = $this->reporteModel->generarReporteMensual($mes, $anio);
 
         if ($reporte) {
-            error_log("✅ Reporte generado exitosamente");
+            error_log(" Reporte generado exitosamente");
             Herramientas::jsonResponse(true, 'Reporte generado exitosamente', [
                 'reporte' => $reporte
             ]);
