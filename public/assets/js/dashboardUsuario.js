@@ -1421,7 +1421,7 @@ async function loadResumenSemanal() {
     const container = document.getElementById('resumen-semanal-container');
     if (!container) return;
 
-    container.innerHTML = '<p class="loading">Cargando resumen semanal...</p>';
+    container.innerHTML = '<p class="loading" >Cargando resumen semanal...</p>';
 
     try {
         const response = await fetch('/api/horas/resumen-semanal');
@@ -1443,7 +1443,15 @@ async function loadResumenSemanal() {
 function renderResumenSemanal(resumen) {
     const container = document.getElementById('resumen-semanal-container');
 
-    const diasSemana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+    const diasSemana = [
+        '<span data-i18n="dashboardUser.hours.weeklySummary.days.monday">Lunes</span>',
+        '<span data-i18n="dashboardUser.hours.weeklySummary.days.tuesday">Martes</span>',
+        '<span data-i18n="dashboardUser.hours.weeklySummary.days.wednesday">Miércoles</span>',
+        '<span data-i18n="dashboardUser.hours.weeklySummary.days.thursday">Jueves</span>',
+        '<span data-i18n="dashboardUser.hours.weeklySummary.days.friday">Viernes</span>',
+        '<span data-i18n="dashboardUser.hours.weeklySummary.days.saturday">Sábado</span>',
+        '<span data-i18n="dashboardUser.hours.weeklySummary.days.sunday">Domingo</span>'
+    ];
     const registrosPorDia = {};
 
     // Organizar registros por día
@@ -1464,10 +1472,10 @@ function renderResumenSemanal(resumen) {
 
     let html = `
         <div class="resumen-semana-header">
-            <p><strong>Semana del ${formatearFechaSimple(resumen.semana.inicio)} al ${formatearFechaSimple(resumen.semana.fin)}</strong></p>
+            <p><strong> <span data-i18n="dashboardUser.hours.weeklySummary.calendarHeader.week">Semana del </span>${formatearFechaSimple(resumen.semana.inicio)} <span data-i18n="dashboardUser.hours.weeklySummary.calendarHeader.to">al</span> ${formatearFechaSimple(resumen.semana.fin)}</strong></p>
             <p>
                 📊 Total: <strong>${resumen.total_horas}h</strong> | 
-                📅 Días trabajados: <strong>${resumen.dias_trabajados}</strong>
+                <span data-i18n="dashboardUser.hours.weeklySummary.calendarHeader.daysWorked">📅 Días trabajados: </span><strong>${resumen.dias_trabajados}</strong>
             </p>
         </div>
         <div class="resumen-dias-grid">
@@ -1493,20 +1501,20 @@ function renderResumenSemanal(resumen) {
 
         if (registro) {
             const entrada = registro.hora_entrada ? registro.hora_entrada.substring(0, 5) : '--:--';
-            const salida = registro.hora_salida ? registro.hora_salida.substring(0, 5) : 'En curso';
+            const salida = registro.hora_salida ? registro.hora_salida.substring(0, 5) : '<span data-i18n="dashboardUser.hours.weeklySummary.days.content.inProgress">En curso</span>';
             const horas = registro.total_horas || 0;
             const estadoBadge = getEstadoBadge(registro.estado);
 
             html += `
                 <div class="registro-info">
-                    <p><i class="fas fa-sign-in-alt"></i> Entrada: <strong>${entrada}</strong></p>
-                    <p><i class="fas fa-sign-out-alt"></i> Salida: <strong>${salida}</strong></p>
-                    <p><i class="fas fa-clock"></i> Total: <strong>${horas}h</strong></p>
+                    <p><i class="fas fa-sign-in-alt"></i> <span data-i18n="dashboardUser.hours.weeklySummary.days.content.entry">Entrada:</span> <strong>${entrada}</strong></p>
+                    <p><i class="fas fa-sign-out-alt"></i> <span data-i18n="dashboardUser.hours.weeklySummary.days.content.exit">Salida:</span> <strong>${salida}</strong></p>
+                    <p><i class="fas fa-clock"></i> <span data-i18n="dashboardUser.hours.weeklySummary.days.content.total">Total:</span> <strong>${horas}h</strong></p>
                     ${estadoBadge}
                 </div>
             `;
         } else {
-            html += '<p class="no-registro"><i class="fas fa-calendar-times"></i> Sin registro</p>';
+            html += '<p class="no-registro"><i class="fas fa-calendar-times"></i> <span data-i18n="dashboardUser.hours.weeklySummary.days.content.withoutRegistration">Sin registro</span></p>';
         }
 
         html += `
@@ -1517,13 +1525,14 @@ function renderResumenSemanal(resumen) {
 
     html += '</div>';
     container.innerHTML = html;
+    i18n.translatePage();
 }
 
 function getEstadoBadge(estado) {
     const badges = {
-        'pendiente': '<span class="badge-estado pendiente"><i class="fas fa-clock"></i> Pendiente</span>',
-        'aprobado': '<span class="badge-estado aprobado"><i class="fas fa-check-circle"></i> Aprobado</span>',
-        'rechazado': '<span class="badge-estado rechazado"><i class="fas fa-times-circle"></i> Rechazado</span>'
+        'pendiente': '<span class="badge-estado pendiente" data-i18n="dashboardUser.hours.weeklySummary.days.content.status.pending"><i class="fas fa-clock"></i> Pendiente</span>',
+        'aprobado': '<span class="badge-estado aprobado" data-i18n="dashboardUser.hours.weeklySummary.days.content.status.approved"><i class="fas fa-check-circle"></i> Aprobado</span>',
+        'rechazado': '<span class="badge-estado rechazado" data-i18n="dashboardUser.hours.weeklySummary.days.content.status.rejected"><i class="fas fa-times-circle"></i> Rechazado</span>'
     };
     return badges[estado] || '';
 }
@@ -2675,7 +2684,7 @@ function renderMisCuotasOrganizadas(cuotas) {
     html += '</div>';
 
     container.innerHTML = html;
-// AL PARECER INUTIL, NO MUESTRA LOS LOGS EXISTENTES DESPUES DE ESTA LINEA, NO SE COMPROBO ANTES DE ESTA LINEA
+    // AL PARECER INUTIL, NO MUESTRA LOS LOGS EXISTENTES DESPUES DE ESTA LINEA, NO SE COMPROBO ANTES DE ESTA LINEA
 }
 
 
