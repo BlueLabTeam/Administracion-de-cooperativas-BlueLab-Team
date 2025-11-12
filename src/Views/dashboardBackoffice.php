@@ -903,6 +903,17 @@
 </section>
 
 	
-	<script src="/assets/js/dashboardAdmin.js"></script>
+	<script src="/assets/js/admin/inicioAdmin.js"></script>
+	<script src="/assets/js/admin/reportesMensuales.js"></script>
+	<script src="/assets/js/admin/gestionUsuarios.js"></script>
+	<script src="/assets/js/admin/gestionNucleosFamiliares.js"></script>
+	<script src="/assets/js/admin/gestionViviendas.js"></script>
+	<script src="/assets/js/admin/gestionCuotas.js"></script>
+	<script src="/assets/js/admin/gestionNotificaciones.js"></script>
+	<script src="/assets/js/admin/gestionMateriales.js"></script>
+	<script src="/assets/js/admin/gestionTareas.js"></script>
+	<script src="/assets/js/admin/gestionSolicitudes.js"></script>
+	<script src="/assets/js/admin/navigation.js"></script>
+
 </body>
 </html>
