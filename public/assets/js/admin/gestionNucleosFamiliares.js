@@ -1,7 +1,3 @@
-// ==========================================
-// MÓDULO: GESTIÓN DE NÚCLEOS FAMILIARES
-// Archivo: nucleosFamiliares.js
-// ==========================================
 
 console.log('🟢 [MÓDULO NÚCLEOS] Cargando...');
 
@@ -13,23 +9,23 @@ window.NucleosModule = {
 
 // ========== INICIALIZACIÓN ==========
 function inicializarModuloNucleos() {
-    console.log('🏠 [NÚCLEOS] Inicializando módulo...');
+
     
     const nucleosMenuItem = document.querySelector('.menu li[data-section="nucleo"]');
     if (nucleosMenuItem) {
         nucleosMenuItem.addEventListener('click', function() {
-            console.log('>>> [NÚCLEOS] Sección abierta');
+     
             loadNucleosFamiliares();
         });
     }
     
     window.NucleosModule.loaded = true;
-    console.log('✅ [NÚCLEOS] Módulo inicializado');
+
 }
 
 // ========== CARGAR NÚCLEOS ==========
 async function loadNucleosFamiliares() {
-    console.log('📋 [NÚCLEOS] Cargando lista...');
+   
     
     const container = document.getElementById('nucleosTableContainer');
 
@@ -165,7 +161,7 @@ function renderNucleosTable(nucleos) {
 
 // ========== MOSTRAR MODAL CREAR ==========
 function showCreateNucleoModal() {
-    console.log('➕ [NÚCLEOS] Abriendo modal crear...');
+
     
     loadUsersForNucleo().then(usuarios => {
         const modalHTML = `
@@ -358,7 +354,7 @@ async function submitCreateNucleo(event) {
 
 // ========== VER DETALLES ==========
 async function viewNucleoDetails(nucleoId) {
-    console.log('👁️ [NÚCLEOS] Cargando detalles:', nucleoId);
+   
     
     try {
         const response = await fetch(`/api/nucleos/details?nucleo_id=${nucleoId}`);
@@ -435,7 +431,7 @@ function showNucleoDetailsModal(nucleo, miembros) {
 
 // ========== EDITAR NÚCLEO ==========
 async function editNucleo(nucleoId) {
-    console.log('✏️ [NÚCLEOS] Editando:', nucleoId);
+   
     
     try {
         const [detailsData, usuarios] = await Promise.all([

@@ -1,13 +1,8 @@
-// ==========================================
-// MÓDULO: GESTIÓN DE NOTIFICACIONES
-// Archivo: gestionNotificaciones.js
-// Patrón simple sin namespace
-// ==========================================
 
 (function() {
     'use strict';
     
-    console.log('🟢 [NOTIFICACIONES] Iniciando carga del módulo...');
+    
 
     // Evitar carga duplicada
     if (window.GestionNotificacionesCargado) {
@@ -35,7 +30,7 @@
     // ========== CARGAR USUARIOS ==========
 
     window.loadUsersForNotifications = async function() {
-        console.log('👥 [NOTIFICACIONES] Cargando usuarios...');
+       
         
         const usersList = document.getElementById('usersList');
 
@@ -88,13 +83,13 @@
         html += '</div>';
         container.innerHTML = html;
         
-        console.log('✅ [NOTIFICACIONES]', users.length, 'usuarios renderizados');
+     
     }
 
     // ========== SELECCIONAR TODOS ==========
 
     window.toggleAllUsers = function() {
-        console.log('🔄 [NOTIFICACIONES] Toggle todos');
+    
         
         const checkboxes = document.querySelectorAll('input[name="usuarios[]"]');
         const allChecked = Array.from(checkboxes).every(function(cb) { return cb.checked; });
@@ -104,14 +99,14 @@
         });
         
         const selectedCount = Array.from(checkboxes).filter(function(cb) { return cb.checked; }).length;
-        console.log('✅ [NOTIFICACIONES]', selectedCount, 'usuarios seleccionados');
+      
     };
 
     // ========== ENVIAR NOTIFICACIÓN ==========
 
     window.sendNotification = async function(event) {
         event.preventDefault();
-        console.log('📤 [NOTIFICACIONES] Enviando...');
+        
 
         const form = event.target;
         const formData = new FormData(form);
@@ -176,7 +171,7 @@
     // ========== VISTA PREVIA ==========
 
     window.previewNotification = function() {
-        console.log('👁️ [NOTIFICACIONES] Vista previa');
+     
         
         const tituloEl = document.getElementById('notif-titulo');
         const mensajeEl = document.getElementById('notif-mensaje');
@@ -250,7 +245,7 @@
             }
         });
         
-        console.log('🔍 [NOTIFICACIONES]', visibleCount, 'usuarios visibles');
+     
     };
 
     // ========== TEMPLATES ==========
@@ -288,7 +283,7 @@
         if (mensajeEl) mensajeEl.value = template.mensaje;
         if (prioridadEl) prioridadEl.value = template.prioridad;
         
-        console.log('📋 [NOTIFICACIONES] Plantilla aplicada:', opcion);
+    
     };
 
     // ========== INICIALIZACIÓN ==========

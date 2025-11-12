@@ -1,12 +1,8 @@
-// ==========================================
-// MÓDULO: GESTIÓN DE TAREAS
-// Archivo: gestionTareas.js
-// ==========================================
 
 (function() {
     'use strict';
     
-    console.log('🟢 [MÓDULO TAREAS] Cargando...');
+  
 
     // Evitar carga duplicada
     if (window.TareasModuleCargado) {
@@ -33,22 +29,22 @@
 
     // ========== INICIALIZACIÓN ==========
     function inicializarModuloTareas() {
-        console.log('📋 [TAREAS] Inicializando módulo...');
+       ('📋 [TAREAS] Inicializando módulo...');
         
         const tareasMenuItem = document.querySelector('.menu li[data-section="tareas"]');
         if (tareasMenuItem) {
             tareasMenuItem.addEventListener('click', function() {
-                console.log('>>> [TAREAS] Sección abierta');
+            
                 window.inicializarSeccionTareas();
             });
         }
         
-        console.log('✅ [TAREAS] Módulo inicializado');
+  
     }
 
     // ========== INICIALIZAR SECCIÓN ==========
     window.inicializarSeccionTareas = async function() {
-        console.log('📋 [TAREAS] Inicializando sección...');
+     
         
         try {
             await Promise.all([
@@ -64,7 +60,7 @@
                 }
             }, 300);
             
-            console.log('✅ [TAREAS] Sección inicializada');
+       
         } catch (error) {
             console.error('❌ [TAREAS] Error al inicializar:', error);
         }
@@ -87,7 +83,7 @@
 
     // ========== CARGAR USUARIOS PARA TAREAS ==========
     window.loadTaskUsers = async function() {
-        console.log('👥 [TAREAS] Cargando usuarios...');
+    
         
         const container = document.getElementById('taskUsersList');
 
@@ -132,7 +128,7 @@
 
     // ========== CARGAR NÚCLEOS ==========
     window.loadNucleos = async function() {
-        console.log('🏘️ [TAREAS] Cargando núcleos...');
+      
         
         const container = document.getElementById('taskNucleosList');
 
@@ -192,7 +188,7 @@
     // ========== CREAR TAREA ==========
     window.createTask = async function(event) {
         event.preventDefault();
-        console.log('📤 [TAREAS] Creando tarea...');
+      
 
         const form = event.target;
         const formData = new FormData(form);
@@ -251,7 +247,7 @@
 
     // ========== CARGAR TODAS LAS TAREAS ==========
     window.loadAllTasks = async function() {
-        console.log('📋 [TAREAS] Cargando todas las tareas...');
+   
         
         const container = document.getElementById('tasksList');
         const filtro = document.getElementById('filtro-estado')?.value || '';
@@ -280,7 +276,7 @@
 
     // ========== RENDERIZAR LISTA DE TAREAS ==========
     function renderTasksList(tareas, filtroActivo = '') {
-        console.log('🎨 [TAREAS] Renderizando lista:', tareas.length);
+      
         
         const container = document.getElementById('tasksList');
 
@@ -401,7 +397,7 @@
 
     // ========== VER DETALLES ==========
     window.viewTaskDetails = async function(tareaId) {
-        console.log('👁️ [TAREAS] Cargando detalles:', tareaId);
+      
 
         try {
             const response = await fetch(`/api/tasks/details?id=${tareaId}`);
@@ -468,7 +464,7 @@
 
     // ========== VER MATERIALES ==========
     window.viewTaskMaterials = async function(tareaId) {
-        console.log('📦 [TAREAS] Cargando materiales:', tareaId);
+       
 
         try {
             const response = await fetch(`/api/materiales/task-materials?id_tarea=${tareaId}`);
@@ -638,7 +634,5 @@
         inicializarModuloTareas();
     }
 
-    console.log('✅ [MÓDULO TAREAS] Cargado completamente');
-    console.log('✅ [TAREAS] Funciones disponibles:', Object.keys(window.TareasModule));
 
 })();

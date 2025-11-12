@@ -1,7 +1,3 @@
-// ==========================================
-// MÓDULO: GESTIÓN DE VIVIENDAS
-// Archivo: gestionViviendas.js
-// ==========================================
 
 console.log('🟢 [MÓDULO VIVIENDAS] Cargando...');
 
@@ -29,24 +25,24 @@ const COLORS = {
 
 // ========== INICIALIZACIÓN ==========
 function inicializarModuloViviendas() {
-    console.log('🏠 [VIVIENDAS] Inicializando módulo...');
+
     
     const viviendasMenuItem = document.querySelector('.menu li[data-section="viviendas"]');
     if (viviendasMenuItem) {
         viviendasMenuItem.addEventListener('click', function() {
-            console.log('>>> [VIVIENDAS] Sección abierta');
+          
             loadViviendas();
             loadTiposVivienda();
         });
     }
     
     window.ViviendasModule.loaded = true;
-    console.log('✅ [VIVIENDAS] Módulo inicializado');
+   
 }
 
 // ========== CARGAR VIVIENDAS ==========
 async function loadViviendas() {
-    console.log('📋 [VIVIENDAS] Cargando lista...');
+ 
     
     const container = document.getElementById('viviendasTableContainer');
 
@@ -231,7 +227,7 @@ async function loadTiposVivienda() {
 
 // ========== MOSTRAR MODAL CREAR ==========
 function showCreateViviendaModal() {
-    console.log('➕ [VIVIENDAS] Abriendo modal crear...');
+
     
     limpiarModalesAnteriores();
 
@@ -266,7 +262,7 @@ function showCreateViviendaModal() {
 
 // ========== EDITAR VIVIENDA ==========
 function editVivienda(id) {
-    console.log('✏️ [VIVIENDAS] Editando:', id);
+  
     
     limpiarModalesAnteriores();
 
@@ -321,7 +317,7 @@ function closeViviendaModal() {
 // ========== GUARDAR VIVIENDA ==========
 async function saveVivienda(event) {
     event.preventDefault();
-    console.log('💾 [VIVIENDAS] Guardando...');
+
 
     const id = document.getElementById('vivienda-id').value;
     const formData = new FormData();
@@ -360,7 +356,7 @@ async function saveVivienda(event) {
 
 // ========== VER DETALLES ==========
 async function viewViviendaDetails(id) {
-    console.log('👁️ [VIVIENDAS] Cargando detalles:', id);
+ 
     
     try {
         const response = await fetch(`/api/viviendas/details?id=${id}`);
@@ -414,7 +410,7 @@ function showViviendaDetailsModal(vivienda) {
 
 // ========== ASIGNAR VIVIENDA ==========
 async function asignarVivienda(viviendaId, numeroVivienda) {
-    console.log('👥 [VIVIENDAS] Asignando:', numeroVivienda);
+  
     
     const tipo = prompt(
         `🏠 Asignar Vivienda: ${numeroVivienda}\n\n` +
@@ -524,7 +520,7 @@ async function asignarVivienda(viviendaId, numeroVivienda) {
 
 // ========== DESASIGNAR VIVIENDA ==========
 async function desasignarVivienda(asignacionId) {
-    console.log('🚫 [VIVIENDAS] Desasignando:', asignacionId);
+ 
     
     if (!confirm('¿Desasignar esta vivienda?\n\nLos usuarios/núcleo quedarán sin vivienda asignada.')) {
         return;

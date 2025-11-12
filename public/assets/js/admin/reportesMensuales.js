@@ -1,22 +1,3 @@
-/**
- * ==========================================
- * MÓDULO: REPORTES MENSUALES - ADMINISTRADOR
- * ==========================================
- * 
- * Responsabilidades:
- * - Generar reportes mensuales de usuarios
- * - Mostrar estadísticas de cumplimiento
- * - Exportar reportes a CSV
- * - Filtrar por mes y año
- * - Visualizar datos de horas, tareas y cuotas
- * 
- * Dependencias:
- * - COLORS (constantes globales)
- * - obtenerNombreMes() (función global)
- * 
- * @author Sistema de Gestión Cooperativa
- * @version 2.0
- */
 
 const ReportesMensuales = (function() {
     'use strict';
@@ -69,7 +50,7 @@ const ReportesMensuales = (function() {
      * Inicializar selectores de año
      */
     function inicializarSelectores() {
-        console.log('📅 [REPORTES] Inicializando selectores...');
+     
 
         const anioMinimo = 2025;
         const aniosFuturos = 5;
@@ -95,7 +76,7 @@ const ReportesMensuales = (function() {
             selectMes.value = mesActual;
         }
 
-        console.log('✓ [REPORTES] Selectores inicializados');
+   
     }
 
     /**
@@ -266,7 +247,7 @@ const ReportesMensuales = (function() {
             const mes = document.getElementById('reporte-mes').value;
             const anio = document.getElementById('reporte-anio').value;
             
-            console.log('📊 [REPORTE] Generando reporte para:', { mes, anio });
+          
             
             if (!mes || !anio) {
                 alert('⚠️ Selecciona mes y año');
@@ -281,7 +262,7 @@ const ReportesMensuales = (function() {
             try {
                 const url = `${ENDPOINTS.MENSUAL}?mes=${encodeURIComponent(mes)}&anio=${encodeURIComponent(anio)}`;
                 
-                console.log('🌐 [REPORTE] URL:', url);
+               
                 
                 const response = await fetch(url, {
                     method: 'GET',
@@ -292,7 +273,7 @@ const ReportesMensuales = (function() {
                     credentials: 'same-origin'
                 });
                 
-                console.log('📡 [REPORTE] Response status:', response.status);
+           
                 
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -306,18 +287,14 @@ const ReportesMensuales = (function() {
                 }
                 
                 const data = await response.json();
-                console.log('📊 [REPORTE] Data recibida:', data);
+           
                 
                 if (data.success) {
                     if (!data.reporte || !data.reporte.resumen) {
                         throw new Error('Estructura de datos inválida');
                     }
                     
-                    console.log('✓ [REPORTE] Reporte válido:', {
-                        mes: data.reporte.periodo?.mes || mes,
-                        anio: data.reporte.periodo?.anio || anio,
-                        total_usuarios: data.reporte.resumen.total_usuarios
-                    });
+                 
                     
                     reporteActual = data.reporte;
                     this.mostrarReporte(data.reporte);
@@ -336,7 +313,7 @@ const ReportesMensuales = (function() {
          * Mostrar reporte
          */
         mostrarReporte: function(reporte) {
-            console.log('📊 [MOSTRAR] Renderizando reporte...');
+        
             
             if (!reporte || !reporte.resumen) {
                 alert('✗ Datos de reporte inválidos');
@@ -347,14 +324,13 @@ const ReportesMensuales = (function() {
             const anio = document.getElementById('reporte-anio').value;
             const nombreMes = obtenerNombreMes(mes);
             
-            console.log('📅 [MOSTRAR] Período:', `${nombreMes} ${anio}`);
-            console.log('👥 [MOSTRAR] Total usuarios:', reporte.resumen.total_usuarios);
+        
             
             actualizarEstadisticas(reporte.resumen);
             mostrarContenedores(true);
             renderTablaReporte(reporte.usuarios);
             
-            console.log('✓ [MOSTRAR] Reporte renderizado correctamente');
+         
         },
 
         /**
@@ -369,7 +345,7 @@ const ReportesMensuales = (function() {
             const mes = document.getElementById('reporte-mes').value;
             const anio = document.getElementById('reporte-anio').value;
             
-            console.log('📥 [EXPORTAR] Exportando para:', { mes, anio });
+           
             
             if (!mes || !anio) {
                 alert('⚠️ Selecciona mes y año');
@@ -377,7 +353,7 @@ const ReportesMensuales = (function() {
             }
             
             const url = `${ENDPOINTS.EXPORTAR}?mes=${encodeURIComponent(mes)}&anio=${encodeURIComponent(anio)}&formato=csv`;
-            console.log('🌐 [EXPORTAR] URL:', url);
+           
             
             window.location.href = url;
         },
@@ -396,14 +372,14 @@ const ReportesMensuales = (function() {
             reporteActual = null;
             mostrarContenedores(false);
             document.getElementById('reporteTableContainer').innerHTML = '';
-            console.log('🧹 [REPORTES] Reporte limpiado');
+         
         },
 
         /**
          * Inicializar módulo
          */
         inicializar: function() {
-            console.log('🟢 [REPORTES] Inicializando módulo...');
+           
             
             try {
                 inicializarSelectores();
@@ -412,7 +388,7 @@ const ReportesMensuales = (function() {
                 const reportesMenuItem = document.querySelector('.menu li[data-section="reportes"]');
                 if (reportesMenuItem) {
                     reportesMenuItem.addEventListener('click', () => {
-                        console.log('📊 [REPORTES] Sección abierta');
+                       
                         inicializarSelectores();
                     });
                 }
@@ -429,7 +405,6 @@ const ReportesMensuales = (function() {
                     btnExportar.addEventListener('click', () => this.exportarCSV());
                 }
                 
-                console.log('✓ [REPORTES] Módulo inicializado correctamente');
             } catch (error) {
                 console.error('✗ [REPORTES] Error al inicializar:', error);
             }

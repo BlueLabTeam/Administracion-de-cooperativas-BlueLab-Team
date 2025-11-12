@@ -1,23 +1,3 @@
-/**
- * ==========================================
- * MÓDULO: GESTIÓN DE USUARIOS - ADMINISTRADOR
- * ==========================================
- * 
- * Responsabilidades:
- * - Cargar y renderizar tabla de usuarios
- * - Ver detalles de usuarios
- * - Aprobar/Rechazar registros
- * - Gestionar pagos de usuarios
- * - Filtrar y buscar usuarios
- * 
- * Dependencias:
- * - COLORS (constantes globales)
- * - limpiarModalesAnteriores() (función global)
- * - formatearFechaUY() (función global)
- * 
- * @author Sistema de Gestión Cooperativa
- * @version 2.0
- */
 
 const GestionUsuarios = (function() {
     'use strict';
@@ -328,7 +308,7 @@ const GestionUsuarios = (function() {
          * Cargar todos los usuarios
          */
         cargarUsuarios: async function() {
-            console.log('📋 [USUARIOS] Cargando lista de usuarios...');
+        
             
             const container = document.getElementById('usersTableContainer');
 
@@ -416,7 +396,7 @@ const GestionUsuarios = (function() {
          * Ver detalles de usuario
          */
         verDetalles: async function(userId) {
-            console.log('👁️ [USUARIOS] Cargando detalles:', userId);
+        
 
             if (typeof window.limpiarModalesAnteriores === 'function') {
                 window.limpiarModalesAnteriores();
@@ -441,7 +421,7 @@ const GestionUsuarios = (function() {
          * Ver detalles de pago
          */
         verDetallesPago: async function(userId) {
-            console.log('💵 [USUARIOS] Cargando detalles de pago:', userId);
+         
             
             try {
                 const response = await fetch(`${ENDPOINTS.PAYMENT_DETAILS}?id_usuario=${userId}`);
@@ -467,7 +447,7 @@ const GestionUsuarios = (function() {
          * Aprobar usuario
          */
         aprobarUsuario: async function(userId, nombreUsuario) {
-            console.log('✓ [USUARIOS] Aprobando usuario:', userId);
+          
             
             if (!confirm(`¿Aprobar el registro de ${nombreUsuario}?\n\nEl usuario podrá acceder al sistema.`)) {
                 return;
@@ -501,7 +481,7 @@ const GestionUsuarios = (function() {
          * Rechazar usuario
          */
         rechazarUsuario: async function(userId, nombreUsuario) {
-            console.log('✗ [USUARIOS] Rechazando usuario:', userId);
+           
             
             const motivo = prompt(`¿Por qué rechazas el registro de ${nombreUsuario}?\n\nMotivo (opcional):`);
             
@@ -631,20 +611,20 @@ const GestionUsuarios = (function() {
                 }
             });
 
-            console.log(`📊 [USUARIOS] ${visibleCount} usuarios visibles después del filtro`);
+          
         },
 
         /**
          * Inicializar módulo
          */
         inicializar: function() {
-            console.log('🟢 [USUARIOS] Inicializando módulo...');
+         
             
             // Listener para sección de usuarios
             const usuariosMenuItem = document.querySelector('.menu li[data-section="usuarios"]');
             if (usuariosMenuItem) {
                 usuariosMenuItem.addEventListener('click', () => {
-                    console.log('📋 [USUARIOS] Sección abierta');
+              
                     this.cargarUsuarios();
                 });
             }
@@ -660,7 +640,7 @@ const GestionUsuarios = (function() {
                 searchInput.addEventListener('input', () => this.filtrarUsuarios());
             }
 
-            console.log('✓ [USUARIOS] Módulo inicializado correctamente');
+     
         }
     };
 })();

@@ -1,7 +1,3 @@
-// ==========================================
-// SISTEMA DE SOLICITUDES - ADMINISTRADOR
-// Módulo modularizado para gestión de solicitudes
-// ==========================================
 
 console.log('🟢 [SOLICITUDES] Cargando módulo de solicitudes ADMIN');
 
@@ -43,7 +39,7 @@ const SolicitudesAdmin = {
     
     // ========== INICIALIZACIÓN ==========
     init: async function() {
-        console.log('📋 [SOLICITUDES] Inicializando módulo...');
+
         await this.loadAllSolicitudes();
         await this.loadEstadisticas();
     },
@@ -609,7 +605,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const solicitudesMenuItem = document.querySelector('.menu li[data-section="solicitudes"]');
     if (solicitudesMenuItem) {
         solicitudesMenuItem.addEventListener('click', function() {
-            console.log('>>> Sección solicitudes ADMIN abierta');
+          
             SolicitudesAdmin.init();
         });
     }

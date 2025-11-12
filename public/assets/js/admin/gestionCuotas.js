@@ -1,12 +1,9 @@
-// ==========================================
-// MÓDULO: GESTIÓN DE CUOTAS MENSUALES
-// Archivo: gestionCuotas.js
-// ==========================================
+
 
 (function() {
     'use strict';
     
-    console.log('🟢 [CUOTAS] Iniciando carga del módulo...');
+  
 
     // Evitar carga duplicada
     if (window.GestionCuotasCargado) {
@@ -90,7 +87,7 @@
     // ========== CARGAR PRECIOS ==========
 
     window.loadPreciosCuotas = async function() {
-        console.log('💵 [CUOTAS] Cargando precios...');
+   
         
         const container = document.getElementById('preciosCuotasContainer');
         if (!container) {
@@ -104,7 +101,7 @@
             const response = await fetch('/api/cuotas/precios');
             const data = await response.json();
             
-            console.log('📊 [CUOTAS] Precios recibidos:', data);
+         
             
             if (data.success) {
                 renderPreciosCuotas(data.precios);
@@ -118,7 +115,7 @@
     };
 
     function renderPreciosCuotas(precios) {
-    console.log('🎨 [CUOTAS] Renderizando', precios.length, 'precios');
+ 
     
     const container = document.getElementById('preciosCuotasContainer');
     container.innerHTML = '';
@@ -154,13 +151,13 @@
     
     html += '</div>';
     container.innerHTML = html;
-    console.log('✅ [CUOTAS] Precios renderizados');
+
 }
 
     // ========== EDITAR PRECIO ==========
 
     window.editarPrecioCuota = function(idTipo, nombreTipo, montoActual) {
-        console.log('✏️ [CUOTAS] Editando:', nombreTipo);
+  
         
         document.getElementById('precio-id-tipo').value = idTipo;
         document.getElementById('precio-tipo-nombre').innerHTML = '<strong style="font-size:18px;color:' + COLORS.primary + ';">' + nombreTipo + '</strong><p style="margin:10px 0 0 0;font-size:13px;color:' + COLORS.gray500 + ';">Monto actual: $' + parseFloat(montoActual).toLocaleString('es-UY', {minimumFractionDigits: 2}) + '</p>';
@@ -249,7 +246,7 @@
     // ========== ESTADÍSTICAS ==========
 
     window.loadEstadisticasCuotas = async function() {
-        console.log('📊 [CUOTAS] Cargando estadísticas...');
+       
         
         try {
             const mes = document.getElementById('admin-filtro-mes') ? document.getElementById('admin-filtro-mes').value : '';
@@ -275,7 +272,7 @@
                 if (pendientesEl) pendientesEl.textContent = stats.pendientes || 0;
                 if (montoEl) montoEl.textContent = '$' + parseFloat(stats.monto_cobrado || 0).toLocaleString('es-UY', {minimumFractionDigits: 2});
                 
-                console.log('✅ [CUOTAS] Estadísticas actualizadas');
+          
             }
         } catch (error) {
             console.error('❌ [CUOTAS] Error:', error);
@@ -285,7 +282,7 @@
     // ========== CARGAR CUOTAS ==========
 
     window.loadAllCuotasAdmin = async function() {
-        console.log('📋 [CUOTAS] Cargando cuotas...');
+      
         
         const container = document.getElementById('allCuotasAdminContainer');
         if (!container) {
@@ -305,12 +302,11 @@
             if (anio) url += 'anio=' + anio + '&';
             if (estado) url += 'estado=' + estado + '&';
             
-            console.log('🌐 [CUOTAS] URL:', url);
+       
             
             const response = await fetch(url);
             const data = await response.json();
-            
-            console.log('📊 [CUOTAS] Datos:', data);
+ 
             
             if (data.success) {
                 renderAllCuotasAdmin(data.cuotas);
@@ -325,7 +321,7 @@
     };
 
     function renderAllCuotasAdmin(cuotas) {
-        console.log('🎨 [CUOTAS] Renderizando', cuotas.length, 'cuotas');
+
         
         const container = document.getElementById('allCuotasAdminContainer');
 
@@ -380,7 +376,7 @@
         html += '</tbody></table></div>';
         container.innerHTML = html;
         
-        console.log('✅ [CUOTAS] Renderizado completo');
+   
     }
 
     // ========== LIQUIDAR ==========
@@ -420,7 +416,7 @@
     // ========== INICIALIZACIÓN ==========
 
     function inicializar() {
-        console.log('🎯 [CUOTAS] Inicializando...');
+
         poblarSelectorAnios();
         console.log('✅ [CUOTAS] Módulo cargado completamente');
         console.log('✅ [CUOTAS] Funciones disponibles:', {

@@ -1,12 +1,7 @@
-// ==========================================
-// MÓDULO: GESTIÓN DE MATERIALES
-// Archivo: gestionMateriales.js
-// ==========================================
 
 (function() {
     'use strict';
     
-    console.log('🟢 [MÓDULO MATERIALES] Cargando...');
 
     // Evitar carga duplicada
     if (window.MaterialesModuleCargado) {
@@ -36,22 +31,22 @@
 
     // ========== INICIALIZACIÓN ==========
     function inicializarModuloMateriales() {
-        console.log('📦 [MATERIALES] Inicializando módulo...');
+     
         
         const materialesMenuItem = document.querySelector('.menu li[data-section="materiales"]');
         if (materialesMenuItem) {
             materialesMenuItem.addEventListener('click', function() {
-                console.log('>>> [MATERIALES] Sección abierta');
+          
                 window.loadMateriales();
             });
         }
         
-        console.log('✅ [MATERIALES] Módulo inicializado');
+   
     }
 
     // ========== CARGAR MATERIALES ==========
     window.loadMateriales = async function() {
-        console.log('📋 [MATERIALES] Cargando lista...');
+   
         
         const container = document.getElementById('materialesTableContainer');
 
@@ -225,7 +220,7 @@
 
     // ========== MOSTRAR MODAL CREAR ==========
     window.showCreateMaterialModal = function() {
-        console.log('➕ [MATERIALES] Abriendo modal crear...');
+   
 
         limpiarModalesAnteriores();
 
@@ -247,7 +242,7 @@
 
     // ========== EDITAR MATERIAL ==========
     window.editMaterial = async function(id) {
-        console.log('✏️ [MATERIALES] Editando:', id);
+
 
         limpiarModalesAnteriores();
 
@@ -285,7 +280,7 @@
     // ========== GUARDAR MATERIAL ==========
     window.saveMaterial = async function(event) {
         event.preventDefault();
-        console.log('💾 [MATERIALES] Guardando...');
+      
 
         const id = document.getElementById('material-id').value;
         const nombre = document.getElementById('material-nombre').value.trim();
@@ -354,7 +349,7 @@
 
     // ========== MOSTRAR MODAL STOCK ==========
     window.showStockModal = function(id, nombre, stockActual) {
-        console.log('📦 [MATERIALES] Abriendo modal stock:', nombre);
+       
         
         limpiarModalesAnteriores();
         
@@ -379,7 +374,7 @@
     // ========== ACTUALIZAR STOCK ==========
     window.updateStock = async function(event) {
         event.preventDefault();
-        console.log('💾 [MATERIALES] Actualizando stock...');
+
 
         const id = document.getElementById('stock-material-id').value;
         const cantidad = parseInt(document.getElementById('stock-cantidad').value);
@@ -413,7 +408,7 @@
 
     // ========== CARGAR MATERIALES PARA TAREA ==========
     window.loadMaterialesParaTarea = async function() {
-        console.log('📋 [MATERIALES] Cargando para tarea...');
+
 
         const container = document.getElementById('materiales-tarea-list');
 
@@ -607,7 +602,7 @@
 
     // ========== AGREGAR MATERIAL A TAREA ==========
     window.addMaterialToTask = function(materialId, materialNombre, stockDisponible) {
-        console.log('➕ [MATERIALES] Agregando a tarea:', materialNombre);
+      
 
         const cantidadInput = document.getElementById(`cantidad-${materialId}`);
         const cantidad = parseInt(cantidadInput.value);
@@ -748,7 +743,5 @@
         inicializarModuloMateriales();
     }
 
-    console.log('✅ [MÓDULO MATERIALES] Cargado completamente');
-    console.log('✅ [MATERIALES] Funciones disponibles:', Object.keys(window.MaterialesModule));
 
 })();
