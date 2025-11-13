@@ -1,4 +1,3 @@
-
 const GestionUsuarios = (function() {
     'use strict';
 
@@ -24,6 +23,16 @@ const GestionUsuarios = (function() {
         'inactivo': 'Inactivo'
     };
 
+    const COLORS = {
+        primary: '#005CB9',
+        primaryLight: '#E3F2FD',
+        white: '#FFFFFF',
+        gray100: '#F5F7FA',
+        gray500: '#6C757D',
+        gray700: '#495057',
+        shadow: '0 4px 12px rgba(0, 92, 185, 0.12)'
+    };
+
     // ==========================================
     // FUNCIONES PRIVADAS
     // ==========================================
@@ -46,6 +55,172 @@ const GestionUsuarios = (function() {
             month: '2-digit', 
             year: 'numeric' 
         });
+    }
+
+    /**
+     * Limpiar modales anteriores
+     */
+    function limpiarModalesAnteriores() {
+        const modales = document.querySelectorAll('.user-detail-modal, #detallesPagoModal');
+        modales.forEach(modal => modal.remove());
+        document.body.style.overflow = '';
+    }
+
+    /**
+     * Mostrar modal con detalles de usuario
+     */
+    function mostrarModalDetallesUsuario(user) {
+        limpiarModalesAnteriores();
+
+        const modalHTML = `
+            <div class="user-detail-modal" 
+                 style="
+                    position: fixed !important;
+                    top: 0 !important;
+                    left: 0 !important;
+                    right: 0 !important;
+                    bottom: 0 !important;
+                    background: rgba(0, 68, 148, 0.5) !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    z-index: 10000 !important;
+                    padding: 20px !important;
+                    overflow-y: auto !important;
+                 "
+                 onclick="if(event.target.classList.contains('user-detail-modal')) { GestionUsuarios.cerrarModales(); }">
+                
+                <div class="user-detail-content" 
+                     style="
+                        background: ${COLORS.white} !important;
+                        border-radius: 12px !important;
+                        box-shadow: ${COLORS.shadow} !important;
+                        max-width: 600px !important;
+                        width: 100% !important;
+                        padding: 30px !important;
+                        position: relative !important;
+                        max-height: 90vh !important;
+                        overflow-y: auto !important;
+                     "
+                     onclick="event.stopPropagation()">
+                    
+                    <button class="user-detail-close" 
+                            onclick="GestionUsuarios.cerrarModales()"
+                            style="
+                                position: absolute !important;
+                                top: 15px !important;
+                                right: 15px !important;
+                                background: ${COLORS.gray100} !important;
+                                border: none !important;
+                                width: 35px !important;
+                                height: 35px !important;
+                                border-radius: 50% !important;
+                                font-size: 20px !important;
+                                color: ${COLORS.gray500} !important;
+                                cursor: pointer !important;
+                                transition: all 0.3s ease !important;
+                            "
+                            onmouseover="this.style.background='${COLORS.primary}'; this.style.color='${COLORS.white}'"
+                            onmouseout="this.style.background='${COLORS.gray100}'; this.style.color='${COLORS.gray500}'">
+                        &times;
+                    </button>
+                    
+                    <h2 style="
+                        margin: 0 0 10px 0;
+                        color: ${COLORS.primary};
+                        font-size: 24px;
+                        padding-right: 40px;
+                    ">
+                        ${user.nombre_completo}
+                    </h2>
+                    
+                    <span class="estado-badge estado-${user.estado}" 
+                          style="
+                            display: inline-block;
+                            padding: 5px 12px;
+                            border-radius: 20px;
+                            font-size: 12px;
+                            font-weight: 600;
+                            text-transform: uppercase;
+                            margin-bottom: 20px;
+                            background: ${user.estado === 'aceptado' ? '#4CAF50' : user.estado === 'rechazado' ? '#F44336' : '#FF9800'};
+                            color: white;
+                          ">
+                        ${formatEstadoUsuario(user.estado)}
+                    </span>
+                    
+                    <div style="
+                        margin-top: 20px;
+                        padding: 20px;
+                        background: ${COLORS.primaryLight};
+                        border-radius: 8px;
+                        border-left: 4px solid ${COLORS.primary};
+                    ">
+                        <p style="margin: 10px 0; display: flex; align-items: center; gap: 10px; color: ${COLORS.gray700};">
+                            <strong style="min-width: 150px; color: ${COLORS.primary};">
+                                <i class="fas fa-id-card"></i> Cédula:
+                            </strong>
+                            <span>${user.cedula}</span>
+                        </p>
+                        <p style="margin: 10px 0; display: flex; align-items: center; gap: 10px; color: ${COLORS.gray700};">
+                            <strong style="min-width: 150px; color: ${COLORS.primary};">
+                                <i class="fas fa-envelope"></i> Email:
+                            </strong>
+                            <span>${user.email}</span>
+                        </p>
+                        <p style="margin: 10px 0; display: flex; align-items: center; gap: 10px; color: ${COLORS.gray700};">
+                            <strong style="min-width: 150px; color: ${COLORS.primary};">
+                                <i class="fas fa-map-marker-alt"></i> Dirección:
+                            </strong>
+                            <span>${user.direccion || '-'}</span>
+                        </p>
+                        <p style="margin: 10px 0; display: flex; align-items: center; gap: 10px; color: ${COLORS.gray700};">
+                            <strong style="min-width: 150px; color: ${COLORS.primary};">
+                                <i class="fas fa-birthday-cake"></i> Fecha Nacimiento:
+                            </strong>
+                            <span>${formatFecha(user.fecha_nacimiento)}</span>
+                        </p>
+                        <p style="margin: 10px 0; display: flex; align-items: center; gap: 10px; color: ${COLORS.gray700};">
+                            <strong style="min-width: 150px; color: ${COLORS.primary};">
+                                <i class="fas fa-calendar-plus"></i> Fecha Ingreso:
+                            </strong>
+                            <span>${formatFecha(user.fecha_ingreso)}</span>
+                        </p>
+                        <p style="margin: 10px 0; display: flex; align-items: center; gap: 10px; color: ${COLORS.gray700};">
+                            <strong style="min-width: 150px; color: ${COLORS.primary};">
+                                <i class="fas fa-user-tag"></i> Rol:
+                            </strong>
+                            <span>${user.nombre_rol || 'Sin rol'}</span>
+                        </p>
+                        <p style="margin: 10px 0; display: flex; align-items: center; gap: 10px; color: ${COLORS.gray700};">
+                            <strong style="min-width: 150px; color: ${COLORS.primary};">
+                                <i class="fas fa-users"></i> Núcleo:
+                            </strong>
+                            <span>${user.nombre_nucleo || 'Sin núcleo'}</span>
+                        </p>
+                    </div>
+                    
+                    <div style="margin-top: 20px; text-align: right;">
+                        <button class="btn btn-secondary" 
+                                onclick="GestionUsuarios.cerrarModales()"
+                                style="
+                                    padding: 10px 20px;
+                                    background: #6C757D;
+                                    color: white;
+                                    border: none;
+                                    border-radius: 5px;
+                                    cursor: pointer;
+                                    font-size: 14px;
+                                ">
+                            Cerrar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+        document.body.style.overflow = 'hidden';
     }
 
     /**
@@ -135,7 +310,16 @@ const GestionUsuarios = (function() {
                         
                         <button class="btn-small btn-secondary" 
                                 onclick="GestionUsuarios.verDetalles(${user.id_usuario})"
-                                title="Ver detalles">
+                                title="Ver detalles"
+                                style="
+                                    padding: 5px 10px;
+                                    background: #6C757D;
+                                    color: white;
+                                    border: none;
+                                    border-radius: 4px;
+                                    cursor: pointer;
+                                    font-size: 12px;
+                                ">
                             <i class="fas fa-eye"></i>
                         </button>
                         
@@ -143,7 +327,15 @@ const GestionUsuarios = (function() {
                             <button class="btn-small btn-info" 
                                     onclick="GestionUsuarios.verDetallesPago(${user.id_usuario})"
                                     title="Ver detalles de pago"
-                                    style="background: #17a2b8;">
+                                    style="
+                                        padding: 5px 10px;
+                                        background: #17a2b8;
+                                        color: white;
+                                        border: none;
+                                        border-radius: 4px;
+                                        cursor: pointer;
+                                        font-size: 12px;
+                                    ">
                                 <i class="fas fa-file-invoice-dollar"></i>
                             </button>
                         ` : ''}
@@ -153,13 +345,31 @@ const GestionUsuarios = (function() {
                                     onclick="GestionUsuarios.aprobarUsuario(${user.id_usuario}, '${user.nombre_completo.replace(/'/g, "\\'")}')"
                                     id="aprobar-btn-${user.id_usuario}"
                                     title="Aprobar registro"
+                                    style="
+                                        padding: 5px 10px;
+                                        background: ${!hasPayment ? '#ccc' : '#28a745'};
+                                        color: white;
+                                        border: none;
+                                        border-radius: 4px;
+                                        cursor: ${!hasPayment ? 'not-allowed' : 'pointer'};
+                                        font-size: 12px;
+                                    "
                                     ${!hasPayment ? 'disabled' : ''}>
                                 <i class="fas fa-user-check"></i>
                             </button>
                             <button class="btn-small btn-danger" 
                                     onclick="GestionUsuarios.rechazarUsuario(${user.id_usuario}, '${user.nombre_completo.replace(/'/g, "\\'")}')"
                                     id="rechazar-btn-${user.id_usuario}"
-                                    title="Rechazar registro">
+                                    title="Rechazar registro"
+                                    style="
+                                        padding: 5px 10px;
+                                        background: #dc3545;
+                                        color: white;
+                                        border: none;
+                                        border-radius: 4px;
+                                        cursor: pointer;
+                                        font-size: 12px;
+                                    ">
                                 <i class="fas fa-user-times"></i>
                             </button>
                         ` : ''}
@@ -185,8 +395,7 @@ const GestionUsuarios = (function() {
      * Mostrar modal con detalles de pago
      */
     function mostrarModalDetallesPago(pago, usuario) {
-        const modalAnterior = document.getElementById('detallesPagoModal');
-        if (modalAnterior) modalAnterior.remove();
+        limpiarModalesAnteriores();
 
         const modal = `
             <div id="detallesPagoModal" 
@@ -204,7 +413,7 @@ const GestionUsuarios = (function() {
                     z-index: 10000;
                     padding: 20px;
                  "
-                 onclick="if(event.target.id === 'detallesPagoModal') this.remove()">
+                 onclick="if(event.target.id === 'detallesPagoModal') GestionUsuarios.cerrarModales()">
                 
                 <div class="modal-content-large" 
                      style="
@@ -232,7 +441,7 @@ const GestionUsuarios = (function() {
                                 cursor: pointer;
                                 font-size: 20px;
                             "
-                            onclick="document.getElementById('detallesPagoModal').remove()">×</button>
+                            onclick="GestionUsuarios.cerrarModales()">&times;</button>
                     
                     <h2 style="color: #005CB9; margin-bottom: 20px;">
                         <i class="fas fa-file-invoice-dollar"></i> Detalles de Pago
@@ -272,10 +481,28 @@ const GestionUsuarios = (function() {
                         
                         ${pago.estado_validacion === 'pendiente' ? `
                             <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
-                                <button class="btn btn-danger" onclick="GestionUsuarios.rechazarPagoDesdeModal(${pago.id_pago}, ${usuario.id_usuario})">
+                                <button class="btn btn-danger" 
+                                        onclick="GestionUsuarios.rechazarPagoDesdeModal(${pago.id_pago}, ${usuario.id_usuario})"
+                                        style="
+                                            padding: 10px 20px;
+                                            background: #dc3545;
+                                            color: white;
+                                            border: none;
+                                            border-radius: 5px;
+                                            cursor: pointer;
+                                        ">
                                     <i class="fas fa-times"></i> Rechazar Pago
                                 </button>
-                                <button class="btn btn-success" onclick="GestionUsuarios.aprobarPagoDesdeModal(${pago.id_pago}, ${usuario.id_usuario})">
+                                <button class="btn btn-success" 
+                                        onclick="GestionUsuarios.aprobarPagoDesdeModal(${pago.id_pago}, ${usuario.id_usuario})"
+                                        style="
+                                            padding: 10px 20px;
+                                            background: #28a745;
+                                            color: white;
+                                            border: none;
+                                            border-radius: 5px;
+                                            cursor: pointer;
+                                        ">
                                     <i class="fas fa-check"></i> Aprobar Pago
                                 </button>
                             </div>
@@ -288,7 +515,16 @@ const GestionUsuarios = (function() {
                     `}
                     
                     <div style="text-align: right; margin-top: 20px;">
-                        <button class="btn btn-secondary" onclick="document.getElementById('detallesPagoModal').remove()">
+                        <button class="btn btn-secondary" 
+                                onclick="GestionUsuarios.cerrarModales()"
+                                style="
+                                    padding: 10px 20px;
+                                    background: #6C757D;
+                                    color: white;
+                                    border: none;
+                                    border-radius: 5px;
+                                    cursor: pointer;
+                                ">
                             Cerrar
                         </button>
                     </div>
@@ -297,6 +533,7 @@ const GestionUsuarios = (function() {
         `;
         
         document.body.insertAdjacentHTML('beforeend', modal);
+        document.body.style.overflow = 'hidden';
     }
 
     // ==========================================
@@ -305,11 +542,16 @@ const GestionUsuarios = (function() {
 
     return {
         /**
+         * Cerrar todos los modales
+         */
+        cerrarModales: function() {
+            limpiarModalesAnteriores();
+        },
+
+        /**
          * Cargar todos los usuarios
          */
         cargarUsuarios: async function() {
-        
-            
             const container = document.getElementById('usersTableContainer');
 
             if (!container) {
@@ -396,24 +638,25 @@ const GestionUsuarios = (function() {
          * Ver detalles de usuario
          */
         verDetalles: async function(userId) {
-        
-
-            if (typeof window.limpiarModalesAnteriores === 'function') {
-                window.limpiarModalesAnteriores();
-            }
+            console.log('🔍 [USUARIOS] Cargando detalles del usuario:', userId);
 
             try {
                 const response = await fetch(`${ENDPOINTS.DETAILS}?id_usuario=${userId}`);
+                
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
+                
                 const data = await response.json();
 
-                if (data.success && typeof window.showUserDetailModal === 'function') {
-                    window.showUserDetailModal(data.user);
+                if (data.success && data.user) {
+                    mostrarModalDetallesUsuario(data.user);
                 } else {
-                    alert('Error: ' + data.message);
+                    alert('❌ Error: ' + (data.message || 'No se pudieron cargar los detalles'));
                 }
             } catch (error) {
                 console.error('✗ [USUARIOS] Error:', error);
-                alert('Error de conexión');
+                alert('❌ Error de conexión: ' + error.message);
             }
         },
 
@@ -421,8 +664,6 @@ const GestionUsuarios = (function() {
          * Ver detalles de pago
          */
         verDetallesPago: async function(userId) {
-         
-            
             try {
                 const response = await fetch(`${ENDPOINTS.PAYMENT_DETAILS}?id_usuario=${userId}`);
                 
@@ -447,8 +688,6 @@ const GestionUsuarios = (function() {
          * Aprobar usuario
          */
         aprobarUsuario: async function(userId, nombreUsuario) {
-          
-            
             if (!confirm(`¿Aprobar el registro de ${nombreUsuario}?\n\nEl usuario podrá acceder al sistema.`)) {
                 return;
             }
@@ -481,8 +720,6 @@ const GestionUsuarios = (function() {
          * Rechazar usuario
          */
         rechazarUsuario: async function(userId, nombreUsuario) {
-           
-            
             const motivo = prompt(`¿Por qué rechazas el registro de ${nombreUsuario}?\n\nMotivo (opcional):`);
             
             if (motivo === null) return;
@@ -520,7 +757,7 @@ const GestionUsuarios = (function() {
          * Aprobar pago desde modal
          */
         aprobarPagoDesdeModal: async function(pagoId, userId) {
-            document.getElementById('detallesPagoModal').remove();
+            this.cerrarModales();
             
             if (!confirm('¿Aprobar este pago?\n\nEl usuario será notificado.')) {
                 return;
@@ -553,7 +790,7 @@ const GestionUsuarios = (function() {
          * Rechazar pago desde modal
          */
         rechazarPagoDesdeModal: async function(pagoId, userId) {
-            document.getElementById('detallesPagoModal').remove();
+            this.cerrarModales();
 
             const motivo = prompt('¿Por qué rechazas este pago? (opcional)');
             if (motivo === null) return;
@@ -610,21 +847,16 @@ const GestionUsuarios = (function() {
                     row.style.display = 'none';
                 }
             });
-
-          
         },
 
         /**
          * Inicializar módulo
          */
         inicializar: function() {
-         
-            
             // Listener para sección de usuarios
             const usuariosMenuItem = document.querySelector('.menu li[data-section="usuarios"]');
             if (usuariosMenuItem) {
                 usuariosMenuItem.addEventListener('click', () => {
-              
                     this.cargarUsuarios();
                 });
             }
@@ -639,8 +871,6 @@ const GestionUsuarios = (function() {
             if (searchInput) {
                 searchInput.addEventListener('input', () => this.filtrarUsuarios());
             }
-
-     
         }
     };
 })();
@@ -664,5 +894,13 @@ window.aprobarUsuario = (userId, nombre) => GestionUsuarios.aprobarUsuario(userI
 window.rechazarUsuario = (userId, nombre) => GestionUsuarios.rechazarUsuario(userId, nombre);
 window.verDetallesPago = (userId) => GestionUsuarios.verDetallesPago(userId);
 window.filterUsers = () => GestionUsuarios.filtrarUsuarios();
+window.limpiarModalesAnteriores = () => GestionUsuarios.cerrarModales();
+window.showUserDetailModal = (user) => {
+    // Función de compatibilidad que usa la función interna
+    const mostrarModalDetallesUsuario = function(user) {
+        GestionUsuarios.verDetalles(user.id_usuario);
+    };
+    mostrarModalDetallesUsuario(user);
+};
 
 console.log('✓ Módulo de Gestión de Usuarios cargado correctamente');
