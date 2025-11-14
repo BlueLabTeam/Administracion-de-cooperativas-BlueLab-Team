@@ -106,22 +106,3 @@
 
       setTimeout(typeWriter, 500);
     });
-
-    // Contador de progreso para incorporación
-    let pasosCompletados = 0;
-    const totalPasos = 4;
-
-    const actualizarProgreso = () => {
-      pasosCompletados = document.querySelectorAll('.incorporacion ol li.completed').length;
-
-      if (pasosCompletados === totalPasos) {
-        const incorporacionSection = document.querySelector('.incorporacion');
-        incorporacionSection.style.background = 'linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%)';
-        incorporacionSection.style.border = '2px solid #28a745';
-        incorporacionSection.style.borderRadius = '15px';
-        incorporacionSection.style.padding = '20px';
-      }
-    };
-
-    // Modificar la función togglePaso para actualizar progreso
-
