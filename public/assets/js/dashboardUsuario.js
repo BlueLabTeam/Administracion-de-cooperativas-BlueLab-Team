@@ -3804,7 +3804,7 @@ function abrirModalNuevaSolicitud() {
                             maxlength="250"
                             placeholder="Describe detalladamente tu solicitud..."
                             required
-                            style="resize: vertical; width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; font-size: 14px;"
+                            style="resize: vertical; width: 100%; padding: 10px; max-height: 230px; height: 230px; border-radius: 8px; border: 1px solid #ccc; font-size: 14px;"
                             oninput="actualizarContadorCaracteres(this)"
                         ></textarea>
                         <small id="charCount" style="color: #666; display: block; text-align: right; margin-top: 4px;">

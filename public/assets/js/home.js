@@ -124,9 +124,4 @@
     };
 
     // Modificar la función togglePaso para actualizar progreso
-    const originalTogglePaso = togglePaso;
-    togglePaso = function (index) {
-      originalTogglePaso(index);
-      setTimeout(actualizarProgreso, 100);
-    };
 
