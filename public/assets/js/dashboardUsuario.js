@@ -3,83 +3,83 @@
 document.addEventListener('DOMContentLoaded', function () {
     const menuItems = document.querySelectorAll('.menu li');
 
-    document.addEventListener('DOMContentLoaded', function() {
-    ('🔧 Inicializando listeners de solicitudes');
-    
-    // Listener para la sección de solicitudes
-    const solicitudesMenuItem = document.querySelector('.menu li[data-section="solicitudes"]');
-    
-    if (solicitudesMenuItem) {
-        (' Menu item de solicitudes encontrado');
-        
-        solicitudesMenuItem.addEventListener('click', function() {
-            ('🎯 CLICK EN SOLICITUDES DETECTADO');
-            
-            // Esperar un momento para que la sección se active
-            setTimeout(() => {
-                ('⏰ Ejecutando loadMisSolicitudes()');
-                loadMisSolicitudes();
-            }, 100);
-        });
-    } else {
-        console.error('❌ No se encontró el menu item de solicitudes');
-    }
-});
+    document.addEventListener('DOMContentLoaded', function () {
+        ('🔧 Inicializando listeners de solicitudes');
+
+        // Listener para la sección de solicitudes
+        const solicitudesMenuItem = document.querySelector('.menu li[data-section="solicitudes"]');
+
+        if (solicitudesMenuItem) {
+            (' Menu item de solicitudes encontrado');
+
+            solicitudesMenuItem.addEventListener('click', function () {
+                ('🎯 CLICK EN SOLICITUDES DETECTADO');
+
+                // Esperar un momento para que la sección se active
+                setTimeout(() => {
+                    ('⏰ Ejecutando loadMisSolicitudes()');
+                    loadMisSolicitudes();
+                }, 100);
+            });
+        } else {
+            console.error('❌ No se encontró el menu item de solicitudes');
+        }
+    });
 
 
-// ========== CARGAR MIS SOLICITUDES==========
-async function loadMisSolicitudes() {
-    ('==========================================');
-    ('📋 INICIANDO CARGA DE SOLICITUDES');
-    ('==========================================');
-    
-    const container = document.getElementById('misSolicitudesContainer');
-    
-    if (!container) {
-        console.error('❌ Container "misSolicitudesContainer" NO ENCONTRADO');
-        ('Elementos disponibles con "solicitudes":', 
-            document.querySelectorAll('[id*="solicitud"]'));
-        return;
-    }
+    // ========== CARGAR MIS SOLICITUDES==========
+    async function loadMisSolicitudes() {
+        ('==========================================');
+        ('📋 INICIANDO CARGA DE SOLICITUDES');
+        ('==========================================');
 
-    (' Container encontrado:', container);
-    container.innerHTML = '<p class="loading">Cargando solicitudes...</p>';
+        const container = document.getElementById('misSolicitudesContainer');
 
-    try {
-        const estado = document.getElementById('filtro-estado-solicitudes')?.value || '';
-        const tipo = document.getElementById('filtro-tipo-solicitudes')?.value || '';
+        if (!container) {
+            console.error('❌ Container "misSolicitudesContainer" NO ENCONTRADO');
+            ('Elementos disponibles con "solicitudes":',
+                document.querySelectorAll('[id*="solicitud"]'));
+            return;
+        }
 
-        let url = '/api/solicitudes/mis-solicitudes?';
-        if (estado) url += `estado=${estado}&`;
-        if (tipo) url += `tipo=${tipo}&`;
+        (' Container encontrado:', container);
+        container.innerHTML = '<p class="loading">Cargando solicitudes...</p>';
 
-        ('🔗 URL de petición:', url);
-        ('📤 Iniciando fetch...');
-
-        const response = await fetch(url, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            credentials: 'same-origin'
-        });
-
-        ('📡 Response status:', response.status);
-        ('📡 Response headers:', [...response.headers.entries()]);
-
-        // Leer como texto primero para debug
-        const responseText = await response.text();
-        ('📥 Response text (primeros 500 chars):', responseText.substring(0, 500));
-
-        // Intentar parsear
-        let data;
         try {
-            data = JSON.parse(responseText);
-            (' JSON parseado correctamente');
-        } catch (parseError) {
-            console.error('❌ Error al parsear JSON:', parseError);
-            console.error('📄 Respuesta completa:', responseText);
-            container.innerHTML = `
+            const estado = document.getElementById('filtro-estado-solicitudes')?.value || '';
+            const tipo = document.getElementById('filtro-tipo-solicitudes')?.value || '';
+
+            let url = '/api/solicitudes/mis-solicitudes?';
+            if (estado) url += `estado=${estado}&`;
+            if (tipo) url += `tipo=${tipo}&`;
+
+            ('🔗 URL de petición:', url);
+            ('📤 Iniciando fetch...');
+
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'same-origin'
+            });
+
+            ('📡 Response status:', response.status);
+            ('📡 Response headers:', [...response.headers.entries()]);
+
+            // Leer como texto primero para debug
+            const responseText = await response.text();
+            ('📥 Response text (primeros 500 chars):', responseText.substring(0, 500));
+
+            // Intentar parsear
+            let data;
+            try {
+                data = JSON.parse(responseText);
+                (' JSON parseado correctamente');
+            } catch (parseError) {
+                console.error('❌ Error al parsear JSON:', parseError);
+                console.error('📄 Respuesta completa:', responseText);
+                container.innerHTML = `
                 <div class="error">
                     <h3>❌ Error de Servidor</h3>
                     <p>El servidor devolvió HTML en lugar de JSON</p>
@@ -89,28 +89,28 @@ async function loadMisSolicitudes() {
                     </button>
                 </div>
             `;
-            return;
-        }
-
-        ('📊 Data recibida:', data);
-        ('   - success:', data.success);
-        ('   - count:', data.count);
-        ('   - solicitudes length:', data.solicitudes?.length);
-
-        if (data.success) {
-            (' Petición exitosa, renderizando...');
-            
-            if (data.solicitudes && data.solicitudes.length > 0) {
-                ('📋 Primera solicitud:', data.solicitudes[0]);
+                return;
             }
-            
-            renderMisSolicitudes(data.solicitudes);
-            updateSolicitudesStats(data.solicitudes);
-            
-            (' Renderizado completado');
-        } else {
-            console.error('❌ success = false');
-            container.innerHTML = `
+
+            ('📊 Data recibida:', data);
+            ('   - success:', data.success);
+            ('   - count:', data.count);
+            ('   - solicitudes length:', data.solicitudes?.length);
+
+            if (data.success) {
+                (' Petición exitosa, renderizando...');
+
+                if (data.solicitudes && data.solicitudes.length > 0) {
+                    ('📋 Primera solicitud:', data.solicitudes[0]);
+                }
+
+                renderMisSolicitudes(data.solicitudes);
+                updateSolicitudesStats(data.solicitudes);
+
+                (' Renderizado completado');
+            } else {
+                console.error('❌ success = false');
+                container.innerHTML = `
                 <div class="error">
                     <h3>❌ Error</h3>
                     <p>${data.message || 'Error desconocido'}</p>
@@ -119,16 +119,16 @@ async function loadMisSolicitudes() {
                     </button>
                 </div>
             `;
-        }
+            }
 
-    } catch (error) {
-        console.error('==========================================');
-        console.error('❌ ERROR CAPTURADO:');
-        console.error('   - Mensaje:', error.message);
-        console.error('   - Stack:', error.stack);
-        console.error('==========================================');
-        
-        container.innerHTML = `
+        } catch (error) {
+            console.error('==========================================');
+            console.error('❌ ERROR CAPTURADO:');
+            console.error('   - Mensaje:', error.message);
+            console.error('   - Stack:', error.stack);
+            console.error('==========================================');
+
+            container.innerHTML = `
             <div class="error">
                 <h3>❌ Error de Conexión</h3>
                 <p>${error.message}</p>
@@ -137,17 +137,17 @@ async function loadMisSolicitudes() {
                 </button>
             </div>
         `;
+        }
+
+        ('==========================================');
+        ('📋 FIN CARGA DE SOLICITUDES');
+        ('==========================================');
     }
-    
-    ('==========================================');
-    ('📋 FIN CARGA DE SOLICITUDES');
-    ('==========================================');
-}
 
-// Exportar para uso global
-window.loadMisSolicitudes = loadMisSolicitudes;
+    // Exportar para uso global
+    window.loadMisSolicitudes = loadMisSolicitudes;
 
-(' Fix de solicitudes cargado');
+    (' Fix de solicitudes cargado');
 
     menuItems.forEach(item => {
         item.addEventListener('click', function (e) {
@@ -217,7 +217,8 @@ async function loadNotifications() {
     } catch (error) {
         console.error('Error al cargar notificaciones:', error);
         document.getElementById('notificationsList').innerHTML =
-            '<div class="no-notifications">No se pudieron cargar las notificaciones</div>';
+            '<div class="no-notifications" data-i18n="dashboardUser.notifications.errorNotifications">No se pudieron cargar las notificaciones</div>';
+        i18n.translatePage();
     }
 }
 
@@ -229,7 +230,8 @@ function renderNotifications(notifications, unreadCount) {
     badge.className = 'notifications-badge' + (unreadCount === 0 ? ' zero' : '');
 
     if (notifications.length === 0) {
-        list.innerHTML = '<div class="no-notifications">No tienes notificaciones</div>';
+        list.innerHTML = '<div class="no-notifications" data-i18n="dashboardUser.home.notificationsContent.noNotifications">No tienes notificaciones</div>';
+        i18n.translatePage();
         return;
     }
 
@@ -247,12 +249,13 @@ function renderNotifications(notifications, unreadCount) {
                         ${notif.titulo}
                         ${isUnread ? '<span class="notification-type-badge tipo-' + notif.tipo + '-badge">NUEVO</span>' : ''}
                     </div>
-                    <span class="notification-date">${fechaFormateada}</span>
+                    <span class="notification-date">${fechaFormateada}</span>1049906394
                 </div>
                 <div class="notification-message">${notif.mensaje}</div>
             </div>
         `;
     }).join('');
+    i18n.translatePage();
 }
 
 function getTipoIcon(tipo) {
@@ -329,8 +332,10 @@ async function loadUserTasks() {
             console.error('Error al cargar tareas:', data.message || data);
             document.getElementById('tareasUsuarioList').innerHTML =
                 '<div class="no-tasks">Error al cargar tareas</div>';
+            i18n.translatePage();
             document.getElementById('tareasNucleoList').innerHTML =
                 '<div class="no-tasks">Error al cargar tareas</div>';
+            i18n.translatePage();
         }
     } catch (error) {
         console.error('Error:', error);
@@ -345,11 +350,12 @@ async function loadUserTasks() {
 
 function renderUserTasks(tareas, containerId, esNucleo = false) {
     ('🎨 [RENDER USER TASKS] Iniciando con detección de vencidas');
-    
+
     const container = document.getElementById(containerId);
 
     if (!tareas || tareas.length === 0) {
-        container.innerHTML = '<div class="no-tasks">No tienes tareas asignadas</div>';
+        container.innerHTML = '<div class="no-tasks" data-i18n="dashboardUser.tasks.individualTasks.noTasks">No tienes tareas asignadas</div>';
+        i18n.translatePage();
         return;
     }
 
@@ -584,10 +590,10 @@ function addTaskAvance(tareaId) {
         })
         .then(text => {
             console.log('📥 Response raw:', text);
-            
+
             try {
                 const data = JSON.parse(text);
-                
+
                 if (data.success) {
                     alert(data.message);
                     loadUserTasks();
@@ -835,7 +841,8 @@ function loadMyVivienda() {
         return;
     }
 
-    container.innerHTML = '<p class="loading">Cargando información de vivienda...</p>';
+    container.innerHTML = '<p class="loading" data-i18n="dashboardUser.housing.loading">Cargando información de vivienda...</p>';
+    i18n.translatePage();
 
     fetch('/api/viviendas/my-vivienda', {
         method: 'GET',
@@ -848,7 +855,8 @@ function loadMyVivienda() {
                 if (data.vivienda) {
                     renderMyVivienda(data.vivienda);
                 } else {
-                    container.innerHTML = '<p>Aún no tienes una vivienda asignada.</p>';
+                    container.innerHTML = '<p data-i18n="dashboardUser.housing.noAssigned">Aún no tienes una vivienda asignada.</p>';
+                    i18n.translatePage();
                 }
             } else {
                 container.innerHTML = `<p class="error">Error: ${data.message}</p>`;
@@ -929,7 +937,7 @@ document.addEventListener('DOMContentLoaded', function () {
 function updateClock() {
     // Obtener hora actual del navegador
     const now = new Date();
-    
+
     // Crear opciones para formato Uruguay
     const options = {
         timeZone: 'America/Montevideo',
@@ -938,10 +946,10 @@ function updateClock() {
         second: '2-digit',
         hour12: false
     };
-    
+
     // Formatear hora en zona horaria de Uruguay
     const timeString = now.toLocaleTimeString('es-UY', options);
-    
+
     const clockElement = document.getElementById('current-time-display');
     if (clockElement) {
         clockElement.textContent = timeString;
@@ -951,8 +959,8 @@ function updateClock() {
 
 function updateClockWithDate() {
     const now = new Date();
-    
-    
+
+
     const dateOptions = {
         timeZone: 'America/Montevideo',
         weekday: 'long',
@@ -960,7 +968,7 @@ function updateClockWithDate() {
         month: 'long',
         day: 'numeric'
     };
-    
+
     const timeOptions = {
         timeZone: 'America/Montevideo',
         hour: '2-digit',
@@ -968,21 +976,21 @@ function updateClockWithDate() {
         second: '2-digit',
         hour12: false
     };
-    
+
     const dateString = now.toLocaleDateString('es-UY', dateOptions);
     const timeString = now.toLocaleTimeString('es-UY', timeOptions);
-    
+
     // Capitalizar primera letra del día
     const dateCapitalized = dateString.charAt(0).toUpperCase() + dateString.slice(1);
-    
+
     // Actualizar elementos si existen
     const clockElement = document.getElementById('current-time-display');
     const dateElement = document.getElementById('current-date-display');
-    
+
     if (clockElement) {
         clockElement.textContent = timeString;
     }
-    
+
     if (dateElement) {
         dateElement.textContent = dateCapitalized;
     }
@@ -995,9 +1003,9 @@ async function cargarDeudaHorasWidget() {
         console.log('⚠️ Container deuda-actual-container no encontrado');
         return;
     }
-    
+
     container.innerHTML = '<p class="loading">Calculando deuda...</p>';
-    
+
     try {
         const response = await fetch('/api/horas/deuda-actual');
         const data = await response.json();
@@ -1009,7 +1017,7 @@ async function cargarDeudaHorasWidget() {
         } else {
             container.innerHTML = '<p class="error">No se pudo cargar la deuda de horas</p>';
         }
-        
+
     } catch (error) {
         console.error('❌ Error al cargar deuda:', error);
         container.innerHTML = '<p class="error">Error de conexión</p>';
@@ -1023,7 +1031,7 @@ function renderDeudaHorasWidget(deuda) {
     const deudaAcumulada = parseFloat(deuda.deuda_acumulada || 0);
     const totalAPagar = deudaMesActual + deudaAcumulada;
     const tieneDeuda = totalAPagar > 0;
-    
+
     container.innerHTML = `
         <div class="deuda-widget-compacto ${tieneDeuda ? 'con-deuda' : 'sin-deuda'}">
             <!-- VISTA COMPACTA (SIEMPRE VISIBLE) -->
@@ -1183,7 +1191,7 @@ async function verificarRegistroAbierto() {
 
     } catch (error) {
         console.error('❌ Error en verificarRegistroAbierto:', error);
-    
+
         mostrarBotonEntrada();
     }
 }
@@ -1227,8 +1235,8 @@ async function marcarEntrada() {
 
     const btnEntrada = document.getElementById('btn-entrada');
     btnEntrada.disabled = true;
-    btnEntrada.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Registrando...';
-
+    btnEntrada.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span data-i18n="dashboardUser.hours.registering">Registrando...</span>';
+    i18n.translatePage();
     try {
         const hoy = new Date();
         const formData = new FormData();
@@ -1250,23 +1258,26 @@ async function marcarEntrada() {
         if (data.success) {
             alert(` ${data.message}\nHora registrada: ${data.hora_entrada}`);
             registroAbiertoId = data.id_registro;
-            
+
             // Restablecer botón antes de recargar
             btnEntrada.disabled = false;
-            btnEntrada.innerHTML = '<i class="fas fa-sign-in-alt"></i> Marcar Entrada';
-            
+            btnEntrada.innerHTML = '<i class="fas fa-sign-in-alt"></i> <span data-i18n="dashboardUser.hours.clockIn">Marcar Entrada</span>';
+            i18n.translatePage();
+
             await inicializarSeccionHoras();
         } else {
             alert(`❌ ${data.message}`);
             btnEntrada.disabled = false;
-            btnEntrada.innerHTML = '<i class="fas fa-sign-in-alt"></i> Marcar Entrada';
+            btnEntrada.innerHTML = '<i class="fas fa-sign-in-alt"></i> <span data-i18n="dashboardUser.hours.clockIn">Marcar Entrada</span>';
+            i18n.translatePage();
         }
 
     } catch (error) {
         console.error('❌ Error al marcar entrada:', error);
         alert('❌ Error de conexión. Por favor, intenta nuevamente.');
         btnEntrada.disabled = false;
-        btnEntrada.innerHTML = '<i class="fas fa-sign-in-alt"></i> Marcar Entrada';
+        btnEntrada.innerHTML = '<i class="fas fa-sign-in-alt"></i> <span data-i18n="dashboardUser.hours.clockIn">Marcar Entrada</span>';
+        i18n.translatePage();
     }
 }
 
@@ -1287,7 +1298,8 @@ async function marcarSalida() {
     const btnSalida = document.getElementById('btn-salida');
     const btnHTML = btnSalida.innerHTML;
     btnSalida.disabled = true;
-    btnSalida.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Registrando...';
+    btnSalida.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span data-i18n="dashboardUser.hours.registering">Registrando...</span>';
+    i18n.translatePage();
 
     try {
         const ahora = new Date();
@@ -1310,11 +1322,11 @@ async function marcarSalida() {
             alert(` ${data.message}\n\n⏱️ Total trabajado: ${data.total_horas} horas`);
             registroAbiertoId = null;
             registroAbiertoData = null;
-            
+
             // Restablecer botón antes de recargar
             btnSalida.disabled = false;
             btnSalida.innerHTML = btnHTML;
-            
+
             await inicializarSeccionHoras();
         } else {
             alert(`❌ ${data.message}`);
@@ -1374,7 +1386,7 @@ async function loadResumenSemanal() {
     const container = document.getElementById('resumen-semanal-container');
     if (!container) return;
 
-    container.innerHTML = '<p class="loading">Cargando resumen semanal...</p>';
+    container.innerHTML = '<p class="loading" >Cargando resumen semanal...</p>';
 
     try {
         const response = await fetch('/api/horas/resumen-semanal');
@@ -1396,7 +1408,15 @@ async function loadResumenSemanal() {
 function renderResumenSemanal(resumen) {
     const container = document.getElementById('resumen-semanal-container');
 
-    const diasSemana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+    const diasSemana = [
+        '<span data-i18n="dashboardUser.hours.weeklySummary.days.monday">Lunes</span>',
+        '<span data-i18n="dashboardUser.hours.weeklySummary.days.tuesday">Martes</span>',
+        '<span data-i18n="dashboardUser.hours.weeklySummary.days.wednesday">Miércoles</span>',
+        '<span data-i18n="dashboardUser.hours.weeklySummary.days.thursday">Jueves</span>',
+        '<span data-i18n="dashboardUser.hours.weeklySummary.days.friday">Viernes</span>',
+        '<span data-i18n="dashboardUser.hours.weeklySummary.days.saturday">Sábado</span>',
+        '<span data-i18n="dashboardUser.hours.weeklySummary.days.sunday">Domingo</span>'
+    ];
     const registrosPorDia = {};
 
     // Organizar registros por día
@@ -1417,10 +1437,10 @@ function renderResumenSemanal(resumen) {
 
     let html = `
         <div class="resumen-semana-header">
-            <p><strong>Semana del ${formatearFechaSimple(resumen.semana.inicio)} al ${formatearFechaSimple(resumen.semana.fin)}</strong></p>
+            <p><strong> <span data-i18n="dashboardUser.hours.weeklySummary.calendarHeader.week">Semana del </span>${formatearFechaSimple(resumen.semana.inicio)} <span data-i18n="dashboardUser.hours.weeklySummary.calendarHeader.to">al</span> ${formatearFechaSimple(resumen.semana.fin)}</strong></p>
             <p>
                 📊 Total: <strong>${resumen.total_horas}h</strong> | 
-                📅 Días trabajados: <strong>${resumen.dias_trabajados}</strong>
+                <span data-i18n="dashboardUser.hours.weeklySummary.calendarHeader.daysWorked">📅 Días trabajados: </span><strong>${resumen.dias_trabajados}</strong>
             </p>
         </div>
         <div class="resumen-dias-grid">
@@ -1431,7 +1451,7 @@ function renderResumenSemanal(resumen) {
         const dia = diasSemana[index];
         const fechaFormateada = formatearFechaSimple(fecha);
         const esHoy = fecha === new Date().toISOString().split('T')[0];
-        const esFinDeSemana = index === 5 || index === 6; 
+        const esFinDeSemana = index === 5 || index === 6;
 
        html += `
     <div class="dia-card ${registro ? 'con-registro' : 'sin-registro'} ${esHoy ? 'dia-hoy' : ''} ${esFinDeSemana ? 'fin-de-semana' : ''}">
@@ -1450,20 +1470,20 @@ function renderResumenSemanal(resumen) {
 
         if (registro) {
             const entrada = registro.hora_entrada ? registro.hora_entrada.substring(0, 5) : '--:--';
-            const salida = registro.hora_salida ? registro.hora_salida.substring(0, 5) : 'En curso';
+            const salida = registro.hora_salida ? registro.hora_salida.substring(0, 5) : '<span data-i18n="dashboardUser.hours.weeklySummary.days.content.inProgress">En curso</span>';
             const horas = registro.total_horas || 0;
             const estadoBadge = getEstadoBadge(registro.estado);
 
             html += `
                 <div class="registro-info">
-                    <p><i class="fas fa-sign-in-alt"></i> Entrada: <strong>${entrada}</strong></p>
-                    <p><i class="fas fa-sign-out-alt"></i> Salida: <strong>${salida}</strong></p>
-                    <p><i class="fas fa-clock"></i> Total: <strong>${horas}h</strong></p>
+                    <p><i class="fas fa-sign-in-alt"></i> <span data-i18n="dashboardUser.hours.weeklySummary.days.content.entry">Entrada:</span> <strong>${entrada}</strong></p>
+                    <p><i class="fas fa-sign-out-alt"></i> <span data-i18n="dashboardUser.hours.weeklySummary.days.content.exit">Salida:</span> <strong>${salida}</strong></p>
+                    <p><i class="fas fa-clock"></i> <span data-i18n="dashboardUser.hours.weeklySummary.days.content.total">Total:</span> <strong>${horas}h</strong></p>
                     ${estadoBadge}
                 </div>
             `;
         } else {
-            html += '<p class="no-registro"><i class="fas fa-calendar-times"></i> Sin registro</p>';
+            html += '<p class="no-registro"><i class="fas fa-calendar-times"></i> <span data-i18n="dashboardUser.hours.weeklySummary.days.content.withoutRegistration">Sin registro</span></p>';
         }
 
         html += `
@@ -1474,13 +1494,14 @@ function renderResumenSemanal(resumen) {
 
     html += '</div>';
     container.innerHTML = html;
+    i18n.translatePage();
 }
 
 function getEstadoBadge(estado) {
     const badges = {
-        'pendiente': '<span class="badge-estado pendiente"><i class="fas fa-clock"></i> Pendiente</span>',
-        'aprobado': '<span class="badge-estado aprobado"><i class="fas fa-check-circle"></i> Aprobado</span>',
-        'rechazado': '<span class="badge-estado rechazado"><i class="fas fa-times-circle"></i> Rechazado</span>'
+        'pendiente': '<span class="badge-estado pendiente" data-i18n="dashboardUser.hours.weeklySummary.days.content.status.pending"><i class="fas fa-clock"></i> Pendiente</span>',
+        'aprobado': '<span class="badge-estado aprobado" data-i18n="dashboardUser.hours.weeklySummary.days.content.status.approved"><i class="fas fa-check-circle"></i> Aprobado</span>',
+        'rechazado': '<span class="badge-estado rechazado" data-i18n="dashboardUser.hours.weeklySummary.days.content.status.rejected"><i class="fas fa-times-circle"></i> Rechazado</span>'
     };
     return badges[estado] || '';
 }
@@ -1509,11 +1530,13 @@ async function loadMisRegistros() {
             console.log(` ${data.registros.length} registros cargados`);
         } else {
             container.innerHTML = '<p class="error">Error al cargar registros</p>';
+            i18n.translatePage();
         }
 
     } catch (error) {
         console.error('❌ Error al cargar registros:', error);
         container.innerHTML = '<p class="error">Error de conexión</p>';
+        i18n.translatePage();
     }
 }
 
@@ -1575,9 +1598,9 @@ function renderHistorialRegistros(registros) {
                     <table class="registros-mini-table">
                         <thead>
                             <tr>
-                                <th>Fecha</th>
-                                <th>Entrada</th>
-                                <th>Salida</th>
+                                <th data-i18n="dashboardUser.hours.history.table.columns.date">Fecha</th>
+                                <th data-i18n="dashboardUser.hours.history.table.columns.entry">Entrada</th>
+                                <th data-i18n="dashboardUser.hours.history.table.columns.exit">Salida</th>
                                 <th>Horas</th>
                                 <th></th>
                             </tr>
@@ -1622,7 +1645,7 @@ function verDescripcionRegistro(descripcion, fecha) {
             </div>
         </div>
     `;
-    
+
     document.body.insertAdjacentHTML('beforeend', modal);
 }
 
@@ -1636,7 +1659,16 @@ function formatearFechaSimple(fecha) {
 }
 
 function obtenerDiaSemana(fecha) {
-    const dias = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+    const dias = [
+        '<span data-i18n="dashboardUser.hours.history.table.row.days.sun"></span>',
+        '<span data-i18n="dashboardUser.hours.history.table.row.days.mon"></span>',
+        '<span data-i18n="dashboardUser.hours.history.table.row.days.tue"></span>',
+        '<span data-i18n="dashboardUser.hours.history.table.row.days.wed"></span>',
+        '<span data-i18n="dashboardUser.hours.history.table.row.days.thu"></span>',
+        '<span data-i18n="dashboardUser.hours.history.table.row.days.fri"></span>',
+        '<span data-i18n="dashboardUser.hours.history.table.row.days.sat"></span>'
+    ];
+
     return dias[fecha.getDay()];
 }
 
@@ -1686,7 +1718,7 @@ function toggleEditProfile() {
     const viewDiv = document.getElementById('profile-view');
     const editDiv = document.getElementById('profile-edit');
     const btnText = document.getElementById('btn-edit-text');
-    
+
     // Debug: verificar que los elementos existen
     if (!viewDiv || !editDiv) {
         console.error('Error: No se encontraron los divs de perfil');
@@ -1694,9 +1726,9 @@ function toggleEditProfile() {
         ('editDiv:', editDiv);
         return;
     }
-    
+
     if (editDiv.style.display === 'none' || editDiv.style.display === '') {
-    
+
         loadProfileData();
         viewDiv.style.display = 'none';
         editDiv.style.display = 'block';
@@ -1706,12 +1738,12 @@ function toggleEditProfile() {
         viewDiv.style.display = 'block';
         editDiv.style.display = 'none';
         if (btnText) btnText.textContent = 'Editar Perfil';
-        
+
         // Limpiar campos de contraseÃ±a
         const passActual = document.getElementById('edit-password-actual');
         const passNueva = document.getElementById('edit-password-nueva');
         const passConfirmar = document.getElementById('edit-password-confirmar');
-        
+
         if (passActual) passActual.value = '';
         if (passNueva) passNueva.value = '';
         if (passConfirmar) passConfirmar.value = '';
@@ -1723,10 +1755,10 @@ async function loadProfileData() {
     try {
         const response = await fetch('/api/users/my-profile');
         const data = await response.json();
-        
+
         if (data.success) {
             profileData = data.user;
-            
+
             // Llenar formulario de edición
             document.getElementById('edit-nombre').value = profileData.nombre_completo || '';
             document.getElementById('edit-cedula').value = profileData.cedula || '';
@@ -1734,7 +1766,7 @@ async function loadProfileData() {
             document.getElementById('edit-direccion').value = profileData.direccion || '';
             document.getElementById('edit-fecha-nacimiento').value = profileData.fecha_nacimiento || '';
             document.getElementById('edit-telefono').value = profileData.telefono || '';
-            
+
             // Actualizar vista de solo lectura también
             updateProfileView(profileData);
         } else {
@@ -1753,20 +1785,20 @@ function updateProfileView(user) {
     if (nombreEl) {
         nombreEl.textContent = user.nombre_completo || 'No disponible';
     }
-    
-   
+
+
     // Actualizar email
     const emailEl = document.getElementById('display-email');
     if (emailEl) {
         emailEl.textContent = user.email || 'No disponible';
     }
-    
+
     // Actualizar dirección
     const direccionEl = document.getElementById('display-direccion');
     if (direccionEl) {
         direccionEl.textContent = user.direccion || 'No especificada';
     }
-    
+
     // Actualizar fecha de nacimiento
     const fechaNacEl = document.getElementById('display-fecha-nacimiento');
     if (fechaNacEl && user.fecha_nacimiento) {
@@ -1779,45 +1811,45 @@ function updateProfileView(user) {
     } else if (fechaNacEl) {
         fechaNacEl.textContent = 'No especificada';
     }
-    
+
     // Actualizar teléfono
     const telefonoEl = document.getElementById('display-telefono');
     if (telefonoEl) {
         telefonoEl.textContent = user.telefono || 'No especificado';
     }
-    
-   
+
+
 }
 
 // Cargar datos del usuario al iniciar
 async function cargarDatosUsuario() {
     try {
         const response = await fetch('/api/users/my-profile');
-        
+
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}`);
         }
-        
+
         const data = await response.json();
-        
+
         if (data.success && data.user) {
             // Actualizar header
             const nombreElement = document.getElementById('user-name-header');
             if (nombreElement) {
                 nombreElement.textContent = data.user.nombre_completo || 'Usuario';
             }
-            
+
             const emailElement = document.getElementById('user-email-header');
             if (emailElement) {
                 emailElement.textContent = data.user.email || '';
             }
-            
+
             // Actualizar vista del perfil
             updateProfileView(data.user);
-            
+
             // Guardar datos globalmente
             profileData = data.user;
-            
+
             (' Datos de usuario cargados correctamente');
         } else {
             console.error('Error en respuesta:', data);
@@ -1830,53 +1862,53 @@ async function cargarDatosUsuario() {
 // Enviar formulario de edición
 async function submitProfileEdit(event) {
     event.preventDefault();
-    
+
     const nombre = document.getElementById('edit-nombre').value.trim();
     const email = document.getElementById('edit-email').value.trim();
     const direccion = document.getElementById('edit-direccion').value.trim();
     const fechaNacimiento = document.getElementById('edit-fecha-nacimiento').value;
     const telefono = document.getElementById('edit-telefono').value.trim();
-    
+
     const passwordActual = document.getElementById('edit-password-actual').value;
     const passwordNueva = document.getElementById('edit-password-nueva').value;
     const passwordConfirmar = document.getElementById('edit-password-confirmar').value;
-    
+
     // Validaciones
     if (!nombre || !email) {
         alert('⚠️ El nombre y email son obligatorios');
         return;
     }
-    
+
     // Validar email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
         alert('⚠️ Por favor ingresa un email válido');
         return;
     }
-    
+
     // Validar cambio de contraseña
     if (passwordNueva || passwordConfirmar) {
         if (!passwordActual) {
             alert('⚠️ Debes ingresar tu contraseña actual para cambiarla');
             return;
         }
-        
+
         if (passwordNueva.length < 6) {
             alert('⚠️ La nueva contraseña debe tener al menos 6 caracteres');
             return;
         }
-        
+
         if (passwordNueva !== passwordConfirmar) {
             alert('⚠️ Las contraseñas nuevas no coinciden');
             return;
         }
     }
-    
+
     // Confirmar cambios
     if (!confirm('¿Estás seguro de guardar los cambios?')) {
         return;
     }
-    
+
     // Preparar datos
     const formData = new FormData();
     formData.append('nombre_completo', nombre);
@@ -1884,30 +1916,30 @@ async function submitProfileEdit(event) {
     formData.append('direccion', direccion);
     formData.append('fecha_nacimiento', fechaNacimiento);
     formData.append('telefono', telefono);
-    
+
     if (passwordActual && passwordNueva) {
         formData.append('password_actual', passwordActual);
         formData.append('password_nueva', passwordNueva);
     }
-    
+
     try {
         const response = await fetch('/api/users/update-profile', {
             method: 'POST',
             body: formData,
             credentials: 'same-origin'
         });
-        
+
         const data = await response.json();
-        
+
         if (data.success) {
             alert(' ' + data.message);
-            
+
             // Recargar los datos del usuario para actualizar la vista
             await cargarDatosUsuario();
-            
+
             // Volver a vista de solo lectura
             toggleEditProfile();
-            
+
             // Actualizar sesión si es necesario
             if (data.reload) {
                 setTimeout(() => {
@@ -1924,7 +1956,7 @@ async function submitProfileEdit(event) {
 }
 
 // Inicializar al cargar la página
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     ('🔄 Cargando datos del usuario...');
     cargarDatosUsuario();
 });
@@ -1945,19 +1977,19 @@ window.cargarDatosUsuario = cargarDatosUsuario;
 window.deudaHorasActual = 0;
 
 // ========== INICIALIZACIÓN ==========
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const cuotasMenuItem = document.querySelector('.menu li[data-section="cuotas"]');
     if (cuotasMenuItem) {
-    cuotasMenuItem.addEventListener('click', async function() {
-        ('>>> Sección cuotas abierta');
-        
-        // Limpiar cache
-        ultimoCheckCuotas = null;
-        
-        // Recargar todo
-        await inicializarSeccionCuotas();
-    });
-}
+        cuotasMenuItem.addEventListener('click', async function () {
+            ('>>> Sección cuotas abierta');
+
+            // Limpiar cache
+            ultimoCheckCuotas = null;
+
+            // Recargar todo
+            await inicializarSeccionCuotas();
+        });
+    }
 
     // Poblar selector de años
     const selectAnio = document.getElementById('filtro-anio-cuotas');
@@ -1975,35 +2007,35 @@ document.addEventListener('DOMContentLoaded', function() {
 
 async function generarCuotaMesActualSiNoExiste() {
     ('🔄 Verificando cuota del mes actual...');
-    
+
     try {
         const hoy = new Date();
         const mesActual = hoy.getMonth() + 1;
         const anioActual = hoy.getFullYear();
-        
+
         // Verificar si ya existe la cuota
         const response = await fetch(`/api/cuotas/verificar-cuota-mes?mes=${mesActual}&anio=${anioActual}`);
         const data = await response.json();
-        
+
         ('📊 Verificación de cuota:', data);
-        
+
         if (data.success && !data.existe) {
             ('⚠️ No existe cuota del mes actual, generando...');
-            
+
             // Generar cuota del mes actual
             const formData = new FormData();
             formData.append('mes', mesActual);
             formData.append('anio', anioActual);
-            
+
             const responseGenerar = await fetch('/api/cuotas/generar-mi-cuota', {
                 method: 'POST',
                 body: formData
             });
-            
+
             // 🔥 DEBUG: Ver respuesta completa
             const dataGenerar = await responseGenerar.json();
             ('🔍 RESPUESTA COMPLETA DE GENERAR:', dataGenerar);
-            
+
             if (dataGenerar.success) {
                 (' Cuota generada:', dataGenerar.message);
                 if (dataGenerar.debug) {
@@ -2029,7 +2061,7 @@ async function inicializarSeccionCuotas() {
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     console.log('📋 [INIT CUOTAS] Inicializando sección de cuotas');
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-    
+
     try {
         //  PASO 1: Generar cuota del mes actual
         console.log('⏳ [PASO 1/4] Verificando/generando cuota...');
@@ -2065,7 +2097,7 @@ async function inicializarSeccionCuotas() {
         console.log(' [INIT CUOTAS] Sección inicializada correctamente');
         console.log('   💰 Deuda final disponible:', window.deudaHorasActual);
         console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        
+
     } catch (error) {
         console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
         console.error('❌ [INIT CUOTAS] Error al inicializar:', error);
@@ -2080,23 +2112,23 @@ async function inicializarSeccionCuotas() {
 // ========== CARGAR DEUDA DE HORAS ==========
 async function loadDeudaHorasParaCuotas() {
     console.log('💰 [DEUDA HORAS] Cargando deuda de horas para cuotas...');
-    
+
     try {
         const response = await fetch('/api/horas/deuda-actual');
         const data = await response.json();
-        
+
         console.log('📥 [DEUDA HORAS] Respuesta recibida:', data);
-        
+
         if (data.success && data.deuda) {
             // 🔥 CRÍTICO: Calcular deuda correctamente
             const deudaEnPesos = parseFloat(data.deuda.deuda_en_pesos || 0);
             const deudaMesActual = parseFloat(data.deuda.deuda_mes_actual || 0);
             const deudaAcumulada = parseFloat(data.deuda.deuda_acumulada || 0);
-            
+
             // Usar el campo correcto del backend
             // Usar el campo correcto del backend
-window.deudaHorasActual = deudaEnPesos;
-            
+            window.deudaHorasActual = deudaEnPesos;
+
             console.log('💵 [DEUDA HORAS] Deuda calculada:');
             console.log('   - deuda_en_pesos (PRINCIPAL):', deudaEnPesos);
             console.log('   - deuda_mes_actual:', deudaMesActual);
@@ -2108,17 +2140,17 @@ window.deudaHorasActual = deudaEnPesos;
                 console.error('❌ [DEUDA HORAS] ERROR: Deuda no se asignó correctamente!');
                 deudaHorasActual = deudaEnPesos; // Forzar asignación
             }
-            
-        } else {
-    console.warn('⚠️ [DEUDA HORAS] No se recibió deuda válida del backend');
-    window.deudaHorasActual = 0;
-}
 
-   } catch (error) {
-    console.error('❌ [DEUDA HORAS] Error al cargar:', error);
-    window.deudaHorasActual = 0;
-}
-    
+        } else {
+            console.warn('⚠️ [DEUDA HORAS] No se recibió deuda válida del backend');
+            window.deudaHorasActual = 0;
+        }
+
+    } catch (error) {
+        console.error('❌ [DEUDA HORAS] Error al cargar:', error);
+        window.deudaHorasActual = 0;
+    }
+
     console.log('🔚 [DEUDA HORAS] Proceso finalizado. Valor final:', deudaHorasActual);
     return deudaHorasActual; //  IMPORTANTE: Retornar el valor
 }
@@ -2127,13 +2159,13 @@ window.deudaHorasActual = deudaEnPesos;
 async function loadInfoViviendaCuota() {
     const container = document.getElementById('info-vivienda-cuota');
     if (!container) return;
-    
+
     container.innerHTML = '<p class="loading">Cargando información de vivienda...</p>';
-    
+
     try {
         const response = await fetch('/api/viviendas/my-vivienda');
         const data = await response.json();
-        
+
         if (data.success && data.vivienda) {
             const v = data.vivienda;
             container.innerHTML = `
@@ -2172,27 +2204,27 @@ async function loadInfoViviendaCuota() {
 async function loadMisCuotas() {
     const container = document.getElementById('misCuotasContainer');
     if (!container) return;
-    
+
     container.innerHTML = '<p class="loading">Cargando cuotas...</p>';
-    
+
     try {
         const mes = document.getElementById('filtro-mes-cuotas')?.value || '';
         const anio = document.getElementById('filtro-anio-cuotas')?.value || '';
         const estado = document.getElementById('filtro-estado-cuotas')?.value || '';
-        
+
         let url = '/api/cuotas/mis-cuotas?';
         if (mes) url += `mes=${mes}&`;
         if (anio) url += `anio=${anio}&`;
         if (estado) url += `estado=${estado}&`;
-        
+
         const response = await fetch(url);
         const data = await response.json();
-        
+
         ('📊 Cuotas recibidas:', data);
-        
+
         if (data.success) {
             let cuotas = data.cuotas || [];
-            
+
             // 1. ORDENAR POR FECHA DESCENDENTE (Prepara el array)
             cuotas.sort((a, b) => {
                 const anioA = parseInt(a.anio, 10) || 0;
@@ -2212,10 +2244,10 @@ async function loadMisCuotas() {
                 const isPaid = (c.estado === 'pagada' || c.estado_pago === 'pagado');
                 return !isPaid;
             });
-            
+
             if (cuotaDestacada) {
                 const index = cuotas.findIndex(c => c.id_cuota === cuotaDestacada.id_cuota);
-                
+
                 if (index > 0) {
                     // Mueve la cuota pendiente al inicio (posición [0])
                     const [featuredCuota] = cuotas.splice(index, 1);
@@ -2233,9 +2265,10 @@ async function loadMisCuotas() {
             if (cuotas.length > 0) {
                 console.log(' CUOTA DESTACADA FINAL (Pendiente primero):', cuotas[0]);
             }
-            
+
             renderMisCuotasOrganizadas(cuotas);
             updateCuotasStats(cuotas);
+            i18n.translatePage();
         } else {
             container.innerHTML = '<p class="error">Error al cargar cuotas</p>';
         }
@@ -2249,81 +2282,81 @@ async function loadMisCuotas() {
 // ========== RENDERIZAR CUOTAS CON DEUDA TOTAL ==========
 function renderMisCuotasOrganizadas(cuotas) {
     const container = document.getElementById('misCuotasContainer');
-    
+
     if (!cuotas || cuotas.length === 0) {
         container.innerHTML = `
             <div class="no-data">
                 <i class="fas fa-inbox" style="font-size: 48px; color: #ddd; margin-bottom: 10px;"></i>
-                <p>No se encontraron cuotas con los filtros seleccionados</p>
+                <p data-i18n="dashboardUser.billing.history.empty">No se encontraron cuotas con los filtros seleccionados</p>
             </div>
         `;
         return;
     }
-    
+
     let html = '';
     //DEUDA TOTAL DEL MES (CON CONTROL DE PERÍODO)
-const cuotaMasReciente = cuotas[0];
+    const cuotaMasReciente = cuotas[0];
 
-// Calcular deuda total
-const montoCuota = parseFloat(cuotaMasReciente.monto_base || cuotaMasReciente.monto_actual || cuotaMasReciente.monto || 0);
-const deudaAcumuladaAnterior = parseFloat(cuotaMasReciente.monto_pendiente_anterior || 0);
-const montoTotal = montoCuota + deudaHorasActual + deudaAcumuladaAnterior;
+    // Calcular deuda total
+    const montoCuota = parseFloat(cuotaMasReciente.monto_base || cuotaMasReciente.monto_actual || cuotaMasReciente.monto || 0);
+    const deudaAcumuladaAnterior = parseFloat(cuotaMasReciente.monto_pendiente_anterior || 0);
+    const montoTotal = montoCuota + deudaHorasActual + deudaAcumuladaAnterior;
 
-console.log('💰 Deuda total calculada:', {
-    montoCuota,
-    deudaAcumuladaAnterior,
-    deudaHorasActual,
-    montoTotal
-});
+    console.log('💰 Deuda total calculada:', {
+        montoCuota,
+        deudaAcumuladaAnterior,
+        deudaHorasActual,
+        montoTotal
+    });
 
-('💵 Cálculo de montos:', {
-    monto_base: cuotaMasReciente.monto_base,
-    monto_actual: cuotaMasReciente.monto_actual,
-    monto: cuotaMasReciente.monto,
-    montoCuota,
-    deudaHorasActual,
-    deudaAcumuladaAnterior,
-    montoTotal
-});
+    ('💵 Cálculo de montos:', {
+        monto_base: cuotaMasReciente.monto_base,
+        monto_actual: cuotaMasReciente.monto_actual,
+        monto: cuotaMasReciente.monto,
+        montoCuota,
+        deudaHorasActual,
+        deudaAcumuladaAnterior,
+        montoTotal
+    });
 
-let ultimoCheckCuotas = null;
+    let ultimoCheckCuotas = null;
 
-async function verificarCambiosCuotas() {
-    try {
-        const mesActual = new Date().getMonth() + 1;
-        const anioActual = new Date().getFullYear();
-        
-        const response = await fetch(`/api/cuotas/mis-cuotas?mes=${mesActual}&anio=${anioActual}`);
-        const data = await response.json();
-        
-        if (data.success && data.cuotas.length > 0) {
-            const cuotaActual = data.cuotas[0];
-            const checksum = `${cuotaActual.id_cuota}-${cuotaActual.monto}-${cuotaActual.monto_base}`;
-            
-            if (ultimoCheckCuotas === null) {
-                ultimoCheckCuotas = checksum;
-            } else if (ultimoCheckCuotas !== checksum) {
-                ('🔄 Detectado cambio en cuota, recargando...');
-                ultimoCheckCuotas = checksum;
-                
-                // Recargar solo si estamos en la sección de cuotas
-                const cuotasSection = document.getElementById('cuotas-section');
-                if (cuotasSection && cuotasSection.classList.contains('active')) {
-                    await inicializarSeccionCuotas();
-                    
-                    // Mostrar notificación
-                    mostrarNotificacionCambio();
+    async function verificarCambiosCuotas() {
+        try {
+            const mesActual = new Date().getMonth() + 1;
+            const anioActual = new Date().getFullYear();
+
+            const response = await fetch(`/api/cuotas/mis-cuotas?mes=${mesActual}&anio=${anioActual}`);
+            const data = await response.json();
+
+            if (data.success && data.cuotas.length > 0) {
+                const cuotaActual = data.cuotas[0];
+                const checksum = `${cuotaActual.id_cuota}-${cuotaActual.monto}-${cuotaActual.monto_base}`;
+
+                if (ultimoCheckCuotas === null) {
+                    ultimoCheckCuotas = checksum;
+                } else if (ultimoCheckCuotas !== checksum) {
+                    ('🔄 Detectado cambio en cuota, recargando...');
+                    ultimoCheckCuotas = checksum;
+
+                    // Recargar solo si estamos en la sección de cuotas
+                    const cuotasSection = document.getElementById('cuotas-section');
+                    if (cuotasSection && cuotasSection.classList.contains('active')) {
+                        await inicializarSeccionCuotas();
+
+                        // Mostrar notificación
+                        mostrarNotificacionCambio();
+                    }
                 }
             }
+        } catch (error) {
+            console.error('Error verificando cambios:', error);
         }
-    } catch (error) {
-        console.error('Error verificando cambios:', error);
     }
-}
 
-function mostrarNotificacionCambio() {
-    const notif = document.createElement('div');
-    notif.style.cssText = `
+    function mostrarNotificacionCambio() {
+        const notif = document.createElement('div');
+        notif.style.cssText = `
         position: fixed;
         top: 20px;
         right: 20px;
@@ -2335,7 +2368,7 @@ function mostrarNotificacionCambio() {
         z-index: 10000;
         animation: slideIn 0.3s ease-out;
     `;
-    notif.innerHTML = `
+        notif.innerHTML = `
         <div style="display: flex; align-items: center; gap: 10px;">
             <i class="fas fa-sync-alt fa-spin"></i>
             <div>
@@ -2344,94 +2377,94 @@ function mostrarNotificacionCambio() {
             </div>
         </div>
     `;
-    
-    document.body.appendChild(notif);
-    
-    setTimeout(() => {
-        notif.style.animation = 'slideOut 0.3s ease-in';
-        setTimeout(() => notif.remove(), 300);
-    }, 5000);
-}
 
-// Iniciar polling cada 30 segundos (solo en sección cuotas)
-setInterval(() => {
-    const cuotasSection = document.getElementById('cuotas-section');
-    if (cuotasSection && cuotasSection.classList.contains('active')) {
-        verificarCambiosCuotas();
+        document.body.appendChild(notif);
+
+        setTimeout(() => {
+            notif.style.animation = 'slideOut 0.3s ease-in';
+            setTimeout(() => notif.remove(), 300);
+        }, 5000);
     }
-}, 30000); 
 
-// Verificar al cargar la sección
-const originalInicializarSeccionCuotas = window.inicializarSeccionCuotas;
-window.inicializarSeccionCuotas = async function() {
-    await originalInicializarSeccionCuotas();
-    await verificarCambiosCuotas();
-};
+    // Iniciar polling cada 30 segundos (solo en sección cuotas)
+    setInterval(() => {
+        const cuotasSection = document.getElementById('cuotas-section');
+        if (cuotasSection && cuotasSection.classList.contains('active')) {
+            verificarCambiosCuotas();
+        }
+    }, 30000);
 
-function obtenerPrecioActualizado(cuota) {
-    const precio = parseFloat(
-        cuota.monto_base || 
-        cuota.monto_actual || 
-        cuota.monto || 
-        0
-    );
-    
-    (`💰 Precio para cuota ${cuota.id_cuota}:`, {
-        monto_base: cuota.monto_base,
-        monto_actual: cuota.monto_actual,
-        monto: cuota.monto,
-        precio_final: precio
+    // Verificar al cargar la sección
+    const originalInicializarSeccionCuotas = window.inicializarSeccionCuotas;
+    window.inicializarSeccionCuotas = async function () {
+        await originalInicializarSeccionCuotas();
+        await verificarCambiosCuotas();
+    };
+
+    function obtenerPrecioActualizado(cuota) {
+        const precio = parseFloat(
+            cuota.monto_base ||
+            cuota.monto_actual ||
+            cuota.monto ||
+            0
+        );
+
+        (`💰 Precio para cuota ${cuota.id_cuota}:`, {
+            monto_base: cuota.monto_base,
+            monto_actual: cuota.monto_actual,
+            monto: cuota.monto,
+            precio_final: precio
+        });
+
+        return precio;
+    }
+
+    window.obtenerPrecioActualizado = obtenerPrecioActualizado;
+
+
+    // Verificar estado de pago
+    const estadoFinal = cuotaMasReciente.estado_actual || cuotaMasReciente.estado;
+    const tienePagoPendiente = cuotaMasReciente.id_pago && cuotaMasReciente.estado_pago === 'pendiente';
+    const estaPagada = estadoFinal === 'pagada';
+
+    //  VERIFICAR SI ESTÁ EN PERÍODO DE PAGO
+    const hoy = new Date();
+    const diaActual = hoy.getDate();
+    const mesActual = hoy.getMonth() + 1;
+    const anioActual = hoy.getFullYear();
+
+    const esMesCuota = cuotaMasReciente.mes == mesActual && cuotaMasReciente.anio == anioActual;
+    const estaDentroPeriodoPago = diaActual >= 25; // Del 25 al último día del mes
+
+    const puedePagar = esMesCuota && estaDentroPeriodoPago && !estaPagada && !tienePagoPendiente;
+
+    // Calcular días restantes para poder pagar
+    let diasParaPagar = 0;
+    if (esMesCuota && !estaDentroPeriodoPago) {
+        diasParaPagar = 25 - diaActual;
+    }
+
+    ('📅 Control de período:', {
+        diaActual,
+        mesActual,
+        esMesCuota,
+        estaDentroPeriodoPago,
+        puedePagar,
+        diasParaPagar
     });
-    
-    return precio;
-}
 
-window.obtenerPrecioActualizado = obtenerPrecioActualizado;
-
-
-// Verificar estado de pago
-const estadoFinal = cuotaMasReciente.estado_actual || cuotaMasReciente.estado;
-const tienePagoPendiente = cuotaMasReciente.id_pago && cuotaMasReciente.estado_pago === 'pendiente';
-const estaPagada = estadoFinal === 'pagada';
-
-//  VERIFICAR SI ESTÁ EN PERÍODO DE PAGO
-const hoy = new Date();
-const diaActual = hoy.getDate();
-const mesActual = hoy.getMonth() + 1;
-const anioActual = hoy.getFullYear();
-
-const esMesCuota = cuotaMasReciente.mes == mesActual && cuotaMasReciente.anio == anioActual;
-const estaDentroPeriodoPago = diaActual >= 25; // Del 25 al último día del mes
-
-const puedePagar = esMesCuota && estaDentroPeriodoPago && !estaPagada && !tienePagoPendiente;
-
-// Calcular días restantes para poder pagar
-let diasParaPagar = 0;
-if (esMesCuota && !estaDentroPeriodoPago) {
-    diasParaPagar = 25 - diaActual;
-}
-
-('📅 Control de período:', {
-    diaActual,
-    mesActual,
-    esMesCuota,
-    estaDentroPeriodoPago,
-    puedePagar,
-    diasParaPagar
-});
-
-html += `
+    html += `
     <div class="deuda-total-destacada ${estaPagada ? 'pagada-mes' : puedePagar ? '' : 'periodo-bloqueado'}">
         <div class="deuda-total-header">
             <h2 style="margin: 0; color: #fff;">
                 <i class="fas ${estaPagada ? 'fa-check-circle' : puedePagar ? 'fa-exclamation-triangle' : 'fa-clock'}"></i>
-                Resumen del Mes Actual
+                <span data-i18n="dashboardUser.billing.summary.currentMonth">Resumen del Mes Actual</span>
             </h2>
             <span class="deuda-total-badge ${estaPagada ? 'badge-pagada' : tienePagoPendiente ? 'badge-pendiente' : puedePagar ? 'badge-requerida' : 'badge-bloqueado'}">
-                ${estaPagada ? ' PAGADA' : 
-                  tienePagoPendiente ? '⏳ EN VALIDACIÓN' : 
-                  puedePagar ? '⚠️ PERÍODO DE PAGO ABIERTO' : 
-                  '🔒 PERÍODO DE TRABAJO'}
+                ${estaPagada ? ' PAGADA' :
+            tienePagoPendiente ? '⏳ EN VALIDACIÓN' :
+                puedePagar ? '⚠️ PERÍODO DE PAGO ABIERTO' :
+                    '🔒 PERÍODO DE TRABAJO'}
             </span>
         </div>
         
@@ -2439,8 +2472,8 @@ html += `
     <div class="deuda-breakdown-item">
         <i class="fas fa-home"></i>
         <div>
-            <span class="deuda-label">Cuota de Vivienda</span>
-            <span class="deuda-monto">$${montoCuota.toLocaleString('es-UY', {minimumFractionDigits: 2})}</span>
+            <span class="deuda-label" data-i18n="dashboardUser.billing.summary.houseFee">Cuota de Vivienda</span>
+            <span class="deuda-monto">$${montoCuota.toLocaleString('es-UY', { minimumFractionDigits: 2 })}</span>
         </div>
     </div>
     
@@ -2450,11 +2483,11 @@ html += `
         <div class="deuda-breakdown-item deuda-acumulada">
             <i class="fas fa-exclamation-triangle"></i>
             <div>
-                <span class="deuda-label">Deuda de Meses Anteriores</span>
+                <span class="deuda-label" data-i18n="dashboardUser.billing.summary.previousMonthsDebt">Deuda de Meses Anteriores</span>
                 <span class="deuda-monto error">
-                    $${deudaAcumuladaAnterior.toLocaleString('es-UY', {minimumFractionDigits: 2})}
+                    $${deudaAcumuladaAnterior.toLocaleString('es-UY', { minimumFractionDigits: 2 })}
                 </span>
-                <small style="color: #ff8a80; display: block; margin-top: 5px;">
+                <small style="color: #ff8a80; display: block; margin-top: 5px;" data-i18n="dashboardUser.billing.summary.previousMonthsDebtNote">
                     (Cuotas vencidas no pagadas)
                 </small>
             </div>
@@ -2467,7 +2500,7 @@ html += `
    <div class="deuda-breakdown-item deuda-horas">
     <i class="fas fa-clock"></i>
     <div>
-        <span class="deuda-label">Deuda por Horas No Trabajadas</span>
+        <span class="deuda-label" data-i18n="dashboardUser.billing.summary.hoursNotWorkedDebt">Deuda por Horas No Trabajadas</span>
         <small style="color: ${deudaHoras > 0 ? '#ff8a80' : '#81c784'}; display: block; margin-top: 3px; margin-bottom: 5px;">
             ${deudaHoras > 0 ? '($160 por hora × horas faltantes)' : '¡Sin deuda de horas!'}
         </small>
@@ -2485,7 +2518,7 @@ html += `
         <div>
             <span class="deuda-label">TOTAL ${estaPagada ? 'PAGADO' : 'A PAGAR'}</span>
             <span class="deuda-monto-total" style="color: ${estaPagada ? '#4caf50' : '#fff'};">
-                $${montoTotal.toLocaleString('es-UY', {minimumFractionDigits: 2})}
+                $${montoTotal.toLocaleString('es-UY', { minimumFractionDigits: 2 })}
             </span>
         </div>
     </div>
@@ -2493,36 +2526,36 @@ html += `
             
          ${estaPagada ? `
     <div class="alert-success" style="margin-top: 20px;">
-        <strong style="color: #4caf50;">🎉 ¡Pago Completado!</strong>
+        <strong style="color: #4caf50;" data-i18n="dashboardUser.billing.summary.paymentCompleted">🎉 ¡Pago Completado!</strong>
         <p style="color: rgba(255, 255, 255, 0.9); margin: 10px 0 0 0;">
-            Has pagado exitosamente tu cuota de ${obtenerNombreMes(cuotaMasReciente.mes)} ${cuotaMasReciente.anio}.
+            <span data-i18n="dashboardUser.billing.summary.paymentSuccess">Has pagado exitosamente tu cuota de </span>${obtenerNombreMes(cuotaMasReciente.mes)} ${cuotaMasReciente.anio}.
             ${cuotaMasReciente.fecha_pago ? `<br>Fecha de pago: ${new Date(cuotaMasReciente.fecha_pago).toLocaleDateString('es-UY')}` : ''}
             
             <!--  MOSTRAR DESGLOSE DEL PAGO -->
             <br><br>
             <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; margin-top: 10px;">
-                <strong style="display: block; margin-bottom: 10px;">📋 Desglose del Pago:</strong>
+                <strong style="display: block; margin-bottom: 10px;" data-i18n="dashboardUser.billing.summary.paymentBreakdown">📋 Desglose del Pago:</strong>
                 <div style="display: grid; gap: 8px; font-size: 13px;">
                     <div style="display: flex; justify-content: space-between;">
-                        <span>🏠 Cuota de vivienda:</span>
-                        <strong>$${montoCuota.toLocaleString('es-UY', {minimumFractionDigits: 2})}</strong>
+                        <span data-i18n="dashboardUser.billing.summary.housingFee">🏠 Cuota de vivienda:</span>
+                        <strong>$${montoCuota.toLocaleString('es-UY', { minimumFractionDigits: 2 })}</strong>
                     </div>
                     ${deudaAcumuladaAnterior > 0 ? `
                         <div style="display: flex; justify-content: space-between; color: #ffeb3b;">
-                            <span>⚠️ Deuda acumulada:</span>
-                            <strong>$${deudaAcumuladaAnterior.toLocaleString('es-UY', {minimumFractionDigits: 2})}</strong>
+                            <span data-i18n="dashboardUser.billing.summary.accumulatedDebt">⚠️ Deuda acumulada:</span>
+                            <strong>$${deudaAcumuladaAnterior.toLocaleString('es-UY', { minimumFractionDigits: 2 })}</strong>
                         </div>
                     ` : ''}
                     ${deudaHorasActual > 0 ? `
                         <div style="display: flex; justify-content: space-between; color: #ff9800;">
-                            <span>⏰ Deuda por horas no trabajadas:</span>
-                            <strong>$${deudaHorasActual.toLocaleString('es-UY', {minimumFractionDigits: 2})}</strong>
+                            <span data-i18n="dashboardUser.billing.summary.unworkedHoursDebt">⏰ Deuda por horas no trabajadas:</span>
+                            <strong>$${deudaHorasActual.toLocaleString('es-UY', { minimumFractionDigits: 2 })}</strong>
                         </div>
                     ` : ''}
                     <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.2); margin: 5px 0;">
                     <div style="display: flex; justify-content: space-between; font-size: 16px;">
-                        <span><strong>💰 TOTAL PAGADO:</strong></span>
-                        <strong style="color: #4caf50;">$${montoTotal.toLocaleString('es-UY', {minimumFractionDigits: 2})}</strong>
+                        <span><strong data-i18n="dashboardUser.billing.summary.totalPaid">💰 TOTAL PAGADO:</strong></span>
+                        <strong style="color: #4caf50;">$${montoTotal.toLocaleString('es-UY', { minimumFractionDigits: 2 })}</strong>
                     </div>
                 </div>
             </div>
@@ -2532,16 +2565,16 @@ html += `
             
             <!--  AGREGAR ESTO -->
             ${deudaAcumuladaAnterior > 0 ? `
-                <br><br><strong>Nota:</strong> El pago incluyó $${deudaAcumuladaAnterior.toLocaleString('es-UY', {minimumFractionDigits: 2})} de deuda acumulada de meses anteriores.
+                <br><br><strong>Nota:</strong> El pago incluyó $${deudaAcumuladaAnterior.toLocaleString('es-UY', { minimumFractionDigits: 2 })} de deuda acumulada de meses anteriores.
             ` : ''}
         </p>
     </div>
             ` : tienePagoPendiente ? `
                 <!-- ⏳ PAGO PENDIENTE DE VALIDACIÓN -->
                 <div class="alert-info" style="margin-top: 20px; background: rgba(33, 150, 243, 0.2); border-color: rgba(33, 150, 243, 0.4);">
-                    <strong style="color: #2196F3;">⏳ Pago en Revisión</strong>
+                    <strong style="color: #2196F3;" data-i18n="dashboardUser.billing.pendingPayment">⏳ Pago en Revisión</strong>
                     <p style="color: rgba(255, 255, 255, 0.9); margin: 10px 0 0 0;">
-                        Tu pago de $${parseFloat(cuotaMasReciente.monto_pagado || 0).toLocaleString('es-UY', {minimumFractionDigits: 2})} 
+                        Tu pago de $${parseFloat(cuotaMasReciente.monto_pagado || 0).toLocaleString('es-UY', { minimumFractionDigits: 2 })} 
                         está siendo validado por un administrador.
                         ${cuotaMasReciente.fecha_pago ? `<br>Enviado el: ${new Date(cuotaMasReciente.fecha_pago).toLocaleDateString('es-UY')}` : ''}
                     </p>
@@ -2572,13 +2605,13 @@ html += `
             onmousedown="this.style.transform='translateY(0px)'"
             onmouseup="this.style.transform='translateY(-2px)'">
         <i class="fas fa-credit-card"></i>
-        Pagar Ahora
+        <span data-i18n="dashboardUser.billing.payNow">Pagar Ahora</span>
     </button>
 </div>
                 
                 <div class="alert-success" style="margin-top: 20px; background: rgba(76, 175, 80, 0.15); border-color: rgba(76, 175, 80, 0.3);">
-                    <strong style="color: #4caf50;"> Período de Pago Habilitado</strong>
-                    <p style="color: rgba(255, 255, 255, 0.9); margin: 10px 0 0 0;">
+                    <strong style="color: #4caf50;" data-i18n="dashboardUser.billing.enabledPaymentPeriod"> Período de Pago Habilitado</strong>
+                    <p style="color: rgba(255, 255, 255, 0.9); margin: 10px 0 0 0;" data-i18n="dashboardUser.billing.enabledPaymentPeriodMessage">
                         Ya puedes realizar el pago de tu cuota. El período de pago está activo hasta fin de mes.
                     </p>
                 </div>
@@ -2605,11 +2638,11 @@ html += `
                 gap: 10px;
             ">
         <i class="fas fa-lock"></i>
-        Pago Bloqueado
+        <span data-i18n="dashboardUser.billing.blockedPayment">Pago Bloqueado</span>
     </button>
 </div>
                     <div class="alert-warning" style="margin-top: 20px;">
-                        <strong style="color: #ff9800;">🔒 Periodo de Trabajo en Curso</strong>
+                        <strong style="color: #ff9800;" data-i18n="dashboardUser.billing.workingPeriod">🔒 Periodo de Trabajo en Curso</strong>
                         <p style="color: rgba(255, 255, 255, 0.9); margin: 10px 0 0 0;">
                             El período de pago se habilitará en <strong>${diasParaPagar} día${diasParaPagar !== 1 ? 's' : ''}</strong> (desde el 25 del mes).
                             <br>Por ahora, enfócate en cumplir tus <strong>21 horas semanales</strong> para evitar cargos adicionales.
@@ -2621,49 +2654,49 @@ html += `
     
     <hr style="margin: 40px 0; border: none; border-top: 2px solid #e0e0e0;">
 `;
-   
-    
+
+
     // Separar cuotas para las secciones restantes
     const cuotasPagables = cuotas.filter(c => {
         const estadoFinal = c.estado_actual || c.estado;
         return estadoFinal !== 'pagada';
     });
-    
+
     const cuotasHistorial = cuotas.filter(c => {
         const estadoFinal = c.estado_actual || c.estado;
         return estadoFinal === 'pagada';
     });
-    
+
     // SECCIÓN: CUOTAS PENDIENTES (SI HAY MÁS DE UNA)
     if (cuotasPagables.length > 1) { // Más de una pendiente
         html += `
             <div class="cuotas-section">
                 <h3 style="color: #f44336; margin-bottom: 20px;">
-                    <i class="fas fa-exclamation-circle"></i> Otras Cuotas Pendientes (${cuotasPagables.length - 1})
+                    <i class="fas fa-exclamation-circle"></i> <span data-i18n="dashboardUser.billing.pending.title">Otras Cuotas Pendientes</span> (${cuotasPagables.length - 1})
                 </h3>
                 <div class="cuotas-grid">
         `;
-        
+
         // Mostrar desde la segunda en adelante (la primera ya está en destacada)
         cuotasPagables.slice(1).forEach(cuota => {
             html += renderCuotaCard(cuota);
         });
-        
+
         html += `
                 </div>
             </div>
             <hr style="margin: 40px 0; border: none; border-top: 2px solid #e0e0e0;">
         `;
     }
-    
+
     // SECCIÓN: HISTORIAL
     html += `
         <div class="cuotas-section">
             <h3 style="color: #666; margin-bottom: 20px;">
-                <i class="fas fa-history"></i> Historial de Cuotas
+                <i class="fas fa-history"></i> <span data-i18n="dashboardUser.billing.history.title">Historial de Cuotas</span>
             </h3>
     `;
-    
+
     if (cuotasHistorial.length > 0) {
         html += '<div class="cuotas-grid">';
         cuotasHistorial.forEach(cuota => {
@@ -2671,15 +2704,16 @@ html += `
         });
         html += '</div>';
     } else {
-        html += '<p style="color: #999; text-align: center;">No hay cuotas en el historial</p>';
+        html += '<p style="color: #999; text-align: center;" data-i18n="dashboardUser.billing.history.empty">No hay cuotas en el historial</p>';
     }
-    
+
     html += '</div>';
-    
+
     container.innerHTML = html;
+    // AL PARECER INUTIL, NO MUESTRA LOS LOGS EXISTENTES DESPUES DE ESTA LINEA, NO SE COMPROBO ANTES DE ESTA LINEA
 }
 
-   
+
 
 // ========== RENDERIZAR TARJETA DE CUOTA ==========
 function renderCuotaCard(cuota) {
@@ -2687,22 +2721,22 @@ function renderCuotaCard(cuota) {
     const mes = obtenerNombreMes(cuota.mes);
     const fechaVenc = new Date(cuota.fecha_vencimiento + 'T00:00:00');
     const fechaVencFormatted = fechaVenc.toLocaleDateString('es-UY');
-    
+
     const esVencida = estadoFinal === 'vencida';
     const esPagada = cuota.estado === 'pagada';
     const tienePagoPendiente = cuota.id_pago && cuota.estado_pago === 'pendiente';
-    
+
     // Calcular montos
     const montoCuota = obtenerPrecioActualizado(cuota);
     const deudaAcumuladaAnterior = parseFloat(cuota.monto_pendiente_anterior || 0);
     const deudaHorasMostrar = (estadoFinal !== 'pagada' && !tienePagoPendiente) ? deudaHorasActual : 0;
-    
+
     // Monto total a mostrar
     const montoMostrar = montoCuota + deudaAcumuladaAnterior + deudaHorasMostrar;
-    
+
     // Si está pagada, obtener el monto realmente pagado
     const montoPagado = esPagada && cuota.monto_pagado ? parseFloat(cuota.monto_pagado) : montoMostrar;
-    
+
     return `
         <div class="cuota-card estado-${estadoFinal}">
              <div class="cuota-card-header">
@@ -2722,7 +2756,7 @@ function renderCuotaCard(cuota) {
             <div class="cuota-card-body">
                 <div class="cuota-monto">
                     <span class="cuota-monto-label">${esPagada ? 'Monto Pagado:' : 'Monto Total:'}</span>
-                    <span class="cuota-monto-valor">$${(esPagada ? montoPagado : montoMostrar).toLocaleString('es-UY', {minimumFractionDigits: 2})}</span>
+                    <span class="cuota-monto-valor">$${(esPagada ? montoPagado : montoMostrar).toLocaleString('es-UY', { minimumFractionDigits: 2 })}</span>
                 </div>
                 
                 ${esPagada && (deudaAcumuladaAnterior > 0 || deudaHorasActual > 0) ? `
@@ -2731,18 +2765,18 @@ function renderCuotaCard(cuota) {
                         <div style="display: grid; gap: 6px; font-size: 12px; color: #555;">
                             <div style="display: flex; justify-content: space-between;">
                                 <span>Cuota vivienda:</span>
-                                <strong>$${montoCuota.toLocaleString('es-UY', {minimumFractionDigits: 2})}</strong>
+                                <strong>$${montoCuota.toLocaleString('es-UY', { minimumFractionDigits: 2 })}</strong>
                             </div>
                             ${deudaAcumuladaAnterior > 0 ? `
                                 <div style="display: flex; justify-content: space-between; color: #ff9800;">
                                     <span>+ Deuda acumulada:</span>
-                                    <strong>$${deudaAcumuladaAnterior.toLocaleString('es-UY', {minimumFractionDigits: 2})}</strong>
+                                    <strong>$${deudaAcumuladaAnterior.toLocaleString('es-UY', { minimumFractionDigits: 2 })}</strong>
                                 </div>
                             ` : ''}
                             ${deudaHorasMostrar > 0 ? `
                                 <div style="display: flex; justify-content: space-between; color: #f44336;">
                                     <span>+ Deuda horas:</span>
-                                    <strong>$${deudaHorasMostrar.toLocaleString('es-UY', {minimumFractionDigits: 2})}</strong>
+                                    <strong>$${deudaHorasMostrar.toLocaleString('es-UY', { minimumFractionDigits: 2 })}</strong>
                                 </div>
                             ` : ''}
                         </div>
@@ -2750,9 +2784,9 @@ function renderCuotaCard(cuota) {
                 ` : !esPagada && !tienePagoPendiente && (deudaAcumuladaAnterior > 0 || deudaHorasMostrar > 0) ? `
                     <div class="cuota-desglose">
                         <small style="color: #666;">
-                            Cuota: $${montoCuota.toLocaleString('es-UY', {minimumFractionDigits: 2})}
-                            ${deudaAcumuladaAnterior > 0 ? ` + Deuda anterior: $${deudaAcumuladaAnterior.toLocaleString('es-UY', {minimumFractionDigits: 2})}` : ''}
-                            ${deudaHorasMostrar > 0 ? ` + Deuda horas: $${deudaHorasMostrar.toLocaleString('es-UY', {minimumFractionDigits: 2})}` : ''}
+                            Cuota: $${montoCuota.toLocaleString('es-UY', { minimumFractionDigits: 2 })}
+                            ${deudaAcumuladaAnterior > 0 ? ` + Deuda anterior: $${deudaAcumuladaAnterior.toLocaleString('es-UY', { minimumFractionDigits: 2 })}` : ''}
+                            ${deudaHorasMostrar > 0 ? ` + Deuda horas: $${deudaHorasMostrar.toLocaleString('es-UY', { minimumFractionDigits: 2 })}` : ''}
                         </small>
                     </div>
                 ` : ''}
@@ -2817,22 +2851,22 @@ async function abrirPagarDeudaTotal(cuotaId, montoTotal) {
     ('💳 Abriendo modal para pagar deuda total');
     ('   Cuota ID:', cuotaId);
     ('   Monto total:', montoTotal);
-    
+
     try {
         const response = await fetch(`/api/cuotas/detalle?cuota_id=${cuotaId}`);
         const data = await response.json();
-        
+
         if (!data.success) {
             alert('❌ Error al cargar información de la cuota');
             return;
         }
-        
+
         const cuota = data.cuota;
         const mes = obtenerNombreMes(cuota.mes);
         const montoCuota = parseFloat(cuota.monto);
-        
-        
-        
+
+
+
         document.getElementById('pagar-cuota-id').value = cuotaId;
         document.getElementById('pagar-monto').value = montoTotal;
         document.getElementById('pagarCuotaForm').reset();
@@ -2862,52 +2896,52 @@ function closePagarCuotaModal() {
 async function submitPagarCuota(event) {
     event.preventDefault();
     ('💾 Enviando pago de cuota con deuda');
-    
+
     const cuotaId = document.getElementById('pagar-cuota-id').value;
     const monto = document.getElementById('pagar-monto').value;
     const metodo = document.getElementById('pagar-metodo').value;
     const numeroComprobante = document.getElementById('pagar-numero-comprobante').value;
     const archivo = document.getElementById('pagar-comprobante').files[0];
-    
+
     if (!archivo) {
         alert('⚠️ Debes adjuntar el comprobante de pago');
         return;
     }
-    
+
     const montoNum = parseFloat(monto);
-    const mensaje = deudaHorasActual > 0 
-        ? `¿Estás seguro de enviar este pago?\n\nMonto total: ${montoNum.toLocaleString('es-UY', {minimumFractionDigits: 2})}\n\nEsto incluye:\n- Cuota de vivienda\n- Deuda por horas no trabajadas`
+    const mensaje = deudaHorasActual > 0
+        ? `¿Estás seguro de enviar este pago?\n\nMonto total: ${montoNum.toLocaleString('es-UY', { minimumFractionDigits: 2 })}\n\nEsto incluye:\n- Cuota de vivienda\n- Deuda por horas no trabajadas`
         : '¿Estás seguro de enviar este pago?';
-    
+
     if (!confirm(mensaje)) {
         return;
     }
-    
+
     const formData = new FormData();
     formData.append('cuota_id', cuotaId);
     formData.append('monto_pagado', monto);
     formData.append('metodo_pago', metodo);
     formData.append('numero_comprobante', numeroComprobante);
     formData.append('comprobante', archivo);
-    
+
 
     if (deudaHorasActual > 0) {
         formData.append('incluye_deuda_horas', 'true');
         formData.append('monto_deuda_horas', deudaHorasActual);
     }
-    
+
     try {
         const response = await fetch('/api/cuotas/pagar', {
             method: 'POST',
             body: formData
         });
-        
+
         const data = await response.json();
-        
+
         if (data.success) {
             alert(' ' + data.mensaje + '\n\nTu pago será revisado por un administrador.');
             closePagarCuotaModal();
-            await inicializarSeccionCuotas(); 
+            await inicializarSeccionCuotas();
         } else {
             alert('❌ ' + data.message);
         }
@@ -2922,11 +2956,11 @@ function updateCuotasStats(cuotas) {
     const pendientes = cuotas.filter(c => c.estado === 'pendiente' && c.estado_actual !== 'vencida').length;
     const pagadas = cuotas.filter(c => c.estado === 'pagada').length;
     const vencidas = cuotas.filter(c => c.estado_actual === 'vencida').length;
-    
+
     const pendientesEl = document.getElementById('cuotas-pendientes-count');
     const pagadasEl = document.getElementById('cuotas-pagadas-count');
     const vencidasEl = document.getElementById('cuotas-vencidas-count');
-    
+
     if (pendientesEl) pendientesEl.textContent = pendientes;
     if (pagadasEl) pagadasEl.textContent = pagadas;
     if (vencidasEl) vencidasEl.textContent = vencidas;
@@ -2942,16 +2976,16 @@ async function verDetalleCuota(cuotaId) {
     try {
         const response = await fetch(`/api/cuotas/detalle?cuota_id=${cuotaId}`);
         const data = await response.json();
-        
+
         if (!data.success) {
             alert('Error al cargar detalles');
             return;
         }
-        
+
         const cuota = data.cuota;
         const validacion = data.validacion;
         const mes = obtenerNombreMes(cuota.mes);
-        
+
         const modal = `
             <div class="modal-detail" onclick="if(event.target.classList.contains('modal-detail')) this.remove()">
                 <div class="modal-detail-content">
@@ -2965,7 +2999,7 @@ async function verDetalleCuota(cuotaId) {
                             <div class="detalle-grid">
                                 <div><strong>Período:</strong> ${mes} ${cuota.anio}</div>
                                 <div><strong>Estado:</strong> <span class="badge-${cuota.estado}">${formatEstadoCuota(cuota.estado)}</span></div>
-                                <div><strong>Monto:</strong> ${parseFloat(cuota.monto).toLocaleString('es-UY', {minimumFractionDigits: 2})}</div>
+                                <div><strong>Monto:</strong> ${parseFloat(cuota.monto).toLocaleString('es-UY', { minimumFractionDigits: 2 })}</div>
                                 <div><strong>Vencimiento:</strong> ${new Date(cuota.fecha_vencimiento + 'T00:00:00').toLocaleDateString('es-UY')}</div>
                             </div>
                         </div>
@@ -3000,9 +3034,9 @@ async function verDetalleCuota(cuotaId) {
                 </div>
             </div>
         `;
-        
+
         document.body.insertAdjacentHTML('beforeend', modal);
-        
+
     } catch (error) {
         console.error('Error:', error);
         alert('Error al cargar detalles');
@@ -3055,7 +3089,7 @@ function esUltimoDiaMes() {
     const hoy = new Date();
     const diaActual = hoy.getDate();
     const ultimoDia = obtenerUltimoDiaMes();
-    
+
     return diaActual === ultimoDia;
 }
 
@@ -3064,18 +3098,18 @@ function diasHastaPago() {
     const hoy = new Date();
     const diaActual = hoy.getDate();
     const ultimoDia = obtenerUltimoDiaMes();
-    
+
     return ultimoDia - diaActual;
 }
 
 
-window.renderMisCuotasOrganizadas = function(cuotas) {
+window.renderMisCuotasOrganizadas = function (cuotas) {
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     console.log('🎨 [RENDER] Iniciando renderizado de cuotas');
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-    
+
     const container = document.getElementById('misCuotasContainer');
-    
+
     if (!cuotas || cuotas.length === 0) {
         container.innerHTML = `
             <div class="no-data">
@@ -3085,16 +3119,16 @@ window.renderMisCuotasOrganizadas = function(cuotas) {
         `;
         return;
     }
-    
+
     let html = '';
     
     //  CUOTA DEL MES ACTUAL
     const cuotaMasReciente = cuotas[0];
     console.log('📋 [RENDER] Cuota más reciente:', cuotaMasReciente);
-    
+
     // 🔥 CRÍTICO: Obtener deuda de horas de la variable global
     const deudaHoras = parseFloat(window.deudaHorasActual || 0);
-    
+
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     console.log('💰 [RENDER] DEUDA DE HORAS:');
     console.log('    window.deudaHorasActual:', window.deudaHorasActual);
@@ -3103,12 +3137,12 @@ window.renderMisCuotasOrganizadas = function(cuotas) {
     
     //  CALCULAR MONTO DE CUOTA
     const montoCuota = parseFloat(
-        cuotaMasReciente.monto_base || 
-        cuotaMasReciente.monto_actual || 
-        cuotaMasReciente.monto || 
+        cuotaMasReciente.monto_base ||
+        cuotaMasReciente.monto_actual ||
+        cuotaMasReciente.monto ||
         0
     );
-    
+
     // 🔥 DEUDA ACUMULADA DE MESES ANTERIORES
     const deudaAcumuladaAnterior = parseFloat(cuotaMasReciente.monto_pendiente_anterior || 0);
     
@@ -3117,7 +3151,7 @@ window.renderMisCuotasOrganizadas = function(cuotas) {
 
     // 🔥 MONTO TOTAL
     const montoTotal = montoPendienteBase + deudaHoras;
-    
+
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     console.log('💰 [RENDER] CÁLCULO COMPLETO:');
     console.log('    monto_cuota:', montoCuota);
@@ -3125,7 +3159,7 @@ window.renderMisCuotasOrganizadas = function(cuotas) {
     console.log('    deuda_horas_actual:', deudaHoras);
     console.log('     TOTAL A PAGAR:', montoTotal);
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-    
+
     // ⚠️ VALIDACIÓN CRÍTICA
     if (deudaHoras === 0 && window.deudaHorasActual > 0) {
         console.error('❌ [ERROR] deudaHoras es 0 pero window.deudaHorasActual es:', window.deudaHorasActual);
@@ -3137,7 +3171,7 @@ window.renderMisCuotasOrganizadas = function(cuotas) {
     const estadoFinal = cuotaMasReciente.estado_actual || cuotaMasReciente.estado;
     const estadoPago = cuotaMasReciente.estado_pago || '';
     const estadoUsuario = cuotaMasReciente.estado_usuario || '';
-    
+
     const tienePagoPendiente = cuotaMasReciente.id_pago && estadoPago === 'pendiente';
     
     // 💡 CORRECCIÓN APLICADA: La cuota es 'pagada' si el estado final lo dice, 
@@ -3155,11 +3189,11 @@ window.renderMisCuotasOrganizadas = function(cuotas) {
     const diaActual = hoy.getDate();
     const mesActual = hoy.getMonth() + 1;
     const anioActual = hoy.getFullYear();
-    
+
     const esMesCuota = cuotaMasReciente.mes == mesActual && cuotaMasReciente.anio == anioActual;
     const estaDentroPeriodoPago = diaActual >= 25;
     const puedePagar = esMesCuota && estaDentroPeriodoPago && !estaPagada && !tienePagoPendiente;
-    
+
     const diasParaPagar = estaDentroPeriodoPago ? 0 : Math.max(0, 25 - diaActual);
     
    console.log('📅 Periodo:', {
@@ -3197,7 +3231,7 @@ window.renderMisCuotasOrganizadas = function(cuotas) {
                         <i class="fas fa-home"></i>
                         <div>
                             <span class="deuda-label">Cuota de Vivienda</span>
-                            <span class="deuda-monto">$${montoCuota.toLocaleString('es-UY', {minimumFractionDigits: 2})}</span>
+                            <span class="deuda-monto">$${montoCuota.toLocaleString('es-UY', { minimumFractionDigits: 2 })}</span>
                         </div>
                     </div>
                     
@@ -3210,7 +3244,7 @@ window.renderMisCuotasOrganizadas = function(cuotas) {
             <div>
                 <span class="deuda-label">Deuda de Meses Anteriores</span>
                 <span class="deuda-monto error">
-                    $${deudaAcumuladaAnterior.toLocaleString('es-UY', {minimumFractionDigits: 2})}
+                    $${deudaAcumuladaAnterior.toLocaleString('es-UY', { minimumFractionDigits: 2 })}
                 </span>
                 <small style="color: #ff8a80; display: block; margin-top: 5px;">
                     (Cuotas vencidas no pagadas)
@@ -3244,7 +3278,7 @@ window.renderMisCuotasOrganizadas = function(cuotas) {
                         <div>
                             <span class="deuda-label">TOTAL ${estaPagada ? 'PAGADO' : 'A PAGAR'}</span>
                             <span class="deuda-monto-total" style="color: ${estaPagada ? '#4caf50' : '#fff'};">
-                                $${montoTotal.toLocaleString('es-UY', {minimumFractionDigits: 2})}
+                                $${montoTotal.toLocaleString('es-UY', { minimumFractionDigits: 2 })}
                             </span>
                         </div>
                     </div>
@@ -3263,24 +3297,24 @@ window.renderMisCuotasOrganizadas = function(cuotas) {
                                 <div style="display: grid; gap: 8px; font-size: 13px;">
                                     <div style="display: flex; justify-content: space-between;">
                                         <span>🏠 Cuota de vivienda:</span>
-                                        <strong>$${montoCuota.toLocaleString('es-UY', {minimumFractionDigits: 2})}</strong>
+                                        <strong>$${montoCuota.toLocaleString('es-UY', { minimumFractionDigits: 2 })}</strong>
                                     </div>
                                     ${deudaAcumuladaAnterior > 0 ? `
                                         <div style="display: flex; justify-content: space-between; color: #ffeb3b;">
                                             <span>⚠️ Deuda de meses anteriores:</span>
-                                            <strong>$${deudaAcumuladaAnterior.toLocaleString('es-UY', {minimumFractionDigits: 2})}</strong>
+                                            <strong>$${deudaAcumuladaAnterior.toLocaleString('es-UY', { minimumFractionDigits: 2 })}</strong>
                                         </div>
                                     ` : ''}
                                     ${deudaHoras > 0 ? `
                                         <div style="display: flex; justify-content: space-between; color: #ff9800;">
                                             <span>⏰ Deuda por horas del mes:</span>
-                                            <strong>$${deudaHoras.toLocaleString('es-UY', {minimumFractionDigits: 2})}</strong>
+                                            <strong>$${deudaHoras.toLocaleString('es-UY', { minimumFractionDigits: 2 })}</strong>
                                         </div>
                                     ` : ''}
                                     <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.2); margin: 5px 0;">
                                     <div style="display: flex; justify-content: space-between; font-size: 16px;">
                                         <span><strong>💰 TOTAL PAGADO:</strong></span>
-                                        <strong style="color: #4caf50;">$${montoTotal.toLocaleString('es-UY', {minimumFractionDigits: 2})}</strong>
+                                        <strong style="color: #4caf50;">$${montoTotal.toLocaleString('es-UY', { minimumFractionDigits: 2 })}</strong>
                                     </div>
                                 </div>
                             </div>
@@ -3290,7 +3324,7 @@ window.renderMisCuotasOrganizadas = function(cuotas) {
                     <div class="alert-info" style="margin-top: 20px; background: rgba(33, 150, 243, 0.2); border-color: rgba(33, 150, 243, 0.4);">
                         <strong style="color: #2196F3;">⏳ Pago en Revisión</strong>
                         <p style="color: rgba(255, 255, 255, 0.9); margin: 10px 0 0 0;">
-                            Tu pago de $${parseFloat(cuotaMasReciente.monto_pagado || 0).toLocaleString('es-UY', {minimumFractionDigits: 2})} 
+                            Tu pago de $${parseFloat(cuotaMasReciente.monto_pagado || 0).toLocaleString('es-UY', { minimumFractionDigits: 2 })} 
                             está siendo validado por un administrador.
                             ${cuotaMasReciente.fecha_pago ? `<br>Enviado el: ${new Date(cuotaMasReciente.fecha_pago).toLocaleDateString('es-UY')}` : ''}
                         </p>
@@ -3377,47 +3411,47 @@ window.renderMisCuotasOrganizadas = function(cuotas) {
         
         <hr style="margin: 40px 0; border: none; border-top: 2px solid #e0e0e0;">
     `;
-    
+
     // Separar cuotas para las secciones restantes
     const cuotasPagables = cuotas.filter(c => {
         const estadoFinal = c.estado_actual || c.estado;
         return estadoFinal !== 'pagada';
     });
-    
+
     const cuotasHistorial = cuotas.filter(c => {
         const estadoFinal = c.estado_actual || c.estado;
         return estadoFinal === 'pagada';
     });
-    
+
     // SECCIÓN: CUOTAS PENDIENTES (SI HAY MÁS DE UNA)
     if (cuotasPagables.length > 1) {
         html += `
             <div class="cuotas-section">
                 <h3 style="color: #f44336; margin-bottom: 20px;">
-                    <i class="fas fa-exclamation-circle"></i> Otras Cuotas Pendientes (${cuotasPagables.length - 1})
+                    <i class="fas fa-exclamation-circle"></i> <span data-i18n="dashboardUser.billing.pending.title">Otras Cuotas Pendientes</span> (${cuotasPagables.length - 1})
                 </h3>
                 <div class="cuotas-grid">
         `;
-        
+
         cuotasPagables.slice(1).forEach(cuota => {
             html += renderCuotaCard(cuota);
         });
-        
+
         html += `
                 </div>
             </div>
             <hr style="margin: 40px 0; border: none; border-top: 2px solid #e0e0e0;">
         `;
     }
-    
+
     // SECCIÓN: HISTORIAL
     html += `
         <div class="cuotas-section">
             <h3 style="color: #666; margin-bottom: 20px;">
-                <i class="fas fa-history"></i> Historial de Cuotas
+                <i class="fas fa-history"></i> <span data-i18n="dashboardUser.billing.history.title">Historial de Cuotas</span>
             </h3>
     `;
-    
+
     if (cuotasHistorial.length > 0) {
         html += '<div class="cuotas-grid">';
         cuotasHistorial.forEach(cuota => {
@@ -3427,9 +3461,10 @@ window.renderMisCuotasOrganizadas = function(cuotas) {
     } else {
         html += '<p style="color: #999; text-align: center;">No hay cuotas en el historial</p>';
     }
-    
+
     html += '</div>';
-    
+
+
     container.innerHTML = html;
 };
 
@@ -3437,7 +3472,7 @@ window.renderMisCuotasOrganizadas = function(cuotas) {
  *  Función auxiliar: Obtener nombre del mes
  */
 if (typeof obtenerNombreMes !== 'function') {
-    window.obtenerNombreMes = function(mes) {
+    window.obtenerNombreMes = function (mes) {
         const meses = [
             'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
             'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
@@ -3468,35 +3503,35 @@ async function abrirPagarDeudaTotal(cuotaId, montoTotal) {
     ('💳 Abriendo modal para pagar deuda total');
     ('   Cuota ID:', cuotaId);
     ('   Monto total:', montoTotal);
-    
+
     try {
         const response = await fetch(`/api/cuotas/detalle?cuota_id=${cuotaId}`);
         const data = await response.json();
-        
+
         if (!data.success) {
             alert('❌ Error al cargar información de la cuota');
             return;
         }
-        
+
         const cuota = data.cuota;
         const mes = obtenerNombreMes(cuota.mes);
         const montoCuota = parseFloat(cuota.monto);
-        
-       
-        
+
+
+
         document.getElementById('pagar-cuota-id').value = cuotaId;
         document.getElementById('pagar-monto').value = montoTotal;
         document.getElementById('pagarCuotaForm').reset();
         document.getElementById('pagar-cuota-id').value = cuotaId;
         document.getElementById('pagar-monto').value = montoTotal;
-        
+
         //  OCULTAR selector de método 
         const metodoSelect = document.getElementById('pagar-metodo');
         if (metodoSelect) {
             metodoSelect.value = 'transferencia';
             metodoSelect.disabled = true;
             metodoSelect.style.display = 'none';
-            
+
             // Agregar texto informativo
             const metodoLabel = metodoSelect.previousElementSibling;
             if (metodoLabel) {
@@ -3505,9 +3540,9 @@ async function abrirPagarDeudaTotal(cuotaId, montoTotal) {
                 `;
             }
         }
-        
+
         document.getElementById('pagarCuotaModal').style.display = 'flex';
-        
+
     } catch (error) {
         console.error('Error:', error);
         alert('❌ Error al cargar información');
@@ -3519,47 +3554,47 @@ async function abrirPagarDeudaTotal(cuotaId, montoTotal) {
 async function submitPagarCuota(event) {
     event.preventDefault();
     ('💾 Enviando pago de cuota (SOLO TRANSFERENCIA)');
-    
+
     const cuotaId = document.getElementById('pagar-cuota-id').value;
     const monto = document.getElementById('pagar-monto').value;
     const numeroComprobante = document.getElementById('pagar-numero-comprobante').value;
     const archivo = document.getElementById('pagar-comprobante').files[0];
-    
+
     if (!archivo) {
         alert('⚠️ Debes adjuntar el comprobante de pago');
         return;
     }
-    
+
     const montoNum = parseFloat(monto);
-    const mensaje = deudaHorasActual > 0 
-        ? `¿Estás seguro de enviar este pago?\n\nMonto total: ${montoNum.toLocaleString('es-UY', {minimumFractionDigits: 2})}\n\nEsto incluye:\n- Cuota de vivienda\n- Deuda por horas no trabajadas\n\nMétodo: Transferencia Bancaria`
-        : `¿Estás seguro de enviar este pago?\n\nMonto: ${montoNum.toLocaleString('es-UY', {minimumFractionDigits: 2})}\n\nMétodo: Transferencia Bancaria`;
-    
+    const mensaje = deudaHorasActual > 0
+        ? `¿Estás seguro de enviar este pago?\n\nMonto total: ${montoNum.toLocaleString('es-UY', { minimumFractionDigits: 2 })}\n\nEsto incluye:\n- Cuota de vivienda\n- Deuda por horas no trabajadas\n\nMétodo: Transferencia Bancaria`
+        : `¿Estás seguro de enviar este pago?\n\nMonto: ${montoNum.toLocaleString('es-UY', { minimumFractionDigits: 2 })}\n\nMétodo: Transferencia Bancaria`;
+
     if (!confirm(mensaje)) {
         return;
     }
-    
+
     const formData = new FormData();
     formData.append('cuota_id', cuotaId);
     formData.append('monto_pagado', monto);
     formData.append('metodo_pago', 'transferencia'); // ⭐ FORZAR transferencia
     formData.append('numero_comprobante', numeroComprobante);
     formData.append('comprobante', archivo);
-    
+
     // Agregar flag si incluye deuda de horas
     if (deudaHorasActual > 0) {
         formData.append('incluye_deuda_horas', 'true');
         formData.append('monto_deuda_horas', deudaHorasActual);
     }
-    
+
     try {
         const response = await fetch('/api/cuotas/pagar', {
             method: 'POST',
             body: formData
         });
-        
+
         const data = await response.json();
-        
+
         if (data.success) {
             alert(' ' + data.mensaje + '\n\nTu pago por transferencia será revisado por un administrador.');
             closePagarCuotaModal();
@@ -3586,7 +3621,7 @@ function obtenerNombreMes(mes) {
 
 
 // Mostrar nombre del archivo seleccionado
-document.getElementById('pagar-comprobante')?.addEventListener('change', function(e) {
+document.getElementById('pagar-comprobante')?.addEventListener('change', function (e) {
     const fileName = e.target.files[0]?.name || '';
     const fileNameDisplay = document.getElementById('file-name');
     if (fileNameDisplay) {
@@ -3613,10 +3648,10 @@ window.submitPagarCuota = submitPagarCuota;
 ('🟢 Cargando módulo de solicitudes');
 
 // ========== INICIALIZACIÓN ==========
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const solicitudesMenuItem = document.querySelector('.menu li[data-section="solicitudes"]');
     if (solicitudesMenuItem) {
-        solicitudesMenuItem.addEventListener('click', function() {
+        solicitudesMenuItem.addEventListener('click', function () {
             ('>>> Sección solicitudes abierta');
             loadMisSolicitudes();
         });
@@ -3675,12 +3710,13 @@ function renderMisSolicitudes(solicitudes) {
         container.innerHTML = `
             <div class="no-data">
                 <i class="fas fa-inbox" style="font-size: 48px; color: #ddd; margin-bottom: 10px;"></i>
-                <p>No tienes solicitudes registradas</p>
+                <p data-i18n="dashboardUser.requests.noRequests">No tienes solicitudes registradas</p>
                 <button class="btn btn-primary" onclick="abrirModalNuevaSolicitud()">
-                    <i class="fas fa-plus"></i> Nueva Solicitud
+                    <i class="fas fa-plus"></i> <span data-i18n="dashboardUser.requests.newRequest">Nueva Solicitud</span>
                 </button>
             </div>
         `;
+        i18n.translatePage();
         return;
     }
 
@@ -3761,100 +3797,126 @@ function abrirModalNuevaSolicitud() {
          <div id="nuevaSolicitudModal" class="material-modal" style="display: flex;">
             <div class="material-modal-content" onclick="event.stopPropagation()">
                 <div class="material-modal-header">
-                    <h3 id="solicitudModalTitle">Nueva Solicitud</h3>
+                    <h3 id="solicitudModalTitle" data-i18n="dashboardUser.requests.newRequest">Nueva Solicitud</h3>
                     <button class="close-material-modal" onclick="cerrarModalNuevaSolicitud()">&times;</button>
                 </div>
                 
 
-                <form id="nuevaSolicitudForm" onsubmit="submitNuevaSolicitud(event)" enctype="multipart/form-data">
-                    <div class="form-group">
-                        <label for="tipo-solicitud">
-                            <i class="fas fa-tag"></i> Tipo de Solicitud *
-                        </label>
-                        <select id="tipo-solicitud" name="tipo_solicitud" required>
-                            <option value="horas">📊 Registro de Horas</option>
-                            <option value="pago">💳 Pagos/Cuotas</option>
-                            <option value="vivienda">🏡 Vivienda</option>
-                            <option value="general">📝 Consulta General</option>
-                            <option value="otro">❓ Otro</option>
-                        </select>
-                    </div>
+    <!-- Formulario -->
+    <form id="nuevaSolicitudForm" onsubmit="submitNuevaSolicitud(event)" enctype="multipart/form-data">
 
-                    <div class="form-group">
-                        <label for="asunto-solicitud">
-                            <i class="fas fa-heading"></i> Asunto *
-                        </label>
-                        <input 
-                            type="text" 
-                            id="asunto-solicitud" 
-                            name="asunto"
-                            placeholder="Ej: Justificación de horas - Certificado médico"
-                            maxlength="255"
-                            required>
-                    </div>
+      <!-- Tipo de Solicitud -->
+      <div class="form-group">
+        <label for="tipo-solicitud">
+          <i class="fas fa-tag"></i>
+          <span data-i18n="dashboardUser.requests.form.typeLabel">Tipo de Solicitud</span> *
+        </label>
+        <select id="tipo-solicitud" name="tipo_solicitud" required>
+          <option value="horas" data-i18n="dashboardUser.requests.form.types.hours">📊 Registro de Horas</option>
+          <option value="pago" data-i18n="dashboardUser.requests.form.types.payment">💳 Pagos/Cuotas</option>
+          <option value="vivienda" data-i18n="dashboardUser.requests.form.types.housing">🏡 Vivienda</option>
+          <option value="general" data-i18n="dashboardUser.requests.form.types.general">📝 Consulta General</option>
+          <option value="otro" data-i18n="dashboardUser.requests.form.types.other">❓ Otro</option>
+        </select>
+      </div>
 
-                    <div class="form-group">
-                        <label for="descripcion-solicitud">
-                            <i class="fas fa-align-left"></i> Descripción *
-                        </label>
-                        <textarea 
-                            id="descripcion-solicitud" 
-                            name="descripcion"
-                            rows="6"
+      <!-- Asunto -->
+      <div class="form-group">
+        <label for="asunto-solicitud">
+          <i class="fas fa-heading"></i>
+          <span data-i18n="dashboardUser.requests.form.subjectLabel">Asunto</span> *
+        </label>
+        <input
+          type="text"
+          id="asunto-solicitud"
+          name="asunto"
+          placeholder="Ej: Justificación de horas - Certificado médico"
+          maxlength="255"
+          data-i18n-placeholder="dashboardUser.requests.form.subjectPlaceholder"
+          required>
+      </div>
+
+      <!-- Descripción -->
+      <div class="form-group">
+        <label for="descripcion-solicitud">
+          <i class="fas fa-align-left"></i>
+          <span data-i18n="dashboardUser.requests.form.descriptionLabel">Descripción</span> *
+        </label>
+        <textarea
+          id="descripcion-solicitud"
+          name="descripcion"
+          rows="6"
                             maxlength="250"
-                            placeholder="Describe detalladamente tu solicitud..."
-                            required
+          data-i18n-placeholder="dashboardUser.requests.form.descriptionPlaceholder"
+          required
                             style="resize: vertical; width: 100%; padding: 10px; max-height: 230px; height: 230px; border-radius: 8px; border: 1px solid #ccc; font-size: 14px;"
                             oninput="actualizarContadorCaracteres(this)"
                         ></textarea>
                         <small id="charCount" style="color: #666; display: block; text-align: right; margin-top: 4px;">
                             0 / 250 caracteres
                         </small>
-                    </div>
+      </div>
 
-                    <div class="form-group">
-                        <label for="prioridad-solicitud">
-                            <i class="fas fa-exclamation-circle"></i> Prioridad
-                        </label>
-                        <select id="prioridad-solicitud" name="prioridad">
-                            <option value="baja">Baja</option>
-                            <option value="media" selected>Media</option>
-                            <option value="alta">Alta</option>
-                        </select>
-                        <small class="form-help">Selecciona "Alta" solo si es urgente</small>
-                    </div>
+      <!-- Prioridad -->
+      <div class="form-group">
+        <label for="prioridad-solicitud">
+          <i class="fas fa-exclamation-circle"></i>
+          <span data-i18n="dashboardUser.requests.form.priorityLabel">Prioridad</span> *
+        </label>
+        <select id="prioridad-solicitud" name="prioridad" required>
+          <option value="baja" data-i18n="dashboardUser.requests.form.priority.low">Baja</option>
+          <option value="media" selected data-i18n="dashboardUser.requests.form.priority.medium">Media</option>
+          <option value="alta" data-i18n="dashboardUser.requests.form.priority.high">Alta</option>
+        </select>
+        <small class="form-help" data-i18n="dashboardUser.requests.form.priorityUrgentHelp">
+          Selecciona "Alta" solo si es urgente
+        </small>
+      </div>
 
-                    <div class="form-group">
-                        <label for="archivo-solicitud">
-                            <i class="fas fa-paperclip"></i> Archivo Adjunto (Opcional)
-                        </label>
-                        <input 
-                            type="file" 
-                            id="archivo-solicitud" 
-                            name="archivo"
-                            accept="image/*,.pdf">
-                        <small class="form-help">Puedes adjuntar certificados, comprobantes, etc. (máx. 5MB)</small>
-                    </div>
+      <!-- Archivo adjunto -->
+      <div class="form-group">
+        <label for="archivo-solicitud">
+          <i class="fas fa-paperclip"></i>
+          <span data-i18n="dashboardUser.requests.form.attachmentLabel">Archivo Adjunto (Opcional)</span>
+        </label>
+        <input
+          type="file"
+          id="archivo-solicitud"
+          name="archivo"
+          accept="image/*,.pdf"
+        <small class="form-help" data-i18n="dashboardUser.requests.form.attachmentHelp">
+          Puedes adjuntar certificados, comprobantes, etc. (máx. 5MB)
+        </small>
+      </div>
 
-                    <div class="alert-info">
-                        <strong>ℹ️ Información:</strong>
-                        <p>Tu solicitud será revisada por un administrador. Recibirás una notificación cuando haya novedades.</p>
-                    </div>
+      <!-- Información -->
+      <div class="alert-info">
+        <strong>ℹ️ <span data-i18n="dashboardUser.requests.form.infoTitle">Información:</span></strong>
+        <p data-i18n="dashboardUser.requests.form.infoText">
+          Tu solicitud será revisada por un administrador. Recibirás una notificación cuando haya novedades.
+        </p>
+      </div>
 
-                    <div class="form-actions">
-                        <button type="button" class="btn btn-secondary" onclick="cerrarModalNuevaSolicitud()">
-                            <i class="fas fa-times"></i> Cancelar
-                        </button>
-                        <button type="submit" class="btn btn-primary" id="btn-submit-solicitud">
-                            <i class="fas fa-paper-plane"></i> Enviar Solicitud
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
+      <!-- Botones -->
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" onclick="cerrarModalNuevaSolicitud()">
+          <i class="fas fa-times"></i>
+          <span data-i18n="common.cancel">Cancelar</span>
+        </button>
+        <button type="submit" class="btn btn-primary" id="btn-submit-solicitud">
+          <i class="fas fa-paper-plane"></i>
+          <span data-i18n="dashboardUser.requests.form.submitButton">Enviar Solicitud</span>
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>
+
     `;
 
     document.body.insertAdjacentHTML('beforeend', modal);
+    i18n.translatePage();
     
     // Prevenir scroll del body
    
@@ -3963,7 +4025,7 @@ async function submitNuevaSolicitud(event) {
     const form = document.getElementById('nuevaSolicitudForm');
     const submitBtn = document.getElementById('btn-submit-solicitud');
     const btnHTML = submitBtn.innerHTML;
-    
+
     // Deshabilitar botón
     submitBtn.disabled = true;
     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
@@ -3971,7 +4033,7 @@ async function submitNuevaSolicitud(event) {
     try {
         //  CREAR FormData CORRECTAMENTE
         const formData = new FormData(form);
-        
+
         // 📋 DEBUG: Verificar contenido
         ('📋 FormData contenido:');
         for (let [key, value] of formData.entries()) {
@@ -3982,7 +4044,7 @@ async function submitNuevaSolicitud(event) {
             }
         }
 
-      
+
         const response = await fetch('/api/solicitudes/create', {
             method: 'POST',
             body: formData,
@@ -3990,7 +4052,7 @@ async function submitNuevaSolicitud(event) {
         });
 
         ('📡 Response status:', response.status);
-        
+
         // Leer respuesta como texto primero
         const responseText = await response.text();
         ('📥 Response text:', responseText.substring(0, 500));
@@ -4075,8 +4137,8 @@ async function verDetalleSolicitud(solicitudId) {
                             <h3><i class="fas fa-comments"></i> Conversación (${respuestas.length})</h3>
                             <div class="respuestas-thread">
                                 ${respuestas.map(resp => {
-                                    const fechaResp = new Date(resp.fecha_respuesta).toLocaleString('es-UY');
-                                    return `
+            const fechaResp = new Date(resp.fecha_respuesta).toLocaleString('es-UY');
+            return `
                                         <div class="respuesta-item ${resp.es_admin ? 'respuesta-admin' : 'respuesta-usuario'}">
                                             <div class="respuesta-header">
                                                 <strong>
@@ -4094,7 +4156,7 @@ async function verDetalleSolicitud(solicitudId) {
                                             </div>
                                         </div>
                                     `;
-                                }).join('')}
+        }).join('')}
                             </div>
                         </div>
                     ` : '<p style="text-align: center; color: #999;">Sin respuestas aún</p>'}
@@ -4275,36 +4337,36 @@ async function cargarJustificacionesUsuario() {
         ('⚠️ Container de justificaciones no encontrado');
         return;
     }
-    
+
     container.innerHTML = '<p class="loading">Cargando justificaciones...</p>';
-    
+
     try {
         const hoy = new Date();
         const mes = hoy.getMonth() + 1;
         const anio = hoy.getFullYear();
-        
+
         // Obtener ID del usuario desde sesión
         const profileResponse = await fetch('/api/users/my-profile');
         const profileData = await profileResponse.json();
-        
+
         if (!profileData.success) {
             throw new Error('No se pudo obtener el perfil del usuario');
         }
-        
+
         const userId = profileData.user.id_usuario;
-        
+
         // Obtener justificaciones del mes actual
         const response = await fetch(`/api/justificaciones/usuario?id_usuario=${userId}&mes=${mes}&anio=${anio}`);
         const data = await response.json();
-        
+
         ('📋 Justificaciones recibidas:', data);
-        
+
         if (data.success && data.justificaciones) {
             renderJustificacionesUsuario(data.justificaciones);
         } else {
             container.innerHTML = '<p style="color: #999; font-size: 12px;">No hay justificaciones este mes</p>';
         }
-        
+
     } catch (error) {
         console.error('❌ Error al cargar justificaciones:', error);
         container.innerHTML = '<p style="color: #f44336; font-size: 12px;">Error al cargar justificaciones</p>';
@@ -4316,15 +4378,15 @@ async function cargarJustificacionesUsuario() {
  */
 function renderJustificacionesUsuario(justificaciones) {
     const container = document.getElementById('justificaciones-usuario-container');
-    
+
     if (!justificaciones || justificaciones.length === 0) {
         container.innerHTML = '<p style="color: #999; font-size: 12px; text-align: center;">No tienes justificaciones este mes</p>';
         return;
     }
-    
+
     const totalJustificado = justificaciones.reduce((sum, j) => sum + parseFloat(j.horas_justificadas), 0);
     const totalDescontado = justificaciones.reduce((sum, j) => sum + parseFloat(j.monto_descontado), 0);
-    
+
     let html = `
         <div class="justificaciones-widget">
             <div class="justificaciones-header">
@@ -4340,13 +4402,13 @@ function renderJustificacionesUsuario(justificaciones) {
             
             <div class="justificaciones-lista">
     `;
-    
+
     justificaciones.forEach((just, index) => {
         const fecha = new Date(just.fecha_justificacion).toLocaleDateString('es-UY', {
             day: '2-digit',
             month: '2-digit'
         });
-        
+
         html += `
             <div class="justificacion-item">
                 <div class="justificacion-info">
@@ -4374,7 +4436,7 @@ function renderJustificacionesUsuario(justificaciones) {
             </div>
         `;
     });
-    
+
     html += `
             </div>
             
@@ -4383,7 +4445,7 @@ function renderJustificacionesUsuario(justificaciones) {
             </button>
         </div>
     `;
-    
+
     container.innerHTML = html;
 }
 
@@ -4401,24 +4463,24 @@ async function verTodasJustificaciones() {
     try {
         const profileResponse = await fetch('/api/users/my-profile');
         const profileData = await profileResponse.json();
-        
+
         if (!profileData.success) {
             throw new Error('No se pudo obtener el perfil');
         }
-        
+
         const userId = profileData.user.id_usuario;
-        
+
         // Obtener TODAS las justificaciones (sin filtrar por mes)
         const response = await fetch(`/api/justificaciones/usuario?id_usuario=${userId}`);
         const data = await response.json();
-        
+
         if (!data.success) {
             alert('❌ Error al cargar historial');
             return;
         }
-        
+
         mostrarModalHistorialJustificaciones(data.justificaciones || []);
-        
+
     } catch (error) {
         console.error('Error:', error);
         alert('❌ Error de conexión');
@@ -4433,7 +4495,7 @@ function mostrarModalHistorialJustificaciones(justificaciones) {
         alert('ℹ️ No tienes justificaciones registradas');
         return;
     }
-    
+
     // Agrupar por mes/año
     const porPeriodo = {};
     justificaciones.forEach(j => {
@@ -4451,18 +4513,18 @@ function mostrarModalHistorialJustificaciones(justificaciones) {
         porPeriodo[key].totalHoras += parseFloat(j.horas_justificadas);
         porPeriodo[key].totalDescuento += parseFloat(j.monto_descontado);
     });
-    
+
     // Ordenar por período (más reciente primero)
     const periodos = Object.values(porPeriodo).sort((a, b) => {
         if (a.anio !== b.anio) return b.anio - a.anio;
         return b.mes - a.mes;
     });
-    
+
     let html = '';
-    
+
     periodos.forEach(periodo => {
         const nombreMes = obtenerNombreMes(periodo.mes);
-        
+
         html += `
             <div class="periodo-justificaciones">
                 <div class="periodo-header">
@@ -4475,7 +4537,7 @@ function mostrarModalHistorialJustificaciones(justificaciones) {
                 
                 <div class="justificaciones-del-periodo">
         `;
-        
+
         periodo.justificaciones.forEach(just => {
             const fecha = new Date(just.fecha_justificacion).toLocaleDateString('es-UY', {
                 day: '2-digit',
@@ -4484,7 +4546,7 @@ function mostrarModalHistorialJustificaciones(justificaciones) {
                 hour: '2-digit',
                 minute: '2-digit'
             });
-            
+
             html += `
                 <div class="justificacion-detalle-item">
                     <div class="justificacion-encabezado">
@@ -4509,13 +4571,13 @@ function mostrarModalHistorialJustificaciones(justificaciones) {
                 </div>
             `;
         });
-        
+
         html += `
                 </div>
             </div>
         `;
     });
-    
+
     const modal = `
         <div class="modal-detail" onclick="if(event.target.classList.contains('modal-detail')) this.remove()">
             <div class="modal-detail-content" style="max-width: 900px;">
@@ -4541,7 +4603,7 @@ function mostrarModalHistorialJustificaciones(justificaciones) {
             </div>
         </div>
     `;
-    
+
     document.body.insertAdjacentHTML('beforeend', modal);
 }
 
@@ -4552,7 +4614,7 @@ function renderDeudaHorasWidget(deuda) {
     const deudaAcumulada = parseFloat(deuda.deuda_acumulada || 0);
     const totalAPagar = deudaMesActual + deudaAcumulada;
     const tieneDeuda = totalAPagar > 0;
-    
+
     container.innerHTML = `
         <div class="deuda-widget-compacto ${tieneDeuda ? 'con-deuda' : 'sin-deuda'}">
             <!-- VISTA COMPACTA (SIEMPRE VISIBLE) -->
@@ -4607,7 +4669,7 @@ function renderDeudaHorasWidget(deuda) {
                 <!-- Barra de progreso -->
                 <div class="progreso-bar-container">
                     <div class="progreso-bar-header">
-                        <span>Progreso Mensual</span>
+                        <span data-i18n="dashboardUser.billing.debtStatus.debtBreakdown.progress">Progreso Mensual</span>
                         <span>${deuda.porcentaje_cumplido}%</span>
                     </div>
                     <div class="progreso-bar">
@@ -4622,12 +4684,12 @@ function renderDeudaHorasWidget(deuda) {
                 ${tieneDeuda ? `
                     <div class="alert-warning-compact">
                         <i class="fas fa-info-circle"></i>
-                        <span>Esta deuda se sumará a tu próxima cuota de vivienda.</span>
+                        <span data-i18n="dashboardUser.billing.debtStatus.debtBreakdown.alertWarning.nextmessage">Esta deuda se sumará a tu próxima cuota de vivienda.</span>
                     </div>
                 ` : `
                     <div class="alert-success-compact">
                         <i class="fas fa-check-circle"></i>
-                        <span>¡Has cumplido con tus horas requeridas!</span>
+                        <span data-i18n="dashboardUser.billing.debtStatus.debtBreakdown.alertWarning.excellentMessageDescription">¡Has cumplido con tus horas requeridas!</span>
                     </div>
                 `}
             </div>
@@ -4673,22 +4735,22 @@ let nucleoYaCargado = false;
 let verificacionEnCurso = false;
 
 // ========== INICIALIZACIÓN OPTIMIZADA (SIN DUPLICADOS) ==========
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     ('📋 DOM Ready - Preparando verificación de núcleo');
-    
+
     //  SOLO ejecutar UNA VEZ cuando la página carga
     setTimeout(() => {
         if (!nucleoYaCargado && !verificacionEnCurso) {
             verificarEstadoNucleo();
         }
     }, 500);
-    
+
     //  Listener para cuando se hace click en "Inicio"
     const inicioMenuItem = document.querySelector('.menu li[data-section="inicio"]');
     if (inicioMenuItem) {
-        inicioMenuItem.addEventListener('click', function() {
+        inicioMenuItem.addEventListener('click', function () {
             ('🏠 Click en sección Inicio');
-            
+
             // Solo recargar si no se ha mostrado aún
             if (!nucleoYaCargado) {
                 setTimeout(() => {
@@ -4709,42 +4771,42 @@ async function verificarEstadoNucleo() {
         ('⏳ Verificación ya en curso, saltando...');
         return;
     }
-    
+
     if (nucleoYaCargado) {
         (' Núcleo ya cargado previamente, saltando...');
         return;
     }
-    
+
     verificacionEnCurso = true;
     ('🔍 Verificando estado de núcleo...');
-    
+
     try {
         const response = await fetch('/api/users/my-profile');
         const data = await response.json();
-        
+
         ('📊 Datos de perfil:', data);
-        
+
         if (data.success && data.user) {
             //  BUSCAR SECCIÓN DE INICIO
             const inicioSection = document.getElementById('inicio-section');
-            
+
             if (!inicioSection) {
                 console.error('❌ No se encontró la sección de inicio');
                 verificacionEnCurso = false;
                 return;
             }
-            
+
             // LIMPIAR CUALQUIER CARD/BANNER ANTERIOR
             const elementosAnteriores = inicioSection.querySelectorAll('.nucleo-info-card, .banner-nucleo-invitation');
-            
+
             if (elementosAnteriores.length > 0) {
                 ('🗑️ Removiendo', elementosAnteriores.length, 'elementos anteriores');
                 elementosAnteriores.forEach(el => el.remove());
             }
-            
+
             const idNucleo = data.user.id_nucleo;
             ('🔍 id_nucleo del usuario:', idNucleo);
-            
+
             if (idNucleo) {
                 //  TIENE NÚCLEO - Mostrar info
                 (' Usuario tiene núcleo:', idNucleo);
@@ -4754,7 +4816,7 @@ async function verificarEstadoNucleo() {
                 ('⚠️ Usuario sin núcleo, mostrando banner');
                 mostrarBannerNucleoEnInicio(inicioSection);
             }
-            
+
             //  Marcar como cargado
             nucleoYaCargado = true;
             (' Núcleo cargado correctamente');
@@ -4773,28 +4835,28 @@ async function verificarEstadoNucleo() {
 async function mostrarInfoNucleoEnInicio(idNucleo, inicioSection) {
     try {
         ('📡 Cargando info del núcleo para inicio...');
-        
+
         const response = await fetch('/api/nucleos/mi-nucleo-info');
         const data = await response.json();
-        
+
         if (!data.success || !data.nucleo) {
             console.error('❌ Error al cargar núcleo');
             return;
         }
-        
+
         const nucleo = data.nucleo;
         const miembros = data.miembros || [];
         const miId = data.mi_id;
-        
+
         ('📋 Núcleo:', nucleo.nombre_nucleo, '- Miembros:', miembros.length);
-        
+
         let miembrosHTML = '';
-        
+
         if (miembros.length > 0) {
             // Mostrar hasta 4 miembros
             const miembrosMostrar = miembros.slice(0, 4);
             const miembrosRestantes = miembros.length - 4;
-            
+
             miembrosHTML = `
                 <div class="miembros-grid-compact" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; margin-top: 15px;">
                     ${miembrosMostrar.map(miembro => `
@@ -4836,7 +4898,7 @@ async function mostrarInfoNucleoEnInicio(idNucleo, inicioSection) {
                 </div>
             `;
         }
-        
+
         const infoHTML = `
             <div class="nucleo-info-card" style="
                 background: linear-gradient(135deg, #69b2d5 0%, #1b1397 100%); 
@@ -4863,7 +4925,7 @@ async function mostrarInfoNucleoEnInicio(idNucleo, inicioSection) {
                         👨‍👩‍👧
                     </div>
                     <div style="flex: 1;">
-                        <p style="margin: 0 0 5px 0; opacity: 0.9; font-size: 13px; font-weight: 500;">
+                        <p style="margin: 0 0 5px 0; opacity: 0.9; font-size: 13px; font-weight: 500;" data-i18n="dashboardUser.home.nucleoInfoCard.title">
                             Tu Núcleo Familiar
                         </p>
                         <h3 style="margin: 0 0 10px 0; font-size: 22px; font-weight: 700;">
@@ -4876,7 +4938,7 @@ async function mostrarInfoNucleoEnInicio(idNucleo, inicioSection) {
                                 </span>
                             ` : ''}
                             <span style="display: flex; align-items: center; gap: 5px;">
-                                <i class="fas fa-users"></i> ${nucleo.total_miembros} miembro${nucleo.total_miembros != 1 ? 's' : ''}
+                                <i class="fas fa-users"></i> ${nucleo.total_miembros} <span data-i18n="dashboardUser.home.nucleoInfoCard.membersCount">miembro</span>${nucleo.total_miembros != 1 ? 's' : ''}
                             </span>
                         </div>
                     </div>
@@ -4884,7 +4946,7 @@ async function mostrarInfoNucleoEnInicio(idNucleo, inicioSection) {
                 
                 <div style="border-top: 1px solid rgba(255,255,255,0.2); padding-top: 15px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                        <strong style="font-size: 14px;">Miembros del Núcleo</strong>
+                        <strong style="font-size: 14px;" data-i18n="dashboardUser.home.nucleoInfoCard.members">Miembros del núcleo</strong>
                         <button 
                             onclick="verDetallesNucleoDesdeInicio(${idNucleo})" 
                             style="
@@ -4898,25 +4960,29 @@ async function mostrarInfoNucleoEnInicio(idNucleo, inicioSection) {
                                 transition: all 0.3s;
                             "
                             onmouseover="this.style.background='rgba(255,255,255,0.3)'"
-                            onmouseout="this.style.background='rgba(255,255,255,0.2)'">
-                            <i class="fas fa-info-circle"></i> Ver Todo
+                            onmouseout="this.style.background='rgba(255,255,255,0.2)'"
+                            >
+                            <i class="fas fa-info-circle"></i> <span data-i18n="dashboardUser.home.nucleoInfoCard.viewAllButton">Ver Todo</span>
                         </button>
                     </div>
                     ${miembrosHTML}
                 </div>
             </div>
         `;
-        
-       
+
+        // Traducir los elementos data-i18n que acabamos de insertar
+        if (window.i18n && typeof window.i18n.translatePage === 'function') {
+            window.i18n.translatePage();
+        }
         const tituloInicio = inicioSection.querySelector('.section-title, h2');
         if (tituloInicio) {
             tituloInicio.insertAdjacentHTML('afterend', infoHTML);
         } else {
             inicioSection.insertAdjacentHTML('afterbegin', infoHTML);
         }
-        
+
         (' Card de núcleo insertado en inicio');
-        
+
     } catch (error) {
         console.error('❌ Error al mostrar núcleo en inicio:', error);
     }
@@ -4967,7 +5033,7 @@ function mostrarBannerNucleoEnInicio(inicioSection) {
             </div>
         </div>
     `;
-    
+
     // Insertar al principio (después del título)
     const tituloInicio = inicioSection.querySelector('.section-title, h2');
     if (tituloInicio) {
@@ -4975,7 +5041,7 @@ function mostrarBannerNucleoEnInicio(inicioSection) {
     } else {
         inicioSection.insertAdjacentHTML('afterbegin', banner);
     }
-    
+
     (' Banner de núcleo insertado en inicio');
 }
 
@@ -4984,20 +5050,22 @@ function mostrarBannerNucleoEnInicio(inicioSection) {
  */
 async function verDetallesNucleoDesdeInicio(idNucleo) {
     try {
+        console.log("🔍 Idioma actual en i18n:", i18n.getLanguage());
+
         const response = await fetch(`/api/nucleos/mi-nucleo-info`);
         const data = await response.json();
-        
+
         if (!data.success) {
             alert('❌ Error al cargar detalles del núcleo');
             return;
         }
-        
+
         const nucleo = data.nucleo;
         const miembros = data.miembros || [];
         const miId = data.mi_id;
-        
+
         let miembrosHTML = '';
-        
+
         if (miembros.length > 0) {
             miembrosHTML = `
                 <div class="miembros-grid" style="display: grid; gap: 15px; margin-top: 20px;">
@@ -5037,7 +5105,7 @@ async function verDetallesNucleoDesdeInicio(idNucleo) {
         } else {
             miembrosHTML = '<p style="color: #999; text-align: center; margin-top: 20px;">No hay miembros en este núcleo</p>';
         }
-        
+
         const modal = `
             <div id="detallesNucleoModal" class="modal-overlay" onclick="if(event.target.classList.contains('modal-overlay')) this.remove()">
                 <div class="modal-content-large" style="max-width: 700px;">
@@ -5062,25 +5130,25 @@ async function verDetallesNucleoDesdeInicio(idNucleo) {
                             border-radius: 12px;
                             margin-bottom: 25px;
                         ">
-                            <h3 style="margin: 0 0 10px 0; font-size: 18px;">
+                            <h3 style="margin: 0 0 10px 0; font-size: 18px;" data-i18n="dashboardUser.home.coreDetails.coreInfoTitle">
                                 Información del Núcleo
                             </h3>
                             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
                                 <div>
-                                    <div style="opacity: 0.9; font-size: 13px;">Total de Miembros</div>
+                                    <div style="opacity: 0.9; font-size: 13px;" data-i18n="dashboardUser.home.coreDetails.totalMembers">Total de Miembros</div>
                                     <div style="font-size: 28px; font-weight: 700;">${nucleo.total_miembros}</div>
                                 </div>
                             </div>
                         </div>
                         
-                        <h3 style="margin: 0 0 15px 0; color: #333;">
+                        <h3 style="margin: 0 0 15px 0; color: #333;" data-i18n="dashboardUser.home.coreDetails.membersTitle">
                             <i class="fas fa-users"></i> Miembros del Núcleo
                         </h3>
                         
                         ${miembrosHTML}
                         
                         <div style="margin-top: 30px; text-align: right;">
-                            <button class="btn btn-secondary" onclick="document.getElementById('detallesNucleoModal').remove()">
+                            <button class="btn btn-secondary" onclick="document.getElementById('detallesNucleoModal').remove()" data-i18n="common.close">
                                 Cerrar
                             </button>
                         </div>
@@ -5088,14 +5156,16 @@ async function verDetallesNucleoDesdeInicio(idNucleo) {
                 </div>
             </div>
         `;
-        
         document.body.insertAdjacentHTML('beforeend', modal);
-        
+        i18n.translatePage(); // Traducir los elementos data-i18n
+
     } catch (error) {
         console.error('Error:', error);
         alert('❌ Error de conexión');
     }
 }
+
+
 
 // ========== RESTO DE FUNCIONES ==========
 
@@ -5103,12 +5173,11 @@ async function abrirModalNucleosDisponibles() {
     try {
         const response = await fetch('/api/nucleos/disponibles');
         const data = await response.json();
-        
+
         if (!data.success) {
             alert('❌ Error al cargar núcleos');
             return;
         }
-        
         mostrarModalNucleosDisponibles(data.nucleos);
     } catch (error) {
         console.error('Error:', error);
@@ -5121,9 +5190,9 @@ function mostrarModalNucleosDisponibles(nucleos) {
         alert('ℹ️ No hay núcleos disponibles en este momento');
         return;
     }
-    
+
     let nucleosHTML = '';
-    
+
     nucleos.forEach(nucleo => {
         nucleosHTML += `
             <div class="nucleo-card-disponible" style="
@@ -5178,7 +5247,7 @@ function mostrarModalNucleosDisponibles(nucleos) {
             </div>
         `;
     });
-    
+
     const modal = `
         <div id="nucleosDisponiblesModal" class="modal-overlay" onclick="if(event.target.classList.contains('modal-overlay')) this.remove()">
             <div class="modal-content-large" style="max-width: 700px;">
@@ -5216,35 +5285,36 @@ function mostrarModalNucleosDisponibles(nucleos) {
             </div>
         </div>
     `;
-    
+
     document.body.insertAdjacentHTML('beforeend', modal);
+    i18n.translatePage(); // Traducir los elementos data-i18n
 }
 
 async function solicitarUnirseNucleo(idNucleo, nombreNucleo) {
     const mensaje = prompt(`Mensaje opcional para el administrador del núcleo "${nombreNucleo}":`);
-    
+
     if (mensaje === null) return;
-    
+
     if (!confirm(`¿Enviar solicitud para unirte al núcleo "${nombreNucleo}"?`)) {
         return;
     }
-    
+
     try {
         const formData = new FormData();
         formData.append('id_nucleo', idNucleo);
         formData.append('mensaje', mensaje || '');
-        
+
         const response = await fetch('/api/nucleos/solicitar-unirse', {
             method: 'POST',
             body: formData
         });
-        
+
         const data = await response.json();
-        
+
         if (data.success) {
             alert(' ' + data.message);
             document.getElementById('nucleosDisponiblesModal').remove();
-            
+
             // Recargar
             nucleoYaCargado = false;
             setTimeout(() => {
@@ -5277,32 +5347,32 @@ window.verDetallesNucleoDesdeInicio = verDetallesNucleoDesdeInicio;
  */
 async function solicitarUnirseNucleo(idNucleo, nombreNucleo) {
     const mensaje = prompt(`Mensaje opcional para el administrador del núcleo "${nombreNucleo}":`);
-    
+
     if (mensaje === null) {
         // Usuario canceló
         return;
     }
-    
+
     if (!confirm(`¿Enviar solicitud para unirte al núcleo "${nombreNucleo}"?`)) {
         return;
     }
-    
+
     try {
         const formData = new FormData();
         formData.append('id_nucleo', idNucleo);
         formData.append('mensaje', mensaje || '');
-        
+
         const response = await fetch('/api/nucleos/solicitar-unirse', {
             method: 'POST',
             body: formData
         });
-        
+
         const data = await response.json();
-        
+
         if (data.success) {
             alert(' ' + data.message);
             cerrarModalNucleosDisponibles();
-            
+
             // Recargar para ocultar el banner si es necesario
             setTimeout(() => {
                 location.reload();
@@ -5323,12 +5393,12 @@ async function verMisSolicitudesNucleo() {
     try {
         const response = await fetch('/api/nucleos/mis-solicitudes');
         const data = await response.json();
-        
+
         if (!data.success) {
             alert('❌ Error al cargar solicitudes');
             return;
         }
-        
+
         cerrarModalNucleosDisponibles();
         mostrarModalMisSolicitudes(data.solicitudes);
     } catch (error) {
@@ -5345,9 +5415,9 @@ function mostrarModalMisSolicitudes(solicitudes) {
         alert('ℹ️ No tienes solicitudes enviadas');
         return;
     }
-    
+
     let solicitudesHTML = '';
-    
+
     solicitudes.forEach(sol => {
         const fecha = new Date(sol.fecha_solicitud).toLocaleDateString('es-UY', {
             day: '2-digit',
@@ -5356,10 +5426,10 @@ function mostrarModalMisSolicitudes(solicitudes) {
             hour: '2-digit',
             minute: '2-digit'
         });
-        
+
         let estadoHTML = '';
         let accionesHTML = '';
-        
+
         if (sol.estado === 'pendiente') {
             estadoHTML = '<span style="background: #ff9800; color: white; padding: 5px 12px; border-radius: 20px; font-size: 12px;">⏳ Pendiente</span>';
             accionesHTML = `
@@ -5372,7 +5442,7 @@ function mostrarModalMisSolicitudes(solicitudes) {
         } else {
             estadoHTML = '<span style="background: #f44336; color: white; padding: 5px 12px; border-radius: 20px; font-size: 12px;">❌ Rechazada</span>';
         }
-        
+
         solicitudesHTML += `
             <div style="
                 background: white;
@@ -5419,7 +5489,7 @@ function mostrarModalMisSolicitudes(solicitudes) {
             </div>
         `;
     });
-    
+
     const modal = `
         <div id="misSolicitudesModal" class="modal-overlay" style="
             position: fixed;
@@ -5471,7 +5541,7 @@ function mostrarModalMisSolicitudes(solicitudes) {
             </div>
         </div>
     `;
-    
+
     document.body.insertAdjacentHTML('beforeend', modal);
 }
 
@@ -5487,18 +5557,18 @@ async function cancelarMiSolicitud(idSolicitud) {
     if (!confirm('¿Cancelar esta solicitud?')) {
         return;
     }
-    
+
     try {
         const formData = new FormData();
         formData.append('id_solicitud', idSolicitud);
-        
+
         const response = await fetch('/api/nucleos/cancelar-solicitud', {
             method: 'POST',
             body: formData
         });
-        
+
         const data = await response.json();
-        
+
         if (data.success) {
             alert(' Solicitud cancelada');
             cerrarModalMisSolicitudes();
@@ -5539,8 +5609,8 @@ window.verDetallesNucleoDesdeInicio = verDetallesNucleoDesdeInicio;
 
 function parseFechaLocal(fechaSQL) {
     if (!fechaSQL) return null;
-    
-  
+
+
     return new Date(fechaSQL + 'T00:00:00');
 }
 
@@ -5549,9 +5619,9 @@ function parseFechaLocal(fechaSQL) {
  */
 function formatearFechaUY(fecha) {
     if (!fecha) return '-';
-    
+
     const f = parseFechaLocal(fecha);
-    
+
     return f.toLocaleDateString('es-UY', {
         day: '2-digit',
         month: '2-digit',
@@ -5565,9 +5635,9 @@ function formatearFechaUY(fecha) {
  */
 function formatearFechaHoraUY(fechaHora) {
     if (!fechaHora) return '-';
-    
+
     const f = new Date(fechaHora);
-    
+
     return f.toLocaleString('es-UY', {
         day: '2-digit',
         month: '2-digit',
@@ -5583,9 +5653,9 @@ function formatearFechaHoraUY(fechaHora) {
  */
 function formatearFechaLargaUY(fecha) {
     if (!fecha) return '-';
-    
+
     const f = parseFechaLocal(fecha);
-    
+
     return f.toLocaleDateString('es-UY', {
         day: 'numeric',
         month: 'long',
@@ -5599,7 +5669,7 @@ function formatearFechaLargaUY(fecha) {
  */
 function getFechaActualSQL() {
     const ahora = new Date();
-    
+
     // Formatear en zona horaria de Uruguay
     const opciones = {
         year: 'numeric',
@@ -5607,7 +5677,7 @@ function getFechaActualSQL() {
         day: '2-digit',
         timeZone: 'America/Montevideo'
     };
-    
+
     const partes = ahora.toLocaleDateString('es-UY', opciones).split('/');
     return `${partes[2]}-${partes[1]}-${partes[0]}`; // YYYY-MM-DD
 }
@@ -5617,7 +5687,7 @@ function getFechaActualSQL() {
  */
 function getHoraActualSQL() {
     const ahora = new Date();
-    
+
     return ahora.toLocaleTimeString('es-UY', {
         hour: '2-digit',
         minute: '2-digit',
@@ -5631,15 +5701,16 @@ function getHoraActualSQL() {
 
 function fixFechasTareas() {
     ('🔧 Aplicando fix de fechas en tareas...');
-    
-   
+
+
     window.renderUserTasks_ORIGINAL = window.renderUserTasks;
-    
-    window.renderUserTasks = function(tareas, containerId, esNucleo = false) {
+
+    window.renderUserTasks = function (tareas, containerId, esNucleo = false) {
         const container = document.getElementById(containerId);
 
         if (!tareas || tareas.length === 0) {
-            container.innerHTML = '<div class="no-tasks">No tienes tareas asignadas</div>';
+            container.innerHTML = '<div class="no-tasks" data-i18n="dashboardUser.tasks.individualTasks.noTasks">No tienes tareas asignadas</div>';
+            i18n.translatePage();
             return;
         }
 
@@ -5647,7 +5718,7 @@ function fixFechasTareas() {
             //  FIX: Usar parseFechaLocal
             const fechaInicio = formatearFechaUY(tarea.fecha_inicio);
             const fechaFin = formatearFechaUY(tarea.fecha_fin);
-            
+
             const progreso = tarea.progreso || 0;
             const esCompletada = tarea.estado_usuario === 'completada';
 
@@ -5665,9 +5736,9 @@ function fixFechasTareas() {
                     <p class="user-task-description">${tarea.descripcion}</p>
                     
                     <div class="user-task-meta">
-                        <div><strong>Inicio:</strong> ${fechaInicio}</div>
-                        <div><strong>Fin:</strong> ${fechaFin}</div>
-                        <div><strong>Creado por:</strong> ${tarea.creador}</div>
+                        <div><strong data-i18n="dashboardUser.tasks.start">Inicio:</strong> ${fechaInicio}</div>
+                        <div><strong data-i18n="dashboardUser.tasks.end">Fin:</strong> ${fechaFin}</div>
+                        <div><strong data-i18n="dashboardUser.tasks.createdBy">Creado por:</strong> ${tarea.creador}</div>
                     </div>
                     
                     <div class="progress-bar-container">
@@ -5679,25 +5750,26 @@ function fixFechasTareas() {
                     ${!esCompletada ? `
                         <div class="user-task-actions">
                             <button class="btn-small btn-update" onclick="updateTaskProgress(${tarea.id_asignacion}, '${esNucleo ? 'nucleo' : 'usuario'}', ${tarea.id_tarea})">
-                                Actualizar Progreso
+                                <span data-i18n="dashboardUser.tasks.updateProgress">Actualizar Progreso</span>
                             </button>
                             <button class="btn-small btn-avance" onclick="addTaskAvance(${tarea.id_tarea})">
-    Reportar Avance
+    <span data-i18n="dashboardUser.tasks.reportProgress">Reportar Avance</span>
 </button>
                             <button class="btn-small btn-materiales" onclick="viewTaskMaterials(${tarea.id_tarea})" title="Ver materiales necesarios">
-                                <i class="fas fa-boxes"></i> Materiales
+                                <i class="fas fa-boxes"></i> <span data-i18n="dashboardUser.tasks.materials">Materiales</span>
                             </button>
                             <button class="btn-small btn-detalles" onclick="viewUserTaskDetails(${tarea.id_tarea})">
-                                Ver Detalles Completos
+                                <span data-i18n="dashboardUser.tasks.viewFullDetails">Ver Detalles Completos</span>
                             </button>
                         </div>
-                    ` : '<p style="color: #28a745; margin-top: 10px;"><strong>✓ Tarea completada</strong></p>'}
+                    ` : '<p style="color: #28a745; margin-top: 10px;"><strong data-i18n="dashboardUser.tasks.tareaCompletada">✓ Tarea completada</strong></p>'}
                 </div>
             `;
         }).join('');
     };
-    
+
     (' Fix de fechas en tareas aplicado');
+    i18n.translatePage();
 }
 
 /**
@@ -5705,11 +5777,11 @@ function fixFechasTareas() {
  */
 function fixFechasTareasAdmin() {
     ('🔧 Aplicando fix de fechas en tareas admin...');
-    
+
     // Reemplazar en renderTasksList
     window.renderTasksList_ORIGINAL = window.renderTasksList;
-    
-    window.renderTasksList = function(tareas) {
+
+    window.renderTasksList = function (tareas) {
         const container = document.getElementById('tasksList');
 
         if (!tareas || tareas.length === 0) {
@@ -5721,7 +5793,7 @@ function fixFechasTareasAdmin() {
             //  FIX: Usar formatearFechaUY
             const fechaInicio = formatearFechaUY(tarea.fecha_inicio);
             const fechaFin = formatearFechaUY(tarea.fecha_fin);
-            
+
             const asignados = tarea.tipo_asignacion === 'usuario' ?
                 `${tarea.total_usuarios} usuario(s)` :
                 `${tarea.total_nucleos} núcleo(s)`;
@@ -5789,7 +5861,7 @@ function fixFechasTareasAdmin() {
             `;
         }).join('');
     };
-    
+
     (' Fix de fechas en tareas admin aplicado');
 }
 
@@ -5798,10 +5870,10 @@ function fixFechasTareasAdmin() {
  */
 function fixFechasRegistroHoras() {
     ('🔧 Aplicando fix de fechas en registro de horas...');
-    
+
 
     window.formatearFechaSimple = formatearFechaUY;
-    
+
     (' Fix de fechas en registro de horas aplicado');
 }
 
@@ -5810,10 +5882,10 @@ function fixFechasRegistroHoras() {
  */
 function fixFechasSolicitudes() {
     ('🔧 Aplicando fix de fechas en solicitudes...');
-    
+
     // La función de renderizado de solicitudes ya usa toLocaleDateString
     // pero podemos asegurarnos que use la zona horaria correcta
-    
+
     (' Fix de fechas en solicitudes aplicado');
 }
 
@@ -5848,9 +5920,9 @@ window.getHoraActualSQL = getHoraActualSQL;
 // ========== APLICAR FIXES AUTOMÁTICAMENTE ==========
 
 // Esperar un momento para que otras funciones se carguen
-setTimeout(function() {
+setTimeout(function () {
     ('🔧 [FIX FECHAS] Aplicando fixes automáticos...');
-    
+
     try {
         fixFechasTareas();
         fixFechasTareasAdmin();
@@ -5859,7 +5931,7 @@ setTimeout(function() {
         ('📅 [FIX FECHAS] Zona horaria:', Intl.DateTimeFormat().resolvedOptions().timeZone);
         ('📅 [FIX FECHAS] Fecha actual SQL:', getFechaActualSQL());
         ('⏰ [FIX FECHAS] Hora actual SQL:', getHoraActualSQL());
-        
+
         // Prueba
         ('🧪 [FIX FECHAS] Prueba: formatearFechaUY("2025-01-15") =', formatearFechaUY('2025-01-15'));
     } catch (error) {
@@ -5881,7 +5953,7 @@ setTimeout(function() {
 /**
  * OVERRIDE: renderUserTasks con detección de VENCIDAS
  */
-(function() {
+(function () {
     ('🔄 [OVERRIDE USER] Sobrescribiendo renderUserTasks...');
 
     // Guardar versión original si existe
@@ -5892,15 +5964,16 @@ setTimeout(function() {
     /**
      *  VERSIÓN con detección de VENCIDAS
      */
-    window.renderUserTasks = function(tareas, containerId, esNucleo = false) {
+    window.renderUserTasks = function (tareas, containerId, esNucleo = false) {
         ('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
         ('🎨 [RENDER USER TASKS] Iniciando con detección de vencidas');
         ('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        
+
         const container = document.getElementById(containerId);
 
         if (!tareas || tareas.length === 0) {
-            container.innerHTML = '<div class="no-tasks">No tienes tareas asignadas</div>';
+            container.innerHTML = '<div class="no-tasks" data-i18n="dashboardUser.tasks.individualTasks.noTasks">No tienes tareas asignadas</div>';
+            i18n.translatePage();
             return;
         }
 
@@ -5952,55 +6025,89 @@ setTimeout(function() {
             }
 
             return `
-                <div class="user-task-item prioridad-${tarea.prioridad} ${tareaClass}">
-                    <div class="user-task-header">
-                        <h4 class="user-task-title">${tarea.titulo}</h4>
-                        <div class="user-task-badges">
-                            <span class="task-badge badge-estado ${estadoBadgeClass}">
-                                ${estadoTexto}
-                            </span>
-                            ${esNucleo ? '<span class="task-badge" style="background: #6f42c1; color: white;">Núcleo</span>' : ''}
-                        </div>
-                    </div>
-                    
-                    <p class="user-task-description">${tarea.descripcion}</p>
-                    
-                    <div class="user-task-meta">
-                        <div><strong>Inicio:</strong> ${fechaInicio}</div>
-                        <div><strong>Fin:</strong> ${fechaFin}</div>
-                        <div><strong>Creado por:</strong> ${tarea.creador}</div>
-                    </div>
-                    
-                    <div class="progress-bar-container">
-                        <div class="progress-bar" style="width: ${progreso}%; background: ${tarea.esVencida ? '#dc3545' : tarea.esCompletada ? '#28a745' : '#667eea'};">
-                            ${progreso}%
-                        </div>
-                    </div>
-                    
-                    ${tarea.esVencida ? `
-                        <div class="alert-warning" style="margin-top: 15px;">
-                            <i class="fas fa-exclamation-triangle"></i>
-                            <strong>Esta tarea está vencida.</strong> La fecha límite ya ha pasado.
-                        </div>
-                    ` : ''}
-                    
-                    ${!tarea.esCompletada ? `
-                        <div class="user-task-actions">
-                            <button class="btn-small btn-update" onclick="updateTaskProgress(${tarea.id_asignacion}, '${esNucleo ? 'nucleo' : 'usuario'}', ${tarea.id_tarea})">
-                                Actualizar Progreso
-                            </button>
-                            <button class="btn-small btn-avance" onclick="addTaskAvance(${tarea.id_tarea})">
-                                Reportar Avance
-                            </button>
-                            <button class="btn-small btn-materiales" onclick="viewTaskMaterials(${tarea.id_tarea})" title="Ver materiales necesarios">
-                                <i class="fas fa-boxes"></i> Materiales
-                            </button>
-                            <button class="btn-small btn-detalles" onclick="viewUserTaskDetails(${tarea.id_tarea})">
-                                Ver Detalles Completos
-                            </button>
-                        </div>
-                    ` : '<p style="color: #28a745; margin-top: 10px;"><strong>✓ Tarea completada</strong></p>'}
-                </div>
+<div class="user-task-item prioridad-${tarea.prioridad} ${tareaClass}">
+    <div class="user-task-header">
+        <h4 class="user-task-title">${tarea.titulo}</h4>
+        <div class="user-task-badges">
+            <span class="task-badge badge-estado ${estadoBadgeClass}">
+                ${estadoTexto}
+            </span>
+            ${esNucleo ? `
+                <span class="task-badge" style="background: #6f42c1; color: white;">
+                    <span data-i18n="dashboardUser.tasks.nucleo">Núcleo</span>
+                </span>
+            ` : ''}
+        </div>
+    </div>
+    
+    <p class="user-task-description">${tarea.descripcion}</p>
+    
+    <div class="user-task-meta">
+        <div>
+            <strong>
+                <span data-i18n="dashboardUser.tasks.inicio">Inicio:</span>
+            </strong> ${fechaInicio}
+        </div>
+        <div>
+            <strong>
+                <span data-i18n="dashboardUser.tasks.fin">Fin:</span>
+            </strong> ${fechaFin}
+        </div>
+        <div>
+            <strong>
+                <span data-i18n="dashboardUser.tasks.creadoPor">Creado por:</span>
+            </strong> ${tarea.creador}
+        </div>
+    </div>
+    
+    <div class="progress-bar-container">
+        <div class="progress-bar" 
+             style="width: ${progreso}%; background: ${tarea.esVencida ? '#dc3545' : tarea.esCompletada ? '#28a745' : '#667eea'};">
+            ${progreso}%
+        </div>
+    </div>
+    
+    ${tarea.esVencida ? `
+        <div class="alert-warning" style="margin-top: 15px;">
+            <i class="fas fa-exclamation-triangle"></i>
+            <strong>
+                <span data-i18n="dashboardUser.tasks.tareaVencida">Esta tarea está vencida.</span>
+            </strong>
+            <span data-i18n="dashboardUser.tasks.fechaLimitePasada">
+                La fecha límite ya ha pasado.
+            </span>
+        </div>
+    ` : ''}
+    
+    ${!tarea.esCompletada ? `
+        <div class="user-task-actions">
+            <button class="btn-small btn-update" 
+                    onclick="updateTaskProgress(${tarea.id_asignacion}, '${esNucleo ? 'nucleo' : 'usuario'}', ${tarea.id_tarea})">
+                <span data-i18n="dashboardUser.tasks.actualizarProgreso">Actualizar Progreso</span>
+            </button>
+            
+            <button class="btn-small btn-avance" onclick="addTaskAvance(${tarea.id_tarea})">
+                <span data-i18n="dashboardUser.tasks.reportarAvance">Reportar Avance</span>
+            </button>
+            
+            <button class="btn-small btn-materiales" onclick="viewTaskMaterials(${tarea.id_tarea})" title="Ver materiales necesarios">
+                <i class="fas fa-boxes"></i>
+                <span data-i18n="dashboardUser.tasks.materiales">Materiales</span>
+            </button>
+            
+            <button class="btn-small btn-detalles" onclick="viewUserTaskDetails(${tarea.id_tarea})">
+                <span data-i18n="dashboardUser.tasks.verDetallesCompletos">Ver Detalles Completos</span>
+            </button>
+        </div>
+    ` : `
+        <p style="color: #28a745; margin-top: 10px;">
+            <strong>
+                <span data-i18n="dashboardUser.tasks.tareaCompletada">✓ Tarea completada</span>
+            </strong>
+        </p>
+    `}
+</div>
+
             `;
         }).join('');
 
@@ -6009,13 +6116,14 @@ setTimeout(function() {
     };
 
     (' [OVERRIDE USER] renderUserTasks sobrescrito correctamente');
+    i18n.translatePage();
 })();
 
 /**
  * FUNCIONES AUXILIARES (si no existen)
  */
 if (typeof formatEstadoUsuario !== 'function') {
-    window.formatEstadoUsuario = function(estado) {
+    window.formatEstadoUsuario = function (estado) {
         const estados = {
             'pendiente': 'Pendiente',
             'en_progreso': 'En Progreso',
@@ -6026,7 +6134,7 @@ if (typeof formatEstadoUsuario !== 'function') {
 }
 
 if (typeof formatPrioridad !== 'function') {
-    window.formatPrioridad = function(prioridad) {
+    window.formatPrioridad = function (prioridad) {
         const prioridades = {
             'baja': 'Baja',
             'media': 'Media',
@@ -6040,7 +6148,7 @@ if (typeof formatPrioridad !== 'function') {
  *  ASEGURAR formatearFechaUY existe
  */
 if (typeof formatearFechaUY !== 'function') {
-    window.formatearFechaUY = function(fecha) {
+    window.formatearFechaUY = function (fecha) {
         if (!fecha) return '-';
         const f = new Date(fecha + 'T00:00:00');
         return f.toLocaleDateString('es-UY', {
@@ -6055,28 +6163,28 @@ if (typeof formatearFechaUY !== 'function') {
 /**
  *  FORZAR RECARGA AL ENTRAR A SECCIÓN TAREAS
  */
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const tareasMenuItem = document.querySelector('.menu li[data-section="tareas"]');
     if (tareasMenuItem) {
         (' Listener de tareas usuario agregado');
-        tareasMenuItem.addEventListener('click', function() {
+        tareasMenuItem.addEventListener('click', function () {
             ('>>> Click en sección tareas USUARIO');
-            
+
             // Esperar un momento para que la sección se active
             setTimeout(() => {
                 ('🔄 Cargando tareas de usuario...');
-                
+
                 // Verificar si los contenedores existen
                 const tareasUsuarioList = document.getElementById('tareasUsuarioList');
                 const tareasNucleoList = document.getElementById('tareasNucleoList');
-                
+
                 if (tareasUsuarioList) {
                     (' Container tareasUsuarioList encontrado');
                 }
                 if (tareasNucleoList) {
                     (' Container tareasNucleoList encontrado');
                 }
-                
+
                 // Cargar tareas
                 if (typeof loadUserTasks === 'function') {
                     loadUserTasks();
@@ -6218,16 +6326,16 @@ async function verificarCambiosCuotas() {
     try {
         const mesActual = new Date().getMonth() + 1;
         const anioActual = new Date().getFullYear();
-        
+
         const response = await fetch(`/api/cuotas/mis-cuotas?mes=${mesActual}&anio=${anioActual}`);
         const data = await response.json();
-        
+
         if (data.success && data.cuotas.length > 0) {
             const cuotaActual = data.cuotas[0];
-            
+
             // Crear checksum para detectar cambios
             const checksum = `${cuotaActual.id_cuota}-${cuotaActual.estado}-${cuotaActual.estado_pago || 'none'}-${cuotaActual.estado_usuario || 'none'}`;
-            
+
             console.log('🔍 [POLLING] Verificando cuota:', {
                 id: cuotaActual.id_cuota,
                 estado: cuotaActual.estado,
@@ -6236,23 +6344,23 @@ async function verificarCambiosCuotas() {
                 checksum_actual: checksum,
                 checksum_anterior: ultimoCheckCuotas
             });
-            
+
             // Primera vez
             if (ultimoCheckCuotas === null) {
                 ultimoCheckCuotas = checksum;
                 console.log(' [POLLING] Checksum inicial guardado');
                 return;
             }
-            
+
             // Detectar cambio
             if (ultimoCheckCuotas !== checksum) {
                 console.log('🔔 [POLLING] ¡CAMBIO DETECTADO EN CUOTA!');
                 console.log('   Checksum anterior:', ultimoCheckCuotas);
                 console.log('   Checksum nuevo:', checksum);
-                
+
                 // Actualizar checksum
                 ultimoCheckCuotas = checksum;
-                
+
                 // Verificar si estamos en la sección de cuotas
                 const cuotasSection = document.getElementById('cuotas-section');
                 if (cuotasSection && cuotasSection.classList.contains('active')) {
@@ -6274,11 +6382,11 @@ async function verificarCambiosCuotas() {
  */
 async function recargarSeccionCuotas() {
     console.log('🔄 [RELOAD] Iniciando recarga completa de cuotas...');
-    
+
     try {
         // 1. Limpiar cache
         ultimoCheckCuotas = null;
-        
+
         // 2. Recargar deuda de horas
         await loadDeudaHorasParaCuotas();
         console.log(' [RELOAD] Deuda de horas recargada');
@@ -6307,14 +6415,14 @@ function mostrarNotificacionActualizacion(cuota) {
     if (notifAnterior) {
         notifAnterior.remove();
     }
-    
+
     const estadoPago = cuota.estado_pago || cuota.estado;
     const estadoUsuario = cuota.estado_usuario || '';
-    
+
     let mensaje = '';
     let icono = '';
     let color = '';
-    
+
     if (estadoUsuario === 'aceptado' || estadoPago === 'aprobado') {
         mensaje = '¡Tu pago ha sido aprobado!';
         icono = 'fa-check-circle';
@@ -6328,7 +6436,7 @@ function mostrarNotificacionActualizacion(cuota) {
         icono = 'fa-sync-alt';
         color = '#2196F3';
     }
-    
+
     const notif = document.createElement('div');
     notif.id = 'notif-actualizacion-cuota';
     notif.style.cssText = `
@@ -6345,7 +6453,7 @@ function mostrarNotificacionActualizacion(cuota) {
         min-width: 300px;
         max-width: 400px;
     `;
-    
+
     notif.innerHTML = `
         <div style="display: flex; align-items: center; gap: 15px;">
             <i class="fas ${icono}" style="font-size: 32px;"></i>
@@ -6365,7 +6473,7 @@ function mostrarNotificacionActualizacion(cuota) {
             </button>
         </div>
     `;
-    
+
     // Agregar animación CSS
     if (!document.getElementById('notif-animation-style')) {
         const style = document.createElement('style');
@@ -6394,15 +6502,15 @@ function mostrarNotificacionActualizacion(cuota) {
         `;
         document.head.appendChild(style);
     }
-    
+
     document.body.appendChild(notif);
-    
+
     // Auto-remover después de 8 segundos
     setTimeout(() => {
         notif.style.animation = 'slideOutRight 0.5s ease-in';
         setTimeout(() => notif.remove(), 500);
     }, 8000);
-    
+
     console.log('🔔 [NOTIF] Notificación mostrada:', mensaje);
 }
 
@@ -6414,13 +6522,13 @@ function iniciarPollingCuotas() {
         console.log('ℹ️ [POLLING] Ya está activo, ignorando...');
         return;
     }
-    
+
     console.log('▶️ [POLLING] Iniciando polling de cuotas (cada 15 segundos)');
     pollingCuotasActivo = true;
-    
+
     // Verificar inmediatamente
     verificarCambiosCuotas();
-    
+
     // Luego cada 15 segundos
     pollingInterval = setInterval(verificarCambiosCuotas, 15000);
 }
@@ -6432,15 +6540,15 @@ function detenerPollingCuotas() {
     if (!pollingCuotasActivo) {
         return;
     }
-    
+
     console.log('⏸️ [POLLING] Deteniendo polling de cuotas');
     pollingCuotasActivo = false;
-    
+
     if (pollingInterval) {
         clearInterval(pollingInterval);
         pollingInterval = null;
     }
-    
+
     // Resetear checksum
     ultimoCheckCuotas = null;
 }
@@ -6450,13 +6558,13 @@ function detenerPollingCuotas() {
  */
 const originalInicializarSeccionCuotas = window.inicializarSeccionCuotas;
 
-window.inicializarSeccionCuotas = async function() {
+window.inicializarSeccionCuotas = async function () {
     console.log('🔄 [OVERRIDE] inicializarSeccionCuotas con polling');
-    
+
     try {
         // Ejecutar función original
         await originalInicializarSeccionCuotas();
-        
+
         // Iniciar polling
         iniciarPollingCuotas();
         
@@ -6470,15 +6578,15 @@ window.inicializarSeccionCuotas = async function() {
 /**
  * Listener para detectar cambio de sección
  */
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     console.log('📋 [SETUP] Configurando listeners de sección cuotas');
-    
+
     const menuItems = document.querySelectorAll('.menu li[data-section]');
-    
+
     menuItems.forEach(item => {
-        item.addEventListener('click', function() {
+        item.addEventListener('click', function () {
             const section = this.getAttribute('data-section');
-            
+
             if (section === 'cuotas') {
                 console.log('➡️ [SECTION] Usuario entró a cuotas');
                 // Esperar un momento para que la sección se cargue
@@ -6498,7 +6606,7 @@ document.addEventListener('DOMContentLoaded', function() {
 /**
  * Detener polling al salir de la página
  */
-window.addEventListener('beforeunload', function() {
+window.addEventListener('beforeunload', function () {
     detenerPollingCuotas();
 });
 
@@ -6550,7 +6658,7 @@ window.renderCuotaCard = function(cuota) {
         cuota.estado = 'pagada';
         cuota.estado_actual = 'pagada';
     }
-    
+
     // Llamar a la función original
     return originalRenderCuotaCard(cuota);
 };
@@ -6566,10 +6674,10 @@ console.log(' Sistema de actualización automática de cuotas cargado completame
 async function mostrarResumenDeuda() {
     const response = await fetch('/api/cuotas/resumen-deuda');
     const data = await response.json();
-    
+
     if (data.success) {
         const resumen = data.resumen;
-        
+
         const html = `
             <div class="resumen-deuda-widget">
                 <h3>💰 Resumen de Deuda</h3>
@@ -6591,7 +6699,7 @@ async function mostrarResumenDeuda() {
                 </div>
             </div>
         `;
-        
+
         document.getElementById('resumen-deuda-container').innerHTML = html;
     }
 }
@@ -6601,42 +6709,42 @@ async function mostrarResumenDeuda() {
 window.closeEdit    /**
      *  Aprobar pago desde modal - OPTIMIZADO
      */
-    window.aprobarPagoDesdeModal = async function(pagoId, userId) {
-        const modal = document.getElementById('detallesPagoModal');
-        
-        if (!confirm('¿Aprobar este pago?\n\nEl usuario será notificado.')) {
-            return;
+window.aprobarPagoDesdeModal = async function (pagoId, userId) {
+    const modal = document.getElementById('detallesPagoModal');
+
+    if (!confirm('¿Aprobar este pago?\n\nEl usuario será notificado.')) {
+        return;
+    }
+
+    // Cerrar modal inmediatamente
+    if (modal) modal.remove();
+
+    // Mostrar indicador en la tabla
+    const row = document.querySelector(`tr.user-row[data-estado="enviado"]`);
+    if (row) {
+        const actionsCell = row.querySelector('td:last-child');
+        if (actionsCell) {
+            actionsCell.innerHTML = '<span style="color: #17a2b8;"><i class="fas fa-spinner fa-spin"></i> Procesando...</span>';
         }
+    }
 
-        // Cerrar modal inmediatamente
-        if (modal) modal.remove();
+    try {
+        const formData = new FormData();
+        formData.append('id_usuario', userId);
 
-        // Mostrar indicador en la tabla
-        const row = document.querySelector(`tr.user-row[data-estado="enviado"]`);
-        if (row) {
-            const actionsCell = row.querySelector('td:last-child');
-            if (actionsCell) {
-                actionsCell.innerHTML = '<span style="color: #17a2b8;"><i class="fas fa-spinner fa-spin"></i> Procesando...</span>';
-            }
-        }
+        const response = await fetch('/api/payment/approve', {
+            method: 'POST',
+            body: formData
+        });
 
-        try {
-            const formData = new FormData();
-            formData.append('id_usuario', userId);
+        const data = await response.json();
 
-            const response = await fetch('/api/payment/approve', {
-                method: 'POST',
-                body: formData
-            });
-
-            const data = await response.json();
-
-            if (data.success) {
-                // Actualizar solo la fila afectada
-                if (row) {
-                    row.querySelector('.estado-badge').textContent = 'Aceptado';
-                    row.querySelector('.estado-badge').className = 'estado-badge estado-aceptado';
-                    row.querySelector('td:last-child').innerHTML = `
+        if (data.success) {
+            // Actualizar solo la fila afectada
+            if (row) {
+                row.querySelector('.estado-badge').textContent = 'Aceptado';
+                row.querySelector('.estado-badge').className = 'estado-badge estado-aceptado';
+                row.querySelector('td:last-child').innerHTML = `
                         <button class="btn-icon btn-primary" onclick="viewUserDetails(${userId})">
                             <i class="fas fa-eye"></i>
                         </button>
@@ -6644,11 +6752,11 @@ window.closeEdit    /**
                             <i class="fas fa-check-circle"></i> Aprobado
                         </span>
                     `;
-                }
-                
-                // Mostrar notificación sin bloquear
-                const notification = document.createElement('div');
-                notification.innerHTML = `
+            }
+
+            // Mostrar notificación sin bloquear
+            const notification = document.createElement('div');
+            notification.innerHTML = `
                     <div style="
                         position: fixed;
                         top: 20px;
@@ -6664,24 +6772,24 @@ window.closeEdit    /**
                         <i class="fas fa-check-circle"></i> Pago aprobado correctamente
                     </div>
                 `;
-                document.body.appendChild(notification);
-                setTimeout(() => notification.remove(), 3000);
-                
-            } else {
-                alert('❌ Error: ' + data.message);
-                // Recargar solo si hay error
-                if (typeof loadUsersForTable === 'function') {
-                    loadUsersForTable();
-                }
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('❌ Error de conexión');
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 3000);
+
+        } else {
+            alert('❌ Error: ' + data.message);
+            // Recargar solo si hay error
             if (typeof loadUsersForTable === 'function') {
                 loadUsersForTable();
             }
         }
-    };
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Error de conexión');
+        if (typeof loadUsersForTable === 'function') {
+            loadUsersForTable();
+        }
+    }
+};
 
 // ==========================================
 // FIN DEL ARCHIVO - VERIFICACIONES FINALES
@@ -6713,21 +6821,21 @@ console.log('🔧 Aplicando fix completo con funciones auxiliares...');
 /**
  *  Obtener precio actualizado de la cuota
  */
-window.obtenerPrecioActualizado = function(cuota) {
+window.obtenerPrecioActualizado = function (cuota) {
     const precio = parseFloat(
-        cuota.monto_base || 
-        cuota.monto_actual || 
-        cuota.monto || 
+        cuota.monto_base ||
+        cuota.monto_actual ||
+        cuota.monto ||
         0
     );
-    
+
     console.log(`💰 Precio para cuota ${cuota.id_cuota}:`, {
         monto_base: cuota.monto_base,
         monto_actual: cuota.monto_actual,
         monto: cuota.monto,
         precio_final: precio
     });
-    
+
     return precio;
 };
 
@@ -6735,7 +6843,7 @@ window.obtenerPrecioActualizado = function(cuota) {
  *  Obtener nombre del mes
  */
 if (typeof obtenerNombreMes !== 'function') {
-    window.obtenerNombreMes = function(mes) {
+    window.obtenerNombreMes = function (mes) {
         const meses = [
             'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
             'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
@@ -6748,7 +6856,7 @@ if (typeof obtenerNombreMes !== 'function') {
  *  Formatear estado de cuota
  */
 if (typeof formatEstadoCuota !== 'function') {
-    window.formatEstadoCuota = function(estado) {
+    window.formatEstadoCuota = function (estado) {
         const estados = {
             'pendiente': 'Pendiente',
             'pagada': 'Pagada',
@@ -6763,7 +6871,7 @@ if (typeof formatEstadoCuota !== 'function') {
  *  Truncar texto
  */
 if (typeof truncarTexto !== 'function') {
-    window.truncarTexto = function(texto, maxLength) {
+    window.truncarTexto = function (texto, maxLength) {
         if (!texto || texto.length <= maxLength) return texto;
         return texto.substring(0, maxLength) + '...';
     };
@@ -6774,27 +6882,27 @@ if (typeof truncarTexto !== 'function') {
 /**
  *  Renderizar tarjeta de cuota (para historial y pendientes)
  */
-window.renderCuotaCard = function(cuota) {
+window.renderCuotaCard = function (cuota) {
     const estadoFinal = cuota.estado_actual || cuota.estado;
     const mes = obtenerNombreMes(cuota.mes);
     const fechaVenc = new Date(cuota.fecha_vencimiento + 'T00:00:00');
     const fechaVencFormatted = fechaVenc.toLocaleDateString('es-UY');
-    
+
     const esVencida = estadoFinal === 'vencida';
     const esPagada = cuota.estado === 'pagada';
     const tienePagoPendiente = cuota.id_pago && cuota.estado_pago === 'pendiente';
-    
+
     // Calcular montos
     const montoCuota = obtenerPrecioActualizado(cuota);
     const deudaAcumuladaAnterior = parseFloat(cuota.monto_pendiente_anterior || 0);
     const deudaHorasMostrar = (estadoFinal !== 'pagada' && !tienePagoPendiente) ? (window.deudaHorasActual || 0) : 0;
-    
+
     // Monto total a mostrar
     const montoMostrar = montoCuota + deudaAcumuladaAnterior + deudaHorasMostrar;
-    
+
     // Si está pagada, obtener el monto realmente pagado
     const montoPagado = esPagada && cuota.monto_pagado ? parseFloat(cuota.monto_pagado) : montoMostrar;
-    
+
     return `
         <div class="cuota-card estado-${estadoFinal}">
             <div class="cuota-card-header">
@@ -6810,7 +6918,7 @@ window.renderCuotaCard = function(cuota) {
             <div class="cuota-card-body">
                 <div class="cuota-monto">
                     <span class="cuota-monto-label">${esPagada ? 'Monto Pagado:' : 'Monto Total:'}</span>
-                    <span class="cuota-monto-valor">$${(esPagada ? montoPagado : montoMostrar).toLocaleString('es-UY', {minimumFractionDigits: 2})}</span>
+                    <span class="cuota-monto-valor">$${(esPagada ? montoPagado : montoMostrar).toLocaleString('es-UY', { minimumFractionDigits: 2 })}</span>
                 </div>
                 
                 ${esPagada && (deudaAcumuladaAnterior > 0 || deudaHorasMostrar > 0) ? `
@@ -6819,18 +6927,18 @@ window.renderCuotaCard = function(cuota) {
                         <div style="display: grid; gap: 6px; font-size: 12px; color: #555;">
                             <div style="display: flex; justify-content: space-between;">
                                 <span>Cuota vivienda:</span>
-                                <strong>$${montoCuota.toLocaleString('es-UY', {minimumFractionDigits: 2})}</strong>
+                                <strong>$${montoCuota.toLocaleString('es-UY', { minimumFractionDigits: 2 })}</strong>
                             </div>
                             ${deudaAcumuladaAnterior > 0 ? `
                                 <div style="display: flex; justify-content: space-between; color: #ff9800;">
                                     <span>+ Deuda acumulada:</span>
-                                    <strong>$${deudaAcumuladaAnterior.toLocaleString('es-UY', {minimumFractionDigits: 2})}</strong>
+                                    <strong>$${deudaAcumuladaAnterior.toLocaleString('es-UY', { minimumFractionDigits: 2 })}</strong>
                                 </div>
                             ` : ''}
                             ${deudaHorasMostrar > 0 ? `
                                 <div style="display: flex; justify-content: space-between; color: #f44336;">
                                     <span>+ Deuda horas:</span>
-                                    <strong>$${deudaHorasMostrar.toLocaleString('es-UY', {minimumFractionDigits: 2})}</strong>
+                                    <strong>$${deudaHorasMostrar.toLocaleString('es-UY', { minimumFractionDigits: 2 })}</strong>
                                 </div>
                             ` : ''}
                         </div>
@@ -6838,9 +6946,9 @@ window.renderCuotaCard = function(cuota) {
                 ` : !esPagada && !tienePagoPendiente && (deudaAcumuladaAnterior > 0 || deudaHorasMostrar > 0) ? `
                     <div class="cuota-desglose">
                         <small style="color: #666;">
-                            Cuota: $${montoCuota.toLocaleString('es-UY', {minimumFractionDigits: 2})}
-                            ${deudaAcumuladaAnterior > 0 ? ` + Deuda anterior: $${deudaAcumuladaAnterior.toLocaleString('es-UY', {minimumFractionDigits: 2})}` : ''}
-                            ${deudaHorasMostrar > 0 ? ` + Deuda horas: $${deudaHorasMostrar.toLocaleString('es-UY', {minimumFractionDigits: 2})}` : ''}
+                            Cuota: $${montoCuota.toLocaleString('es-UY', { minimumFractionDigits: 2 })}
+                            ${deudaAcumuladaAnterior > 0 ? ` + Deuda anterior: $${deudaAcumuladaAnterior.toLocaleString('es-UY', { minimumFractionDigits: 2 })}` : ''}
+                            ${deudaHorasMostrar > 0 ? ` + Deuda horas: $${deudaHorasMostrar.toLocaleString('es-UY', { minimumFractionDigits: 2 })}` : ''}
                         </small>
                     </div>
                 ` : ''}
@@ -6905,52 +7013,52 @@ window.renderCuotaCard = function(cuota) {
 /**
  *  OVERRIDE: renderMisCuotasOrganizadas - VERSION COMPLETA
  */
-window.renderMisCuotasOrganizadas = function(cuotas) {
+window.renderMisCuotasOrganizadas = function (cuotas) {
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     console.log('🎨 [RENDER] Iniciando renderizado de cuotas');
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-    
-    
+
+
     const container = document.getElementById('misCuotasContainer');
-    
+
     if (!cuotas || cuotas.length === 0) {
         container.innerHTML = `
             <div class="no-data">
                 <i class="fas fa-inbox" style="font-size: 48px; color: #ddd; margin-bottom: 10px;"></i>
-                <p>No se encontraron cuotas con los filtros seleccionados</p>
+                <p data-i18n="dashboardUser.billing.notFoundFilters">No se encontraron cuotas con los filtros seleccionados</p>
             </div>
         `;
         return;
     }
-    
+
     let html = '';
     
     //  CUOTA DEL MES ACTUAL
     const cuotaMasReciente = cuotas[0];
     console.log('📋 [RENDER] Cuota más reciente:', cuotaMasReciente);
-    
+
     // 🔥 CRÍTICO: Obtener deuda de horas de la variable global
     const deudaHoras = parseFloat(window.deudaHorasActual || 0);
-    
+
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     console.log('💰 [RENDER] DEUDA DE HORAS:');
     console.log('   window.deudaHorasActual:', window.deudaHorasActual);
     console.log('   deudaHoras (parseado):', deudaHoras);
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-    
-   
- 
-const montoCuota = parseFloat(cuotaMasReciente.monto_base || cuotaMasReciente.monto_actual || cuotaMasReciente.monto || 0);
 
 
-// 🔥 DEUDA ACUMULADA DE MESES ANTERIORES
-const deudaAcumuladaAnterior = parseFloat(cuotaMasReciente.monto_pendiente_anterior || 0);
+
+    const montoCuota = parseFloat(cuotaMasReciente.monto_base || cuotaMasReciente.monto_actual || cuotaMasReciente.monto || 0);
 
 
-const montoPendienteBase = montoCuota + deudaAcumuladaAnterior;
+    // 🔥 DEUDA ACUMULADA DE MESES ANTERIORES
+    const deudaAcumuladaAnterior = parseFloat(cuotaMasReciente.monto_pendiente_anterior || 0);
 
-// 🔥 MONTO TOTAL
-const montoTotal = montoCuota + deudaAcumuladaAnterior + deudaHoras;
+
+    const montoPendienteBase = montoCuota + deudaAcumuladaAnterior;
+
+    // 🔥 MONTO TOTAL
+    const montoTotal = montoCuota + deudaAcumuladaAnterior + deudaHoras;
 
 console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
 console.log('💰 [RENDER] CÁLCULO COMPLETO:');
@@ -6994,7 +7102,7 @@ console.log('━━━━━━━━━━━━━━━━━━━━━━�
     const diaActual = hoy.getDate();
     const mesActual = hoy.getMonth() + 1;
     const anioActual = hoy.getFullYear();
-    
+
     const esMesCuota = cuotaMasReciente.mes == mesActual && cuotaMasReciente.anio == anioActual;
     const estaDentroPeriodoPago = diaActual >= 25;
     const puedePagar = esMesCuota && estaDentroPeriodoPago && !estaPagada && !tienePagoPendiente;
@@ -7006,15 +7114,15 @@ console.log('━━━━━━━━━━━━━━━━━━━━━━�
             <div class="deuda-total-header">
                 <h2 style="margin: 0; color: #fff;">
                     <i class="fas ${estaPagada ? 'fa-check-circle' : puedePagar ? 'fa-exclamation-triangle' : 'fa-calendar-alt'}"></i>
-                    Resumen del Mes Actual
+                    <span data-i18n="dashboardUser.billing.summary.currentMonth">Resumen del Mes Actual</span>
                 </h2>
                 <span class="deuda-total-badge ${estaPagada ? 'badge-pagada' : tienePagoPendiente ? 'badge-pendiente' : puedePagar ? 'badge-requerida' : 'badge-bloqueado'}">
-                    ${estaPagada ? ' PAGADA' : 
-                      tienePagoPendiente ? '⏳ EN VALIDACIÓN' : 
-                      puedePagar ? '⚠️ PERIODO DE PAGO ABIERTO' : 
-                      esMesCuota && diasParaPagar > 0 ? `🔒 ${diasParaPagar} DÍA${diasParaPagar !== 1 ? 'S' : ''} PARA PAGAR` :
+                    ${estaPagada ? ' <span data-i18n="dashboardUser.billing.summary.paid"> PAGADA</span>' :
+            tienePagoPendiente ? '<span data-i18n="dashboardUser.billing.summary.inReview">⏳ EN VALIDACIÓN</span>' :
+                puedePagar ? '<span data-i18n="dashboardUser.billing.summary.openPaymentPeriod">⚠️ PERIODO DE PAGO ABIERTO</span>' :
+                    esMesCuota && diasParaPagar > 0 ? `🔒 ${diasParaPagar} <span data-i18n="dashboardUser.billing.summary.day">DÍA</span>${diasParaPagar !== 1 ? 'S' : ''} <span data-i18n="dashboardUser.billing.summary.toPay">PARA PAGAR</span>` :
                       !esMesCuota ? '⏰ Mes cerrado' :
-                      '❌ VENCIDA'}
+                        '<span data-i18n="dashboardUser.billing.summary.overdue">❌ VENCIDA</span>'}
                 </span>
             </div>
             
@@ -7023,8 +7131,8 @@ console.log('━━━━━━━━━━━━━━━━━━━━━━�
                     <div class="deuda-breakdown-item">
                         <i class="fas fa-home"></i>
                         <div>
-                            <span class="deuda-label">Cuota de Vivienda</span>
-                            <span class="deuda-monto">$${montoCuota.toLocaleString('es-UY', {minimumFractionDigits: 2})}</span>
+                            <span class="deuda-label" data-i18n="dashboardUser.billing.summary.houseFee">Cuota de Vivienda</span>
+                            <span class="deuda-monto">$${montoCuota.toLocaleString('es-UY', { minimumFractionDigits: 2 })}</span>
                         </div>
                     </div>
                     
@@ -7034,11 +7142,11 @@ console.log('━━━━━━━━━━━━━━━━━━━━━━�
  <div class="deuda-breakdown-item deuda-acumulada">
  <i class="fas fa-exclamation-triangle"></i>
  <div>
- <span class="deuda-label">Deuda de Meses Anteriores</span>
+ <span class="deuda-label" data-i18n="dashboardUser.billing.summary.previousMonthsDebt">Deuda de Meses Anteriores</span>
 <span class="deuda-monto error">
-$${deudaAcumuladaAnterior.toLocaleString('es-UY', {minimumFractionDigits: 2})}
+$${deudaAcumuladaAnterior.toLocaleString('es-UY', { minimumFractionDigits: 2 })}
 </span>
-<small style="color: #ff8a80; display: block; margin-top: 5px;">
+<small style="color: #ff8a80; display: block; margin-top: 5px;" data-i18n="dashboardUser.billing.summary.previousMonthsDebtNote">
 (Cuotas vencidas no pagadas)
 </small>
 </div>
@@ -7051,9 +7159,9 @@ $${deudaAcumuladaAnterior.toLocaleString('es-UY', {minimumFractionDigits: 2})}
     <div class="deuda-breakdown-item deuda-horas">
       <i class="fas fa-clock"></i>
 <div>
-    <span class="deuda-label">Deuda por Horas No Trabajadas</span>
+    <span class="deuda-label" data-i18n="dashboardUser.billing.summary.hoursNotWorkedDebt">Deuda por Horas No Trabajadas</span>
     <small style="color: ${deudaHoras > 0 ? '#ff8a80' : '#81c784'}; display: block; margin-top: 3px; margin-bottom: 5px;">
-        ${deudaHoras > 0 ? '($160 por hora × horas faltantes)' : '¡Sin deuda de horas!'}
+        ${deudaHoras > 0 ? '<span data-i18n="dashboardUser.billing.summary.hoursNotWorkedDebtNote">($160 por hora × horas faltantes)</span>' : '<span data-i18n="dashboardUser.billing.summary.noHoursNotWorkedDebt">¡Sin deuda de horas!</span>'}
     </small>
     <span class="deuda-monto ${deudaHoras > 0 ? 'error' : 'success'}">${deudaHoras.toLocaleString('es-UY', {minimumFractionDigits: 2})}</span>
 </div>
@@ -7067,23 +7175,23 @@ $${deudaAcumuladaAnterior.toLocaleString('es-UY', {minimumFractionDigits: 2})}
                     <div class="deuda-breakdown-item deuda-total">
                         <i class="fas fa-calculator"></i>
                         <div>
-                            <span class="deuda-label">TOTAL ${estaPagada ? 'PAGADO' : 'A PAGAR'}</span>
-                            <span class="deuda-monto-total" style="color: ${estaPagada ? '#4caf50' : '#fff'};">$${montoTotal.toLocaleString('es-UY', {minimumFractionDigits: 2})}</span>
+                            <span class="deuda-label"> <span data-i18n="dashboardUser.billing.summary.total">TOTAL</span> ${estaPagada ? '<span data-i18n="dashboardUser.billing.summary.totalPaid">PAGADO</span>' : '<span data-i18n="dashboardUser.billing.summary.toPay">A PAGAR</span>'}</span>
+                            <span class="deuda-monto-total" style="color: ${estaPagada ? '#4caf50' : '#fff'};">$${montoTotal.toLocaleString('es-UY', { minimumFractionDigits: 2 })}</span>
                         </div>
                     </div>
                 </div>
                 
                 ${estaPagada ? `
                     <div class="alert-success" style="margin-top: 20px;">
-                        <strong style="color: #4caf50;">🎉 ¡Pago Completado!</strong>
+                        <strong style="color: #4caf50;" data-i18n="dashboardUser.billing.summary.paymentCompleted">🎉 ¡Pago Completado!</strong>
                         <p style="color: rgba(255, 255, 255, 0.9); margin: 10px 0 0 0;">
-                            Has pagado exitosamente tu cuota de ${obtenerNombreMes(cuotaMasReciente.mes)} ${cuotaMasReciente.anio}.
+                            <span data-i18n="dashboardUser.billing.summary.paymentSuccess">Has pagado exitosamente tu cuota de</span>${obtenerNombreMes(cuotaMasReciente.mes)} ${cuotaMasReciente.anio}.
                         </p>
                     </div>
                 ` : tienePagoPendiente ? `
                     <div class="alert-info" style="margin-top: 20px;">
-                        <strong style="color: #2196F3;">⏳ Pago en Revisión</strong>
-                        <p style="color: rgba(255, 255, 255, 0.9); margin: 10px 0 0 0;">Tu pago está siendo validado.</p>
+                        <strong style="color: #2196F3;" data-i18n="dashboardUser.billing.paymentReview">⏳ Pago en Revisión</strong>
+                        <p style="color: rgba(255, 255, 255, 0.9); margin: 10px 0 0 0;" data-i18n="dashboardUser.billing.summary.paymentInReviewNote">Tu pago está siendo validado.</p>
                     </div>
                 ` : puedePagar ? `
                     <!--  PERÍODO DE PAGO ABIERTO - MOSTRAR BOTÓN VERDE -->
@@ -7115,7 +7223,7 @@ $${deudaAcumuladaAnterior.toLocaleString('es-UY', {minimumFractionDigits: 2})}
     </div>
     
     <div class="alert-success" style="margin-top: 20px; background: rgba(76, 175, 80, 0.15);">
-        <strong style="color: #4caf50;"> Período de Pago Habilitado</strong>
+        <strong style="color: #4caf50;" data-i18n="dashboardUser.billing.summary.paymentEnabled"> Período de Pago Habilitado</strong>
         <p style="color: rgba(255, 255, 255, 0.9); margin: 10px 0 0 0;">
             Ya puedes realizar el pago de tu cuota. El período de pago está activo hasta fin de mes.
         </p>
@@ -7181,43 +7289,49 @@ $${deudaAcumuladaAnterior.toLocaleString('es-UY', {minimumFractionDigits: 2})}
     </button>
 </div>
                     <div class="alert-warning" style="margin-top: 20px;">
-                        <strong style="color: #ff9800;">🔒 Periodo de Trabajo en Curso</strong>
+                        <strong style="color: #ff9800;" data-i18n="dashboardUser.billing.workingPeriod">🔒 Periodo de Trabajo en Curso</strong>
                         <p style="color: rgba(255, 255, 255, 0.9); margin: 10px 0 0 0;">
-                            Podrás pagar en ${diasParaPagar} día${diasParaPagar !== 1 ? 's' : ''}.
+                            <span data-i18n="dashboardUser.billing.workingPeriodNote">Podrás pagar en</span> ${diasParaPagar} <span data-i18n="dashboardUser.billing.workingPeriodDays">día</span>${diasParaPagar !== 1 ? 's' : ''}.
                         </p>
                     </div>
                 ` : `
                     <div class="alert-error" style="margin-top: 20px;">
-                        <strong style="color: #f44336;">❌ Cuota Vencida</strong>
-                        <p style="color: rgba(255, 255, 255, 0.9); margin: 10px 0 0 0;">La deuda se acumulará.</p>
+                        <strong style="color: #f44336;" data-i18n="dashboardUser.billing.dueFeeExpired">❌ Cuota Vencida</strong>
+                        <p style="color: rgba(255, 255, 255, 0.9); margin: 10px 0 0 0;" data-i18n="dashboardUser.billing.dueFeeExpiredNote">La deuda se acumulará.</p>
                     </div>
                 `}
             </div>
         </div>
         <hr style="margin: 40px 0; border: none; border-top: 2px solid #e0e0e0;">
     `;
-    
+
     // Historial y otras cuotas
     const cuotasPagables = cuotas.filter(c => (c.estado_actual || c.estado) !== 'pagada');
     const cuotasHistorial = cuotas.filter(c => (c.estado_actual || c.estado) === 'pagada');
-    
+
     if (cuotasPagables.length > 1) {
-        html += `<div class="cuotas-section"><h3>Otras Pendientes</h3><div class="cuotas-grid">`;
+        html += `<div class="cuotas-section"><h3 data-i18n="dashboardUser.billing.pending.title">Otras Pendientes</h3><div class="cuotas-grid">`;
         cuotasPagables.slice(1).forEach(c => html += renderCuotaCard(c));
         html += `</div></div><hr style="margin: 40px 0;">`;
     }
-    
-    html += `<div class="cuotas-section"><h3>Historial</h3>`;
+
+    html += `<div class="cuotas-section"><h3 data-i18n="dashboardUser.billing.history.title">Historial</h3>`;
     if (cuotasHistorial.length > 0) {
         html += '<div class="cuotas-grid">';
         cuotasHistorial.forEach(c => html += renderCuotaCard(c));
         html += '</div>';
     } else {
-        html += '<p style="color: #999; text-align: center;">No hay cuotas en historial</p>';
+        html += '<p style="color: #999; text-align: center;" data-i18n="dashboardUser.billing.history.empty">No hay cuotas en historial</p>';
     }
     html += '</div>';
-    
+    console.log("🚀 Archivo de cuotas cargado correctamente");
+
     container.innerHTML = html;
+    console.log("¿Existe window.i18n?:", !!window.i18n);
+    console.log("¿Está inicializado?:", window.i18n?.isInitialized());
+    i18n.translatePage();
+    // AL PARECER ESTE ES EL BLOQUE CORRECTO, ESTE ES EL QUE EJECUTA AL PARECER
+
 };
 
 console.log(' Fix completo aplicado con todas las funciones auxiliares');
