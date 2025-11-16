@@ -356,8 +356,10 @@ async function loadUserTasks() {
             console.error('Error al cargar tareas:', data.message || data);
             document.getElementById('tareasUsuarioList').innerHTML =
                 '<div class="no-tasks">Error al cargar tareas</div>';
+            i18n.translatePage();
             document.getElementById('tareasNucleoList').innerHTML =
                 '<div class="no-tasks">Error al cargar tareas</div>';
+            i18n.translatePage();
         }
     } catch (error) {
         console.error('Error:', error);
@@ -376,7 +378,8 @@ function renderUserTasks(tareas, containerId, esNucleo = false) {
     const container = document.getElementById(containerId);
 
     if (!tareas || tareas.length === 0) {
-        container.innerHTML = '<div class="no-tasks">No tienes tareas asignadas</div>';
+        container.innerHTML = '<div class="no-tasks" data-i18n="dashboardUser.tasks.individualTasks.noTasks">No tienes tareas asignadas</div>';
+        i18n.translatePage();
         return;
     }
 
@@ -1274,8 +1277,8 @@ async function marcarEntrada() {
 
     const btnEntrada = document.getElementById('btn-entrada');
     btnEntrada.disabled = true;
-    btnEntrada.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Registrando...';
-
+    btnEntrada.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span data-i18n="dashboardUser.hours.registering">Registrando...</span>';
+    i18n.translatePage();
     try {
         const hoy = new Date();
         const formData = new FormData();
@@ -1300,20 +1303,23 @@ async function marcarEntrada() {
 
             // Restablecer botón antes de recargar
             btnEntrada.disabled = false;
-            btnEntrada.innerHTML = '<i class="fas fa-sign-in-alt"></i> Marcar Entrada';
+            btnEntrada.innerHTML = '<i class="fas fa-sign-in-alt"></i> <span data-i18n="dashboardUser.hours.clockIn">Marcar Entrada</span>';
+            i18n.translatePage();
 
             await inicializarSeccionHoras();
         } else {
             alert(`❌ ${data.message}`);
             btnEntrada.disabled = false;
-            btnEntrada.innerHTML = '<i class="fas fa-sign-in-alt"></i> Marcar Entrada';
+            btnEntrada.innerHTML = '<i class="fas fa-sign-in-alt"></i> <span data-i18n="dashboardUser.hours.clockIn">Marcar Entrada</span>';
+            i18n.translatePage();
         }
 
     } catch (error) {
         console.error('❌ Error al marcar entrada:', error);
         alert('❌ Error de conexión. Por favor, intenta nuevamente.');
         btnEntrada.disabled = false;
-        btnEntrada.innerHTML = '<i class="fas fa-sign-in-alt"></i> Marcar Entrada';
+        btnEntrada.innerHTML = '<i class="fas fa-sign-in-alt"></i> <span data-i18n="dashboardUser.hours.clockIn">Marcar Entrada</span>';
+        i18n.translatePage();
     }
 }
 
@@ -1334,7 +1340,8 @@ async function marcarSalida() {
     const btnSalida = document.getElementById('btn-salida');
     const btnHTML = btnSalida.innerHTML;
     btnSalida.disabled = true;
-    btnSalida.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Registrando...';
+    btnSalida.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span data-i18n="dashboardUser.hours.registering">Registrando...</span>';
+    i18n.translatePage();
 
     try {
         const ahora = new Date();
@@ -1561,11 +1568,13 @@ async function loadMisRegistros() {
             (` ${data.registros.length} registros cargados`);
         } else {
             container.innerHTML = '<p class="error">Error al cargar registros</p>';
+            i18n.translatePage();
         }
 
     } catch (error) {
         console.error('❌ Error al cargar registros:', error);
         container.innerHTML = '<p class="error">Error de conexión</p>';
+        i18n.translatePage();
     }
 }
 
@@ -1587,12 +1596,12 @@ function renderHistorialRegistros(registros) {
             <table class="registros-table">
                 <thead>
                     <tr>
-                        <th>Fecha</th>
-                        <th>Día</th>
-                        <th>Entrada</th>
-                        <th>Salida</th>
-                        <th>Total</th>
-                        <th>Acciones</th>
+                        <th data-i18n="dashboardUser.hours.history.table.columns.date">Fecha</th>
+                        <th data-i18n="dashboardUser.hours.history.table.columns.day">Día</th>
+                        <th data-i18n="dashboardUser.hours.history.table.columns.entry">Entrada</th>
+                        <th data-i18n="dashboardUser.hours.history.table.columns.exit">Salida</th>
+                        <th data-i18n="dashboardUser.hours.history.table.columns.total">Total</th>
+                        <th data-i18n="dashboardUser.hours.history.table.columns.actions">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -1603,7 +1612,7 @@ function renderHistorialRegistros(registros) {
         const fechaFormateada = formatearFechaSimple(reg.fecha);
         const diaSemana = obtenerDiaSemana(fecha);
         const entrada = reg.hora_entrada ? reg.hora_entrada.substring(0, 5) : '--:--';
-        const salida = reg.hora_salida ? reg.hora_salida.substring(0, 5) : '<span class="en-curso">En curso</span>';
+        const salida = reg.hora_salida ? reg.hora_salida.substring(0, 5) : '<span class="en-curso" data-i18n="dashboardUser.hours.history.table.inProgress">En curso</span>';
         const horas = reg.total_horas || '0.00';
 
         html += `
@@ -1672,7 +1681,16 @@ function formatearFechaSimple(fecha) {
 }
 
 function obtenerDiaSemana(fecha) {
-    const dias = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+    const dias = [
+        '<span data-i18n="dashboardUser.hours.history.table.row.days.sun"></span>',
+        '<span data-i18n="dashboardUser.hours.history.table.row.days.mon"></span>',
+        '<span data-i18n="dashboardUser.hours.history.table.row.days.tue"></span>',
+        '<span data-i18n="dashboardUser.hours.history.table.row.days.wed"></span>',
+        '<span data-i18n="dashboardUser.hours.history.table.row.days.thu"></span>',
+        '<span data-i18n="dashboardUser.hours.history.table.row.days.fri"></span>',
+        '<span data-i18n="dashboardUser.hours.history.table.row.days.sat"></span>'
+    ];
+
     return dias[fecha.getDay()];
 }
 
@@ -4447,8 +4465,8 @@ function renderDeudaHorasWidget(deuda) {
                     <i class="fas ${tieneDeuda ? 'fa-exclamation-triangle' : 'fa-check-circle'}"></i>
                 </div>
                 <div class="deuda-titulo">
-                    <h4>${tieneDeuda ? 'Tienes Deuda de Horas' : 'Sin Deuda de Horas'}</h4>
-                    <p>Período: ${getNombreMes(deuda.mes)} ${deuda.anio}</p>
+                    <h4>${tieneDeuda ? '<span data-i18n="dashboardUser.billing.debtStatus.debtType.withDebt">Tienes Deuda de Horas</span>' : '<span data-i18n="dashboardUser.billing.debtStatus.debtType.withoutDebt">Sin Deuda de Horas</span>'}</h4>
+                    <p><span data-i18n="dashboardUser.billing.debtStatus.debtType.period">Período:</span> ${getNombreMes(deuda.mes)} ${deuda.anio}</p>
                 </div>
             </div>
             
@@ -4463,7 +4481,7 @@ function renderDeudaHorasWidget(deuda) {
                     <div class="deuda-desglose-resumen" style="background: #fff3cd; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #ff9800;">
                         <div style="display: grid; gap: 8px;">
                             <div style="display: flex; justify-content: space-between;">
-                                <span>💰 Deuda mes actual:</span>
+                                <span data-i18n="dashboardUser.billing.debtStatus.debtBreakdown.debtForTheCurrentMonth">💰 Deuda mes actual:</span>
                                 <strong>$${deudaMesActual.toLocaleString('es-UY', { minimumFractionDigits: 2 })}</strong>
                             </div>
                             ${deudaAcumulada > 0 ? `
@@ -4483,34 +4501,34 @@ function renderDeudaHorasWidget(deuda) {
                 
                 <div class="deuda-desglose">
                     <div class="desglose-item">
-                        <span class="label">Horas Requeridas:</span>
+                        <span class="label" data-i18n="dashboardUser.billing.debtStatus.debtBreakdown.debtItems.hoursRequired">Horas Requeridas:</span>
                         <span class="valor">${deuda.horas_requeridas_mensuales}h/mes</span>
                     </div>
                     <div class="desglose-item">
-                        <span class="label">Sistema Semanal:</span>
+                        <span class="label" data-i18n="dashboardUser.billing.debtStatus.debtBreakdown.debtItems.weeklySystem">Sistema Semanal:</span>
                         <span class="valor">${deuda.horas_requeridas_semanales}h/semana</span>
                     </div>
                     <div class="desglose-item">
-                        <span class="label">Horas Trabajadas:</span>
+                        <span class="label" data-i18n="dashboardUser.billing.debtStatus.debtBreakdown.debtItems.hoursWorked">Horas Trabajadas:</span>
                         <span class="valor">${deuda.horas_trabajadas}h</span>
                     </div>
                     <div class="desglose-item">
-                        <span class="label">Promedio Semanal:</span>
+                        <span class="label" data-i18n="dashboardUser.billing.debtStatus.debtBreakdown.debtItems.weeklyAverage">Promedio Semanal:</span>
                         <span class="valor">${deuda.promedio_semanal}h/sem</span>
                     </div>
                     <div class="desglose-item ${tieneDeuda ? 'error' : 'success'}">
-                        <span class="label">Horas Faltantes:</span>
+                        <span class="label" data-i18n="dashboardUser.billing.debtStatus.debtBreakdown.debtItems.hoursRemaining">Horas Faltantes:</span>
                         <span class="valor">${deuda.horas_faltantes}h</span>
                     </div>
                     <div class="desglose-item">
-                        <span class="label">Costo por Hora:</span>
+                        <span class="label" data-i18n="dashboardUser.billing.debtStatus.debtBreakdown.debtItems.costPerHour">Costo por Hora:</span>
                         <span class="valor">$${deuda.costo_por_hora}</span>
                     </div>
                 </div>
                 
                 <div class="deuda-progreso">
                     <div class="progreso-header">
-                        <span>Progreso Mensual</span>
+                        <span data-i18n="dashboardUser.billing.debtStatus.debtBreakdown.progress">Progreso Mensual</span>
                         <span class="porcentaje">${deuda.porcentaje_cumplido}%</span>
                     </div>
                     <div class="barra-progreso">
@@ -4523,14 +4541,14 @@ function renderDeudaHorasWidget(deuda) {
                 
                 ${tieneDeuda ? `
                     <div class="alert-warning" style="margin-top: 15px;">
-                        <strong>⚠ Información Importante:</strong>
-                        <p>Esta deuda ${deudaAcumulada > 0 ? '(incluye $' + deudaAcumulada.toLocaleString('es-UY', { minimumFractionDigits: 2 }) + ' de meses anteriores) ' : ''}se sumará automáticamente a tu próxima cuota mensual de vivienda.</p>
-                        <p>Sistema: <strong>21 horas semanales</strong> (84h mensuales).</p>
+                        <strong data-i18n="dashboardUser.billing.debtStatus.debtBreakdown.alertWarning.title">⚠ Información Importante:</strong>
+                        <p><span data-i18n="dashboardUser.billing.debtStatus.debtBreakdown.alertWarning.thisDebt">Esta deuda</span> ${deudaAcumulada > 0 ? '<span data-i18n="dashboardUser.billing.debtStatus.debtBreakdown.alertWarning.include">(incluye</span> $' + deudaAcumulada.toLocaleString('es-UY', { minimumFractionDigits: 2 }) + ' <span data-i18n="dashboardUser.billing.debtStatus.debtBreakdown.alertWarning.fromPreviousMonths">de meses anteriores)</span> ' : ''}<span data-i18n="dashboardUser.billing.debtStatus.debtBreakdown.alertWarning.nextmessage">se sumará automáticamente a tu próxima cuota mensual de vivienda.</span></p>
+                        <p data-i18n="dashboardUser.billing.debtStatus.debtBreakdown.alertWarning.sistemMessage">Sistema: <strong>21 horas semanales</strong> (84h mensuales).</p>
                     </div>
                 ` : `
                     <div class="alert-success" style="margin-top: 15px;">
-                        <strong>🎉 ¡Excelente!</strong>
-                        <p>Has cumplido con tus horas requeridas. No tendrás cargos adicionales en tu cuota.</p>
+                        <strong data-i18n="dashboardUser.billing.debtStatus.debtBreakdown.alertWarning.excellentMessage">🎉 ¡Excelente!</strong>
+                        <p data-i18n="dashboardUser.billing.debtStatus.debtBreakdown.alertWarning.excellentMessageDescription">Has cumplido con tus horas requeridas. No tendrás cargos adicionales en tu cuota.</p>
                     </div>
                 `}
             </div>
@@ -5531,7 +5549,8 @@ function fixFechasTareas() {
         const container = document.getElementById(containerId);
 
         if (!tareas || tareas.length === 0) {
-            container.innerHTML = '<div class="no-tasks">No tienes tareas asignadas</div>';
+            container.innerHTML = '<div class="no-tasks" data-i18n="dashboardUser.tasks.individualTasks.noTasks">No tienes tareas asignadas</div>';
+            i18n.translatePage();
             return;
         }
 
@@ -5557,9 +5576,9 @@ function fixFechasTareas() {
                     <p class="user-task-description">${tarea.descripcion}</p>
                     
                     <div class="user-task-meta">
-                        <div><strong>Inicio:</strong> ${fechaInicio}</div>
-                        <div><strong>Fin:</strong> ${fechaFin}</div>
-                        <div><strong>Creado por:</strong> ${tarea.creador}</div>
+                        <div><strong data-i18n="dashboardUser.tasks.start">Inicio:</strong> ${fechaInicio}</div>
+                        <div><strong data-i18n="dashboardUser.tasks.end">Fin:</strong> ${fechaFin}</div>
+                        <div><strong data-i18n="dashboardUser.tasks.createdBy">Creado por:</strong> ${tarea.creador}</div>
                     </div>
                     
                     <div class="progress-bar-container">
@@ -5571,25 +5590,26 @@ function fixFechasTareas() {
                     ${!esCompletada ? `
                         <div class="user-task-actions">
                             <button class="btn-small btn-update" onclick="updateTaskProgress(${tarea.id_asignacion}, '${esNucleo ? 'nucleo' : 'usuario'}', ${tarea.id_tarea})">
-                                Actualizar Progreso
+                                <span data-i18n="dashboardUser.tasks.updateProgress">Actualizar Progreso</span>
                             </button>
                             <button class="btn-small btn-avance" onclick="addTaskAvance(${tarea.id_tarea})">
-    Reportar Avance
+    <span data-i18n="dashboardUser.tasks.reportProgress">Reportar Avance</span>
 </button>
                             <button class="btn-small btn-materiales" onclick="viewTaskMaterials(${tarea.id_tarea})" title="Ver materiales necesarios">
-                                <i class="fas fa-boxes"></i> Materiales
+                                <i class="fas fa-boxes"></i> <span data-i18n="dashboardUser.tasks.materials">Materiales</span>
                             </button>
                             <button class="btn-small btn-detalles" onclick="viewUserTaskDetails(${tarea.id_tarea})">
-                                Ver Detalles Completos
+                                <span data-i18n="dashboardUser.tasks.viewFullDetails">Ver Detalles Completos</span>
                             </button>
                         </div>
-                    ` : '<p style="color: #28a745; margin-top: 10px;"><strong>✓ Tarea completada</strong></p>'}
+                    ` : '<p style="color: #28a745; margin-top: 10px;"><strong data-i18n="dashboardUser.tasks.tareaCompletada">✓ Tarea completada</strong></p>'}
                 </div>
             `;
         }).join('');
     };
 
     (' Fix de fechas en tareas aplicado');
+    i18n.translatePage();
 }
 
 /**
@@ -5792,7 +5812,8 @@ setTimeout(function () {
         const container = document.getElementById(containerId);
 
         if (!tareas || tareas.length === 0) {
-            container.innerHTML = '<div class="no-tasks">No tienes tareas asignadas</div>';
+            container.innerHTML = '<div class="no-tasks" data-i18n="dashboardUser.tasks.individualTasks.noTasks">No tienes tareas asignadas</div>';
+            i18n.translatePage();
             return;
         }
 
@@ -5844,55 +5865,89 @@ setTimeout(function () {
             }
 
             return `
-                <div class="user-task-item prioridad-${tarea.prioridad} ${tareaClass}">
-                    <div class="user-task-header">
-                        <h4 class="user-task-title">${tarea.titulo}</h4>
-                        <div class="user-task-badges">
-                            <span class="task-badge badge-estado ${estadoBadgeClass}">
-                                ${estadoTexto}
-                            </span>
-                            ${esNucleo ? '<span class="task-badge" style="background: #6f42c1; color: white;">Núcleo</span>' : ''}
-                        </div>
-                    </div>
-                    
-                    <p class="user-task-description">${tarea.descripcion}</p>
-                    
-                    <div class="user-task-meta">
-                        <div><strong>Inicio:</strong> ${fechaInicio}</div>
-                        <div><strong>Fin:</strong> ${fechaFin}</div>
-                        <div><strong>Creado por:</strong> ${tarea.creador}</div>
-                    </div>
-                    
-                    <div class="progress-bar-container">
-                        <div class="progress-bar" style="width: ${progreso}%; background: ${tarea.esVencida ? '#dc3545' : tarea.esCompletada ? '#28a745' : '#667eea'};">
-                            ${progreso}%
-                        </div>
-                    </div>
-                    
-                    ${tarea.esVencida ? `
-                        <div class="alert-warning" style="margin-top: 15px;">
-                            <i class="fas fa-exclamation-triangle"></i>
-                            <strong>Esta tarea está vencida.</strong> La fecha límite ya ha pasado.
-                        </div>
-                    ` : ''}
-                    
-                    ${!tarea.esCompletada ? `
-                        <div class="user-task-actions">
-                            <button class="btn-small btn-update" onclick="updateTaskProgress(${tarea.id_asignacion}, '${esNucleo ? 'nucleo' : 'usuario'}', ${tarea.id_tarea})">
-                                Actualizar Progreso
-                            </button>
-                            <button class="btn-small btn-avance" onclick="addTaskAvance(${tarea.id_tarea})">
-                                Reportar Avance
-                            </button>
-                            <button class="btn-small btn-materiales" onclick="viewTaskMaterials(${tarea.id_tarea})" title="Ver materiales necesarios">
-                                <i class="fas fa-boxes"></i> Materiales
-                            </button>
-                            <button class="btn-small btn-detalles" onclick="viewUserTaskDetails(${tarea.id_tarea})">
-                                Ver Detalles Completos
-                            </button>
-                        </div>
-                    ` : '<p style="color: #28a745; margin-top: 10px;"><strong>✓ Tarea completada</strong></p>'}
-                </div>
+<div class="user-task-item prioridad-${tarea.prioridad} ${tareaClass}">
+    <div class="user-task-header">
+        <h4 class="user-task-title">${tarea.titulo}</h4>
+        <div class="user-task-badges">
+            <span class="task-badge badge-estado ${estadoBadgeClass}">
+                ${estadoTexto}
+            </span>
+            ${esNucleo ? `
+                <span class="task-badge" style="background: #6f42c1; color: white;">
+                    <span data-i18n="dashboardUser.tasks.nucleo">Núcleo</span>
+                </span>
+            ` : ''}
+        </div>
+    </div>
+    
+    <p class="user-task-description">${tarea.descripcion}</p>
+    
+    <div class="user-task-meta">
+        <div>
+            <strong>
+                <span data-i18n="dashboardUser.tasks.inicio">Inicio:</span>
+            </strong> ${fechaInicio}
+        </div>
+        <div>
+            <strong>
+                <span data-i18n="dashboardUser.tasks.fin">Fin:</span>
+            </strong> ${fechaFin}
+        </div>
+        <div>
+            <strong>
+                <span data-i18n="dashboardUser.tasks.creadoPor">Creado por:</span>
+            </strong> ${tarea.creador}
+        </div>
+    </div>
+    
+    <div class="progress-bar-container">
+        <div class="progress-bar" 
+             style="width: ${progreso}%; background: ${tarea.esVencida ? '#dc3545' : tarea.esCompletada ? '#28a745' : '#667eea'};">
+            ${progreso}%
+        </div>
+    </div>
+    
+    ${tarea.esVencida ? `
+        <div class="alert-warning" style="margin-top: 15px;">
+            <i class="fas fa-exclamation-triangle"></i>
+            <strong>
+                <span data-i18n="dashboardUser.tasks.tareaVencida">Esta tarea está vencida.</span>
+            </strong>
+            <span data-i18n="dashboardUser.tasks.fechaLimitePasada">
+                La fecha límite ya ha pasado.
+            </span>
+        </div>
+    ` : ''}
+    
+    ${!tarea.esCompletada ? `
+        <div class="user-task-actions">
+            <button class="btn-small btn-update" 
+                    onclick="updateTaskProgress(${tarea.id_asignacion}, '${esNucleo ? 'nucleo' : 'usuario'}', ${tarea.id_tarea})">
+                <span data-i18n="dashboardUser.tasks.actualizarProgreso">Actualizar Progreso</span>
+            </button>
+            
+            <button class="btn-small btn-avance" onclick="addTaskAvance(${tarea.id_tarea})">
+                <span data-i18n="dashboardUser.tasks.reportarAvance">Reportar Avance</span>
+            </button>
+            
+            <button class="btn-small btn-materiales" onclick="viewTaskMaterials(${tarea.id_tarea})" title="Ver materiales necesarios">
+                <i class="fas fa-boxes"></i>
+                <span data-i18n="dashboardUser.tasks.materiales">Materiales</span>
+            </button>
+            
+            <button class="btn-small btn-detalles" onclick="viewUserTaskDetails(${tarea.id_tarea})">
+                <span data-i18n="dashboardUser.tasks.verDetallesCompletos">Ver Detalles Completos</span>
+            </button>
+        </div>
+    ` : `
+        <p style="color: #28a745; margin-top: 10px;">
+            <strong>
+                <span data-i18n="dashboardUser.tasks.tareaCompletada">✓ Tarea completada</span>
+            </strong>
+        </p>
+    `}
+</div>
+
             `;
         }).join('');
 
@@ -5901,6 +5956,7 @@ setTimeout(function () {
     };
 
     (' [OVERRIDE USER] renderUserTasks sobrescrito correctamente');
+    i18n.translatePage();
 })();
 
 /**
