@@ -1,29 +1,29 @@
-
-
 <header class="header">
     <div class="logo">
         <h1 data-i18n="dashboardUser.title">Gestcoop – Panel de Usuario</h1>
     </div>
 
     <div class="user-controls">
-        
-        
+
+
         <a href="/api/logout" class="logout-link">
             <button class="btn-logout">
                 <span data-i18n="dashboardUser.logout">Logout</span>
             </button>
         </a>
-        
+
         <?php if (isset($_SESSION['is_admin']) && $_SESSION['is_admin']): ?>
-            <a href="/dashboard-admin" style="text-decoration: none;">
-                <button class="btn-admin" type="button">
-                    <i class="fas fa-user-shield"></i>
-                    <span data-i18n="dashboardUser.admin">Admin</span>
-                </button>
-            </a>
+        <a href="/dashboard-admin" style="text-decoration: none;">
+            <button class="btn-admin" type="button">
+                <i class="fas fa-user-shield"></i>
+                <span data-i18n="dashboardUser.admin">Admin</span>
+            </button>
+        </a>
         <?php endif; ?>
-        
-        <span class="nombre"><?php echo htmlspecialchars($_SESSION['nombre_completo'] ?? 'Usuario'); ?></span>
+
+        <span class="nombre">
+            <?php echo htmlspecialchars($_SESSION['nombre_completo'] ?? 'Usuario'); ?>
+        </span>
         <div class="icono-usuario">
             <img src="https://cdn-icons-png.flaticon.com/512/847/847969.png" alt="Usuario">
         </div>
@@ -31,13 +31,14 @@
 
 </header>
 
+<button class="mini-toggle-menu-btn" title="Mostrar Menú">
+    <i class="fa-solid fa-angle-down"></i>
+</button>
 <nav class="menu">
     <ul>
         <li data-section="inicio" class="activo">
-            <a href="#" data-i18n-title="dashboardUser.sections.home" title="Inicio">
+            <a href="#">
                 <i class="fas fa-house-user"></i>
-            </a>
-        </li>
         <li data-section="perfil">
             <a href="#" data-i18n-title="dashboardUser.sections.profile" title="Perfil">
                 <i class="fas fa-user"></i>
@@ -69,6 +70,9 @@
             </a>
         </li>
     </ul>
+    <button class="toggle-menu-btn" title="Minimizar menú">
+        <i class="fas fa-chevron-up"></i>
+    </button>
 </nav>
 
 <!-- Script para manejar la navegación -->
@@ -78,4 +82,5 @@
 
 
 </body>
+
 </html>

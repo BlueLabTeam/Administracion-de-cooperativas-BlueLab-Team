@@ -674,3 +674,92 @@
 .user-task-item.tarea-vencida .progress-bar {
     background: #dc3545 !important;
 }
+
+
+/* ==========================================
+   FORMULARIO DE TAREAS - LAYOUT MEJORADO
+   ========================================== */
+.task-form-main-grid {
+    display: grid;
+    grid-template-columns: 1fr 420px;
+    gap: 24px;
+    margin-bottom: 24px;
+    align-items: stretch;
+}
+
+.task-form-left,
+.task-form-right {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.task-form-right {
+    background: var(--color-gray-50);
+    padding: 20px;
+    border-radius: var(--border-radius-md);
+    border: 1px solid var(--border-color);
+}
+
+/* Hacer que la descripción ocupe el espacio disponible */
+.task-form-left .form-group:last-child {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.task-form-left .form-group:last-child label {
+    margin-bottom: 8px;
+}
+
+.task-form-left .form-group:last-child textarea {
+    flex: 1;
+    resize: vertical;
+}
+
+/* Campos de la columna derecha con altura automática */
+.task-form-right .form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.task-form-right .form-group label {
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--color-gray-700);
+}
+
+.task-form-right .form-group input,
+.task-form-right .form-group select {
+    padding: 10px 12px;
+    height: auto;
+    min-height: 42px;
+    line-height: normal;
+}
+
+.task-form-right .form-group select {
+    padding-right: 32px;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .task-form-main-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .task-form-right {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+    
+    .task-form-left .form-group:last-child textarea {
+        min-height: 150px;
+    }
+}
+
+@media (max-width: 600px) {
+    .task-form-right {
+        grid-template-columns: 1fr;
+    }
+}

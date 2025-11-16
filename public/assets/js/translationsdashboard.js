@@ -834,7 +834,7 @@ es: {
 
       reports: {
         title: "📊 Monthly Reports",
-        selectPeriod: "⚙️ Select Period",
+        selectPeriod: " Select Period",
         selectMonth: "Select month...",
         selectYear: "Select year...",
         generate: "Generate Report",
@@ -895,8 +895,8 @@ es: {
         paid: "Paid",
         pending: "Pending",
         amountCollected: "Amount Collected",
-        priceConfig: "⚙️ Price Configuration",
-        quickActions: "🚀 Quick Actions",
+        priceConfig: " Price Configuration",
+        quickActions: " Quick Actions",
         generateCurrentMonth: "Generate Current Month Fees",
         filterAllYears: "All years",
         filterAllMonths: "All months",
@@ -909,7 +909,7 @@ es: {
         newMonthlyAmount: "New Monthly Amount *",
         amountPlaceholder: "Ex: 7500.00",
         priceChangeWarning: "This change will apply to new fees that are generated. Existing fees will maintain their original amount.",
-        validatePayment: "✅ Validate Fee Payment",
+        validatePayment: " Validate Fee Payment",
         observationsOptional: "Observations (optional)",
         validationComments: "Comments about validation..."
       },

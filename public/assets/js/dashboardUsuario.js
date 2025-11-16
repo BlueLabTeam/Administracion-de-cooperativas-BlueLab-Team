@@ -1,27 +1,3 @@
-// 🧪 MODO TEST: Simular último día de DICIEMBRE
-(function () {
-    const TEST_MODE = true; // Cambiar a false para volver a normal
-
-    if (TEST_MODE) {
-        // Sobrescribir Date para simular el 31 de diciembre
-        const fechaOriginal = Date;
-        // 🚨 CAMBIO: 11 es el índice de Diciembre, y 31 es el último día.
-        const ultimoDiaDiciembre = new Date(new Date().getFullYear(), 11, 31);
-
-        window.Date = function (...args) {
-            if (args.length === 0) {
-                return ultimoDiaDiciembre; // Devolvemos la fecha simulada
-            }
-            return new fechaOriginal(...args);
-        };
-
-        // Copiar métodos estáticos
-        Object.setPrototypeOf(window.Date, fechaOriginal);
-        window.Date.prototype = fechaOriginal.prototype;
-
-        console.log('🧪 TEST MODE: Fecha simulada =', ultimoDiaDiciembre.toLocaleDateString());
-    }
-})();
 
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -564,9 +540,9 @@ function updateTaskProgress(asignacionId, tipoAsignacion, tareaId) {
 }
 
 function addTaskAvance(tareaId) {
-    console.log('🚀 addTaskAvance llamado con tareaId:', tareaId);
-
-    // ✅ Validar que tareaId existe
+    console.log(' addTaskAvance llamado con tareaId:', tareaId);
+    
+    //  Validar que tareaId existe
     if (!tareaId || tareaId === 'undefined') {
         alert('❌ Error: ID de tarea inválido');
         console.error('tareaId recibido:', tareaId);
@@ -592,12 +568,12 @@ function addTaskAvance(tareaId) {
     }
 
     const formData = new FormData();
-    // ✅ CAMBIO CRÍTICO: Usar 'id_tarea' en lugar de 'tarea_id'
+    //  CAMBIO CRÍTICO: Usar 'id_tarea' en lugar de 'tarea_id'
     formData.append('id_tarea', tareaId);
     formData.append('comentario', comentario.trim());
     formData.append('progreso_reportado', progresoNum);
 
-    // ✅ DEBUG: Ver qué estamos enviando
+    //  DEBUG: Ver qué estamos enviando
     console.log('📤 Enviando a /api/tasks/add-avance:');
     console.log('   id_tarea:', tareaId);
     console.log('   comentario:', comentario.trim());
@@ -1024,7 +1000,7 @@ function updateClockWithDate() {
 async function cargarDeudaHorasWidget() {
     const container = document.getElementById('deuda-actual-container');
     if (!container) {
-        ('⚠️ Container deuda-actual-container no encontrado');
+        console.log('⚠️ Container deuda-actual-container no encontrado');
         return;
     }
 
@@ -1033,9 +1009,9 @@ async function cargarDeudaHorasWidget() {
     try {
         const response = await fetch('/api/horas/deuda-actual');
         const data = await response.json();
-
-        ('💰 Deuda de horas recibida:', data);
-
+        
+        console.log('💰 Deuda de horas recibida:', data);
+        
         if (data.success && data.deuda) {
             renderDeudaHorasWidget(data.deuda);
         } else {
@@ -1050,114 +1026,96 @@ async function cargarDeudaHorasWidget() {
 
 function renderDeudaHorasWidget(deuda) {
     const container = document.getElementById('deuda-actual-container');
-
-    const estado = deuda.estado || 'pendiente';
-    const colorEstado = estado === 'cumplido' ? 'success' :
-        estado === 'progreso' ? 'warning' : 'error';
-
+    
     const deudaMesActual = parseFloat(deuda.deuda_en_pesos || 0);
     const deudaAcumulada = parseFloat(deuda.deuda_acumulada || 0);
-    const totalAPagar = deudaMesActual + deudaAcumulada;  // ✅ SUMA CORRECTA
+    const totalAPagar = deudaMesActual + deudaAcumulada;
     const tieneDeuda = totalAPagar > 0;
 
     container.innerHTML = `
-        <div class="deuda-widget ${colorEstado}">
-            <div class="deuda-header">
-                <div class="deuda-icono">
+        <div class="deuda-widget-compacto ${tieneDeuda ? 'con-deuda' : 'sin-deuda'}">
+            <!-- VISTA COMPACTA (SIEMPRE VISIBLE) -->
+            <div class="deuda-resumen" onclick="toggleDeudaDetalle()">
+                <div class="deuda-resumen-left">
                     <i class="fas ${tieneDeuda ? 'fa-exclamation-triangle' : 'fa-check-circle'}"></i>
+                    <div>
+                        <h4>${tieneDeuda ? 'Deuda de Horas' : 'Sin Deuda de Horas'}</h4>
+                        <p>${getNombreMes(deuda.mes)} ${deuda.anio}</p>
+                    </div>
                 </div>
-                <div class="deuda-titulo">
-                    <h4>${tieneDeuda ? 'Tienes Deuda de Horas' : 'Sin Deuda de Horas'}</h4>
-                    <p>Período: ${getNombreMes(deuda.mes)} ${deuda.anio}</p>
+                <div class="deuda-resumen-right">
+                    <div class="deuda-monto-compacto">
+                        $${totalAPagar.toLocaleString('es-UY', {minimumFractionDigits: 2})}
+                    </div>
+                    <i class="fas fa-chevron-down toggle-icon" id="toggle-deuda-icon"></i>
                 </div>
             </div>
             
-            <div class="deuda-body">
-                <!-- ✅ MOSTRAR TOTAL A PAGAR (MES ACTUAL + ACUMULADA) -->
-                <div class="deuda-monto-principal ${tieneDeuda ? 'error' : 'success'}">
-                    $${totalAPagar.toLocaleString('es-UY', { minimumFractionDigits: 2 })}
+            <!-- DETALLE EXPANDIBLE -->
+            <div class="deuda-detalle" id="deuda-detalle-content" style="display: none;">
+                <div class="deuda-stats-row">
+                    <div class="stat-box">
+                        <small>Trabajadas</small>
+                        <strong>${deuda.horas_trabajadas}h</strong>
+                    </div>
+                    <div class="stat-box">
+                        <small>Requeridas</small>
+                        <strong>${deuda.horas_requeridas_mensuales}h</strong>
+                    </div>
+                    <div class="stat-box ${tieneDeuda ? 'error' : 'success'}">
+                        <small>Faltantes</small>
+                        <strong>${deuda.horas_faltantes}h</strong>
+                    </div>
                 </div>
                 
-                <!-- ✅ AGREGAR DESGLOSE DE LA DEUDA TOTAL -->
-                ${totalAPagar > 0 ? `
-                    <div class="deuda-desglose-resumen" style="background: #fff3cd; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #ff9800;">
-                        <div style="display: grid; gap: 8px;">
-                            <div style="display: flex; justify-content: space-between;">
-                                <span>💰 Deuda mes actual:</span>
-                                <strong>$${deudaMesActual.toLocaleString('es-UY', { minimumFractionDigits: 2 })}</strong>
-                            </div>
-                            ${deudaAcumulada > 0 ? `
-                                <div style="display: flex; justify-content: space-between; color: #d32f2f;">
-                                    <span>⚠ Deuda acumulada:</span>
-                                    <strong>$${deudaAcumulada.toLocaleString('es-UY', { minimumFractionDigits: 2 })}</strong>
-                                </div>
-                                <hr style="margin: 8px 0; border: none; border-top: 1px dashed #ccc;">
-                                <div style="display: flex; justify-content: space-between; font-size: 1.1em;">
-                                    <span><strong>Total a pagar:</strong></span>
-                                    <strong style="color: #d32f2f;">$${totalAPagar.toLocaleString('es-UY', { minimumFractionDigits: 2 })}</strong>
-                                </div>
-                            ` : ''}
+                ${totalAPagar > 0 && deudaAcumulada > 0 ? `
+                    <div class="deuda-breakdown-box">
+                        <div class="breakdown-item">
+                            <span>Mes actual:</span>
+                            <strong>$${deudaMesActual.toLocaleString('es-UY', {minimumFractionDigits: 2})}</strong>
+                        </div>
+                        <div class="breakdown-item error">
+                            <span>Acumulada:</span>
+                            <strong>$${deudaAcumulada.toLocaleString('es-UY', {minimumFractionDigits: 2})}</strong>
                         </div>
                     </div>
                 ` : ''}
                 
-                <div class="deuda-desglose">
-                    <div class="desglose-item">
-                        <span class="label">Horas Requeridas:</span>
-                        <span class="valor">${deuda.horas_requeridas_mensuales}h/mes</span>
-                    </div>
-                    <div class="desglose-item">
-                        <span class="label">Sistema Semanal:</span>
-                        <span class="valor">${deuda.horas_requeridas_semanales}h/semana</span>
-                    </div>
-                    <div class="desglose-item">
-                        <span class="label">Horas Trabajadas:</span>
-                        <span class="valor">${deuda.horas_trabajadas}h</span>
-                    </div>
-                    <div class="desglose-item">
-                        <span class="label">Promedio Semanal:</span>
-                        <span class="valor">${deuda.promedio_semanal}h/sem</span>
-                    </div>
-                    <div class="desglose-item ${tieneDeuda ? 'error' : 'success'}">
-                        <span class="label">Horas Faltantes:</span>
-                        <span class="valor">${deuda.horas_faltantes}h</span>
-                    </div>
-                    <div class="desglose-item">
-                        <span class="label">Costo por Hora:</span>
-                        <span class="valor">$${deuda.costo_por_hora}</span>
-                    </div>
-                </div>
-                
-                <div class="deuda-progreso">
-                    <div class="progreso-header">
+                <div class="progreso-bar-container">
+                    <div class="progreso-bar-header">
                         <span>Progreso Mensual</span>
-                        <span class="porcentaje">${deuda.porcentaje_cumplido}%</span>
+                        <span>${deuda.porcentaje_cumplido}%</span>
                     </div>
-                    <div class="barra-progreso">
-                        <div class="barra-fill" style="width: ${Math.min(deuda.porcentaje_cumplido, 100)}%; 
-                             background: ${deuda.porcentaje_cumplido >= 100 ? '#4caf50' :
-            deuda.porcentaje_cumplido >= 50 ? '#ff9800' : '#f44336'}">
+                    <div class="progreso-bar">
+                        <div class="progreso-fill" style="width: ${Math.min(deuda.porcentaje_cumplido, 100)}%; 
+                             background: ${deuda.porcentaje_cumplido >= 100 ? '#4caf50' : 
+                                          deuda.porcentaje_cumplido >= 50 ? '#ff9800' : '#f44336'}">
                         </div>
                     </div>
                 </div>
-                
-                ${tieneDeuda ? `
-                    <div class="alert-warning" style="margin-top: 15px;">
-                        <strong>⚠ Información Importante:</strong>
-                        <p>Esta deuda ${deudaAcumulada > 0 ? '(incluye $' + deudaAcumulada.toLocaleString('es-UY', { minimumFractionDigits: 2 }) + ' de meses anteriores) ' : ''}se sumará automáticamente a tu próxima cuota mensual de vivienda.</p>
-                        <p>Sistema: <strong>21 horas semanales</strong> (84h mensuales).</p>
-                    </div>
-                ` : `
-                    <div class="alert-success" style="margin-top: 15px;">
-                        <strong>🎉 ¡Excelente!</strong>
-                        <p>Has cumplido con tus horas requeridas. No tendrás cargos adicionales en tu cuota.</p>
-                    </div>
-                `}
             </div>
         </div>
     `;
 }
 
+// Función para expandir/colapsar
+function toggleDeudaDetalle() {
+    const detalle = document.getElementById('deuda-detalle-content');
+    const icon = document.getElementById('toggle-deuda-icon');
+    
+    if (detalle.style.display === 'none') {
+        detalle.style.display = 'block';
+        icon.classList.remove('fa-chevron-down');
+        icon.classList.add('fa-chevron-up');
+    } else {
+        detalle.style.display = 'none';
+        icon.classList.remove('fa-chevron-up');
+        icon.classList.add('fa-chevron-down');
+    }
+}
+
+// Exportar función
+window.toggleDeudaDetalle = toggleDeudaDetalle;
 
 function getNombreMes(mes) {
     const meses = [
@@ -1267,7 +1225,7 @@ function mostrarBotonSalida(horaEntrada) {
 
 // ========== MARCAR ENTRADA ==========
 async function marcarEntrada() {
-    ('🚀 Iniciando marcación de entrada');
+    (' Iniciando marcación de entrada');
 
     const descripcion = prompt('Describe brevemente tu trabajo de hoy (opcional):');
     if (descripcion === null) {
@@ -1325,7 +1283,7 @@ async function marcarEntrada() {
 
 // ========== MARCAR SALIDA ==========
 async function marcarSalida() {
-    ('🚀 Iniciando marcación de salida');
+    (' Iniciando marcación de salida');
 
     if (!registroAbiertoId) {
         alert('❌ No hay registro activo para cerrar');
@@ -1495,16 +1453,20 @@ function renderResumenSemanal(resumen) {
         const esHoy = fecha === new Date().toISOString().split('T')[0];
         const esFinDeSemana = index === 5 || index === 6;
 
-        html += `
-            <div class="dia-card ${registro ? 'con-registro' : 'sin-registro'} ${esHoy ? 'dia-hoy' : ''} ${esFinDeSemana ? 'fin-de-semana' : ''}">
-                <div class="dia-header">
-                    <strong>${dia}</strong>
-                    <span class="dia-fecha">${fechaFormateada}</span>
-                    ${esHoy ? '<span class="badge-hoy">HOY</span>' : ''}
-                    ${esFinDeSemana ? '<span class="badge-finde">🏖️</span>' : ''}
-                </div>
-                <div class="dia-content">
-        `;
+       html += `
+    <div class="dia-card ${registro ? 'con-registro' : 'sin-registro'} ${esHoy ? 'dia-hoy' : ''} ${esFinDeSemana ? 'fin-de-semana' : ''}">
+        <div class="dia-header">
+            <div class="dia-info">
+                <strong>${dia}</strong>
+                <span class="dia-fecha">${fechaFormateada}</span>
+            </div>
+            <div class="dia-badges">
+                ${esHoy ? '<span class="badge-hoy">HOY</span>' : ''}
+                ${esFinDeSemana ? '<span class="badge-finde">🏖️</span>' : ''}
+            </div>
+        </div>
+        <div class="dia-content">
+`;
 
         if (registro) {
             const entrada = registro.hora_entrada ? registro.hora_entrada.substring(0, 5) : '--:--';
@@ -1565,7 +1527,7 @@ async function loadMisRegistros() {
 
         if (data.success && data.registros) {
             renderHistorialRegistros(data.registros);
-            (` ${data.registros.length} registros cargados`);
+            console.log(` ${data.registros.length} registros cargados`);
         } else {
             container.innerHTML = '<p class="error">Error al cargar registros</p>';
             i18n.translatePage();
@@ -1583,62 +1545,78 @@ function renderHistorialRegistros(registros) {
 
     if (!registros || registros.length === 0) {
         container.innerHTML = `
-            <div class="no-data">
-                <i class="fas fa-inbox" style="font-size: 48px; color: #ddd; margin-bottom: 10px;"></i>
-                <p>No hay registros para mostrar</p>
+            <div style="text-align: center; padding: 40px; background: #f8f9fa; border-radius: 12px;">
+                <i class="fas fa-inbox" style="font-size: 48px; color: #ccc; margin-bottom: 15px;"></i>
+                <p style="color: #6c757d; margin: 0;">No hay registros para mostrar</p>
             </div>
         `;
         return;
     }
 
-    let html = `
-        <div class="registros-table-wrapper">
-            <table class="registros-table">
-                <thead>
-                    <tr>
-                        <th data-i18n="dashboardUser.hours.history.table.columns.date">Fecha</th>
-                        <th data-i18n="dashboardUser.hours.history.table.columns.day">Día</th>
-                        <th data-i18n="dashboardUser.hours.history.table.columns.entry">Entrada</th>
-                        <th data-i18n="dashboardUser.hours.history.table.columns.exit">Salida</th>
-                        <th data-i18n="dashboardUser.hours.history.table.columns.total">Total</th>
-                        <th data-i18n="dashboardUser.hours.history.table.columns.actions">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-    `;
+    // Agrupar por semanas
+    const semanas = agruparPorSemanas(registros);
+    
+    let html = '<div class="registros-accordion">';
 
-    registros.forEach(reg => {
-        const fecha = new Date(reg.fecha + 'T00:00:00');
-        const fechaFormateada = formatearFechaSimple(reg.fecha);
-        const diaSemana = obtenerDiaSemana(fecha);
-        const entrada = reg.hora_entrada ? reg.hora_entrada.substring(0, 5) : '--:--';
-        const salida = reg.hora_salida ? reg.hora_salida.substring(0, 5) : '<span class="en-curso" data-i18n="dashboardUser.hours.history.table.inProgress">En curso</span>';
-        const horas = reg.total_horas || '0.00';
+    semanas.forEach((semana, index) => {
+        const isOpen = index === 0; // Solo la primera semana abierta
+        const totalHoras = semana.registros.reduce((sum, r) => sum + parseFloat(r.total_horas || 0), 0);
+        const promedioHoras = (totalHoras / semana.registros.length).toFixed(1);
 
         html += `
-            <tr class="registro-row">
-                <td><strong>${fechaFormateada}</strong></td>
-                <td>${diaSemana}</td>
-                <td><i class="fas fa-sign-in-alt"></i> ${entrada}</td>
-                <td><i class="fas fa-sign-out-alt"></i> ${salida}</td>
-                <td><strong>${horas}h</strong></td>
-                <td>
-                    ${reg.descripcion ? `
-                        <button class="btn-small btn-secondary" onclick="verDescripcionRegistro('${reg.descripcion.replace(/'/g, "\\'")}', '${fechaFormateada}')" title="Ver descripción">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                    ` : '-'}
-                </td>
-            </tr>
+            <div class="semana-card ${isOpen ? 'open' : ''}" data-semana="${index}">
+                <div class="semana-header" onclick="toggleSemana(${index})">
+                    <div class="semana-info">
+                        <div class="semana-icono">
+                            <i class="fas fa-calendar-week"></i>
+                        </div>
+                        <div class="semana-texto">
+                            <h4>${semana.titulo}</h4>
+                            <span class="semana-rango">${semana.rango}</span>
+                        </div>
+                    </div>
+                    <div class="semana-stats">
+                        <div class="stat-item">
+                            <span class="stat-valor">${semana.registros.length}</span>
+                            <span class="stat-label">días</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-valor">${totalHoras.toFixed(1)}h</span>
+                            <span class="stat-label">total</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-valor">${promedioHoras}h</span>
+                            <span class="stat-label">promedio</span>
+                        </div>
+                    </div>
+                    <div class="semana-toggle">
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
+                
+                <div class="semana-content ${isOpen ? 'show' : ''}">
+                    <table class="registros-mini-table">
+                        <thead>
+                            <tr>
+                                <th data-i18n="dashboardUser.hours.history.table.columns.date">Fecha</th>
+                                <th data-i18n="dashboardUser.hours.history.table.columns.entry">Entrada</th>
+                                <th data-i18n="dashboardUser.hours.history.table.columns.exit">Salida</th>
+                                <th>Horas</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${semana.registros.map(reg => renderRegistroRow(reg)).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         `;
     });
 
-    html += `
-                </tbody>
-            </table>
-        </div>
-    `;
-
+    html += '</div>';
+    html += getEstilosRegistros();
+    
     container.innerHTML = html;
 }
 
@@ -2085,38 +2063,38 @@ async function inicializarSeccionCuotas() {
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
 
     try {
-        // ✅ PASO 1: Generar cuota del mes actual
+        //  PASO 1: Generar cuota del mes actual
         console.log('⏳ [PASO 1/4] Verificando/generando cuota...');
         await generarCuotaMesActualSiNoExiste();
-        console.log('✅ [PASO 1/4] Cuota verificada/generada');
-
+        console.log(' [PASO 1/4] Cuota verificada/generada');
+        
         // 🔥 PASO 2: CARGAR DEUDA DE HORAS (CRÍTICO - DEBE COMPLETARSE)
         console.log('⏳ [PASO 2/4] Cargando deuda de horas...');
         const deudaCargada = await loadDeudaHorasParaCuotas();
-        console.log('✅ [PASO 2/4] Deuda de horas cargada:', deudaCargada);
-
-        // ✅ VERIFICACIÓN CRÍTICA
+        console.log(' [PASO 2/4] Deuda de horas cargada:', deudaCargada);
+        
+        //  VERIFICACIÓN CRÍTICA
         if (typeof window.deudaHorasActual === 'undefined' || window.deudaHorasActual === null) {
             console.error('❌ [ERROR CRÍTICO] deudaHorasActual NO está definida!');
             console.error('   Forzando a 0 para evitar errores...');
             window.deudaHorasActual = 0;
         } else {
-            console.log('✅ [VERIFICACIÓN] window.deudaHorasActual =', window.deudaHorasActual);
+            console.log(' [VERIFICACIÓN] window.deudaHorasActual =', window.deudaHorasActual);
         }
-
-        // ✅ PASO 3: Cargar info de vivienda
+        
+        //  PASO 3: Cargar info de vivienda
         console.log('⏳ [PASO 3/4] Cargando info de vivienda...');
         await loadInfoViviendaCuota();
-        console.log('✅ [PASO 3/4] Info vivienda cargada');
-
-        // ✅ PASO 4: Cargar cuotas (AHORA sí tiene la deuda disponible)
+        console.log(' [PASO 3/4] Info vivienda cargada');
+        
+        //  PASO 4: Cargar cuotas (AHORA sí tiene la deuda disponible)
         console.log('⏳ [PASO 4/4] Cargando cuotas...');
         console.log('   💰 Deuda disponible para renderizado:', window.deudaHorasActual);
         await loadMisCuotas();
-        console.log('✅ [PASO 4/4] Cuotas cargadas');
-
+        console.log(' [PASO 4/4] Cuotas cargadas');
+        
         console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        console.log('✅ [INIT CUOTAS] Sección inicializada correctamente');
+        console.log(' [INIT CUOTAS] Sección inicializada correctamente');
         console.log('   💰 Deuda final disponible:', window.deudaHorasActual);
         console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
 
@@ -2155,9 +2133,9 @@ async function loadDeudaHorasParaCuotas() {
             console.log('   - deuda_en_pesos (PRINCIPAL):', deudaEnPesos);
             console.log('   - deuda_mes_actual:', deudaMesActual);
             console.log('   - deuda_acumulada:', deudaAcumulada);
-            console.log('   ✅ DEUDA FINAL ASIGNADA:', deudaHorasActual);
-
-            // ✅ VERIFICAR que se asignó correctamente
+            console.log('    DEUDA FINAL ASIGNADA:', deudaHorasActual);
+            
+            //  VERIFICAR que se asignó correctamente
             if (deudaHorasActual === 0 && deudaEnPesos > 0) {
                 console.error('❌ [DEUDA HORAS] ERROR: Deuda no se asignó correctamente!');
                 deudaHorasActual = deudaEnPesos; // Forzar asignación
@@ -2174,7 +2152,7 @@ async function loadDeudaHorasParaCuotas() {
     }
 
     console.log('🔚 [DEUDA HORAS] Proceso finalizado. Valor final:', deudaHorasActual);
-    return deudaHorasActual; // ✅ IMPORTANTE: Retornar el valor
+    return deudaHorasActual; //  IMPORTANTE: Retornar el valor
 }
 
 // ========== CARGAR INFO DE VIVIENDA ==========
@@ -2222,7 +2200,7 @@ async function loadInfoViviendaCuota() {
 }
 
 // ========== CARGAR CUOTAS DEL USUARIO ==========
-// ========== CARGAR CUOTAS DEL USUARIO ==========
+
 async function loadMisCuotas() {
     const container = document.getElementById('misCuotasContainer');
     if (!container) return;
@@ -2276,7 +2254,7 @@ async function loadMisCuotas() {
                     cuotas.unshift(featuredCuota);
                     console.log('🔄 CUOTA PENDIENTE FORZADA AL INICIO:', cuotas[0]);
                 } else if (index === 0) {
-                    console.log('✅ CUOTA PENDIENTE YA ES EL PRIMER ELEMENTO:', cuotas[0]);
+                    console.log(' CUOTA PENDIENTE YA ES EL PRIMER ELEMENTO:', cuotas[0]);
                 }
             } else {
                 console.log('ℹ️ No se encontraron cuotas pendientes para destacar. Se mostrará la más reciente.');
@@ -2285,7 +2263,7 @@ async function loadMisCuotas() {
 
             // DEBUG: Verificación final
             if (cuotas.length > 0) {
-                console.log('✅ CUOTA DESTACADA FINAL (Pendiente primero):', cuotas[0]);
+                console.log(' CUOTA DESTACADA FINAL (Pendiente primero):', cuotas[0]);
             }
 
             renderMisCuotasOrganizadas(cuotas);
@@ -2519,16 +2497,16 @@ function renderMisCuotasOrganizadas(cuotas) {
     
     
     ${deudaHoras > 0 ? `
-    <div class="deuda-breakdown-item deuda-horas">
-        <i class="fas fa-clock"></i>
-        <div>
-            <span class="deuda-label" data-i18n="dashboardUser.billing.summary.hoursNotWorkedDebt">Deuda por Horas No Trabajadas</span>
-            <span class="deuda-monto ${deudaHoras > 0 ? 'error' : 'success'}">$${deudaHoras.toLocaleString('es-UY', { minimumFractionDigits: 2 })}</span>
-            <small style="color: ${deudaHoras > 0 ? '#ff8a80' : '#81c784'}; display: block; margin-top: 5px;">
-                ${deudaHoras > 0 ? '($160 por hora × horas faltantes)' : '¡Sin deuda de horas!'}
-            </small>
-        </div>
+   <div class="deuda-breakdown-item deuda-horas">
+    <i class="fas fa-clock"></i>
+    <div>
+        <span class="deuda-label" data-i18n="dashboardUser.billing.summary.hoursNotWorkedDebt">Deuda por Horas No Trabajadas</span>
+        <small style="color: ${deudaHoras > 0 ? '#ff8a80' : '#81c784'}; display: block; margin-top: 3px; margin-bottom: 5px;">
+            ${deudaHoras > 0 ? '($160 por hora × horas faltantes)' : '¡Sin deuda de horas!'}
+        </small>
+        <span class="deuda-monto ${deudaHoras > 0 ? 'error' : 'success'}">$${deudaHoras.toLocaleString('es-UY', {minimumFractionDigits: 2})}</span>
     </div>
+</div>
 ` : ''}
 
 
@@ -2553,7 +2531,7 @@ function renderMisCuotasOrganizadas(cuotas) {
             <span data-i18n="dashboardUser.billing.summary.paymentSuccess">Has pagado exitosamente tu cuota de </span>${obtenerNombreMes(cuotaMasReciente.mes)} ${cuotaMasReciente.anio}.
             ${cuotaMasReciente.fecha_pago ? `<br>Fecha de pago: ${new Date(cuotaMasReciente.fecha_pago).toLocaleDateString('es-UY')}` : ''}
             
-            <!-- ✅ MOSTRAR DESGLOSE DEL PAGO -->
+            <!--  MOSTRAR DESGLOSE DEL PAGO -->
             <br><br>
             <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; margin-top: 10px;">
                 <strong style="display: block; margin-bottom: 10px;" data-i18n="dashboardUser.billing.summary.paymentBreakdown">📋 Desglose del Pago:</strong>
@@ -2585,7 +2563,7 @@ function renderMisCuotasOrganizadas(cuotas) {
     </div>
             ${cuotaMasReciente.fecha_pago ? `<br>Fecha de pago: ${new Date(cuotaMasReciente.fecha_pago).toLocaleDateString('es-UY')}` : ''}
             
-            <!-- ✅ AGREGAR ESTO -->
+            <!--  AGREGAR ESTO -->
             ${deudaAcumuladaAnterior > 0 ? `
                 <br><br><strong>Nota:</strong> El pago incluyó $${deudaAcumuladaAnterior.toLocaleString('es-UY', { minimumFractionDigits: 2 })} de deuda acumulada de meses anteriores.
             ` : ''}
@@ -2603,12 +2581,33 @@ function renderMisCuotasOrganizadas(cuotas) {
                 </div>
             ` : puedePagar ? `
                 <!-- ⚠️ PERÍODO DE PAGO ABIERTO -->
-                <div class="deuda-total-actions">
-                    <button class="btn-pagar-deuda-total" onclick="abrirPagarDeudaTotal(${cuotaMasReciente.id_cuota}, ${montoTotal})">
-                        <i class="fas fa-credit-card"></i>
-                        <span data-i18n="dashboardUser.billing.payNow">Pagar Ahora</span>
-                    </button>
-                </div>
+                
+<div class="deuda-total-actions">
+    <button class="btn-pagar-deuda-total" 
+            onclick="abrirPagarDeudaTotal(${cuotaMasReciente.id_cuota}, ${montoTotal})"
+            style="
+                background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+                color: #FFFFFF;
+                border: none;
+                padding: 14px 28px;
+                border-radius: 8px;
+                font-size: 15px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+                display: inline-flex;
+                align-items: center;
+                gap: 10px;
+            "
+            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(76, 175, 80, 0.4)'"
+            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(76, 175, 80, 0.3)'"
+            onmousedown="this.style.transform='translateY(0px)'"
+            onmouseup="this.style.transform='translateY(-2px)'">
+        <i class="fas fa-credit-card"></i>
+        <span data-i18n="dashboardUser.billing.payNow">Pagar Ahora</span>
+    </button>
+</div>
                 
                 <div class="alert-success" style="margin-top: 20px; background: rgba(76, 175, 80, 0.15); border-color: rgba(76, 175, 80, 0.3);">
                     <strong style="color: #4caf50;" data-i18n="dashboardUser.billing.enabledPaymentPeriod"> Período de Pago Habilitado</strong>
@@ -2618,28 +2617,37 @@ function renderMisCuotasOrganizadas(cuotas) {
                 </div>
             ` : `
                 <!-- 🔒 PERÍODO DE TRABAJO (NO SE PUEDE PAGAR AÚN) -->
-                <div class="deuda-total-actions">
-                    <button class="btn-pagar-deuda-total" disabled style="opacity: 0.5; cursor: not-allowed;">
-                        <i class="fas fa-lock"></i>
-                        <span data-i18n="dashboardUser.billing.blockedPayment">Pago Bloqueado</span>
-                    </button>
-                </div>
                 
-                <div class="alert-warning" style="margin-top: 20px; background: rgba(255, 152, 0, 0.15); border-color: rgba(255, 152, 0, 0.3);">
-                    <strong style="color: #ff9800;" data-i18n="dashboardUser.billing.workingPeriod">🔒 Período de Trabajo en Curso</strong>
-                    <p style="color: rgba(255, 255, 255, 0.9); margin: 10px 0 0 0;">
-                        ${diasParaPagar > 0 ? `
+<div class="deuda-total-actions">
+    <button class="btn-pagar-deuda-total" 
+            disabled
+            title="El período de pago se habilitará el día 25 del mes"
+            style="
+                background: linear-gradient(135deg, #9e9e9e 0%, #757575 100%);
+                color: #FFFFFF;
+                border: none;
+                padding: 14px 28px;
+                border-radius: 8px;
+                font-size: 15px;
+                font-weight: 600;
+                cursor: not-allowed;
+                opacity: 0.6;
+                box-shadow: none;
+                display: inline-flex;
+                align-items: center;
+                gap: 10px;
+            ">
+        <i class="fas fa-lock"></i>
+        <span data-i18n="dashboardUser.billing.blockedPayment">Pago Bloqueado</span>
+    </button>
+</div>
+                    <div class="alert-warning" style="margin-top: 20px;">
+                        <strong style="color: #ff9800;" data-i18n="dashboardUser.billing.workingPeriod">🔒 Periodo de Trabajo en Curso</strong>
+                        <p style="color: rgba(255, 255, 255, 0.9); margin: 10px 0 0 0;">
                             El período de pago se habilitará en <strong>${diasParaPagar} día${diasParaPagar !== 1 ? 's' : ''}</strong> (desde el 25 del mes).
-                            <br>Por ahora, enfócate en cumplir tus <strong>21 horas mensuales</strong> para evitar cargos adicionales.
-                        ` : `
-                            El período de pago para este mes aún no está disponible.
-                        `}
-                    </p>
-                    
-                            </div>
-                        </div>
+                            <br>Por ahora, enfócate en cumplir tus <strong>21 horas semanales</strong> para evitar cargos adicionales.
+                        </p>
                     </div>
-                </div>
             `}
         </div>
     </div>
@@ -2731,11 +2739,15 @@ function renderCuotaCard(cuota) {
 
     return `
         <div class="cuota-card estado-${estadoFinal}">
-            <div class="cuota-card-header">
+             <div class="cuota-card-header">
                 <div>
                     <h4>${mes} ${cuota.anio}</h4>
                     <span class="cuota-vivienda">${cuota.numero_vivienda} - ${cuota.tipo_vivienda}</span>
                 </div>
+                <span class="cuota-badge badge-${esPagada ? 'pagada' : esVencida ? 'vencida' : estadoFinal}">
+                    ${esPagada ? ' Pagada' : formatEstadoCuota(estadoFinal)}
+                </span>
+            </div>
                 <span class="cuota-badge badge-${estadoFinal}">
                     ${formatEstadoCuota(estadoFinal)}
                 </span>
@@ -2810,11 +2822,13 @@ function renderCuotaCard(cuota) {
             </div>
             
             <div class="cuota-card-footer">
-                ${cuota.comprobante_archivo ? `
-                    <button class="btn btn-secondary btn-small" onclick="verComprobante('${cuota.comprobante_archivo}')">
-                        <i class="fas fa-image"></i> Ver Comprobante
-                    </button>
-                ` : ''}
+              ${estadoFinal === 'pendiente' || estadoFinal === 'vencida' ? `
+    <button class="btn-small btn-primary" 
+            onclick="abrirPagarCuotaModal(${cuota.id_cuota}, ${cuota.monto_total || cuota.monto_base || cuota.monto})"
+            title="Registrar pago">
+        <i class="fas fa-dollar-sign"></i> Pagar
+    </button>
+` : ''}
                 
                 ${estadoFinal !== 'pagada' && !tienePagoPendiente ? `
                     <button class="btn btn-primary btn-small" onclick="abrirPagarDeudaTotal(${cuota.id_cuota}, ${montoMostrar})">
@@ -2858,9 +2872,11 @@ async function abrirPagarDeudaTotal(cuotaId, montoTotal) {
         document.getElementById('pagarCuotaForm').reset();
         document.getElementById('pagar-cuota-id').value = cuotaId;
         document.getElementById('pagar-monto').value = montoTotal;
-
-        document.getElementById('pagarCuotaModal').style.display = 'flex';
-
+        
+        const modal = document.getElementById('pagarCuotaModal');
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        
     } catch (error) {
         console.error('Error:', error);
         alert('❌ Error al cargar información');
@@ -2873,6 +2889,7 @@ async function abrirPagarDeudaTotal(cuotaId, montoTotal) {
 function closePagarCuotaModal() {
     document.getElementById('pagarCuotaModal').style.display = 'none';
     document.getElementById('pagarCuotaForm').reset();
+    document.body.style.overflow = 'auto';
 }
 
 // ========== ENVIAR PAGO ==========
@@ -3104,8 +3121,8 @@ window.renderMisCuotasOrganizadas = function (cuotas) {
     }
 
     let html = '';
-
-    // ✅ CUOTA DEL MES ACTUAL
+    
+    //  CUOTA DEL MES ACTUAL
     const cuotaMasReciente = cuotas[0];
     console.log('📋 [RENDER] Cuota más reciente:', cuotaMasReciente);
 
@@ -3114,11 +3131,11 @@ window.renderMisCuotasOrganizadas = function (cuotas) {
 
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     console.log('💰 [RENDER] DEUDA DE HORAS:');
-    console.log('   window.deudaHorasActual:', window.deudaHorasActual);
-    console.log('   deudaHoras (parseado):', deudaHoras);
+    console.log('    window.deudaHorasActual:', window.deudaHorasActual);
+    console.log('    deudaHoras (parseado):', deudaHoras);
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-
-    // ✅ CALCULAR MONTO DE CUOTA
+    
+    //  CALCULAR MONTO DE CUOTA
     const montoCuota = parseFloat(
         cuotaMasReciente.monto_base ||
         cuotaMasReciente.monto_actual ||
@@ -3128,8 +3145,8 @@ window.renderMisCuotasOrganizadas = function (cuotas) {
 
     // 🔥 DEUDA ACUMULADA DE MESES ANTERIORES
     const deudaAcumuladaAnterior = parseFloat(cuotaMasReciente.monto_pendiente_anterior || 0);
-
-    // ✅ AÑADIR: Monto Base Pendiente (Cuota de vivienda + deuda anterior)
+    
+    //  AÑADIR: Monto Base Pendiente (Cuota de vivienda + deuda anterior)
     const montoPendienteBase = montoCuota + deudaAcumuladaAnterior;
 
     // 🔥 MONTO TOTAL
@@ -3137,35 +3154,37 @@ window.renderMisCuotasOrganizadas = function (cuotas) {
 
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     console.log('💰 [RENDER] CÁLCULO COMPLETO:');
-    console.log('   monto_cuota:', montoCuota);
-    console.log('   deuda_meses_anteriores:', deudaAcumuladaAnterior);
-    console.log('   deuda_horas_actual:', deudaHoras);
-    console.log('   ✅ TOTAL A PAGAR:', montoTotal);
+    console.log('    monto_cuota:', montoCuota);
+    console.log('    deuda_meses_anteriores:', deudaAcumuladaAnterior);
+    console.log('    deuda_horas_actual:', deudaHoras);
+    console.log('     TOTAL A PAGAR:', montoTotal);
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
 
     // ⚠️ VALIDACIÓN CRÍTICA
     if (deudaHoras === 0 && window.deudaHorasActual > 0) {
         console.error('❌ [ERROR] deudaHoras es 0 pero window.deudaHorasActual es:', window.deudaHorasActual);
-        console.error('   Esto indica un problema en el parseo. Forzando valor...');
+        console.error('    Esto indica un problema en el parseo. Forzando valor...');
         // NO hacer nada aquí, el parseFloat ya debería funcionar
     }
-
-    // ✅ VERIFICAR ESTADOS
+    
+    //  VERIFICAR ESTADOS
     const estadoFinal = cuotaMasReciente.estado_actual || cuotaMasReciente.estado;
     const estadoPago = cuotaMasReciente.estado_pago || '';
     const estadoUsuario = cuotaMasReciente.estado_usuario || '';
 
     const tienePagoPendiente = cuotaMasReciente.id_pago && estadoPago === 'pendiente';
-    const pagoAprobado = estadoUsuario === 'aceptado' || (estadoPago === 'aprobado' && estadoFinal === 'pagada');
-    const estaPagada = estadoFinal === 'pagada' || pagoAprobado;
-
+    
+    // 💡 CORRECCIÓN APLICADA: La cuota es 'pagada' si el estado final lo dice, 
+    // O si el pago ha sido aprobado/aceptado por el administrador.
+    const estaPagada = estadoFinal === 'pagada' || estadoUsuario === 'aceptado' || estadoPago === 'aprobado'; 
+    
     console.log('🔍 Estados:', {
         estado_final: estadoFinal,
-        esta_pagada: estaPagada,
+        esta_pagada: estaPagada, // Esta variable ahora es más robusta
         pago_pendiente: tienePagoPendiente
     });
-
-    // ✅ VERIFICAR PERIODO DE PAGO
+    
+    //  VERIFICAR PERIODO DE PAGO
     const hoy = new Date();
     const diaActual = hoy.getDate();
     const mesActual = hoy.getMonth() + 1;
@@ -3176,17 +3195,19 @@ window.renderMisCuotasOrganizadas = function (cuotas) {
     const puedePagar = esMesCuota && estaDentroPeriodoPago && !estaPagada && !tienePagoPendiente;
 
     const diasParaPagar = estaDentroPeriodoPago ? 0 : Math.max(0, 25 - diaActual);
-
-    console.log('📅 Periodo:', {
+    
+   console.log('📅 Periodo:', {
         dia_actual: diaActual,
         mes_cuota: `${cuotaMasReciente.mes}/${cuotaMasReciente.anio}`,
         mes_actual: `${mesActual}/${anioActual}`,
         es_mes_cuota: esMesCuota,
+        esta_pagada: estaPagada,
+        pago_aprobado: pagoAprobado,
         puede_pagar: puedePagar,
         dias_para_pagar: diasParaPagar
     });
-
-    // ✅ RENDERIZAR HTML CON DEUDA COMPLETA
+    
+    //  RENDERIZAR HTML CON DEUDA COMPLETA
     html += `
         <div class="deuda-total-destacada ${estaPagada ? 'pagada-mes' : puedePagar ? '' : 'periodo-bloqueado'}">
             <div class="deuda-total-header">
@@ -3195,17 +3216,17 @@ window.renderMisCuotasOrganizadas = function (cuotas) {
                     Resumen del Mes Actual
                 </h2>
                 <span class="deuda-total-badge ${estaPagada ? 'badge-pagada' : tienePagoPendiente ? 'badge-pendiente' : puedePagar ? 'badge-requerida' : 'badge-bloqueado'}">
-                    ${estaPagada ? '✅ PAGADA' :
-            tienePagoPendiente ? '⏳ EN VALIDACIÓN' :
-                puedePagar ? '⚠️ PERIODO DE PAGO ABIERTO' :
-                    diasParaPagar > 0 ? `🔒 ${diasParaPagar} DÍA${diasParaPagar !== 1 ? 'S' : ''} PARA PAGAR` :
-                        '❌ VENCIDA'}
+                    ${estaPagada ? ' PAGADA' : 
+                      tienePagoPendiente ? '⏳ EN VALIDACIÓN' : 
+                      puedePagar ? '⚠️ PERIODO DE PAGO ABIERTO' : 
+                      esMesCuota && diasParaPagar > 0 ? `🔒 ${diasParaPagar} DÍA${diasParaPagar !== 1 ? 'S' : ''} PARA PAGAR` :
+                      !esMesCuota ? '⏰ Mes cerrado' :
+                      '❌ VENCIDA'}
                 </span>
             </div>
             
             <div class="deuda-total-body">
                 <div class="deuda-breakdown">
-                    <!-- 🏠 CUOTA DE VIVIENDA -->
                     <div class="deuda-breakdown-item">
                         <i class="fas fa-home"></i>
                         <div>
@@ -3217,6 +3238,7 @@ window.renderMisCuotasOrganizadas = function (cuotas) {
                   ${deudaAcumuladaAnterior > 0 ? `
 
         
+        <div class="deuda-breakdown-divider">+</div>
         <div class="deuda-breakdown-item deuda-acumulada">
             <i class="fas fa-exclamation-triangle"></i>
             <div>
@@ -3233,23 +3255,24 @@ window.renderMisCuotasOrganizadas = function (cuotas) {
 
                     
                     ${deudaHoras > 0 ? `
-    <div class="deuda-breakdown-item deuda-horas">
-        <i class="fas fa-clock"></i>
-        <div>
-            <span class="deuda-label">Deuda por Horas No Trabajadas</span>
-            <span class="deuda-monto ${deudaHoras > 0 ? 'error' : 'success'}">$${deudaHoras.toLocaleString('es-UY', { minimumFractionDigits: 2 })}</span>
-            <small style="color: ${deudaHoras > 0 ? '#ff8a80' : '#81c784'}; display: block; margin-top: 5px;">
-                ${deudaHoras > 0 ? '($160 por hora × horas faltantes)' : '¡Sin deuda de horas!'}
-            </small>
-        </div>
+        <div class="deuda-breakdown-divider">+</div>
+        <div class="deuda-breakdown-item deuda-horas">
+    <i class="fas fa-clock"></i>
+    <div>
+        <span class="deuda-label">Deuda por Horas No Trabajadas</span>
+        <small style="color: ${deudaHoras > 0 ? '#ff8a80' : '#81c784'}; display: block; margin-top: 3px; margin-bottom: 5px;">
+            ${deudaHoras > 0 ? '($160 por hora × horas faltantes)' : '¡Sin deuda de horas!'}
+        </small>
+        <span class="deuda-monto ${deudaHoras > 0 ? 'error' : 'success'}">$${deudaHoras.toLocaleString('es-UY', {minimumFractionDigits: 2})}</span>
     </div>
-` : ''}
+</div>
+        </div>
+    ` : ''}
 
 
                     
                     <div class="deuda-breakdown-divider">=</div>
                     
-                    <!-- 💰 TOTAL -->
                     <div class="deuda-breakdown-item deuda-total">
                         <i class="fas fa-calculator"></i>
                         <div>
@@ -3261,7 +3284,6 @@ window.renderMisCuotasOrganizadas = function (cuotas) {
                     </div>
                 </div>
                 
-                <!-- 📊 ALERTAS Y ACCIONES -->
                 ${estaPagada ? `
                     <div class="alert-success" style="margin-top: 20px;">
                         <strong style="color: #4caf50;">🎉 ¡Pago Completado!</strong>
@@ -3269,7 +3291,6 @@ window.renderMisCuotasOrganizadas = function (cuotas) {
                             Has pagado exitosamente tu cuota de ${obtenerNombreMes(cuotaMasReciente.mes)} ${cuotaMasReciente.anio}.
                             ${cuotaMasReciente.fecha_pago ? `<br>Fecha de pago: ${new Date(cuotaMasReciente.fecha_pago).toLocaleDateString('es-UY')}` : ''}
                             
-                            <!-- 📋 DESGLOSE DEL PAGO -->
                             <br><br>
                             <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; margin-top: 10px;">
                                 <strong style="display: block; margin-bottom: 10px;">📋 Desglose del Pago:</strong>
@@ -3308,45 +3329,83 @@ window.renderMisCuotasOrganizadas = function (cuotas) {
                             ${cuotaMasReciente.fecha_pago ? `<br>Enviado el: ${new Date(cuotaMasReciente.fecha_pago).toLocaleDateString('es-UY')}` : ''}
                         </p>
                     </div>
-                ` : puedePagar ? `
-                    <div class="deuda-total-actions">
-                        <button class="btn-pagar-deuda-total" onclick="abrirPagarDeudaTotal(${cuotaMasReciente.id_cuota}, ${montoTotal})">
-                            <i class="fas fa-credit-card"></i>
-                            Pagar Ahora
-                        </button>
-                    </div>
-                    
-                    <div class="alert-success" style="margin-top: 20px; background: rgba(76, 175, 80, 0.15); border-color: rgba(76, 175, 80, 0.3);">
-                        <strong style="color: #4caf50;">✓ Periodo de Pago Habilitado</strong>
-                        <p style="color: rgba(255, 255, 255, 0.9); margin: 10px 0 0 0;">
-                            Ya puedes realizar el pago de tu cuota. El periodo de pago está activo hasta fin de mes.
-                            ${deudaAcumuladaAnterior > 0 ? `<br><br><strong>⚠️ Importante:</strong> Tienes $${deudaAcumuladaAnterior.toLocaleString('es-UY', { minimumFractionDigits: 2 })} de deuda acumulada de meses anteriores que se incluye en el pago.` : ''}
-                        </p>
-                    </div>
-                ` : diasParaPagar > 0 ? `
-                    <div class="deuda-total-actions">
-                        <button class="btn-pagar-deuda-total" disabled style="opacity: 0.5; cursor: not-allowed;">
-                            <i class="fas fa-lock"></i>
-                            Pago Bloqueado
-                        </button>
-                    </div>
-                    
-                    <div class="alert-warning" style="margin-top: 20px; background: rgba(255, 152, 0, 0.15); border-color: rgba(255, 152, 0, 0.3);">
-                        <strong style="color: #ff9800;">🔒 Periodo de Trabajo en Curso</strong>
-                        <p style="color: rgba(255, 255, 255, 0.9); margin: 10px 0 0 0;">
-                            El periodo de pago se habilitará en <strong>${diasParaPagar} día${diasParaPagar !== 1 ? 's' : ''}</strong> (desde el 25 del mes).
-                            <br>Por ahora, enfócate en cumplir tus <strong>84 horas mensuales</strong> (21h/semana) para evitar cargos adicionales.
-                            ${deudaAcumuladaAnterior > 0 ? `<br><br><strong>⚠️ Atención:</strong> Tienes $${deudaAcumuladaAnterior.toLocaleString('es-UY', { minimumFractionDigits: 2 })} de deuda acumulada que se sumará al pago.` : ''}
-                        </p>
-                    </div>
-                ` : `
-                    <div class="alert-error" style="margin-top: 20px;">
-                        <strong style="color: #f44336;">❌ Cuota Vencida</strong>
-                        <p style="color: rgba(255, 255, 255, 0.9); margin: 10px 0 0 0;">
-                            Esta cuota no fue pagada a tiempo. La deuda se acumulará al siguiente mes.
-                        </p>
-                    </div>
-                `}
+               ` : puedePagar ? `
+    <!--  PERÍODO DE PAGO ABIERTO - MOSTRAR BOTÓN -->
+    <div class="deuda-total-actions">
+        <button class="btn-pagar-deuda-total" 
+                onclick="abrirPagarDeudaTotal(${cuotaMasReciente.id_cuota}, ${montoTotal})"
+                style="
+                    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+                    color: #FFFFFF;
+                    border: none;
+                    padding: 14px 28px;
+                    border-radius: 8px;
+                    font-size: 15px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 10px;
+                "
+                onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(76, 175, 80, 0.4)'"
+                onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(76, 175, 80, 0.3)'"
+                onmousedown="this.style.transform='translateY(0px)'"
+                onmouseup="this.style.transform='translateY(-2px)'">
+            <i class="fas fa-credit-card"></i>
+            Pagar Ahora
+        </button>
+    </div>
+    
+    <div class="alert-success" style="margin-top: 20px; background: rgba(76, 175, 80, 0.15); border-color: rgba(76, 175, 80, 0.3);">
+        <strong style="color: #4caf50;"> Período de Pago Habilitado</strong>
+        <p style="color: rgba(255, 255, 255, 0.9); margin: 10px 0 0 0;">
+            Ya puedes realizar el pago de tu cuota. El período de pago está activo hasta fin de mes.
+        </p>
+    </div>
+` : diasParaPagar > 0 ? `
+    <!-- 🔒 PERÍODO DE TRABAJO (BLOQUEADO) -->
+    <div class="deuda-total-actions">
+        <button class="btn-pagar-deuda-total" 
+                disabled
+                title="El período de pago se habilitará el día 25 del mes"
+                style="
+                    background: linear-gradient(135deg, #9e9e9e 0%, #757575 100%);
+                    color: #FFFFFF;
+                    border: none;
+                    padding: 14px 28px;
+                    border-radius: 8px;
+                    font-size: 15px;
+                    font-weight: 600;
+                    cursor: not-allowed;
+                    opacity: 0.6;
+                    box-shadow: none;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 10px;
+                ">
+            <i class="fas fa-lock"></i>
+            Pago Bloqueado
+        </button>
+    </div>
+    
+    <div class="alert-warning" style="margin-top: 20px;">
+        <strong style="color: #ff9800;">🔒 Periodo de Trabajo en Curso</strong>
+        <p style="color: rgba(255, 255, 255, 0.9); margin: 10px 0 0 0;">
+            El período de pago se habilitará en <strong>${diasParaPagar} día${diasParaPagar !== 1 ? 's' : ''}</strong> (desde el 25 del mes).
+            <br>Por ahora, enfócate en cumplir tus <strong>21 horas semanales</strong> para evitar cargos adicionales.
+        </p>
+    </div>
+` : `
+    <!-- ❌ CUOTA VENCIDA -->
+    <div class="alert-error" style="margin-top: 20px;">
+        <strong style="color: #f44336;">❌ Cuota Vencida</strong>
+        <p style="color: rgba(255, 255, 255, 0.9); margin: 10px 0 0 0;">
+            Esta cuota no fue pagada a tiempo. La deuda se acumulará al siguiente mes.
+        </p>
+    </div>
+`}
             </div>
         </div>
         
@@ -3410,7 +3469,7 @@ window.renderMisCuotasOrganizadas = function (cuotas) {
 };
 
 /**
- * ✅ Función auxiliar: Obtener nombre del mes
+ *  Función auxiliar: Obtener nombre del mes
  */
 if (typeof obtenerNombreMes !== 'function') {
     window.obtenerNombreMes = function (mes) {
@@ -3422,18 +3481,19 @@ if (typeof obtenerNombreMes !== 'function') {
     };
 }
 
-console.log('✅ Fix de renderizado completo aplicado');
+console.log(' Fix de renderizado completo aplicado');
 console.log('📊 Ahora se muestra:');
-console.log('   ✓ Cuota de vivienda');
-console.log('   ✓ Deuda de meses anteriores (si existe)');
-console.log('   ✓ Deuda por horas del mes actual');
-console.log('   ✓ Total correcto');
+console.log('    ✓ Cuota de vivienda');
+console.log('    ✓ Deuda de meses anteriores (si existe)');
+console.log('    ✓ Deuda por horas del mes actual');
+console.log('    ✓ Total correcto');
 
 
 // Exportar funciones
-window.esUltimoDiaMes = esUltimoDiaMes;
-window.diasHastaPago = diasHastaPago;
-window.obtenerUltimoDiaMes = obtenerUltimoDiaMes;
+// Asumiendo que estas funciones se definen en alguna otra parte del código:
+// window.esUltimoDiaMes = esUltimoDiaMes; 
+// window.diasHastaPago = diasHastaPago;
+// window.obtenerUltimoDiaMes = obtenerUltimoDiaMes;
 
 (' Sistema actualizado: Pago solo último día del mes');
 
@@ -3726,20 +3786,21 @@ function updateSolicitudesStats(solicitudes) {
     if (resueltasEl) resueltasEl.textContent = resueltas;
 }
 
-// ========== ABRIR MODAL NUEVA SOLICITUD ==========
 function abrirModalNuevaSolicitud() {
-    const modal = `
-        <div id="nuevaSolicitudModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalNuevaSolicitudTitulo">
-  <div class="modal-content-large">
-    
-    <!-- Botón de cierre -->
-    <button type="button" class="modal-close-btn" aria-label="Cerrar modal" onclick="cerrarModalNuevaSolicitud()">×</button>
+    // Eliminar modal existente si hay uno
+    const modalExistente = document.getElementById('nuevaSolicitudModal');
+    if (modalExistente) {
+        modalExistente.remove();
+    }
 
-    <!-- Título -->
-    <h2 id="modalNuevaSolicitudTitulo" class="modal-title">
-      <i class="fas fa-paper-plane"></i>
-      <span data-i18n="dashboardUser.requests.newRequest">Nueva Solicitud</span>
-    </h2>
+    const modal = `
+         <div id="nuevaSolicitudModal" class="material-modal" style="display: flex;">
+            <div class="material-modal-content" onclick="event.stopPropagation()">
+                <div class="material-modal-header">
+                    <h3 id="solicitudModalTitle" data-i18n="dashboardUser.requests.newRequest">Nueva Solicitud</h3>
+                    <button class="close-material-modal" onclick="cerrarModalNuevaSolicitud()">&times;</button>
+                </div>
+                
 
     <!-- Formulario -->
     <form id="nuevaSolicitudForm" onsubmit="submitNuevaSolicitud(event)" enctype="multipart/form-data">
@@ -3785,8 +3846,15 @@ function abrirModalNuevaSolicitud() {
           id="descripcion-solicitud"
           name="descripcion"
           rows="6"
+                            maxlength="250"
           data-i18n-placeholder="dashboardUser.requests.form.descriptionPlaceholder"
-          required></textarea>
+          required
+                            style="resize: vertical; width: 100%; padding: 10px; max-height: 230px; height: 230px; border-radius: 8px; border: 1px solid #ccc; font-size: 14px;"
+                            oninput="actualizarContadorCaracteres(this)"
+                        ></textarea>
+                        <small id="charCount" style="color: #666; display: block; text-align: right; margin-top: 4px;">
+                            0 / 250 caracteres
+                        </small>
       </div>
 
       <!-- Prioridad -->
@@ -3849,7 +3917,100 @@ function abrirModalNuevaSolicitud() {
 
     document.body.insertAdjacentHTML('beforeend', modal);
     i18n.translatePage();
+    
+    // Prevenir scroll del body
+   
 }
+
+function cerrarModalNuevaSolicitud() {
+    const modal = document.getElementById('nuevaSolicitudModal');
+    if (modal) {
+        modal.remove();
+    }
+    
+    // Restaurar scroll del body
+    document.body.style.overflow = '';
+}
+
+function actualizarContadorCaracteres(textarea) {
+    const contador = document.getElementById('charCount');
+    const actual = textarea.value.length;
+    const maximo = 250;
+    
+    contador.textContent = `${actual} / ${maximo} caracteres`;
+    
+    // Cambiar color si se acerca al límite
+    if (actual > maximo * 0.9) {
+        contador.style.color = '#F44336';
+    } else if (actual > maximo * 0.7) {
+        contador.style.color = '#FF9800';
+    } else {
+        contador.style.color = '#666';
+    }
+}
+
+console.log(' Modal de solicitud corregido');
+console.log('🔧 Prevención de scroll y limpieza de modales duplicados');
+
+function cerrarModalNuevaSolicitud() {
+    const modal = document.getElementById('nuevaSolicitudModal');
+    if (modal) {
+        modal.remove();
+    }
+    
+    // Restaurar scroll del body
+    document.body.style.overflow = '';
+}
+
+function actualizarContadorCaracteres(textarea) {
+    const contador = document.getElementById('charCount');
+    const actual = textarea.value.length;
+    const maximo = 250;
+    
+    contador.textContent = `${actual} / ${maximo} caracteres`;
+    
+    // Cambiar color si se acerca al límite
+    if (actual > maximo * 0.9) {
+        contador.style.color = '#F44336';
+    } else if (actual > maximo * 0.7) {
+        contador.style.color = '#FF9800';
+    } else {
+        contador.style.color = '#666';
+    }
+}
+
+console.log(' Modal de solicitud corregido');
+console.log('🔧 Prevención de scroll y limpieza de modales duplicados');
+
+function cerrarModalNuevaSolicitud() {
+    const modal = document.getElementById('nuevaSolicitudModal');
+    if (modal) {
+        modal.remove();
+    }
+    
+    // Restaurar scroll del body
+    document.body.style.overflow = '';
+}
+
+function actualizarContadorCaracteres(textarea) {
+    const contador = document.getElementById('charCount');
+    const actual = textarea.value.length;
+    const maximo = 250;
+    
+    contador.textContent = `${actual} / ${maximo} caracteres`;
+    
+    // Cambiar color si se acerca al límite
+    if (actual > maximo * 0.9) {
+        contador.style.color = '#F44336';
+    } else if (actual > maximo * 0.7) {
+        contador.style.color = '#FF9800';
+    } else {
+        contador.style.color = '#666';
+    }
+}
+
+console.log(' Modal de solicitud corregido');
+console.log('🔧 Prevención de scroll y limpieza de modales duplicados');
 
 function cerrarModalNuevaSolicitud() {
     const modal = document.getElementById('nuevaSolicitudModal');
@@ -4448,113 +4609,112 @@ function mostrarModalHistorialJustificaciones(justificaciones) {
 
 function renderDeudaHorasWidget(deuda) {
     const container = document.getElementById('deuda-actual-container');
-
-    const estado = deuda.estado || 'pendiente';
-    const colorEstado = estado === 'cumplido' ? 'success' :
-        estado === 'progreso' ? 'warning' : 'error';
-
+    
     const deudaMesActual = parseFloat(deuda.deuda_en_pesos || 0);
     const deudaAcumulada = parseFloat(deuda.deuda_acumulada || 0);
-    const totalAPagar = deudaMesActual + deudaAcumulada;  // ✅ SUMA CORRECTA
+    const totalAPagar = deudaMesActual + deudaAcumulada;
     const tieneDeuda = totalAPagar > 0;
 
     container.innerHTML = `
-        <div class="deuda-widget ${colorEstado}">
-            <div class="deuda-header">
-                <div class="deuda-icono">
+        <div class="deuda-widget-compacto ${tieneDeuda ? 'con-deuda' : 'sin-deuda'}">
+            <!-- VISTA COMPACTA (SIEMPRE VISIBLE) -->
+            <div class="deuda-resumen" onclick="toggleDeudaDetalle()">
+                <div class="deuda-resumen-left">
                     <i class="fas ${tieneDeuda ? 'fa-exclamation-triangle' : 'fa-check-circle'}"></i>
+                    <div>
+                        <h4>${tieneDeuda ? 'Deuda de Horas' : 'Sin Deuda de Horas'}</h4>
+                        <p>${getNombreMes(deuda.mes)} ${deuda.anio}</p>
+                    </div>
                 </div>
-                <div class="deuda-titulo">
-                    <h4>${tieneDeuda ? '<span data-i18n="dashboardUser.billing.debtStatus.debtType.withDebt">Tienes Deuda de Horas</span>' : '<span data-i18n="dashboardUser.billing.debtStatus.debtType.withoutDebt">Sin Deuda de Horas</span>'}</h4>
-                    <p><span data-i18n="dashboardUser.billing.debtStatus.debtType.period">Período:</span> ${getNombreMes(deuda.mes)} ${deuda.anio}</p>
+                <div class="deuda-resumen-right">
+                    <div class="deuda-monto-compacto">
+                        $${totalAPagar.toLocaleString('es-UY', {minimumFractionDigits: 2})}
+                    </div>
+                    <i class="fas fa-chevron-down toggle-icon" id="toggle-deuda-icon"></i>
                 </div>
             </div>
             
-            <div class="deuda-body">
-                <!-- ✅ MOSTRAR TOTAL A PAGAR (MES ACTUAL + ACUMULADA) -->
-                <div class="deuda-monto-principal ${tieneDeuda ? 'error' : 'success'}">
-                    $${totalAPagar.toLocaleString('es-UY', { minimumFractionDigits: 2 })}
+            <!-- DETALLE EXPANDIBLE -->
+            <div class="deuda-detalle" id="deuda-detalle-content" style="display: none;">
+                <!-- Stats principales -->
+                <div class="deuda-stats-row">
+                    <div class="stat-box">
+                        <small>Trabajadas</small>
+                        <strong>${deuda.horas_trabajadas}h</strong>
+                    </div>
+                    <div class="stat-box">
+                        <small>Requeridas</small>
+                        <strong>${deuda.horas_requeridas_mensuales}h</strong>
+                    </div>
+                    <div class="stat-box ${tieneDeuda ? 'error' : 'success'}">
+                        <small>Faltantes</small>
+                        <strong>${deuda.horas_faltantes}h</strong>
+                    </div>
                 </div>
                 
-                <!-- ✅ AGREGAR DESGLOSE DE LA DEUDA TOTAL -->
-                ${totalAPagar > 0 ? `
-                    <div class="deuda-desglose-resumen" style="background: #fff3cd; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #ff9800;">
-                        <div style="display: grid; gap: 8px;">
-                            <div style="display: flex; justify-content: space-between;">
-                                <span data-i18n="dashboardUser.billing.debtStatus.debtBreakdown.debtForTheCurrentMonth">💰 Deuda mes actual:</span>
-                                <strong>$${deudaMesActual.toLocaleString('es-UY', { minimumFractionDigits: 2 })}</strong>
-                            </div>
-                            ${deudaAcumulada > 0 ? `
-                                <div style="display: flex; justify-content: space-between; color: #d32f2f;">
-                                    <span>⚠ Deuda acumulada:</span>
-                                    <strong>$${deudaAcumulada.toLocaleString('es-UY', { minimumFractionDigits: 2 })}</strong>
-                                </div>
-                                <hr style="margin: 8px 0; border: none; border-top: 1px dashed #ccc;">
-                                <div style="display: flex; justify-content: space-between; font-size: 1.1em;">
-                                    <span><strong>Total a pagar:</strong></span>
-                                    <strong style="color: #d32f2f;">$${totalAPagar.toLocaleString('es-UY', { minimumFractionDigits: 2 })}</strong>
-                                </div>
-                            ` : ''}
+                <!-- Desglose de deuda si hay acumulada -->
+                ${totalAPagar > 0 && deudaAcumulada > 0 ? `
+                    <div class="deuda-breakdown-box">
+                        <div class="breakdown-item">
+                            <span>💰 Mes actual:</span>
+                            <strong>$${deudaMesActual.toLocaleString('es-UY', {minimumFractionDigits: 2})}</strong>
+                        </div>
+                        <div class="breakdown-item error">
+                            <span>⚠️ Acumulada:</span>
+                            <strong>$${deudaAcumulada.toLocaleString('es-UY', {minimumFractionDigits: 2})}</strong>
                         </div>
                     </div>
                 ` : ''}
                 
-                <div class="deuda-desglose">
-                    <div class="desglose-item">
-                        <span class="label" data-i18n="dashboardUser.billing.debtStatus.debtBreakdown.debtItems.hoursRequired">Horas Requeridas:</span>
-                        <span class="valor">${deuda.horas_requeridas_mensuales}h/mes</span>
-                    </div>
-                    <div class="desglose-item">
-                        <span class="label" data-i18n="dashboardUser.billing.debtStatus.debtBreakdown.debtItems.weeklySystem">Sistema Semanal:</span>
-                        <span class="valor">${deuda.horas_requeridas_semanales}h/semana</span>
-                    </div>
-                    <div class="desglose-item">
-                        <span class="label" data-i18n="dashboardUser.billing.debtStatus.debtBreakdown.debtItems.hoursWorked">Horas Trabajadas:</span>
-                        <span class="valor">${deuda.horas_trabajadas}h</span>
-                    </div>
-                    <div class="desglose-item">
-                        <span class="label" data-i18n="dashboardUser.billing.debtStatus.debtBreakdown.debtItems.weeklyAverage">Promedio Semanal:</span>
-                        <span class="valor">${deuda.promedio_semanal}h/sem</span>
-                    </div>
-                    <div class="desglose-item ${tieneDeuda ? 'error' : 'success'}">
-                        <span class="label" data-i18n="dashboardUser.billing.debtStatus.debtBreakdown.debtItems.hoursRemaining">Horas Faltantes:</span>
-                        <span class="valor">${deuda.horas_faltantes}h</span>
-                    </div>
-                    <div class="desglose-item">
-                        <span class="label" data-i18n="dashboardUser.billing.debtStatus.debtBreakdown.debtItems.costPerHour">Costo por Hora:</span>
-                        <span class="valor">$${deuda.costo_por_hora}</span>
-                    </div>
-                </div>
-                
-                <div class="deuda-progreso">
-                    <div class="progreso-header">
+                <!-- Barra de progreso -->
+                <div class="progreso-bar-container">
+                    <div class="progreso-bar-header">
                         <span data-i18n="dashboardUser.billing.debtStatus.debtBreakdown.progress">Progreso Mensual</span>
-                        <span class="porcentaje">${deuda.porcentaje_cumplido}%</span>
+                        <span>${deuda.porcentaje_cumplido}%</span>
                     </div>
-                    <div class="barra-progreso">
-                        <div class="barra-fill" style="width: ${Math.min(deuda.porcentaje_cumplido, 100)}%; 
-                             background: ${deuda.porcentaje_cumplido >= 100 ? '#4caf50' :
-            deuda.porcentaje_cumplido >= 50 ? '#ff9800' : '#f44336'}">
+                    <div class="progreso-bar">
+                        <div class="progreso-fill" style="width: ${Math.min(deuda.porcentaje_cumplido, 100)}%; 
+                             background: ${deuda.porcentaje_cumplido >= 100 ? '#4caf50' : 
+                                          deuda.porcentaje_cumplido >= 50 ? '#ff9800' : '#f44336'}">
                         </div>
                     </div>
                 </div>
                 
+                <!-- Mensaje informativo -->
                 ${tieneDeuda ? `
-                    <div class="alert-warning" style="margin-top: 15px;">
-                        <strong data-i18n="dashboardUser.billing.debtStatus.debtBreakdown.alertWarning.title">⚠ Información Importante:</strong>
-                        <p><span data-i18n="dashboardUser.billing.debtStatus.debtBreakdown.alertWarning.thisDebt">Esta deuda</span> ${deudaAcumulada > 0 ? '<span data-i18n="dashboardUser.billing.debtStatus.debtBreakdown.alertWarning.include">(incluye</span> $' + deudaAcumulada.toLocaleString('es-UY', { minimumFractionDigits: 2 }) + ' <span data-i18n="dashboardUser.billing.debtStatus.debtBreakdown.alertWarning.fromPreviousMonths">de meses anteriores)</span> ' : ''}<span data-i18n="dashboardUser.billing.debtStatus.debtBreakdown.alertWarning.nextmessage">se sumará automáticamente a tu próxima cuota mensual de vivienda.</span></p>
-                        <p data-i18n="dashboardUser.billing.debtStatus.debtBreakdown.alertWarning.sistemMessage">Sistema: <strong>21 horas semanales</strong> (84h mensuales).</p>
+                    <div class="alert-warning-compact">
+                        <i class="fas fa-info-circle"></i>
+                        <span data-i18n="dashboardUser.billing.debtStatus.debtBreakdown.alertWarning.nextmessage">Esta deuda se sumará a tu próxima cuota de vivienda.</span>
                     </div>
                 ` : `
-                    <div class="alert-success" style="margin-top: 15px;">
-                        <strong data-i18n="dashboardUser.billing.debtStatus.debtBreakdown.alertWarning.excellentMessage">🎉 ¡Excelente!</strong>
-                        <p data-i18n="dashboardUser.billing.debtStatus.debtBreakdown.alertWarning.excellentMessageDescription">Has cumplido con tus horas requeridas. No tendrás cargos adicionales en tu cuota.</p>
+                    <div class="alert-success-compact">
+                        <i class="fas fa-check-circle"></i>
+                        <span data-i18n="dashboardUser.billing.debtStatus.debtBreakdown.alertWarning.excellentMessageDescription">¡Has cumplido con tus horas requeridas!</span>
                     </div>
                 `}
             </div>
         </div>
     `;
 }
+
+// Función para expandir/colapsar
+function toggleDeudaDetalle() {
+    const detalle = document.getElementById('deuda-detalle-content');
+    const icon = document.getElementById('toggle-deuda-icon');
+    
+    if (detalle.style.display === 'none') {
+        detalle.style.display = 'block';
+        icon.classList.remove('fa-chevron-down');
+        icon.classList.add('fa-chevron-up');
+    } else {
+        detalle.style.display = 'none';
+        icon.classList.remove('fa-chevron-up');
+        icon.classList.add('fa-chevron-down');
+    }
+}
+
+// Exportar función globalmente
+window.toggleDeudaDetalle = toggleDeudaDetalle;
 
 // Exportar funciones
 window.cargarJustificacionesUsuario = cargarJustificacionesUsuario;
@@ -6188,7 +6348,7 @@ async function verificarCambiosCuotas() {
             // Primera vez
             if (ultimoCheckCuotas === null) {
                 ultimoCheckCuotas = checksum;
-                console.log('✅ [POLLING] Checksum inicial guardado');
+                console.log(' [POLLING] Checksum inicial guardado');
                 return;
             }
 
@@ -6204,7 +6364,7 @@ async function verificarCambiosCuotas() {
                 // Verificar si estamos en la sección de cuotas
                 const cuotasSection = document.getElementById('cuotas-section');
                 if (cuotasSection && cuotasSection.classList.contains('active')) {
-                    console.log('✅ [POLLING] Usuario en sección cuotas, recargando...');
+                    console.log(' [POLLING] Usuario en sección cuotas, recargando...');
                     await recargarSeccionCuotas();
                     mostrarNotificacionActualizacion(cuotaActual);
                 } else {
@@ -6229,18 +6389,18 @@ async function recargarSeccionCuotas() {
 
         // 2. Recargar deuda de horas
         await loadDeudaHorasParaCuotas();
-        console.log('✅ [RELOAD] Deuda de horas recargada');
-
+        console.log(' [RELOAD] Deuda de horas recargada');
+        
         // 3. Recargar cuotas
         await loadMisCuotas();
-        console.log('✅ [RELOAD] Cuotas recargadas');
-
+        console.log(' [RELOAD] Cuotas recargadas');
+        
         // 4. Recargar info de vivienda
         await loadInfoViviendaCuota();
-        console.log('✅ [RELOAD] Info vivienda recargada');
-
-        console.log('✅ [RELOAD] Recarga completada exitosamente');
-
+        console.log(' [RELOAD] Info vivienda recargada');
+        
+        console.log(' [RELOAD] Recarga completada exitosamente');
+        
     } catch (error) {
         console.error('❌ [RELOAD] Error en recarga:', error);
     }
@@ -6407,9 +6567,9 @@ window.inicializarSeccionCuotas = async function () {
 
         // Iniciar polling
         iniciarPollingCuotas();
-
-        console.log('✅ [OVERRIDE] Sección cuotas inicializada con polling activo');
-
+        
+        console.log(' [OVERRIDE] Sección cuotas inicializada con polling activo');
+        
     } catch (error) {
         console.error('❌ [OVERRIDE] Error en inicialización:', error);
     }
@@ -6439,8 +6599,8 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     });
-
-    console.log('✅ [SETUP] Listeners configurados correctamente');
+    
+    console.log(' [SETUP] Listeners configurados correctamente');
 });
 
 /**
@@ -6455,25 +6615,44 @@ window.addEventListener('beforeunload', function () {
  */
 const originalRenderCuotaCard = window.renderCuotaCard;
 
-window.renderCuotaCard = function (cuota) {
-    // Validación extra de estados
+window.renderCuotaCard = function(cuota) {
     const estadoFinal = cuota.estado_actual || cuota.estado;
     const estadoPago = cuota.estado_pago || '';
     const estadoUsuario = cuota.estado_usuario || '';
-    const tienePagoPendiente = cuota.id_pago && estadoPago === 'pendiente';
-    const pagoAprobado = estadoPago === 'aprobado' || estadoUsuario === 'aceptado';
+    
+    const mes = obtenerNombreMes(cuota.mes);
+    const fechaVenc = new Date(cuota.fecha_vencimiento + 'T00:00:00');
+    const fechaVencFormatted = fechaVenc.toLocaleDateString('es-UY');
+    
+    // 🔥 MISMA LÓGICA QUE EN renderMisCuotasOrganizadas
+    const pagoAprobado = estadoUsuario === 'aceptado' || estadoPago === 'aprobado';
+    const tienePagoPendiente = cuota.id_pago && estadoPago === 'pendiente' && !pagoAprobado;
     const esPagada = estadoFinal === 'pagada' || pagoAprobado;
-
-    console.log('🎨 [RENDER CARD] Renderizando cuota:', {
+    const esVencida = estadoFinal === 'vencida' && !esPagada;
+    
+    console.log('🎴 [CARD] Renderizando cuota:', {
         id: cuota.id_cuota,
-        estado: estadoFinal,
+        mes: `${cuota.mes}/${cuota.anio}`,
+        estado_final: estadoFinal,
         estado_pago: estadoPago,
         estado_usuario: estadoUsuario,
-        tiene_pago_pendiente: tienePagoPendiente,
         pago_aprobado: pagoAprobado,
-        es_pagada: esPagada
+        tiene_pago_pendiente: tienePagoPendiente,
+        es_pagada: esPagada,
+        es_vencida: esVencida
     });
-
+    
+    // Calcular montos
+    const montoCuota = obtenerPrecioActualizado(cuota);
+    const deudaAcumuladaAnterior = parseFloat(cuota.monto_pendiente_anterior || 0);
+    const deudaHorasMostrar = (!esPagada && !tienePagoPendiente) ? (window.deudaHorasActual || 0) : 0;
+    
+    // Monto total a mostrar
+    const montoMostrar = montoCuota + deudaAcumuladaAnterior + deudaHorasMostrar;
+    
+    // Si está pagada, obtener el monto realmente pagado
+    const montoPagado = esPagada && cuota.monto_pagado ? parseFloat(cuota.monto_pagado) : montoMostrar;
+    
     // Si está pagada o aprobada, asegurar que no se pueda pagar
     if (esPagada || pagoAprobado) {
         cuota.estado = 'pagada';
@@ -6490,7 +6669,7 @@ window.recargarSeccionCuotas = recargarSeccionCuotas;
 window.iniciarPollingCuotas = iniciarPollingCuotas;
 window.detenerPollingCuotas = detenerPollingCuotas;
 
-console.log('✅ Sistema de actualización automática de cuotas cargado completamente');
+console.log(' Sistema de actualización automática de cuotas cargado completamente');
 
 async function mostrarResumenDeuda() {
     const response = await fetch('/api/cuotas/resumen-deuda');
@@ -6616,7 +6795,7 @@ window.aprobarPagoDesdeModal = async function (pagoId, userId) {
 // FIN DEL ARCHIVO - VERIFICACIONES FINALES
 // ==========================================
 
-console.log('✅ dashboardUser.js cargado completamente');
+console.log(' dashboardUsuario.js cargado completamente');
 console.log('📦 Funciones exportadas:', {
     inicializarSeccionCuotas: typeof window.inicializarSeccionCuotas,
     verificarCambiosCuotas: typeof window.verificarCambiosCuotas,
@@ -6640,7 +6819,7 @@ console.log('🔧 Aplicando fix completo con funciones auxiliares...');
 // ========== 1. FUNCIONES AUXILIARES ==========
 
 /**
- * ✅ Obtener precio actualizado de la cuota
+ *  Obtener precio actualizado de la cuota
  */
 window.obtenerPrecioActualizado = function (cuota) {
     const precio = parseFloat(
@@ -6661,7 +6840,7 @@ window.obtenerPrecioActualizado = function (cuota) {
 };
 
 /**
- * ✅ Obtener nombre del mes
+ *  Obtener nombre del mes
  */
 if (typeof obtenerNombreMes !== 'function') {
     window.obtenerNombreMes = function (mes) {
@@ -6674,7 +6853,7 @@ if (typeof obtenerNombreMes !== 'function') {
 }
 
 /**
- * ✅ Formatear estado de cuota
+ *  Formatear estado de cuota
  */
 if (typeof formatEstadoCuota !== 'function') {
     window.formatEstadoCuota = function (estado) {
@@ -6689,7 +6868,7 @@ if (typeof formatEstadoCuota !== 'function') {
 }
 
 /**
- * ✅ Truncar texto
+ *  Truncar texto
  */
 if (typeof truncarTexto !== 'function') {
     window.truncarTexto = function (texto, maxLength) {
@@ -6701,7 +6880,7 @@ if (typeof truncarTexto !== 'function') {
 // ========== 2. RENDERIZAR TARJETA DE CUOTA INDIVIDUAL ==========
 
 /**
- * ✅ Renderizar tarjeta de cuota (para historial y pendientes)
+ *  Renderizar tarjeta de cuota (para historial y pendientes)
  */
 window.renderCuotaCard = function (cuota) {
     const estadoFinal = cuota.estado_actual || cuota.estado;
@@ -6805,11 +6984,13 @@ window.renderCuotaCard = function (cuota) {
             </div>
             
             <div class="cuota-card-footer">
-                ${cuota.comprobante_archivo ? `
-                    <button class="btn btn-secondary btn-small" onclick="verComprobante('${cuota.comprobante_archivo}')">
-                        <i class="fas fa-image"></i> Ver Comprobante
-                    </button>
-                ` : ''}
+               ${estadoFinal === 'pendiente' || estadoFinal === 'vencida' ? `
+    <button class="btn-small btn-primary" 
+            onclick="abrirPagarCuotaModal(${cuota.id_cuota}, ${cuota.monto_total || cuota.monto_base || cuota.monto})"
+            title="Registrar pago">
+        <i class="fas fa-dollar-sign"></i> Pagar
+    </button>
+` : ''}
                 
                 ${estadoFinal !== 'pagada' && !tienePagoPendiente ? `
                     <button class="btn btn-primary btn-small" onclick="abrirPagarDeudaTotal(${cuota.id_cuota}, ${montoMostrar})">
@@ -6830,7 +7011,7 @@ window.renderCuotaCard = function (cuota) {
 // ========== 3. RENDERIZAR CUOTAS ORGANIZADAS (PRINCIPAL) ==========
 
 /**
- * ✅ OVERRIDE: renderMisCuotasOrganizadas - VERSION COMPLETA
+ *  OVERRIDE: renderMisCuotasOrganizadas - VERSION COMPLETA
  */
 window.renderMisCuotasOrganizadas = function (cuotas) {
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
@@ -6851,8 +7032,8 @@ window.renderMisCuotasOrganizadas = function (cuotas) {
     }
 
     let html = '';
-
-    // ✅ CUOTA DEL MES ACTUAL
+    
+    //  CUOTA DEL MES ACTUAL
     const cuotaMasReciente = cuotas[0];
     console.log('📋 [RENDER] Cuota más reciente:', cuotaMasReciente);
 
@@ -6879,29 +7060,44 @@ window.renderMisCuotasOrganizadas = function (cuotas) {
     // 🔥 MONTO TOTAL
     const montoTotal = montoCuota + deudaAcumuladaAnterior + deudaHoras;
 
-    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-    console.log('💰 [RENDER] CÁLCULO COMPLETO:');
-    console.log('   monto_cuota:', montoCuota);
-    console.log('   deuda_meses_anteriores:', deudaAcumuladaAnterior);
-    console.log('   deuda_horas_actual:', deudaHoras);
-    console.log('   ✅ TOTAL A PAGAR:', montoTotal);
-    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+console.log('💰 [RENDER] CÁLCULO COMPLETO:');
+console.log('   monto_cuota:', montoCuota);
+console.log('   deuda_meses_anteriores:', deudaAcumuladaAnterior);
+console.log('   deuda_horas_actual:', deudaHoras);
+console.log('    TOTAL A PAGAR:', montoTotal);
+console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     // ⚠️ VALIDACIÓN CRÍTICA
     if (deudaHoras === 0 && window.deudaHorasActual > 0) {
         console.error('❌ [ERROR] deudaHoras es 0 pero window.deudaHorasActual es:', window.deudaHorasActual);
         console.error('   Esto indica un problema en el parseo. Forzando valor...');
         // NO hacer nada aquí, el parseFloat ya debería funcionar
     }
-
-    // ✅ VERIFICAR ESTADOS
+    
+    //  VERIFICAR ESTADOS
+    //  VERIFICAR ESTADOS - ORDEN DE PRIORIDAD CORRECTO
     const estadoFinal = cuotaMasReciente.estado_actual || cuotaMasReciente.estado;
     const estadoPago = cuotaMasReciente.estado_pago || '';
     const estadoUsuario = cuotaMasReciente.estado_usuario || '';
-    const tienePagoPendiente = cuotaMasReciente.id_pago && estadoPago === 'pendiente';
-    const pagoAprobado = estadoUsuario === 'aceptado' || (estadoPago === 'aprobado' && estadoFinal === 'pagada');
+    
+    // 🔥 PRIORIDAD 1: Si estado_usuario es 'aceptado' → PAGADA
+    const pagoAprobado = estadoUsuario === 'aceptado' || estadoPago === 'aprobado';
+    
+    // 🔥 PRIORIDAD 2: Si estado_pago es 'pendiente' → EN VALIDACIÓN
+    const tienePagoPendiente = cuotaMasReciente.id_pago && estadoPago === 'pendiente' && !pagoAprobado;
+    
+    // 🔥 PRIORIDAD 3: Si cualquiera de los estados indica pagada → PAGADA
     const estaPagada = estadoFinal === 'pagada' || pagoAprobado;
-
-    // ✅ VERIFICAR PERIODO DE PAGO
+    
+    console.log('🔍 [ESTADOS] Verificación completa:', {
+        estado_final: estadoFinal,
+        estado_pago: estadoPago,
+        estado_usuario: estadoUsuario,
+        pago_aprobado: pagoAprobado,
+        tiene_pago_pendiente: tienePagoPendiente,
+        esta_pagada: estaPagada
+    });
+    //  VERIFICAR PERIODO DE PAGO
     const hoy = new Date();
     const diaActual = hoy.getDate();
     const mesActual = hoy.getMonth() + 1;
@@ -6911,8 +7107,8 @@ window.renderMisCuotasOrganizadas = function (cuotas) {
     const estaDentroPeriodoPago = diaActual >= 25;
     const puedePagar = esMesCuota && estaDentroPeriodoPago && !estaPagada && !tienePagoPendiente;
     const diasParaPagar = estaDentroPeriodoPago ? 0 : Math.max(0, 25 - diaActual);
-
-    // ✅ RENDERIZAR HTML
+    
+    //  RENDERIZAR HTML
     html += `
         <div class="deuda-total-destacada ${estaPagada ? 'pagada-mes' : puedePagar ? '' : 'periodo-bloqueado'}">
             <div class="deuda-total-header">
@@ -6921,10 +7117,11 @@ window.renderMisCuotasOrganizadas = function (cuotas) {
                     <span data-i18n="dashboardUser.billing.summary.currentMonth">Resumen del Mes Actual</span>
                 </h2>
                 <span class="deuda-total-badge ${estaPagada ? 'badge-pagada' : tienePagoPendiente ? 'badge-pendiente' : puedePagar ? 'badge-requerida' : 'badge-bloqueado'}">
-                    ${estaPagada ? ' <span data-i18n="dashboardUser.billing.summary.paid">✅ PAGADA</span>' :
+                    ${estaPagada ? ' <span data-i18n="dashboardUser.billing.summary.paid"> PAGADA</span>' :
             tienePagoPendiente ? '<span data-i18n="dashboardUser.billing.summary.inReview">⏳ EN VALIDACIÓN</span>' :
                 puedePagar ? '<span data-i18n="dashboardUser.billing.summary.openPaymentPeriod">⚠️ PERIODO DE PAGO ABIERTO</span>' :
-                    diasParaPagar > 0 ? `🔒 ${diasParaPagar} <span data-i18n="dashboardUser.billing.summary.day">DÍA</span>${diasParaPagar !== 1 ? 'S' : ''} <span data-i18n="dashboardUser.billing.summary.toPay">PARA PAGAR</span>` :
+                    esMesCuota && diasParaPagar > 0 ? `🔒 ${diasParaPagar} <span data-i18n="dashboardUser.billing.summary.day">DÍA</span>${diasParaPagar !== 1 ? 'S' : ''} <span data-i18n="dashboardUser.billing.summary.toPay">PARA PAGAR</span>` :
+                      !esMesCuota ? '⏰ Mes cerrado' :
                         '<span data-i18n="dashboardUser.billing.summary.overdue">❌ VENCIDA</span>'}
                 </span>
             </div>
@@ -6960,14 +7157,14 @@ $${deudaAcumuladaAnterior.toLocaleString('es-UY', { minimumFractionDigits: 2 })}
                     
                    ${deudaHoras > 0 ? `
     <div class="deuda-breakdown-item deuda-horas">
-        <i class="fas fa-clock"></i>
-        <div>
-            <span class="deuda-label" data-i18n="dashboardUser.billing.summary.hoursNotWorkedDebt">Deuda por Horas No Trabajadas</span>
-            <span class="deuda-monto ${deudaHoras > 0 ? 'error' : 'success'}">$${deudaHoras.toLocaleString('es-UY', { minimumFractionDigits: 2 })}</span>
-            <small style="color: ${deudaHoras > 0 ? '#ff8a80' : '#81c784'}; display: block; margin-top: 5px;">
-                ${deudaHoras > 0 ? '<span data-i18n="dashboardUser.billing.summary.hoursNotWorkedDebtNote">($160 por hora × horas faltantes)</span>' : '<span data-i18n="dashboardUser.billing.summary.noHoursNotWorkedDebt">¡Sin deuda de horas!</span>'}
-            </small>
-        </div>
+      <i class="fas fa-clock"></i>
+<div>
+    <span class="deuda-label" data-i18n="dashboardUser.billing.summary.hoursNotWorkedDebt">Deuda por Horas No Trabajadas</span>
+    <small style="color: ${deudaHoras > 0 ? '#ff8a80' : '#81c784'}; display: block; margin-top: 3px; margin-bottom: 5px;">
+        ${deudaHoras > 0 ? '<span data-i18n="dashboardUser.billing.summary.hoursNotWorkedDebtNote">($160 por hora × horas faltantes)</span>' : '<span data-i18n="dashboardUser.billing.summary.noHoursNotWorkedDebt">¡Sin deuda de horas!</span>'}
+    </small>
+    <span class="deuda-monto ${deudaHoras > 0 ? 'error' : 'success'}">${deudaHoras.toLocaleString('es-UY', {minimumFractionDigits: 2})}</span>
+</div>
     </div>
 ` : ''}
 
@@ -6997,21 +7194,100 @@ $${deudaAcumuladaAnterior.toLocaleString('es-UY', { minimumFractionDigits: 2 })}
                         <p style="color: rgba(255, 255, 255, 0.9); margin: 10px 0 0 0;" data-i18n="dashboardUser.billing.summary.paymentInReviewNote">Tu pago está siendo validado.</p>
                     </div>
                 ` : puedePagar ? `
-                    <div class="deuda-total-actions">
-                        <button class="btn-pagar-deuda-total" onclick="abrirPagarDeudaTotal(${cuotaMasReciente.id_cuota}, ${montoTotal})">
-                            <i class="fas fa-credit-card"></i> <span data-i18n="dashboardUser.billing.payNow">Pagar Ahora</span>
-                        </button>
-                    </div>
-                    <div class="alert-success" style="margin-top: 20px;">
-                        <strong style="color: #4caf50;" data-i18n="dashboardUser.billing.summary.paymentEnabled">✓ Periodo de Pago Habilitado</strong>
-                        <p style="color: rgba(255, 255, 255, 0.9); margin: 10px 0 0 0;" data-i18n="dashboardUser.billing.summary.paymentEnabledNote">Ya puedes realizar el pago.</p>
+                    <!--  PERÍODO DE PAGO ABIERTO - MOSTRAR BOTÓN VERDE -->
+    <div class="deuda-total-actions">
+        <button class="btn-pagar-deuda-total" 
+                onclick="abrirPagarDeudaTotal(${cuotaMasReciente.id_cuota}, ${montoTotal})"
+                style="
+                    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+                    color: #FFFFFF;
+                    border: none;
+                    padding: 14px 28px;
+                    border-radius: 8px;
+                    font-size: 15px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 10px;
+                "
+                onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(76, 175, 80, 0.4)'"
+                onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(76, 175, 80, 0.3)'"
+                onmousedown="this.style.transform='translateY(0px)'"
+                onmouseup="this.style.transform='translateY(-2px)'">
+            <i class="fas fa-credit-card"></i>
+            Pagar Ahora
+        </button>
+    </div>
+    
+    <div class="alert-success" style="margin-top: 20px; background: rgba(76, 175, 80, 0.15);">
+        <strong style="color: #4caf50;" data-i18n="dashboardUser.billing.summary.paymentEnabled"> Período de Pago Habilitado</strong>
+        <p style="color: rgba(255, 255, 255, 0.9); margin: 10px 0 0 0;">
+            Ya puedes realizar el pago de tu cuota. El período de pago está activo hasta fin de mes.
+        </p>
+    </div>
+` : diasParaPagar > 0 ? `
+                    
+<div class="deuda-total-actions">
+    <button class="btn-pagar-deuda-total" 
+            disabled
+            title="El período de pago se habilitará el día 25 del mes"
+            style="
+                background: linear-gradient(135deg, #9e9e9e 0%, #757575 100%);
+                color: #FFFFFF;
+                border: none;
+                padding: 14px 28px;
+                border-radius: 8px;
+                font-size: 15px;
+                font-weight: 600;
+                cursor: not-allowed;
+                opacity: 0.6;
+                box-shadow: none;
+                display: inline-flex;
+                align-items: center;
+                gap: 10px;
+            ">
+        <i class="fas fa-lock"></i>
+        Pago Bloqueado
+    </button>
+</div>
+                    <div class="alert-warning" style="margin-top: 20px;">
+                        <strong style="color: #ff9800;">🔒 Periodo de Trabajo en Curso</strong>
+                        <p style="color: rgba(255, 255, 255, 0.9); margin: 10px 0 0 0;">
+                            El período de pago se habilitará en <strong>${diasParaPagar} día${diasParaPagar !== 1 ? 's' : ''}</strong> (desde el 25 del mes).
+                            <br>Por ahora, enfócate en cumplir tus <strong>21 horas semanales</strong> para evitar cargos adicionales.
+                        </p>
                     </div>
                 ` : diasParaPagar > 0 ? `
-                    <div class="deuda-total-actions">
-                        <button class="btn-pagar-deuda-total" disabled style="opacity: 0.5; cursor: not-allowed;">
-                            <i class="fas fa-lock"></i> <span data-i18n="dashboardUser.billing.paymentBlocked">Pago Bloqueado</span>
-                        </button>
-                    </div>
+                    
+<div class="deuda-total-actions">
+    <button class="btn-pagar-deuda-total" 
+            onclick="abrirPagarDeudaTotal(${cuotaMasReciente.id_cuota}, ${montoTotal})"
+            style="
+                background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+                color: #FFFFFF;
+                border: none;
+                padding: 14px 28px;
+                border-radius: 8px;
+                font-size: 15px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+                display: inline-flex;
+                align-items: center;
+                gap: 10px;
+            "
+            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(76, 175, 80, 0.4)'"
+            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(76, 175, 80, 0.3)'"
+            onmousedown="this.style.transform='translateY(0px)'"
+            onmouseup="this.style.transform='translateY(-2px)'">
+        <i class="fas fa-credit-card"></i>
+        Pagar Ahora
+    </button>
+</div>
                     <div class="alert-warning" style="margin-top: 20px;">
                         <strong style="color: #ff9800;" data-i18n="dashboardUser.billing.workingPeriod">🔒 Periodo de Trabajo en Curso</strong>
                         <p style="color: rgba(255, 255, 255, 0.9); margin: 10px 0 0 0;">
@@ -7058,4 +7334,4 @@ $${deudaAcumuladaAnterior.toLocaleString('es-UY', { minimumFractionDigits: 2 })}
 
 };
 
-console.log('✅ Fix completo aplicado con todas las funciones auxiliares');
+console.log(' Fix completo aplicado con todas las funciones auxiliares');

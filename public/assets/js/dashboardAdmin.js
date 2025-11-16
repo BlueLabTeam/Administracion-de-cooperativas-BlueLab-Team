@@ -1,4 +1,3 @@
-
 // Sistema SPA - Navegación entre secciones
 document.addEventListener('DOMContentLoaded', function () {
 
@@ -55,6 +54,32 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+});
+document.addEventListener('DOMContentLoaded', () => {
+    const toggleMenuBtn = document.querySelector('.toggle-menu-btn');
+    const menu = document.querySelector('nav.menu');
+    const miniToggleBtn = document.querySelector('.mini-toggle-menu-btn');
+
+    // Función al minimizar/expandir
+    toggleMenuBtn.addEventListener('click', () => {
+        menu.classList.toggle('menu-minimized');
+
+        // Si el menú se minimiza, mostramos el botón mini
+        if (menu.classList.contains('menu-minimized')) {
+            miniToggleBtn.style.display = 'block';
+            menu.style.display = 'none'; // opcional: ocultar menú al minimizar
+        } else {
+            miniToggleBtn.style.display = 'none';
+            menu.style.display = 'block';
+        }
+    });
+
+    // Función del botón mini para mostrar el menú de nuevo
+    miniToggleBtn.addEventListener('click', () => {
+        menu.classList.remove('menu-minimized');
+        menu.style.display = 'block';
+        miniToggleBtn.style.display = 'none';
+    });
 });
 
 
@@ -299,9 +324,7 @@ function showUserDetailModal(user) {
 // ==========================================
 //  Crear/Editar Vivienda
 // ==========================================
-
 function showCreateViviendaModal() {
-
 
     //  LIMPIAR MODALES ANTERIORES
     limpiarModalesAnteriores();
@@ -327,6 +350,17 @@ function showCreateViviendaModal() {
         
         //  MOSTRAR EL MODAL
         modal.style.display = 'flex';
+        
+ 
+        
+        //  PREVENIR que se cierre al hacer clic fuera
+        modal.onclick = null;
+        const modalContent = modal.querySelector('.material-modal-content');
+        if (modalContent) {
+            modalContent.onclick = function(event) {
+                event.stopPropagation();
+            };
+        }
    
     }).catch(error => {
         console.error(' Error al cargar tipos:', error);
@@ -336,7 +370,6 @@ function showCreateViviendaModal() {
 
 function editVivienda(id) {
  
-
     //  LIMPIAR MODALES ANTERIORES
     limpiarModalesAnteriores();
 
@@ -366,6 +399,18 @@ function editVivienda(id) {
 
             //  MOSTRAR EL MODAL
             modal.style.display = 'flex';
+            
+            //  PREVENIR SCROLL DEL BODY
+            document.body.style.overflow = 'hidden';
+            
+            //  PREVENIR que se cierre al hacer clic fuera
+            modal.onclick = null;
+            const modalContent = modal.querySelector('.material-modal-content');
+            if (modalContent) {
+                modalContent.onclick = function(event) {
+                    event.stopPropagation();
+                };
+            }
          
         } else {
             alert('Error al cargar vivienda');
@@ -382,6 +427,9 @@ function closeViviendaModal() {
         modal.style.display = 'none';
         document.getElementById('viviendaForm').reset();
     }
+    
+    //  RESTAURAR SCROLL DEL BODY
+    document.body.style.overflow = 'auto';
    
     limpiarModalesAnteriores();
 }
@@ -391,8 +439,6 @@ function closeViviendaModal() {
 // ==========================================
 
 function showAsignarModal(viviendaId, numeroVivienda) {
-
-
     
     limpiarModalesAnteriores();
 
@@ -415,7 +461,21 @@ function showAsignarModal(viviendaId, numeroVivienda) {
 
             document.getElementById('asignar-vivienda-info').textContent = `Vivienda: ${numeroVivienda}`;
             document.getElementById('asignar-vivienda-id').value = viviendaId;
-            document.getElementById('asignarViviendaModal').style.display = 'flex';
+            
+            const modal = document.getElementById('asignarViviendaModal');
+            modal.style.display = 'flex';
+            
+            //  PREVENIR SCROLL DEL BODY
+            document.body.style.overflow = 'hidden';
+            
+            //  PREVENIR que se cierre al hacer clic fuera
+            modal.onclick = null;
+            const modalContent = modal.querySelector('.material-modal-content');
+            if (modalContent) {
+                modalContent.onclick = function(event) {
+                    event.stopPropagation();
+                };
+            }
         }
     }).catch(error => {
         console.error('Error:', error);
@@ -431,6 +491,9 @@ function closeAsignarModal() {
         document.getElementById('asignar-usuario-group').style.display = 'none';
         document.getElementById('asignar-nucleo-group').style.display = 'none';
     }
+    
+    //  RESTAURAR SCROLL DEL BODY
+    document.body.style.overflow = 'auto';
    
     limpiarModalesAnteriores();
 }
@@ -1397,58 +1460,57 @@ function loadUsersForTable() {
         });
 }
 
-// ========== RENDERIZAR TABLA ==========
+// ========== RENDERIZAR TABLA DE USUARIOS ==========
 function renderUsersTable(users) {
-
-
     const container = document.getElementById('usersTableContainer');
- 
 
     if (!users || users.length === 0) {
         console.warn('⚠️ [RENDER] No hay usuarios para mostrar');
-        container.innerHTML = '<p class="no-users">No hay usuarios disponibles</p>';
+        container.innerHTML = `
+            <div style="text-align: center; padding: 60px 20px;">
+                <i class="fas fa-user-friends" style="font-size: 48px; color: #E8EBF0; display: block; margin-bottom: 15px;"></i>
+                <p style="color: #6C757D;">No hay usuarios disponibles</p>
+            </div>
+        `;
         return;
     }
 
-
-
     try {
-        const tableHTML = `
-            <div class="users-table-wrapper">
-                <table class="users-table">
+        let html = `
+            <div style="overflow-x: auto; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 92, 185, 0.12);">
+                <table style="width: 100%; border-collapse: collapse; background: #FFFFFF; min-width: 1400px;">
                     <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Nombre</th>
-                            <th>Cédula</th>
-                            <th>Email</th>
-                            <th>Estado</th>
-                            <th>Rol</th>
-                            <th>Núcleo</th>
-                            <th>Pago</th>
-                            <th>Acciones</th>
+                        <tr style="background: linear-gradient(135deg, #005CB9 0%, #004494 100%); color: #FFFFFF;">
+                            <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">ID</th>
+                            <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;">Nombre</th>
+                            <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;">Cédula</th>
+                            <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;">Email</th>
+                            <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Estado</th>
+                            <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Rol</th>
+                            <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;">Núcleo</th>
+                            <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Pago</th>
+                            <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
-                        ${users.map((user, index) => {
-          
-            return renderUserRow(user);
-        }).join('')}
-                    </tbody>
-                </table>
-            </div>
         `;
 
-   
+        users.forEach(user => {
+            html += renderUserRow(user);
+        });
 
-        container.innerHTML = tableHTML;
-
-     
+        html += '</tbody></table></div>';
+        container.innerHTML = html;
 
     } catch (error) {
         console.error('💥 [RENDER ERROR]', error);
         console.error('💥 [RENDER ERROR] Stack:', error.stack);
-        container.innerHTML = `<p class="error">Error al renderizar tabla: ${error.message}</p>`;
+        container.innerHTML = `
+            <div style="text-align: center; padding: 40px; color: #F44336;">
+                <i class="fas fa-exclamation-triangle" style="font-size: 48px; margin-bottom: 15px;"></i>
+                <p>Error al renderizar tabla: ${error.message}</p>
+            </div>
+        `;
     }
 }
 
@@ -1456,49 +1518,122 @@ function renderUsersTable(users) {
 function renderUserRow(user) {
     const hasPayment = user.comprobante_archivo && user.estado === 'enviado';
 
+    // Colores según estado
+    let estadoColor = '';
+    let estadoText = '';
+    if (user.estado === 'enviado') {
+        estadoColor = '#FF9800';
+        estadoText = 'Pendiente';
+    } else if (user.estado === 'aprobado') {
+        estadoColor = '#4CAF50';
+        estadoText = 'Aprobado';
+    } else if (user.estado === 'rechazado') {
+        estadoColor = '#F44336';
+        estadoText = 'Rechazado';
+    } else if (user.estado === 'activo') {
+        estadoColor = '#4CAF50';
+        estadoText = 'Activo';
+    } else if (user.estado === 'inactivo') {
+        estadoColor = '#9E9E9E';
+        estadoText = 'Inactivo';
+    } else {
+        estadoColor = '#6C757D';
+        estadoText = formatEstadoUsuario(user.estado);
+    }
+
+    // Color del rol
+    const esAdmin = user.nombre_rol === 'Administrador' || user.nombre_rol === 'Admin';
+    const rolColor = esAdmin ? '#005CB9' : '#6C757D';
+
     return `
-        <tr class="user-row estado-${user.estado}" data-estado="${user.estado}">
-            <td>${user.id_usuario}</td>
-            <td>${user.nombre_completo}</td>
-            <td>${user.cedula}</td>
-            <td>${user.email}</td>
-            <td>
-                <span class="estado-badge estado-${user.estado}">
-                    ${formatEstadoUsuario(user.estado)}
-                </span>
+        <tr style="border-bottom: 1px solid #E8EBF0; transition: all 0.2s ease;" 
+            onmouseover="this.style.background='#F5F7FA'" 
+            onmouseout="this.style.background='#FFFFFF'"
+            data-estado="${user.estado}">
+            
+            <td style="padding: 14px 12px; text-align: center;">
+                <div style="font-weight: 600; color: #005CB9; font-size: 14px;">#${user.id_usuario}</div>
             </td>
-            <td>${user.nombre_rol || 'Sin rol'}</td>
-            <td>${user.nombre_nucleo || 'Sin núcleo'}</td>
-            <td>
+            
+            <td style="padding: 14px 12px; font-size: 13px;">
+                <div style="font-weight: 600; color: #495057;">${user.nombre_completo}</div>
+            </td>
+            
+            <td style="padding: 14px 12px; font-size: 13px; color: #495057;">
+                ${user.cedula}
+            </td>
+            
+            <td style="padding: 14px 12px; font-size: 13px;">
+                <div style="color: #6C757D;">${user.email}</div>
+            </td>
+            
+            <td style="padding: 14px 12px; text-align: center;">
+                <span style="
+                    display: inline-block;
+                    padding: 6px 12px;
+                    border-radius: 20px;
+                    font-size: 11px;
+                    font-weight: 600;
+                    text-transform: uppercase;
+                    background: ${estadoColor};
+                    color: #FFFFFF;
+                ">${estadoText}</span>
+            </td>
+            
+            <td style="padding: 14px 12px; text-align: center;">
+                <span style="
+                    font-weight: 600;
+                    color: ${rolColor};
+                    font-size: 13px;
+                ">${user.nombre_rol || 'Sin rol'}</span>
+            </td>
+            
+            <td style="padding: 14px 12px; font-size: 13px; color: #495057;">
+                ${user.nombre_nucleo || '<span style="color: #6C757D; font-style: italic;">Sin núcleo</span>'}
+            </td>
+            
+            <td style="padding: 14px 12px; text-align: center; font-size: 12px;">
                 ${hasPayment ? `
-                    <div style="font-size: 12px;">
-                        <div>${formatFecha(user.fecha_pago)}</div>
+                    <div>
+                        <div style="color: #495057; margin-bottom: 4px;">${formatFecha(user.fecha_pago)}</div>
                         <a href="/files/?path=${user.comprobante_archivo}" 
                            target="_blank" 
-                           style="color: #0066cc;">
-                            📄 Ver comprobante
+                           style="
+                               color: #005CB9;
+                               text-decoration: none;
+                               font-weight: 600;
+                           "
+                           onmouseover="this.style.textDecoration='underline'"
+                           onmouseout="this.style.textDecoration='none'">
+                            <i class="fas fa-file-alt"></i> Ver comprobante
                         </a>
                     </div>
                 ` : `
-                    <span style="color: #999; font-size: 12px;">Sin pago pendiente</span>
+                    <span style="color: #6C757D; font-style: italic;">Sin pago pendiente</span>
                 `}
             </td>
-            <td>
-                <div style="display: flex; gap: 5px; flex-wrap: wrap;">
-                    <button class="btn-small btn-view" 
-                            onclick="viewUserDetails(${user.id_usuario})">
-                        Ver
+            
+            <td style="padding: 14px 12px;">
+                <div style="display: flex; gap: 5px; justify-content: center; flex-wrap: wrap;">
+                    
+                    <button class="btn-small btn-secondary" 
+                            onclick="viewUserDetails(${user.id_usuario})"
+                            title="Ver detalles">
+                        <i class="fas fa-eye"></i>
                     </button>
+                    
                     ${hasPayment ? `
-                        <button class="btn-small btn-approve-small" 
+                        <button class="btn-small btn-success" 
                                 onclick="approvePaymentFromTable(${user.id_usuario})"
-                                id="approve-btn-${user.id_usuario}">
-                            ✓
+                                id="approve-btn-${user.id_usuario}"
+                                title="Aprobar pago">
+                            <i class="fas fa-check"></i>
                         </button>
-                        <button class="btn-small btn-reject-small" 
+                        <button class="btn-small btn-danger" 
                                 onclick="rejectPaymentFromTable(${user.id_usuario})"
-                                id="reject-btn-${user.id_usuario}">
-                            ✗
+                                id="reject-btn-${user.id_usuario}"
+                                title="Rechazar pago">
+                            <i class="fas fa-times"></i>
                         </button>
                     ` : ''}
                 </div>
@@ -1507,6 +1642,8 @@ function renderUserRow(user) {
     `;
 }
 
+console.log(' [USERS TABLE] Tabla con estilos de cuotas aplicados');
+console.log('🎨 [USERS TABLE] Diseño moderno y consistente');
 // ========== FUNCIONES AUXILIARES ==========
 function formatEstadoUsuario(estado) {
     const estados = {
@@ -1869,9 +2006,9 @@ function renderNucleosTable(nucleos) {
 
     if (!nucleos || nucleos.length === 0) {
         container.innerHTML = `
-            <div style="text-align: center; padding: 40px;">
-                <i class="fas fa-users" style="font-size: 48px; color: #ddd; display: block; margin-bottom: 15px;"></i>
-                <p style="color: #999; margin-bottom: 20px;">No hay núcleos familiares registrados</p>
+            <div style="text-align: center; padding: 60px 20px;">
+                <i class="fas fa-users" style="font-size: 48px; color: #E8EBF0; display: block; margin-bottom: 15px;"></i>
+                <p style="color: #6C757D; margin-bottom: 20px;">No hay núcleos familiares registrados</p>
                 <button class="btn btn-primary" onclick="showCreateNucleoModal()">
                     <i class="fas fa-plus"></i> Crear Nuevo Núcleo
                 </button>
@@ -1880,17 +2017,17 @@ function renderNucleosTable(nucleos) {
         return;
     }
 
-    let tableHTML = `
-        <div class="viviendas-table-container">
-            <table class="viviendas-table">
+    let html = `
+        <div style="overflow-x: auto; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 92, 185, 0.12);">
+            <table style="width: 100%; border-collapse: collapse; background: #FFFFFF; min-width: 1000px;">
                 <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Nombre del Núcleo</th>
-                        <th>Dirección</th>
-                        <th>Miembros</th>
-                        <th>Integrantes</th>
-                        <th>Acciones</th>
+                    <tr style="background: linear-gradient(135deg, #005CB9 0%, #004494 100%); color: #FFFFFF;">
+                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">ID</th>
+                        <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;">Nombre del Núcleo</th>
+                        <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;">Dirección</th>
+                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Miembros</th>
+                        <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;">Integrantes</th>
+                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -1902,28 +2039,59 @@ function renderNucleosTable(nucleos) {
               (nucleo.total_miembros > 3 ? ` y ${nucleo.total_miembros - 3} más...` : '')
             : 'Sin miembros';
 
-        tableHTML += `
-            <tr>
-                <td><strong>${nucleo.id_nucleo}</strong></td>
-                <td>${nucleo.nombre_nucleo || 'Sin nombre'}</td>
-                <td>${nucleo.direccion || '-'}</td>
-                <td class="text-center">
-                    <span class="badge-count">${nucleo.total_miembros || 0}</span>
+        const totalMiembros = nucleo.total_miembros || 0;
+
+        html += `
+            <tr style="border-bottom: 1px solid #E8EBF0; transition: all 0.2s ease;" 
+                onmouseover="this.style.background='#F5F7FA'" 
+                onmouseout="this.style.background='#FFFFFF'">
+                
+                <td style="padding: 14px 12px; text-align: center;">
+                    <div style="font-weight: 600; color: #005CB9; font-size: 14px;">#${nucleo.id_nucleo}</div>
                 </td>
-                <td>${integrantes}</td>
-                <td>
-                    <div class="vivienda-actions">
-                        <button class="btn-view-vivienda" 
+                
+                <td style="padding: 14px 12px; font-size: 13px;">
+                    <div style="font-weight: 600; color: #495057;">${nucleo.nombre_nucleo || 'Sin nombre'}</div>
+                </td>
+                
+                <td style="padding: 14px 12px; font-size: 13px; color: #495057;">
+                    ${nucleo.direccion || '-'}
+                </td>
+                
+                <td style="padding: 14px 12px; text-align: center;">
+                    <span style="
+                        display: inline-block;
+                        padding: 6px 12px;
+                        border-radius: 20px;
+                        font-size: 11px;
+                        font-weight: 600;
+                        background: ${totalMiembros > 0 ? '#4CAF50' : '#E8EBF0'};
+                        color: ${totalMiembros > 0 ? '#FFFFFF' : '#6C757D'};
+                    ">${totalMiembros} ${totalMiembros === 1 ? 'miembro' : 'miembros'}</span>
+                </td>
+                
+                <td style="padding: 14px 12px; font-size: 13px;">
+                    ${integrantes !== 'Sin miembros' 
+                        ? `<div style="color: #495057;">${integrantes}</div>` 
+                        : '<span style="color: #6C757D; font-style: italic;">Sin miembros</span>'}
+                </td>
+                
+                <td style="padding: 14px 12px;">
+                    <div style="display: flex; gap: 5px; justify-content: center; flex-wrap: wrap;">
+                        
+                        <button class="btn-small btn-secondary" 
                                 onclick="viewNucleoDetails(${nucleo.id_nucleo})" 
                                 title="Ver detalles">
                             <i class="fas fa-eye"></i>
                         </button>
-                        <button class="btn-edit-vivienda" 
+                        
+                        <button class="btn-small btn-primary" 
                                 onclick="editNucleo(${nucleo.id_nucleo})" 
                                 title="Editar">
                             <i class="fas fa-edit"></i>
                         </button>
-                        <button class="btn-delete-vivienda" 
+                        
+                        <button class="btn-small btn-danger" 
                                 onclick="deleteNucleo(${nucleo.id_nucleo})" 
                                 title="Eliminar">
                             <i class="fas fa-trash"></i>
@@ -1934,14 +2102,12 @@ function renderNucleosTable(nucleos) {
         `;
     });
 
-    tableHTML += `
-                </tbody>
-            </table>
-        </div>
-    `;
-
-    container.innerHTML = tableHTML;
+    html += '</tbody></table></div>';
+    container.innerHTML = html;
 }
+
+console.log(' [NÚCLEOS TABLE] Tabla con estilos de cuotas aplicados');
+console.log('🎨 [NÚCLEOS TABLE] Diseño moderno y consistente');
 
 // ========== RENDERIZAR FILA DE NÚCLEO ==========
 function renderNucleoRow(nucleo) {
@@ -2002,40 +2168,58 @@ function loadUsersForNucleo(nucleoId = null) {
 function showCreateNucleoForm() {
     loadUsersForNucleo().then(usuarios => {
         const modalHTML = `
-            <div class="modal-overlay" onclick="if(event.target.classList.contains('modal-overlay')) this.remove()">
-                <div class="modal-content-large">
-                    <button class="modal-close-btn" onclick="this.closest('.modal-overlay').remove()">×</button>
-                    
-                    <h2 class="modal-title">Crear Nuevo Núcleo Familiar</h2>
+            <div id="createNucleoModal" class="material-modal" style="display: flex;">
+                <div class="material-modal-content">
+                    <div class="material-modal-header">
+                        <h3>Crear Nuevo Núcleo Familiar</h3>
+                        <button class="close-material-modal" onclick="closeCreateNucleoModal()">&times;</button>
+                    </div>
                     
                     <form id="createNucleoForm" onsubmit="submitCreateNucleo(event)">
-                        <div class="form-group">
+                        <div class="material-form-group">
                             <label for="nombre_nucleo">Nombre del Núcleo *</label>
                             <input type="text" id="nombre_nucleo" name="nombre_nucleo" 
+                                   class="material-input"
                                    placeholder="Ej: Familia García" required>
                         </div>
 
-                        <div class="form-group">
+                        <div class="material-form-group">
                             <label for="direccion_nucleo">Dirección</label>
                             <input type="text" id="direccion_nucleo" name="direccion" 
+                                   class="material-input"
                                    placeholder="Ej: Av. Italia 2345">
                         </div>
 
-                        <div class="form-group">
+                        <div class="material-form-group">
                             <label>Seleccionar Miembros del Núcleo *</label>
-                            <div class="user-selection-nucleo">
+                            <div class="user-selection-nucleo" style="display: flex; flex-direction: column; gap: 10px;">
                                 <input type="text" id="search-users-nucleo" 
+                                       class="material-input"
                                        placeholder="Buscar usuario..." 
                                        onkeyup="filterUsersNucleo()">
-                                <div id="usersListNucleo" class="users-checkboxes-nucleo">
+                                <div id="usersListNucleo" class="users-checkboxes-nucleo"
+                                     style="
+                                         display: flex;
+                                         flex-direction: column;
+                                         gap: 8px;
+                                         max-height: 250px;
+                                         overflow-y: auto;
+                                         border: 1px solid #E0E0E0;
+                                         border-radius: 8px;
+                                         padding: 12px;
+                                         background: #FAFAFA;
+                                     ">
                                     ${renderUsersCheckboxes(usuarios)}
                                 </div>
+                                <small style="color: #6C757D; font-size: 12px; margin-top: -5px;">
+                                    Selecciona los miembros que formarán parte de este núcleo familiar
+                                </small>
                             </div>
                         </div>
 
-                        <div class="form-actions">
+                        <div class="material-form-actions">
                             <button type="button" class="btn btn-secondary" 
-                                    onclick="this.closest('.modal-overlay').remove()">
+                                    onclick="closeCreateNucleoModal()">
                                 Cancelar
                             </button>
                             <button type="submit" class="btn btn-primary">
@@ -2047,12 +2231,164 @@ function showCreateNucleoForm() {
             </div>
         `;
 
+        // Eliminar modal previo si existe
+        const existing = document.getElementById('createNucleoModal');
+        if (existing) existing.remove();
+
         document.body.insertAdjacentHTML('beforeend', modalHTML);
+        
+        // Prevenir scroll del body
+        document.body.style.overflow = 'hidden';
     }).catch(error => {
         console.error('Error:', error);
         alert('Error al cargar usuarios');
     });
 }
+
+// Renderizar checkboxes de usuarios de forma simple
+function renderUsersCheckboxes(usuarios) {
+    if (!usuarios || usuarios.length === 0) {
+        return '<p style="color: #6C757D; text-align: center; padding: 20px;">No hay usuarios disponibles</p>';
+    }
+
+    return usuarios.map(usuario => {
+        const isInNucleo = usuario.id_nucleo !== null;
+        const isDisabled = isInNucleo ? 'disabled' : '';
+        const checkboxStyle = isInNucleo ? 'opacity: 0.5; cursor: not-allowed;' : 'cursor: pointer;';
+        
+        return `
+            <label style="
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                padding: 10px 12px;
+                background: ${isInNucleo ? '#FFF3E0' : '#FFFFFF'};
+                border: 1px solid ${isInNucleo ? '#FFB74D' : '#E0E0E0'};
+                border-radius: 6px;
+                ${checkboxStyle}
+                transition: all 0.2s ease;
+            " ${!isInNucleo ? `onmouseover="this.style.borderColor='#005CB9'; this.style.background='#F5F9FF'" onmouseout="this.style.borderColor='#E0E0E0'; this.style.background='#FFFFFF'"` : ''}>
+                <input type="checkbox" 
+                       name="miembros[]" 
+                       value="${usuario.id_usuario}" 
+                       ${isDisabled}
+                       style="
+                           width: 18px;
+                           height: 18px;
+                           cursor: ${isInNucleo ? 'not-allowed' : 'pointer'};
+                           accent-color: #005CB9;
+                       ">
+                <div style="flex: 1;">
+                    <div style="
+                        font-weight: 500;
+                        color: ${isInNucleo ? '#795548' : '#212529'};
+                        font-size: 14px;
+                    ">
+                        ${usuario.nombre} ${usuario.apellido}
+                    </div>
+                    <div style="
+                        font-size: 12px;
+                        color: ${isInNucleo ? '#8D6E63' : '#6C757D'};
+                        margin-top: 2px;
+                    ">
+                        CI: ${usuario.cedula}
+                    </div>
+                </div>
+                ${isInNucleo ? `
+                    <span style="
+                        font-size: 11px;
+                        color: #E65100;
+                        background: #FFE0B2;
+                        padding: 4px 10px;
+                        border-radius: 12px;
+                        font-weight: 600;
+                    ">
+                        Ya en núcleo
+                    </span>
+                ` : ''}
+            </label>
+        `;
+    }).join('');
+}
+
+// Filtrar usuarios en el modal de núcleo
+function filterUsersNucleo() {
+    const searchValue = document.getElementById('search-users-nucleo').value.toLowerCase();
+    const labels = document.querySelectorAll('#usersListNucleo label');
+    
+    labels.forEach(label => {
+        const text = label.textContent.toLowerCase();
+        if (text.includes(searchValue)) {
+            label.style.display = 'flex';
+        } else {
+            label.style.display = 'none';
+        }
+    });
+}
+
+// Cerrar modal
+function closeCreateNucleoModal() {
+    const modal = document.getElementById('createNucleoModal');
+    if (modal) {
+        modal.style.display = 'none';
+        modal.remove();
+    }
+    document.body.style.overflow = 'auto';
+}
+
+// Submit del formulario
+function submitCreateNucleo(event) {
+    event.preventDefault();
+    
+    const formData = new FormData(event.target);
+    const miembros = formData.getAll('miembros[]');
+    
+    if (miembros.length === 0) {
+        alert('Debes seleccionar al menos un miembro para el núcleo');
+        return;
+    }
+    
+    const data = {
+        nombre_nucleo: formData.get('nombre_nucleo'),
+        direccion: formData.get('direccion'),
+        miembros: miembros
+    };
+    
+    // Aquí iría tu llamada al backend
+    console.log('Datos del núcleo:', data);
+    
+    // Ejemplo de llamada fetch (ajustar a tu API)
+    fetch('/api/nucleos/crear', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(result => {
+        alert('Núcleo creado exitosamente');
+        closeCreateNucleoModal();
+        // Recargar la lista de núcleos
+        loadNucleos();
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error al crear el núcleo');
+    });
+}
+
+function closeCreateNucleoModal() {
+    const modal = document.getElementById('createNucleoModal');
+    if (modal) {
+        modal.remove();
+    }
+    
+    // Restaurar scroll del body
+    document.body.style.overflow = '';
+}
+
+console.log(' Modal crear núcleo corregido con material-modal');
 
 // Renderizar checkboxes de usuarios
 function renderUsersCheckboxes(usuarios) {
@@ -2251,16 +2587,21 @@ function editNucleo(nucleoId) {
                                  style="
                                      display: flex;
                                      flex-direction: column;
-                                     gap: 6px;
-                                     max-height: 180px;
+                                     gap: 8px;
+                                     max-height: 250px;
                                      overflow-y: auto;
-                                     border: 1px solid #ddd;
+                                     border: 1px solid #E0E0E0;
                                      border-radius: 8px;
-                                     padding: 10px;
-                                     background: #fafafa;
+                                     padding: 12px;
+                                     background: #FAFAFA;
+                                     scrollbar-width: none;
+                                     -ms-overflow-style: none;
                                  ">
                                 ${renderUsersCheckboxesEdit(usuarios, miembrosActuales, nucleoId)}
                             </div>
+                            <small style="color: #6C757D; font-size: 12px; margin-top: -5px;">
+                                Selecciona los miembros que formarán parte de este núcleo familiar
+                            </small>
                         </div>
                     </div>
 
@@ -2295,7 +2636,6 @@ function closeNucleoModal() {
     const modal = document.getElementById("nucleoModal");
     if (modal) modal.remove();
 }
-
 
 
 
@@ -2442,15 +2782,15 @@ function loadMateriales() {
         });
 }
 
-// ========== RENDERIZAR TABLA MATERIAL ==========
+// ========== RENDERIZAR TABLA DE MATERIALES ==========
 function renderMaterialesTable(materiales) {
     const container = document.getElementById('materialesTableContainer');
 
     if (!materiales || materiales.length === 0) {
         container.innerHTML = `
-            <div style="text-align: center; padding: 40px;">
-                <i class="fas fa-box-open" style="font-size: 48px; color: #ddd; display: block; margin-bottom: 15px;"></i>
-                <p style="color: #999; margin-bottom: 20px;">No hay materiales registrados</p>
+            <div style="text-align: center; padding: 60px 20px;">
+                <i class="fas fa-box-open" style="font-size: 48px; color: #E8EBF0; display: block; margin-bottom: 15px;"></i>
+                <p style="color: #6C757D; margin-bottom: 20px;">No hay materiales registrados</p>
                 <button class="btn btn-primary" onclick="showCreateMaterialModal()">
                     <i class="fas fa-plus"></i> Crear Primer Material
                 </button>
@@ -2459,16 +2799,16 @@ function renderMaterialesTable(materiales) {
         return;
     }
 
-    let tableHTML = `
-        <div class="viviendas-table-container">
-            <table class="viviendas-table">
+    let html = `
+        <div style="overflow-x: auto; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 92, 185, 0.12);">
+            <table style="width: 100%; border-collapse: collapse; background: #FFFFFF; min-width: 900px;">
                 <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Material</th>
-                        <th>Características</th>
-                        <th>Stock</th>
-                        <th>Acciones</th>
+                    <tr style="background: linear-gradient(135deg, #005CB9 0%, #004494 100%); color: #FFFFFF;">
+                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">ID</th>
+                        <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;">Material</th>
+                        <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;">Características</th>
+                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Stock</th>
+                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -2476,35 +2816,81 @@ function renderMaterialesTable(materiales) {
 
     materiales.forEach(material => {
         const stock = parseInt(material.stock) || 0;
-        let stockClass = 'disponible';
-
+        
+        // Determinar color y estado del stock
+        let stockColor = '';
+        let stockText = '';
+        let stockIcon = '';
+        
         if (stock === 0) {
-            stockClass = 'agotado';
+            stockColor = '#F44336';
+            stockText = 'Agotado';
+            stockIcon = 'fa-times-circle';
         } else if (stock < 10) {
-            stockClass = 'bajo';
+            stockColor = '#FF9800';
+            stockText = 'Stock Bajo';
+            stockIcon = 'fa-exclamation-triangle';
+        } else {
+            stockColor = '#4CAF50';
+            stockText = 'Disponible';
+            stockIcon = 'fa-check-circle';
         }
 
-        tableHTML += `
-            <tr>
-                <td>${material.id_material}</td>
-                <td><strong>${material.nombre}</strong></td>
-                <td>${material.caracteristicas || '-'}</td>
-                <td>
-                    <span class="stock-badge ${stockClass}">${stock}</span>
+        html += `
+            <tr style="border-bottom: 1px solid #E8EBF0; transition: all 0.2s ease;" 
+                onmouseover="this.style.background='#F5F7FA'" 
+                onmouseout="this.style.background='#FFFFFF'">
+                
+                <td style="padding: 14px 12px; text-align: center;">
+                    <div style="font-weight: 600; color: #005CB9; font-size: 14px;">#${material.id_material}</div>
                 </td>
-                <td>
-                    <div class="vivienda-actions">
-                        <button class="btn-view-vivienda" 
+                
+                <td style="padding: 14px 12px; font-size: 13px;">
+                    <div style="font-weight: 600; color: #495057; font-size: 14px;">${material.nombre}</div>
+                </td>
+                
+                <td style="padding: 14px 12px; font-size: 13px; color: #495057;">
+                    ${material.caracteristicas || '<span style="color: #6C757D; font-style: italic;">Sin características</span>'}
+                </td>
+                
+                <td style="padding: 14px 12px; text-align: center;">
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                        <span style="
+                            display: inline-block;
+                            padding: 6px 12px;
+                            border-radius: 20px;
+                            font-size: 11px;
+                            font-weight: 600;
+                            text-transform: uppercase;
+                            background: ${stockColor};
+                            color: #FFFFFF;
+                        ">
+                            <i class="fas ${stockIcon}"></i> ${stockText}
+                        </span>
+                        <span style="
+                            font-weight: 700;
+                            font-size: 18px;
+                            color: ${stockColor};
+                        ">${stock}</span>
+                    </div>
+                </td>
+                
+                <td style="padding: 14px 12px;">
+                    <div style="display: flex; gap: 5px; justify-content: center; flex-wrap: wrap;">
+                        
+                        <button class="btn-small btn-primary" 
                                 onclick="showStockModal(${material.id_material}, '${material.nombre.replace(/'/g, "\\'")}', ${stock})" 
                                 title="Actualizar Stock">
                             <i class="fas fa-boxes"></i>
                         </button>
-                        <button class="btn-edit-vivienda" 
+                        
+                        <button class="btn-small btn-secondary" 
                                 onclick="editMaterial(${material.id_material})" 
                                 title="Editar">
                             <i class="fas fa-edit"></i>
                         </button>
-                        <button class="btn-delete-vivienda" 
+                        
+                        <button class="btn-small btn-danger" 
                                 onclick="deleteMaterial(${material.id_material}, '${material.nombre.replace(/'/g, "\\'")}')" 
                                 title="Eliminar">
                             <i class="fas fa-trash"></i>
@@ -2515,15 +2901,12 @@ function renderMaterialesTable(materiales) {
         `;
     });
 
-    tableHTML += `
-                </tbody>
-            </table>
-        </div>
-    `;
-
-    container.innerHTML = tableHTML;
+    html += '</tbody></table></div>';
+    container.innerHTML = html;
 }
 
+console.log(' [MATERIALES TABLE] Tabla con estilos de cuotas aplicados');
+console.log('🎨 [MATERIALES TABLE] Diseño moderno y consistente');
 
 // ========== BUSCAR MATERIALES ==========
 let searchMaterialesTimeout;
@@ -2743,7 +3126,12 @@ function loadMaterialesParaTarea() {
     }
 
    
-    container.innerHTML = '<p class="loading">Cargando materiales...</p>';
+    container.innerHTML = `
+        <div class="loading-state">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Cargando materiales disponibles...</p>
+        </div>
+    `;
 
     fetch('/api/materiales/all', {
         method: 'GET',
@@ -2751,20 +3139,28 @@ function loadMaterialesParaTarea() {
         credentials: 'same-origin'
     })
         .then(response => {
-          
             return response.json();
         })
         .then(data => {
-         
             if (data.success) {
                 renderMaterialesSelectorTarea(data.materiales);
             } else {
-                container.innerHTML = `<p class="error">Error: ${data.message}</p>`;
+                container.innerHTML = `
+                    <div class="error-state">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <p>Error al cargar materiales: ${data.message}</p>
+                    </div>
+                `;
             }
         })
         .catch(error => {
             console.error('Error al cargar materiales:', error);
-            container.innerHTML = '<p class="error">Error de conexión</p>';
+            container.innerHTML = `
+                <div class="error-state">
+                    <i class="fas fa-times-circle"></i>
+                    <p>Error de conexión. Por favor, intenta nuevamente.</p>
+                </div>
+            `;
         });
 }
 
@@ -2774,43 +3170,166 @@ function renderMaterialesSelectorTarea(materiales) {
     const container = document.getElementById('materiales-tarea-list');
 
     if (!materiales || materiales.length === 0) {
-        container.innerHTML = '<p style="color: #999; padding: 10px;">No hay materiales disponibles. <a href="#" onclick="event.preventDefault(); document.querySelector(\'[data-section=\\\'materiales\\\']\').click();">Crear materiales</a></p>';
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-box-open" style="font-size: 48px; color: #ccc; margin-bottom: 16px;"></i>
+                <p style="color: #666; margin-bottom: 12px; font-size: 16px;">No hay materiales disponibles en el inventario</p>
+                <a href="#" 
+                   onclick="event.preventDefault(); document.querySelector('[data-section=\\'materiales\\']').click();" 
+                   class="btn btn-primary btn-small">
+                    <i class="fas fa-plus"></i> Crear Primer Material
+                </a>
+            </div>
+        `;
         return;
     }
 
-    container.innerHTML = materiales.map(material => {
-        const stock = parseInt(material.stock) || 0;
-        const stockClass = stock === 0 ? 'agotado' : (stock < 10 ? 'bajo' : 'disponible');
+    // Categorizar materiales por stock
+    const materialesDisponibles = materiales.filter(m => (parseInt(m.stock) || 0) > 0);
+    const materialesAgotados = materiales.filter(m => (parseInt(m.stock) || 0) === 0);
 
-        return `
-            <div class="material-selector-item" data-material-id="${material.id_material}">
-                <div class="material-selector-info">
-                    <div class="material-selector-name">
-                        <strong>${material.nombre}</strong>
-                        <span class="stock-badge-small ${stockClass}">${stock} disponible</span>
-                    </div>
-                    ${material.caracteristicas ? `<small style="color: #666;">${material.caracteristicas}</small>` : ''}
+    let html = '';
+
+    // Header con resumen
+    html += `
+        <div class="materiales-summary">
+            <div class="summary-item">
+                <i class="fas fa-boxes"></i>
+                <span><strong>${materiales.length}</strong> materiales totales</span>
+            </div>
+            <div class="summary-item success">
+                <i class="fas fa-check-circle"></i>
+                <span><strong>${materialesDisponibles.length}</strong> disponibles</span>
+            </div>
+            ${materialesAgotados.length > 0 ? `
+                <div class="summary-item error">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span><strong>${materialesAgotados.length}</strong> agotados</span>
                 </div>
-                <div class="material-selector-actions">
-                    <input type="number" 
-                           class="material-cantidad-input" 
-                           id="cantidad-${material.id_material}"
-                           min="1" 
-                           max="${stock > 0 ? stock : 999}"
-                           placeholder="Cant." 
-                           style="width: 70px;">
-                    <button type="button" 
-                            class="btn-small btn-add-material" 
-                            onclick="addMaterialToTask(${material.id_material}, '${material.nombre.replace(/'/g, "\\'")}', ${stock})"
-                            ${stock === 0 ? 'disabled title="Sin stock"' : ''}>
-                        <i class="fas fa-plus"></i>
-                    </button>
+            ` : ''}
+        </div>
+    `;
+
+    // Materiales disponibles
+    if (materialesDisponibles.length > 0) {
+        html += '<div class="materiales-section">';
+        html += '<h4 class="section-subtitle"><i class="fas fa-check-circle"></i> Materiales Disponibles</h4>';
+        
+        html += materialesDisponibles.map(material => {
+            const stock = parseInt(material.stock) || 0;
+            const stockClass = stock < 10 ? 'bajo' : 'disponible';
+            const categoria = material.categoria || 'Sin categoría';
+            const unidadMedida = material.unidad_medida || 'unidades';
+
+            return `
+                <div class="material-selector-item expanded" data-material-id="${material.id_material}">
+                    <div class="material-selector-header">
+                        <div class="material-icon">
+                            <i class="fas fa-box"></i>
+                        </div>
+                        <div class="material-selector-info">
+                            <div class="material-selector-name">
+                                <strong>${material.nombre}</strong>
+                                <span class="stock-badge-small ${stockClass}">
+                                    <i class="fas fa-warehouse"></i> ${stock} ${unidadMedida}
+                                </span>
+                            </div>
+                            <div class="material-metadata">
+                                <span class="metadata-item">
+                                    <i class="fas fa-tag"></i> ${categoria}
+                                </span>
+                                ${material.marca ? `
+                                    <span class="metadata-item">
+                                        <i class="fas fa-copyright"></i> ${material.marca}
+                                    </span>
+                                ` : ''}
+                                ${material.modelo ? `
+                                    <span class="metadata-item">
+                                        <i class="fas fa-barcode"></i> ${material.modelo}
+                                    </span>
+                                ` : ''}
+                            </div>
+                            ${material.caracteristicas ? `
+                                <div class="material-description">
+                                    <i class="fas fa-info-circle"></i> ${material.caracteristicas}
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                    <div class="material-selector-actions">
+                        <div class="quantity-control">
+                            <label for="cantidad-${material.id_material}">Cantidad:</label>
+                            <input type="number" 
+                                   class="material-cantidad-input" 
+                                   id="cantidad-${material.id_material}"
+                                   min="1" 
+                                   max="${stock}"
+                                   value="1"
+                                   placeholder="Cant.">
+                            <span class="max-available">máx: ${stock}</span>
+                        </div>
+                        <button type="button" 
+                                class="btn btn-primary btn-add-material" 
+                                onclick="addMaterialToTask(${material.id_material}, '${material.nombre.replace(/'/g, "\\'")}', ${stock})"
+                                title="Agregar a la tarea">
+                            <i class="fas fa-plus"></i> Agregar
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        html += '</div>';
+    }
+
+    // Materiales agotados (colapsados)
+    if (materialesAgotados.length > 0) {
+        html += `
+            <div class="materiales-section agotados">
+                <h4 class="section-subtitle collapsed" onclick="toggleAgotadosSection()">
+                    <i class="fas fa-chevron-right"></i> 
+                    Materiales Agotados (${materialesAgotados.length})
+                </h4>
+                <div class="agotados-list" style="display: none;">
+                    ${materialesAgotados.map(material => `
+                        <div class="material-selector-item agotado" data-material-id="${material.id_material}">
+                            <div class="material-selector-info">
+                                <div class="material-selector-name">
+                                    <strong>${material.nombre}</strong>
+                                    <span class="stock-badge-small agotado">
+                                        <i class="fas fa-times-circle"></i> Sin stock
+                                    </span>
+                                </div>
+                                ${material.caracteristicas ? `<small style="color: #999;">${material.caracteristicas}</small>` : ''}
+                            </div>
+                            <button type="button" class="btn btn-secondary btn-small" disabled title="Sin stock disponible">
+                                <i class="fas fa-ban"></i> No disponible
+                            </button>
+                        </div>
+                    `).join('')}
                 </div>
             </div>
         `;
-    }).join('');
+    }
 
+    container.innerHTML = html;
+}
 
+// ========== TOGGLE SECCIÓN DE AGOTADOS ==========
+function toggleAgotadosSection() {
+    const subtitle = document.querySelector('.section-subtitle.collapsed');
+    const list = document.querySelector('.agotados-list');
+    const icon = subtitle.querySelector('i');
+    
+    if (list.style.display === 'none') {
+        list.style.display = 'block';
+        icon.className = 'fas fa-chevron-down';
+        subtitle.classList.remove('collapsed');
+    } else {
+        list.style.display = 'none';
+        icon.className = 'fas fa-chevron-right';
+        subtitle.classList.add('collapsed');
+    }
 }
 
 // ========== AGREGAR MATERIAL A LA LISTA ==========
@@ -3040,15 +3559,16 @@ function loadViviendas() {
         });
 }
 
-// ========== RENDERIZAR TABLA ==========
+
+// ========== RENDERIZAR TABLA DE VIVIENDAS ==========
 function renderViviendasTable(viviendas) {
     const container = document.getElementById('viviendasTableContainer');
 
     if (!viviendas || viviendas.length === 0) {
         container.innerHTML = `
-            <div style="text-align: center; padding: 40px;">
-                <i class="fas fa-home" style="font-size: 48px; color: #ddd; display: block; margin-bottom: 15px;"></i>
-                <p style="color: #999; margin-bottom: 20px;">No hay viviendas registradas</p>
+            <div style="text-align: center; padding: 60px 20px;">
+                <i class="fas fa-home" style="font-size: 48px; color: #E8EBF0; display: block; margin-bottom: 15px;"></i>
+                <p style="color: #6C757D; margin-bottom: 20px;">No hay viviendas registradas</p>
                 <button class="btn btn-primary" onclick="showCreateViviendaModal()">
                     <i class="fas fa-plus"></i> Crear Primera Vivienda
                 </button>
@@ -3057,60 +3577,110 @@ function renderViviendasTable(viviendas) {
         return;
     }
 
-    let tableHTML = `
-        <div class="viviendas-table-container">
-            <table class="viviendas-table">
+    let html = `
+        <div style="overflow-x: auto; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 92, 185, 0.12);">
+            <table style="width: 100%; border-collapse: collapse; background: #FFFFFF; min-width: 1200px;">
                 <thead>
-                    <tr>
-                        <th>Número</th>
-                        <th>Dirección</th>
-                        <th>Tipo</th>
-                        <th>Estado</th>
-                        <th>Metros²</th>
-                        <th>Asignada a</th>
-                        <th>Acciones</th>
+                    <tr style="background: linear-gradient(135deg, #005CB9 0%, #004494 100%); color: #FFFFFF;">
+                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">ID</th>
+                        <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;">Número</th>
+                        <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;">Dirección</th>
+                        <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;">Tipo</th>
+                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Estado</th>
+                        <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;">Asignada a</th>
+                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
     `;
 
     viviendas.forEach(vivienda => {
-        const estadoClass = vivienda.estado === 'disponible' ? 'disponible' :
-            vivienda.estado === 'ocupada' ? 'ocupada' : 'mantenimiento';
-
         const asignada = vivienda.usuario_asignado || vivienda.nucleo_asignado || '-';
         const tieneAsignacion = vivienda.id_asignacion && vivienda.activa == 1;
+        
+        // Colores según estado
+        let estadoColor = '';
+        let estadoText = '';
+        if (vivienda.estado === 'disponible') {
+            estadoColor = '#4CAF50';
+            estadoText = 'Disponible';
+        } else if (vivienda.estado === 'ocupada') {
+            estadoColor = '#005CB9';
+            estadoText = 'Ocupada';
+        } else if (vivienda.estado === 'mantenimiento') {
+            estadoColor = '#FF9800';
+            estadoText = 'Mantenimiento';
+        }
 
-        tableHTML += `
-            <tr data-estado="${vivienda.estado}" data-habitaciones="${vivienda.habitaciones}">
-                <td><strong>${vivienda.numero_vivienda}</strong></td>
-                <td>${vivienda.direccion || '-'}</td>
-                <td>${vivienda.tipo_nombre} (${vivienda.habitaciones} hab.)</td>
-                <td>
-                    <span class="estado-badge-vivienda ${estadoClass}">
-                        ${formatEstadoVivienda(vivienda.estado)}
-                    </span>
+        html += `
+            <tr style="border-bottom: 1px solid #E8EBF0; transition: all 0.2s ease;" 
+                onmouseover="this.style.background='#F5F7FA'" 
+                onmouseout="this.style.background='#FFFFFF'">
+                
+                <td style="padding: 14px 12px; text-align: center;">
+                    <div style="font-weight: 600; color: #005CB9; font-size: 14px;">#${vivienda.id_vivienda}</div>
                 </td>
-                <td>${vivienda.metros_cuadrados ? vivienda.metros_cuadrados + ' m²' : '-'}</td>
-                <td>${asignada}</td>
-                <td>
-                    <div class="vivienda-actions">
-                        <button class="btn-view-vivienda" onclick="viewViviendaDetails(${vivienda.id_vivienda})" title="Ver detalles">
+                
+                <td style="padding: 14px 12px; font-size: 13px;">
+                    <div style="font-weight: 600; color: #495057;">${vivienda.numero_vivienda}</div>
+                </td>
+                
+                <td style="padding: 14px 12px; font-size: 13px; color: #495057;">
+                    ${vivienda.direccion || '-'}
+                </td>
+                
+                <td style="padding: 14px 12px; font-size: 13px;">
+                    <div style="font-weight: 600; color: #495057;">${vivienda.tipo_nombre}</div>
+                    <div style="font-size: 11px; color: #6C757D; margin-top: 3px;">${vivienda.habitaciones} hab. • ${vivienda.metros_cuadrados ? vivienda.metros_cuadrados + ' m²' : '-'}</div>
+                </td>
+                
+                <td style="padding: 14px 12px; text-align: center;">
+                    <span style="
+                        display: inline-block;
+                        padding: 6px 12px;
+                        border-radius: 20px;
+                        font-size: 11px;
+                        font-weight: 600;
+                        background: ${estadoColor};
+                        color: #FFFFFF;
+                    ">${estadoText}</span>
+                </td>
+                
+                <td style="padding: 14px 12px; font-size: 13px;">
+                    ${asignada !== '-' 
+                        ? `<div style="color: #495057;">${asignada}</div>` 
+                        : '<span style="color: #6C757D; font-style: italic;">Sin asignar</span>'}
+                </td>
+                
+                <td style="padding: 14px 12px;">
+                    <div style="display: flex; gap: 5px; justify-content: center; flex-wrap: wrap;">
+                        
+                        <button class="btn-small btn-secondary" 
+                                onclick="viewViviendaDetails(${vivienda.id_vivienda})" 
+                                title="Ver detalles">
                             <i class="fas fa-eye"></i>
                         </button>
-                        <button class="btn-edit-vivienda" onclick="editVivienda(${vivienda.id_vivienda})" title="Editar">
+                        
+                        <button class="btn-small btn-primary" 
+                                onclick="editVivienda(${vivienda.id_vivienda})" 
+                                title="Editar">
                             <i class="fas fa-edit"></i>
                         </button>
+                        
                         ${!tieneAsignacion ? `
-                            <button class="btn-assign-vivienda" onclick="showAsignarModal(${vivienda.id_vivienda}, '${vivienda.numero_vivienda.replace(/'/g, "\\'")}')">
+                            <button class="btn-small btn-success" 
+                                    onclick="showAsignarModal(${vivienda.id_vivienda}, '${vivienda.numero_vivienda.replace(/'/g, "\\'")}')">
                                 <i class="fas fa-user-plus"></i>
                             </button>
                         ` : `
-                            <button class="btn-unassign-vivienda" onclick="desasignarVivienda(${vivienda.id_asignacion})">
+                            <button class="btn-small btn-warning" 
+                                    onclick="desasignarVivienda(${vivienda.id_asignacion})">
                                 <i class="fas fa-user-minus"></i>
                             </button>
                         `}
-                        <button class="btn-delete-vivienda" onclick="deleteVivienda(${vivienda.id_vivienda}, '${vivienda.numero_vivienda.replace(/'/g, "\\'")}')">
+                        
+                        <button class="btn-small btn-danger" 
+                                onclick="deleteVivienda(${vivienda.id_vivienda}, '${vivienda.numero_vivienda.replace(/'/g, "\\'")}')">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
@@ -3119,14 +3689,12 @@ function renderViviendasTable(viviendas) {
         `;
     });
 
-    tableHTML += `
-                </tbody>
-            </table>
-        </div>
-    `;
-
-    container.innerHTML = tableHTML;
+    html += '</tbody></table></div>';
+    container.innerHTML = html;
 }
+
+console.log(' [VIVIENDAS TABLE] Tabla con estilos de cuotas aplicados');
+console.log('🎨 [VIVIENDAS TABLE] Diseño moderno y consistente');
 
 // ========== FORMATEAR ESTADO ==========
 function formatEstadoVivienda(estado) {
@@ -3174,54 +3742,36 @@ function loadTiposVivienda() {
         .catch(error => console.error('Error al cargar tipos:', error));
 }
 
-// ========== MOSTRAR MODAL CREAR ==========
-function showCreateViviendaModal() {
-  
-
-    loadTiposVivienda().then(() => {
-        document.getElementById('viviendaModalTitle').textContent = 'Nueva Vivienda';
-        document.getElementById('vivienda-id').value = '';
-        document.getElementById('vivienda-numero').value = '';
-        document.getElementById('vivienda-direccion').value = '';
-        document.getElementById('vivienda-tipo').value = '';
-        document.getElementById('vivienda-metros').value = '';
-        document.getElementById('vivienda-fecha').value = '';
-        document.getElementById('vivienda-estado').value = 'disponible';
-        document.getElementById('vivienda-observaciones').value = '';
-        document.getElementById('viviendaModal').style.display = 'flex';
-    });
-}
-
 // ========== EDITAR VIVIENDA ==========
 function editVivienda(id) {
-    ('>>> Editando vivienda ID:', id);
-    ('🧹 Limpiando modales anteriores...');
+    console.log('>>> Editando vivienda ID:', id);
+    console.log('🧹 Limpiando modales anteriores...');
 
     // 🧹 LIMPIAR MODALES ANTERIORES
     limpiarModalesAnteriores();
 
     const modal = document.getElementById('viviendaModal');
-    ('🔍 Modal encontrado:', modal);
-    ('🔍 Modal display actual:', modal ? modal.style.display : 'NULL');
+    console.log('🔍 Modal encontrado:', modal);
+    console.log('🔍 Modal display actual:', modal ? modal.style.display : 'NULL');
     
     if (!modal) {
-        console.error(' Modal viviendaModal NO encontrado');
+        console.error('❌ Modal viviendaModal NO encontrado');
         alert('ERROR: Modal no encontrado. Recarga la página.');
         return;
     }
 
-    ('🌐 Cargando datos de vivienda...');
+    console.log('🌐 Cargando datos de vivienda...');
 
     Promise.all([
         fetch(`/api/viviendas/details?id=${id}`).then(r => r.json()),
         loadTiposVivienda()
     ]).then(([data]) => {
-        ('📦 Datos recibidos:', data);
+        console.log('📦 Datos recibidos:', data);
         
         if (data.success && data.vivienda) {
             const v = data.vivienda;
             
-            ('📝 Llenando formulario...');
+            console.log('📝 Llenando formulario...');
             document.getElementById('viviendaModalTitle').textContent = 'Editar Vivienda';
             document.getElementById('vivienda-id').value = v.id_vivienda;
             document.getElementById('vivienda-numero').value = v.numero_vivienda;
@@ -3232,19 +3782,42 @@ function editVivienda(id) {
             document.getElementById('vivienda-estado').value = v.estado;
             document.getElementById('vivienda-observaciones').value = v.observaciones || '';
 
-            ('👁️ Mostrando modal...');
+            console.log('👁️ Mostrando modal...');
             modal.style.display = 'flex';
-            (' Modal display después de mostrar:', modal.style.display);
-            (' Modal de edición mostrado correctamente');
+            console.log(' Modal display después de mostrar:', modal.style.display);
+            console.log(' Modal de edición mostrado correctamente');
+            
+            // Prevenir cierre al hacer clic fuera
+            setupModalNoCloseOutside(modal);
         } else {
-            console.error(' Error en data.success o data.vivienda');
+            console.error('❌ Error en data.success o data.vivienda');
             alert('Error al cargar vivienda');
         }
     }).catch(error => {
-        console.error(' Error completo:', error);
-        console.error(' Error stack:', error.stack);
+        console.error('❌ Error completo:', error);
+        console.error('❌ Error stack:', error.stack);
         alert('Error al cargar vivienda: ' + error.message);
     });
+}
+
+// ========== FUNCIÓN PARA EVITAR CIERRE AL CLIC EXTERIOR ==========
+function setupModalNoCloseOutside(modal) {
+    // Remover listeners previos si existen
+    const newModal = modal.cloneNode(true);
+    modal.parentNode.replaceChild(newModal, modal);
+    
+    // Obtener el contenido del modal
+    const modalContent = newModal.querySelector('.material-modal-content');
+    
+    if (modalContent) {
+        // Evitar que clics en el contenido cierren el modal
+        modalContent.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+    }
+    
+    // El modal ya NO se cierra al hacer clic en el fondo
+    // Solo se cierra con botones específicos (X o Cancelar)
 }
 
 // ========== GUARDAR VIVIENDA ==========
@@ -3858,148 +4431,142 @@ async function loadAllCuotasAdmin() {
     }
 }
 
-// ========== RENDERIZAR TABLA DE CUOTAS ==========
-function renderAllCuotasAdmin(cuotas) {
-    const container = document.getElementById('allCuotasAdminContainer');
-    
-    if (!cuotas || cuotas.length === 0) {
-        container.innerHTML = `
-            <div style="text-align: center; padding: 60px 20px;">
-                <i class="fas fa-inbox" style="font-size: 48px; color: ${COLORS.gray100}; display: block; margin-bottom: 15px;"></i>
-                <p style="color: ${COLORS.gray500};">No se encontraron cuotas</p>
-            </div>
-        `;
+
+async function forzarPagoCuota(idCuota) {
+    if (!confirm(`¿Seguro que desea LIQUIDAR esta deuda? La cuota ${idCuota} se marcará como PAGADA.`)) {
         return;
     }
-    
-    let html = `
-        <div style="overflow-x: auto; border-radius: 12px; box-shadow: ${COLORS.shadow};">
-            <table style="width: 100%; border-collapse: collapse; background: ${COLORS.white}; min-width: 1200px;">
-                <thead>
-                    <tr style="background: linear-gradient(135deg, ${COLORS.primary} 0%, ${COLORS.primaryDark} 100%); color: ${COLORS.white};">
-                        <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;">Usuario</th>
-                        <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;">Vivienda</th>
-                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Período</th>
-                        <th style="padding: 15px 12px; text-align: right; font-weight: 600; font-size: 13px;">Monto</th>
-                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Estado</th>
-                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Horas</th>
-                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Vencimiento</th>
-                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-    `;
-    
-    cuotas.forEach(cuota => {
-        const estadoFinal = cuota.estado_actual || cuota.estado;
-        const mes = obtenerNombreMes(cuota.mes);
-        const tienePagoPendiente = cuota.id_pago && cuota.estado_pago === 'pendiente';
+
+    try {
+        mostrarCargando();
         
-        const nombreUsuario = cuota.nombre_completo || 'Usuario';
-        const emailUsuario = cuota.email || '';
-        
-        let estadoColor = '';
-        let estadoText = '';
-        if (estadoFinal === 'pagada') {
-            estadoColor = COLORS.success;
-            estadoText = 'Pagada';
-        } else if (estadoFinal === 'pendiente') {
-            estadoColor = COLORS.warning;
-            estadoText = 'Pendiente';
-        } else if (estadoFinal === 'vencida') {
-            estadoColor = COLORS.danger;
-            estadoText = 'Vencida';
-        } else if (estadoFinal === 'exonerada') {
-            estadoColor = COLORS.primary;
-            estadoText = 'Exonerada';
+        // El nuevo estado es 'pagada', que es lo que pide el usuario
+        const resultado = await procesarCambioEstadoCuota(idCuota, 'pagada');
+
+        if (resultado.success) {
+            alert(`Cuota ${idCuota} liquidada y marcada como PAGADA con éxito.`);
+            // Recargar la tabla o la página para reflejar el cambio
+            location.reload(); 
+        } else {
+            alert(`Error al liquidar la cuota ${idCuota}.`);
         }
-        
-        html += `
-            <tr style="border-bottom: 1px solid ${COLORS.gray100}; transition: all 0.2s ease;" 
-                onmouseover="this.style.background='${COLORS.primaryLight}'" 
-                onmouseout="this.style.background='${COLORS.white}'">
-                
-                <td style="padding: 14px 12px; font-size: 13px;">
-                    <div style="font-weight: 600; color: ${COLORS.primary};">${nombreUsuario}</div>
-                    <div style="font-size: 11px; color: ${COLORS.gray500}; margin-top: 3px;">${emailUsuario}</div>
-                </td>
-                
-                <td style="padding: 14px 12px; font-size: 13px; color: ${COLORS.gray700};">
-                    ${cuota.numero_vivienda}<br>
-                    <small style="color: ${COLORS.gray500};">${cuota.tipo_vivienda}</small>
-                </td>
-                
-                <td style="padding: 14px 12px; text-align: center; font-weight: 600; color: ${COLORS.gray700};">
-                    ${mes} ${cuota.anio}
-                </td>
-                
-                <td style="padding: 14px 12px; text-align: right; font-weight: 600; font-size: 14px; color: ${COLORS.primary};">
-                    $${parseFloat(cuota.monto_total || cuota.monto_base || cuota.monto || 0).toLocaleString('es-UY', {minimumFractionDigits: 2})}
-                </td>
-                
-                <td style="padding: 14px 12px; text-align: center;">
-                    <span style="
-                        display: inline-block;
-                        padding: 6px 12px;
-                        border-radius: 20px;
-                        font-size: 11px;
-                        font-weight: 600;
-                        text-transform: uppercase;
-                        background: ${estadoColor};
-                        color: ${COLORS.white};
-                    ">${estadoText}</span>
-                </td>
-                
-                <td style="padding: 14px 12px; text-align: center; font-size: 13px; color: ${COLORS.gray700};">
-                    <div style="font-weight: 600;">${cuota.horas_cumplidas || 0}h / ${cuota.horas_requeridas}h</div>
-                    ${cuota.horas_validadas ? `<small style="color: ${COLORS.success};">✓ Validadas</small>` : ''}
-                </td>
-                
-                <td style="padding: 14px 12px; text-align: center; font-size: 13px; color: ${COLORS.gray700};">
-                    ${new Date(cuota.fecha_vencimiento + 'T00:00:00').toLocaleDateString('es-UY')}
-                </td>
-                
-                <td style="padding: 14px 12px;">
-                    <div style="display: flex; gap: 5px; justify-content: center; flex-wrap: wrap;">
-                        ${tienePagoPendiente ? `
-                            <button class="btn-small btn-primary" 
-                                    onclick="abrirValidarPagoModal(${cuota.id_pago}, ${cuota.id_cuota})" 
-                                    title="Validar pago">
-                                <i class="fas fa-check-circle"></i>
-                            </button>
-                        ` : ''}
-                        
-                        ${cuota.comprobante_archivo ? `
-                            <button class="btn-small btn-secondary" 
-                                    onclick="verComprobanteAdmin('${cuota.comprobante_archivo}')" 
-                                    title="Ver comprobante">
-                                <i class="fas fa-image"></i>
-                            </button>
-                        ` : ''}
-                        
-                        ${cuota.horas_cumplidas < cuota.horas_requeridas ? `
-                            <button class="btn-small btn-success" 
-                                    onclick="abrirModalJustificarHoras(
-                                        ${cuota.id_cuota}, 
-                                        ${cuota.id_usuario}, 
-                                        '${(cuota.nombre_completo || 'Usuario').replace(/'/g, "\\'")}',
-                                        ${cuota.mes},
-                                        ${cuota.anio},
-                                        ${cuota.horas_requeridas - (cuota.horas_cumplidas || 0)}
-                                    )" 
-                                    title="Justificar horas faltantes">
-                                <i class="fas fa-check-circle"></i> Justificar
-                            </button>
-                        ` : ''}
-                    </div>
-                </td>
-            </tr>
-        `;
-    });
-    
-    html += '</tbody></table></div>';
-    container.innerHTML = html;
+    } catch (error) {
+        console.error('Error al procesar la liquidación:', error);
+        alert('Ocurrió un error en el servidor al intentar liquidar la deuda.');
+    } finally {
+        ocultarCargando();
+    }
 }
+
+function mostrarCargando() {
+    const loadingOverlay = document.getElementById('loading-overlay');
+    if (loadingOverlay) {
+        loadingOverlay.style.display = 'flex'; // O 'block', si no es un flexbox
+    }
+    // Opcional: Desactivar el botón para evitar múltiples clics
+    // document.getElementById('btnForzarPago').disabled = true; 
+}
+
+function ocultarCargando() {
+    const loadingOverlay = document.getElementById('loading-overlay');
+    if (loadingOverlay) {
+        loadingOverlay.style.display = 'none';
+    }
+    // Opcional: Reactivar el botón
+    // document.getElementById('btnForzarPago').disabled = false;
+}
+
+async function procesarCambioEstadoCuota(idCuota, nuevoEstado) {
+    // 💡 Aquí está la LÓGICA REAL con un FETCH a tu API
+    const url = '/api/cuotas/liquidar?'; // Endpoint asumido en tu servidor (ej: PHP, Node.js)
+    
+    console.log(`[API CALL] Cambiando estado de cuota ${idCuota} a ${nuevoEstado}...`);
+
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+                id_cuota: idCuota, 
+                estado: nuevoEstado // Debe ser 'pagada'
+            })
+        });
+
+        if (!response.ok) {
+            // Manejar errores HTTP (400, 500, etc.)
+            const errorData = await response.json().catch(() => ({ message: 'Error desconocido en el servidor.' }));
+            throw new Error(`Error HTTP ${response.status}: ${errorData.message || 'Fallo en la liquidación.'}`);
+        }
+
+        // El backend es el responsable de ejecutar la lógica de liquidación, 
+        // actualizar el estado en DB y "sumar lo que debería" (saldos, etc.).
+        return await response.json(); 
+
+    } catch (error) {
+        console.error('Error durante la llamada a la API:', error);
+        // Propagar el error para que forzarPagoCuota lo capture
+        throw new Error('Fallo en la comunicación con el servidor.');
+    }
+}
+
+// ========== RENDERIZAR TABLA DE CUOTAS ==========
+// dashboardAdmin.js (Alrededor de la línea 3931)
+
+async function forzarPagoCuota(idCuota) {
+  
+   mostrarCargando(); 
+
+    try {
+      
+        const url = `/api/cuotas/recalcular-deuda/${idCuota}`; 
+        
+        const response = await fetch(url, {
+            method: 'POST', 
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        // 2. Manejo de errores HTTP
+        if (!response.ok) {
+            // Captura errores como 404, 500, 401, etc.
+            throw new Error(`El servidor respondió con un error ${response.status}.`);
+        }
+
+        const data = await response.json();
+
+        // 3. Manejo de la lógica de negocio (lo que devuelve tu Controller)
+        if (data.success) {
+            // Éxito: Muestra alerta y recarga la interfaz
+            Swal.fire('¡Pago Forzado!', data.message || 'La liquidación se procesó correctamente.', 'success');
+            // Recargar datos (ej. tabla de liquidaciones)
+            // cargarLiquidaciones(); 
+        } else {
+            // Error de negocio devuelto por el Controller
+            throw new Error(data.message || 'Error desconocido al procesar la liquidación.');
+        }
+
+    } catch (error) {
+        // 4. Captura y manejo de cualquier error
+        console.error('Error al procesar la liquidación:', error);
+        // Muestra el error al usuario
+        Swal.fire('Error', `No se pudo procesar: ${error.message}`, 'error');
+        // El error que veías en la consola: "Error al procesar la liquidación: ReferenceError..."
+        // Ahora se mostrará como un error del proceso.
+
+    } finally {
+        // [Línea 3948] ⬅️ Aquí es donde tenías el segundo ReferenceError
+        // ESTO ES CLAVE: se ejecuta SIEMPRE, haya éxito o error.
+        ocultarCargando(); 
+    }
+}
+
+window.abrirValidarPagoModal = abrirValidarPagoModal;
+window.verComprobanteAdmin = verComprobanteAdmin;
+window.abrirModalJustificarHoras = abrirModalJustificarHoras;
+
 
 // ========== VER COMPROBANTE ==========
 function verComprobanteAdmin(archivo) {
@@ -4309,7 +4876,7 @@ async function verDetalleSolicitudAdmin(solicitudId) {
                     ` : '<p style="text-align: center; color: #999;">Sin respuestas aún</p>'}
 
                     <div class="modal-detail-section">
-                        <h3>⚙️ Acciones Rápidas</h3>
+                        <h3> Acciones Rápidas</h3>
                         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                             ${solicitud.estado !== 'en_revision' ? `
                                 <button onclick="cambiarEstadoSolicitud(${solicitudId}, 'en_revision'); this.closest('.modal-detail').remove();" class="btn btn-warning">
@@ -5176,6 +5743,440 @@ window.inicializarReportes = inicializarReportes;
 window.generarReporte = generarReporte;
 window.exportarReporteCSV = exportarReporteCSV;
 
+
+// ==========================================
+// 🔧 FIX COMPLETO: LIQUIDACIÓN DE DEUDAS
+// Reemplaza la función liquidarDeudaCuota en dashboardAdmin.js
+// ==========================================
+
+console.log('🟢 [LIQUIDACIÓN FIX] Cargando versión corregida...');
+
+/**
+ * 🎯 FUNCIÓN CORREGIDA: Liquidar deuda de una cuota
+ * 
+ * CAMBIOS:
+ * - Envía datos como application/x-www-form-urlencoded
+ * - Envía id_cuota en el body (no en la URL)
+ * - Maneja correctamente la respuesta del backend
+ */
+window.liquidarDeudaCuota = async function(idCuota) {
+    console.log('💰 [LIQUIDAR] Iniciando liquidación de cuota:', idCuota);
+    
+    //  PASO 1: VALIDACIÓN INICIAL
+    if (!idCuota || isNaN(idCuota)) {
+        console.error('❌ [LIQUIDAR] ID de cuota inválido:', idCuota);
+        alert('⚠️ Error: ID de cuota inválido');
+        return;
+    }
+    
+    //  PASO 2: OBTENER DETALLES DE LA CUOTA
+    try {
+        console.log('🔍 [LIQUIDAR] Obteniendo detalles de la cuota...');
+        
+        const response = await fetch(`/api/cuotas/detalle?cuota_id=${idCuota}`);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        console.log('📊 [LIQUIDAR] Datos recibidos:', data);
+        
+        if (!data.success) {
+            throw new Error(data.message || 'Error al obtener detalles');
+        }
+        
+        const cuota = data.cuota;
+        
+        //  PASO 3: VALIDAR ESTADO DE LA CUOTA
+        const estadoFinal = cuota.estado_actual || cuota.estado;
+        
+        if (estadoFinal === 'pagada') {
+            alert('ℹ️ Esta cuota ya está pagada');
+            console.warn('⚠️ [LIQUIDAR] La cuota ya está pagada');
+            return;
+        }
+        
+        if (estadoFinal === 'exonerada') {
+            alert('ℹ️ Esta cuota está exonerada, no puede ser liquidada');
+            console.warn('⚠️ [LIQUIDAR] La cuota está exonerada');
+            return;
+        }
+        
+        //  PASO 4: CALCULAR DEUDA TOTAL
+        const horasFaltantes = Math.max(0, (cuota.horas_requeridas || 0) - (cuota.horas_cumplidas || 0));
+        const deudaHoras = horasFaltantes * 160; // $160 por hora
+        const montoCuota = parseFloat(cuota.monto_total || cuota.monto_base || cuota.monto || 0);
+        const deudaTotal = montoCuota + deudaHoras;
+        
+        console.log('💵 [LIQUIDAR] Cálculos:', {
+            horasFaltantes,
+            deudaHoras,
+            montoCuota,
+            deudaTotal
+        });
+        
+        //  PASO 5: CONFIRMACIÓN DEL ADMIN
+        const nombreMes = obtenerNombreMes(cuota.mes);
+        const nombreUsuario = cuota.nombre_completo || 'Usuario';
+        
+        const mensaje = `
+🔸 LIQUIDAR DEUDA 🔸
+
+Usuario: ${nombreUsuario}
+Período: ${nombreMes} ${cuota.anio}
+Vivienda: ${cuota.numero_vivienda || 'N/A'}
+
+📊 DETALLE DE LA DEUDA:
+• Cuota base: $${montoCuota.toLocaleString('es-UY', {minimumFractionDigits: 2})}
+• Horas faltantes: ${horasFaltantes}h × $160 = $${deudaHoras.toLocaleString('es-UY', {minimumFractionDigits: 2})}
+━━━━━━━━━━━━━━━━━━━━━━━
+TOTAL A LIQUIDAR: $${deudaTotal.toLocaleString('es-UY', {minimumFractionDigits: 2})}
+
+⚠️ IMPORTANTE:
+Al liquidar, esta cuota se marcará como PAGADA.
+Esto significa que el usuario cubrió esta deuda con un pago actual.
+
+¿Confirmas la liquidación?
+        `.trim();
+        
+        if (!confirm(mensaje)) {
+            console.log('❌ [LIQUIDAR] Operación cancelada por el admin');
+            return;
+        }
+        
+        //  PASO 6: EJECUTAR LIQUIDACIÓN
+        console.log('📤 [LIQUIDAR] Enviando solicitud de liquidación...');
+        
+        // Mostrar indicador de carga
+        mostrarCargando('Procesando liquidación...');
+        
+        // 🔧 FIX CRÍTICO: Enviar como application/x-www-form-urlencoded
+        const formData = new URLSearchParams();
+        formData.append('id_cuota', idCuota);
+        
+        console.log('📦 [LIQUIDAR] FormData a enviar:', {
+            id_cuota: idCuota,
+            url: '/api/cuotas/liquidar',
+            method: 'POST',
+            contentType: 'application/x-www-form-urlencoded'
+        });
+        
+        const liquidarResponse = await fetch('/api/cuotas/liquidar', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: formData.toString()
+        });
+        
+        console.log('📡 [LIQUIDAR] Response status:', liquidarResponse.status);
+        console.log('📡 [LIQUIDAR] Response headers:', Object.fromEntries(liquidarResponse.headers.entries()));
+        
+        ocultarCargando();
+        
+        // 🔧 OBTENER EL TEXTO DE LA RESPUESTA PRIMERO
+        const responseText = await liquidarResponse.text();
+        console.log('📄 [LIQUIDAR] Response text (primeros 500 chars):', responseText.substring(0, 500));
+        
+        // 🔧 VERIFICAR SI ES HTML (ERROR DE PHP)
+        if (responseText.trim().startsWith('<')) {
+            console.error('❌ [LIQUIDAR] El servidor devolvió HTML en lugar de JSON');
+            console.error('📄 [LIQUIDAR] HTML completo:', responseText);
+            
+            // Intentar extraer el error de PHP
+            const errorMatch = responseText.match(/<b>(.*?)<\/b>/);
+            const errorMsg = errorMatch ? errorMatch[1] : 'Error desconocido del servidor';
+            
+            throw new Error(`El servidor devolvió un error PHP: ${errorMsg}\n\nRevisa los logs del servidor PHP.`);
+        }
+        
+        // 🔧 INTENTAR PARSEAR JSON
+        let liquidarData;
+        try {
+            liquidarData = JSON.parse(responseText);
+            console.log(' [LIQUIDAR] JSON parseado correctamente:', liquidarData);
+        } catch (parseError) {
+            console.error('❌ [LIQUIDAR] Error al parsear JSON:', parseError);
+            console.error('📄 [LIQUIDAR] Texto recibido:', responseText);
+            throw new Error(`Respuesta inválida del servidor. No es JSON válido.\n\nTexto: ${responseText.substring(0, 200)}...`);
+        }
+        
+        // 🔧 VERIFICAR QUE LA RESPUESTA SEA 200 OK
+        if (!liquidarResponse.ok) {
+            console.error('❌ [LIQUIDAR] Response no OK:', liquidarResponse.status);
+            throw new Error(`HTTP ${liquidarResponse.status}: ${liquidarData.message || responseText}`);
+        }
+        
+        if (liquidarData.success) {
+            //  ÉXITO
+            alert(` ${liquidarData.message || 'Deuda liquidada correctamente'}\n\nLa cuota ha sido marcada como PAGADA.`);
+            
+            // Recargar tabla de cuotas
+            if (typeof loadAllCuotasAdmin === 'function') {
+                console.log('🔄 [LIQUIDAR] Recargando tabla de cuotas...');
+                await loadAllCuotasAdmin();
+            }
+            
+            // Recargar estadísticas
+            if (typeof loadEstadisticasCuotas === 'function') {
+                console.log('📊 [LIQUIDAR] Recargando estadísticas...');
+                await loadEstadisticasCuotas();
+            }
+            
+            console.log(' [LIQUIDAR] Liquidación completada exitosamente');
+        } else {
+            throw new Error(liquidarData.message || 'Error desconocido al liquidar');
+        }
+        
+    } catch (error) {
+        console.error('❌ [LIQUIDAR] Error completo:', error);
+        console.error('❌ [LIQUIDAR] Stack:', error.stack);
+        ocultarCargando();
+        
+        alert(`❌ Error al liquidar deuda:\n\n${error.message}\n\nRevisa la consola para más detalles.`);
+    }
+};
+
+/**
+ * 🔄 Mostrar indicador de carga
+ */
+function mostrarCargando(mensaje = 'Cargando...') {
+    let overlay = document.getElementById('loading-overlay-liquidacion');
+    
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'loading-overlay-liquidacion';
+        overlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+        `;
+        
+        overlay.innerHTML = `
+            <div style="
+                background: white;
+                padding: 30px 50px;
+                border-radius: 12px;
+                text-align: center;
+                box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            ">
+                <i class="fas fa-spinner fa-spin" style="font-size: 40px; color: #005CB9; margin-bottom: 15px;"></i>
+                <p id="loading-message" style="margin: 0; font-size: 16px; color: #333; font-weight: 600;">${mensaje}</p>
+            </div>
+        `;
+        
+        document.body.appendChild(overlay);
+    } else {
+        overlay.style.display = 'flex';
+        const messageEl = document.getElementById('loading-message');
+        if (messageEl) messageEl.textContent = mensaje;
+    }
+}
+
+/**
+ * ❌ Ocultar indicador de carga
+ */
+function ocultarCargando() {
+    const overlay = document.getElementById('loading-overlay-liquidacion');
+    if (overlay) {
+        overlay.style.display = 'none';
+    }
+}
+
+/**
+ * 📅 Obtener nombre del mes
+ */
+function obtenerNombreMes(mes) {
+    const meses = [
+        'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+        'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+    ];
+    return meses[parseInt(mes) - 1] || `Mes ${mes}`;
+}
+
+// ==========================================
+// 🎯 RENDERIZAR TABLA CON BOTÓN (Misma versión anterior)
+// ==========================================
+
+console.log('🔧 [LIQUIDACIÓN] Sobrescribiendo renderAllCuotasAdmin...');
+
+window.renderAllCuotasAdmin = function(cuotas) {
+    const container = document.getElementById('allCuotasAdminContainer');
+    
+    if (!cuotas || cuotas.length === 0) {
+        container.innerHTML = `
+            <div style="text-align: center; padding: 60px 20px;">
+                <i class="fas fa-inbox" style="font-size: 48px; color: #E8EBF0; display: block; margin-bottom: 15px;"></i>
+                <p style="color: #6C757D;">No se encontraron cuotas</p>
+            </div>
+        `;
+        return;
+    }
+    
+    let html = `
+        <div style="overflow-x: auto; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 92, 185, 0.12);">
+            <table style="width: 100%; border-collapse: collapse; background: #FFFFFF; min-width: 1200px;">
+                <thead>
+                    <tr style="background: linear-gradient(135deg, #005CB9 0%, #004494 100%); color: #FFFFFF;">
+                        <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;">Usuario</th>
+                        <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;">Vivienda</th>
+                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Período</th>
+                        <th style="padding: 15px 12px; text-align: right; font-weight: 600; font-size: 13px;">Monto</th>
+                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Estado</th>
+                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Horas</th>
+                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Vencimiento</th>
+                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+    
+    cuotas.forEach(cuota => {
+        const estadoFinal = cuota.estado_actual || cuota.estado;
+        const mes = obtenerNombreMes(cuota.mes);
+        const tienePagoPendiente = cuota.id_pago && cuota.estado_pago === 'pendiente';
+        
+        const puedeAdministrar = estadoFinal !== 'pagada' && estadoFinal !== 'exonerada' && !tienePagoPendiente;
+        
+        const nombreUsuario = cuota.nombre_completo || 'Usuario';
+        const emailUsuario = cuota.email || '';
+        
+        let estadoColor = '';
+        let estadoText = '';
+        if (estadoFinal === 'pagada') {
+            estadoColor = '#4CAF50';
+            estadoText = 'Pagada';
+        } else if (estadoFinal === 'pendiente') {
+            estadoColor = '#FF9800';
+            estadoText = 'Pendiente';
+        } else if (estadoFinal === 'vencida') {
+            estadoColor = '#F44336';
+            estadoText = 'Vencida';
+        } else if (estadoFinal === 'exonerada') {
+            estadoColor = '#005CB9';
+            estadoText = 'Exonerada';
+        }
+        
+        html += `
+            <tr style="border-bottom: 1px solid #E8EBF0; transition: all 0.2s ease;" 
+                onmouseover="this.style.background='#F5F7FA'" 
+                onmouseout="this.style.background='#FFFFFF'">
+                
+                <td style="padding: 14px 12px; font-size: 13px;">
+                    <div style="font-weight: 600; color: #005CB9;">${nombreUsuario}</div>
+                    <div style="font-size: 11px; color: #6C757D; margin-top: 3px;">${emailUsuario}</div>
+                </td>
+                
+                <td style="padding: 14px 12px; font-size: 13px; color: #495057;">
+                    ${cuota.numero_vivienda || 'N/A'}<br>
+                    <small style="color: #6C757D;">${cuota.tipo_vivienda || 'N/A'}</small>
+                </td>
+                
+                <td style="padding: 14px 12px; text-align: center; font-weight: 600; color: #495057;">
+                    ${mes} ${cuota.anio}
+                </td>
+                
+                <td style="padding: 14px 12px; text-align: right; font-weight: 600; font-size: 14px; color: #005CB9;">
+                    $${parseFloat(cuota.monto_total || cuota.monto_base || cuota.monto || 0).toLocaleString('es-UY', {minimumFractionDigits: 2})}
+                </td>
+                
+                <td style="padding: 14px 12px; text-align: center;">
+                    <span style="
+                        display: inline-block;
+                        padding: 6px 12px;
+                        border-radius: 20px;
+                        font-size: 11px;
+                        font-weight: 600;
+                        text-transform: uppercase;
+                        background: ${estadoColor};
+                        color: #FFFFFF;
+                    ">${estadoText}</span>
+                </td>
+                
+                <td style="padding: 14px 12px; text-align: center; font-size: 13px; color: #495057;">
+                    <div style="font-weight: 600;">${cuota.horas_cumplidas || 0}h / ${cuota.horas_requeridas}h</div>
+                    ${cuota.horas_validadas ? `<small style="color: #4CAF50;">✓ Validadas</small>` : ''}
+                </td>
+                
+                <td style="padding: 14px 12px; text-align: center; font-size: 13px; color: #495057;">
+                    ${new Date(cuota.fecha_vencimiento + 'T00:00:00').toLocaleDateString('es-UY')}
+                </td>
+                
+                <td style="padding: 14px 12px;">
+                    <div style="display: flex; gap: 5px; justify-content: center; flex-wrap: wrap;">
+                        
+                        ${tienePagoPendiente ? `
+                            <button class="btn-small btn-primary" 
+                                    onclick="abrirValidarPagoModal(${cuota.id_pago}, ${cuota.id_cuota})" 
+                                    title="Validar pago">
+                                <i class="fas fa-check-circle"></i>
+                            </button>
+                        ` : ''}
+                        
+                        ${cuota.comprobante_archivo ? `
+                            <button class="btn-small btn-secondary" 
+                                    onclick="verComprobanteAdmin('${cuota.comprobante_archivo}')" 
+                                    title="Ver comprobante">
+                                <i class="fas fa-image"></i>
+                            </button>
+                        ` : ''}
+                        
+                        ${(cuota.horas_cumplidas || 0) < cuota.horas_requeridas ? `
+                            <button class="btn-small btn-success" 
+                                    onclick="abrirModalJustificarHoras(
+                                        ${cuota.id_cuota}, 
+                                        ${cuota.id_usuario}, 
+                                        '${(cuota.nombre_completo || 'Usuario').replace(/'/g, "\\'")}',
+                                        ${cuota.mes},
+                                        ${cuota.anio},
+                                        ${cuota.horas_requeridas - (cuota.horas_cumplidas || 0)}
+                                    )" 
+                                    title="Justificar horas faltantes">
+                                <i class="fas fa-check-circle"></i> Justificar
+                            </button>
+                        ` : ''}
+                        
+                        ${puedeAdministrar ? `
+                            <button class="btn-small" 
+                                    style="
+                                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                                        color: white;
+                                        border: none;
+                                        padding: 6px 12px;
+                                        border-radius: 6px;
+                                        cursor: pointer;
+                                        font-weight: 600;
+                                        transition: all 0.3s ease;
+                                    "
+                                    onclick="liquidarDeudaCuota(${cuota.id_cuota})" 
+                                    onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(102, 126, 234, 0.4)'"
+                                    onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'"
+                                    title="Marca esta deuda como pagada si el usuario la cubrió con un pago actual">
+                                <i class="fas fa-hand-holding-usd"></i> Liquidar Deuda
+                            </button>
+                        ` : ''}
+                    </div>
+                </td>
+            </tr>
+        `;
+    });
+    
+    html += '</tbody></table></div>';
+    container.innerHTML = html;
+};
+
+console.log(' [LIQUIDACIÓN FIX] Sistema corregido completamente');
+console.log('📦 [LIQUIDACIÓN FIX] Datos se envían como application/x-www-form-urlencoded');
+console.log('🎯 [LIQUIDACIÓN FIX] Listo para usar');
+
 (' Módulo de Reportes con CSS INLINE cargado');
 
 // ==========================================
@@ -5481,7 +6482,7 @@ async function verDetalleSolicitudAdmin(solicitudId) {
                     ` : `<p style="text-align: center; color: ${COLORS.gray500}; padding: 20px; background: ${COLORS.gray50}; border-radius: 8px;">Sin respuestas aún</p>`}
 
                     <div style="background: ${COLORS.gray50}; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-                        <h3 style="color: ${COLORS.primary}; margin-bottom: 15px; font-size: 16px;">⚙️ Acciones Rápidas</h3>
+                        <h3 style="color: ${COLORS.primary}; margin-bottom: 15px; font-size: 16px;"> Acciones Rápidas</h3>
                         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                             ${solicitud.estado !== 'en_revision' ? `
                                 <button onclick="cambiarEstadoSolicitud(${solicitudId}, 'en_revision'); this.closest('.modal-detail-admin').remove();" class="btn-small btn-warning">
@@ -6517,7 +7518,7 @@ limpiarModalesUsuarios = function() {
     (' [OVERRIDE] renderUserRow actualizado sin columna Pago');
 })();
 
-// ========== SOBRESCRIBIR renderUsersTable PARA QUITAR HEADER DE PAGO ==========
+
 (function() {
     ('🔄 [OVERRIDE] Sobrescribiendo renderUsersTable para quitar header Pago...');
 

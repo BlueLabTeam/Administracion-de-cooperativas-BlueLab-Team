@@ -1,6 +1,11 @@
+-- ==========================================
+-- ESTRUCTURA DE BASE DE DATOS - Sistema de Gestión Cooperativa
+-- ==========================================
+
 CREATE DATABASE IF NOT EXISTS proyecto2025 CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 USE proyecto2025;
+
 -- ==========================================
 -- USUARIOS Y ROLES
 -- ==========================================
@@ -44,6 +49,7 @@ CREATE TABLE IF NOT EXISTS Telefonos (
     tipo ENUM('movil', 'fijo', 'trabajo') DEFAULT 'movil',
     INDEX idx_entidad (entidad_tipo, entidad_id)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+
 -- ==========================================
 -- PROVEEDORES Y MATERIALES
 -- ==========================================
@@ -69,6 +75,7 @@ CREATE TABLE IF NOT EXISTS Proveedor_Material (
     FOREIGN KEY (id_proveedor) REFERENCES Proveedores (id_proveedor),
     FOREIGN KEY (id_material) REFERENCES Materiales (id_material)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+
 -- ==========================================
 -- HERRAMIENTAS
 -- ==========================================
@@ -86,6 +93,7 @@ CREATE TABLE IF NOT EXISTS Herramienta_Responsable (
     FOREIGN KEY (id_usuario) REFERENCES Usuario (id_usuario),
     FOREIGN KEY (id_herramienta) REFERENCES Herramientas (id_herramienta)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+
 -- ==========================================
 -- TIPOS DE VIVIENDA
 -- ==========================================
@@ -96,27 +104,6 @@ CREATE TABLE IF NOT EXISTS Tipo_Vivienda (
     habitaciones INT NOT NULL
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
-INSERT IGNORE INTO
-    Tipo_Vivienda (
-        nombre,
-        descripcion,
-        habitaciones
-    )
-VALUES (
-        'Mono-ambiente',
-        'Vivienda de 1 habitacion con cocina y banio integrado',
-        1
-    ),
-    (
-        '2 Dormitorios',
-        'Vivienda de 2 dormitorios, sala, cocina y banio',
-        2
-    ),
-    (
-        '3 Dormitorios',
-        'Vivienda de 3 dormitorios, sala, cocina y 2 banios',
-        3
-    );
 -- ==========================================
 -- ETAPAS DE CONSTRUCCION
 -- ==========================================
@@ -126,6 +113,7 @@ CREATE TABLE IF NOT EXISTS Etapas (
     fechas VARCHAR(100),
     estado VARCHAR(20)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+
 -- ==========================================
 -- VIVIENDAS
 -- ==========================================
@@ -146,6 +134,7 @@ CREATE TABLE IF NOT EXISTS Viviendas (
     FOREIGN KEY (id_tipo) REFERENCES Tipo_Vivienda (id_tipo),
     FOREIGN KEY (id_etapa) REFERENCES Etapas (id_etapa)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+
 -- ==========================================
 -- ASIGNACIONES DE VIVIENDA
 -- ==========================================
@@ -172,6 +161,7 @@ CREATE TABLE IF NOT EXISTS Asignacion_Vivienda (
         )
     )
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+
 -- ==========================================
 -- NOTIFICACIONES
 -- ==========================================
@@ -202,6 +192,7 @@ CREATE TABLE IF NOT EXISTS usuario_notificaciones (
     INDEX idx_usuario_leida (id_usuario, leida),
     INDEX idx_notificacion (id_notificacion)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+
 -- ==========================================
 -- TAREAS
 -- ==========================================
@@ -289,6 +280,7 @@ CREATE TABLE IF NOT EXISTS Tarea_Material (
     INDEX idx_tarea (id_tarea),
     INDEX idx_material (id_material)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+
 -- ==========================================
 -- SOLICITUDES DE MATERIALES
 -- ==========================================
@@ -311,6 +303,7 @@ CREATE TABLE IF NOT EXISTS Solicitud_Material (
     INDEX idx_estado (estado),
     INDEX idx_fecha (fecha_solicitud)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+
 -- ==========================================
 -- REGISTRO DE HORAS
 -- ==========================================
@@ -339,6 +332,7 @@ CREATE TABLE IF NOT EXISTS Registro_Horas (
         OR hora_salida > hora_entrada
     )
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+
 -- ==========================================
 -- TABLA PARA PRIMER PAGO DE REGISTRO
 -- ==========================================
@@ -364,6 +358,7 @@ CREATE TABLE IF NOT EXISTS pagos (
     INDEX idx_estado (estado_validacion),
     INDEX idx_fecha (fecha_pago)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+
 -- ==========================================
 -- SISTEMA DE CUOTAS MENSUALES
 -- ==========================================
@@ -377,32 +372,6 @@ CREATE TABLE IF NOT EXISTS Config_Cuotas (
     FOREIGN KEY (id_tipo) REFERENCES Tipo_Vivienda (id_tipo),
     INDEX idx_tipo_activo (id_tipo, activo)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
-
-INSERT INTO
-    Config_Cuotas (
-        id_tipo,
-        monto_mensual,
-        fecha_vigencia_desde,
-        activo
-    )
-VALUES (
-        1,
-        5000.00,
-        '2025-01-01',
-        TRUE
-    ),
-    (
-        2,
-        7500.00,
-        '2025-01-01',
-        TRUE
-    ),
-    (
-        3,
-        10000.00,
-        '2025-01-01',
-        TRUE
-    );
 
 CREATE TABLE IF NOT EXISTS Cuotas_Mensuales (
     id_cuota INT PRIMARY KEY AUTO_INCREMENT,
@@ -457,6 +426,7 @@ CREATE TABLE IF NOT EXISTS Pagos_Cuotas (
     INDEX idx_estado (estado_validacion),
     INDEX idx_fecha_pago (fecha_pago)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+
 -- ==========================================
 -- JUSTIFICACIONES DE HORAS
 -- ==========================================
@@ -478,6 +448,7 @@ CREATE TABLE IF NOT EXISTS Justificaciones_Horas (
     INDEX idx_usuario_periodo (id_usuario, mes, anio),
     INDEX idx_fecha (fecha_justificacion DESC)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+
 -- ==========================================
 -- SOLICITUDES GENERALES
 -- ==========================================
@@ -522,6 +493,7 @@ CREATE TABLE IF NOT EXISTS Respuestas_Solicitudes (
     INDEX idx_solicitud (id_solicitud),
     INDEX idx_fecha (fecha_respuesta DESC)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+
 -- ==========================================
 -- SOLICITUDES PARA UNIRSE A NUCLEOS
 -- ==========================================
@@ -546,618 +518,18 @@ CREATE TABLE IF NOT EXISTS Solicitudes_Nucleo (
     INDEX idx_fecha (fecha_solicitud DESC),
     INDEX idx_nucleo (id_nucleo)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
--- ==========================================
--- VISTAS
--- ==========================================
-CREATE OR REPLACE VIEW Vista_Cuotas_Con_Justificaciones AS
-SELECT
-    cm.id_cuota,
-    cm.id_usuario,
-    u.nombre_completo,
-    u.email,
-    cm.id_vivienda,
-    CASE
-        WHEN cm.id_vivienda IS NULL THEN 'SIN ASIGNAR'
-        ELSE v.numero_vivienda
-    END as numero_vivienda,
-    CASE
-        WHEN cm.id_vivienda IS NULL THEN 'Sin vivienda'
-        ELSE tv.nombre
-    END as tipo_vivienda,
-    COALESCE(tv.habitaciones, 0) as habitaciones,
-    cm.mes,
-    cm.anio,
-    cm.monto as monto_base,
-    cm.monto_pendiente_anterior,
-    cm.horas_requeridas,
-    cm.horas_cumplidas,
-    cm.pendiente_asignacion,
-    GREATEST(
-        0,
-        cm.horas_requeridas - cm.horas_cumplidas
-    ) as horas_faltantes_base,
-    COALESCE(SUM(jh.horas_justificadas), 0) as horas_justificadas,
-    COALESCE(SUM(jh.monto_descontado), 0) as monto_justificado,
-    GREATEST(
-        0,
-        cm.horas_requeridas - cm.horas_cumplidas - COALESCE(SUM(jh.horas_justificadas), 0)
-    ) as horas_faltantes_real,
-    GREATEST(
-        0,
-        cm.horas_requeridas - cm.horas_cumplidas - COALESCE(SUM(jh.horas_justificadas), 0)
-    ) * 160 as deuda_horas_pesos,
-    (
-        cm.monto + cm.monto_pendiente_anterior + (
-            GREATEST(
-                0,
-                cm.horas_requeridas - cm.horas_cumplidas - COALESCE(SUM(jh.horas_justificadas), 0)
-            ) * 160
-        )
-    ) as monto_total,
-    cm.estado,
-    cm.fecha_vencimiento,
-    cm.horas_validadas,
-    cm.observaciones,
-    pc.id_pago,
-    pc.monto_pagado,
-    pc.fecha_pago,
-    pc.comprobante_archivo,
-    pc.estado_validacion as estado_pago,
-    pc.observaciones_validacion,
-    CASE
-        WHEN cm.pendiente_asignacion = 1 THEN 'sin_vivienda'
-        WHEN cm.fecha_vencimiento < CURDATE()
-        AND cm.estado = 'pendiente' THEN 'vencida'
-        ELSE cm.estado
-    END as estado_actual
-FROM
-    Cuotas_Mensuales cm
-    INNER JOIN Usuario u ON cm.id_usuario = u.id_usuario
-    LEFT JOIN Viviendas v ON cm.id_vivienda = v.id_vivienda
-    LEFT JOIN Tipo_Vivienda tv ON v.id_tipo = tv.id_tipo
-    LEFT JOIN Justificaciones_Horas jh ON cm.id_usuario = jh.id_usuario
-    AND cm.mes = jh.mes
-    AND cm.anio = jh.anio
-    AND jh.estado = 'aprobada'
-    LEFT JOIN Pagos_Cuotas pc ON cm.id_cuota = pc.id_cuota
-    AND pc.estado_validacion != 'rechazado'
-GROUP BY
-    cm.id_cuota;
 
-CREATE OR REPLACE VIEW Vista_Solicitudes_Completa AS
-SELECT
-    s.id_solicitud,
-    s.id_usuario,
-    u.nombre_completo,
-    u.email,
-    u.cedula,
-    s.tipo_solicitud,
-    s.asunto,
-    s.descripcion,
-    s.archivo_adjunto,
-    s.estado,
-    s.prioridad,
-    s.fecha_creacion,
-    s.fecha_actualizacion,
-    COUNT(rs.id_respuesta) as total_respuestas,
-    MAX(rs.fecha_respuesta) as ultima_respuesta
-FROM
-    Solicitudes s
-    INNER JOIN Usuario u ON s.id_usuario = u.id_usuario
-    LEFT JOIN Respuestas_Solicitudes rs ON s.id_solicitud = rs.id_solicitud
-GROUP BY
-    s.id_solicitud
-ORDER BY s.fecha_creacion DESC;
-
-CREATE OR REPLACE VIEW Vista_Solicitudes_Nucleo AS
-SELECT
-    sn.id_solicitud_nucleo,
-    sn.id_usuario,
-    u.nombre_completo,
-    u.email,
-    u.cedula,
-    sn.id_nucleo,
-    nf.nombre_nucleo,
-    nf.direccion as direccion_nucleo,
-    COUNT(DISTINCT u2.id_usuario) as miembros_actuales,
-    sn.mensaje,
-    sn.estado,
-    sn.fecha_solicitud,
-    sn.fecha_respuesta,
-    sn.observaciones_admin,
-    admin.nombre_completo as admin_respuesta
-FROM
-    Solicitudes_Nucleo sn
-    INNER JOIN Usuario u ON sn.id_usuario = u.id_usuario
-    INNER JOIN Nucleo_Familiar nf ON sn.id_nucleo = nf.id_nucleo
-    LEFT JOIN Usuario u2 ON u2.id_nucleo = nf.id_nucleo
-    LEFT JOIN Usuario admin ON sn.id_admin_respuesta = admin.id_usuario
-GROUP BY
-    sn.id_solicitud_nucleo
-ORDER BY sn.fecha_solicitud DESC;
-
-CREATE OR REPLACE VIEW Vista_Informe_Mensual AS
-SELECT
-    YEAR(rh.fecha) as anio,
-    MONTH(rh.fecha) as mes,
-    SUM(rh.total_horas) as total_horas_trabajadas,
-    COUNT(DISTINCT rh.id_usuario) as total_trabajadores,
-    COALESCE(SUM(pc.monto_pagado), 0) as total_ingresado,
-    COUNT(DISTINCT pc.id_pago) as total_pagos
-FROM
-    Registro_Horas rh
-    LEFT JOIN Cuotas_Mensuales cm ON YEAR(rh.fecha) = cm.anio
-    AND MONTH(rh.fecha) = cm.mes
-    AND rh.id_usuario = cm.id_usuario
-    LEFT JOIN Pagos_Cuotas pc ON cm.id_cuota = pc.id_cuota
-    AND pc.estado_validacion = 'aprobado'
-WHERE
-    rh.estado = 'aprobado'
-GROUP BY
-    anio,
-    mes
-ORDER BY anio DESC, mes DESC;
--- ==========================================
--- TRIGGERS
--- ==========================================
--- ==========================================
--- TRIGGER 1: Actualizar horas de cuota al aprobar horas de trabajo
--- ==========================================
-DROP TRIGGER IF EXISTS actualizar_horas_cuota;
-
-DELIMITER $$
-
-CREATE TRIGGER actualizar_horas_cuota
-AFTER UPDATE ON Registro_Horas
-FOR EACH ROW
-BEGIN
-    IF NEW.estado = 'aprobado' AND OLD.estado != 'aprobado' THEN
-        UPDATE Cuotas_Mensuales
-        SET horas_cumplidas = (
-            SELECT COALESCE(SUM(total_horas), 0)
-            FROM Registro_Horas
-            WHERE id_usuario = NEW.id_usuario
-            AND MONTH(fecha) = MONTH(NEW.fecha)
-            AND YEAR(fecha) = YEAR(NEW.fecha)
-            AND estado = 'aprobado'
-        )
-        WHERE id_usuario = NEW.id_usuario
-        AND mes = MONTH(NEW.fecha)
-        AND anio = YEAR(NEW.fecha);
-    END IF;
-END $$
-
-DELIMITER ;
-
--- ==========================================
--- TRIGGER 2: Actualizar cuota al asignar vivienda (Usuario o Núcleo)
--- ==========================================
-DROP TRIGGER IF EXISTS actualizar_cuota_al_asignar_vivienda;
-
-DELIMITER $$
-
-CREATE TRIGGER actualizar_cuota_al_asignar_vivienda
-AFTER INSERT ON Asignacion_Vivienda
-FOR EACH ROW
-BEGIN
-    DECLARE v_id_tipo INT;
-    DECLARE v_monto_vivienda DECIMAL(10, 2);
-
-    IF NEW.activa = 1 THEN
-        SELECT v.id_tipo, cc.monto_mensual
-        INTO v_id_tipo, v_monto_vivienda
-        FROM Viviendas v
-        LEFT JOIN Config_Cuotas cc
-            ON cc.id_tipo = v.id_tipo AND cc.activo = 1
-        WHERE v.id_vivienda = NEW.id_vivienda
-        LIMIT 1;
-
-        -- Asignación a USUARIO
-        IF NEW.id_usuario IS NOT NULL THEN
-            UPDATE Cuotas_Mensuales
-            SET id_vivienda = NEW.id_vivienda,
-                monto = COALESCE(v_monto_vivienda, 0),
-                pendiente_asignacion = 0,
-                observaciones = CONCAT(
-                    COALESCE(observaciones, ''),
-                    IF(observaciones IS NOT NULL AND observaciones != '', '\n', ''),
-                    'Vivienda asignada el ', DATE_FORMAT(NOW(), '%d/%m/%Y %H:%i')
-                )
-            WHERE id_usuario = NEW.id_usuario
-                AND pendiente_asignacion = 1
-                AND (
-                    (anio = YEAR(CURDATE()) AND mes >= MONTH(CURDATE()))
-                    OR anio > YEAR(CURDATE())
-                );
-
-            INSERT INTO notificaciones (titulo, mensaje, tipo)
-            VALUES (
-                'Vivienda Asignada',
-                'Se te ha asignado una vivienda. Tus cuotas han sido actualizadas con el monto correspondiente.',
-                'exito'
-            );
-            INSERT INTO usuario_notificaciones (id_usuario, id_notificacion)
-            VALUES (NEW.id_usuario, LAST_INSERT_ID());
-        END IF;
-
-        -- Asignación a NUCLEO
-        IF NEW.id_nucleo IS NOT NULL THEN
-            UPDATE Cuotas_Mensuales cm
-            INNER JOIN Usuario u ON cm.id_usuario = u.id_usuario
-            SET cm.id_vivienda = NEW.id_vivienda,
-                cm.monto = COALESCE(v_monto_vivienda, 0),
-                cm.pendiente_asignacion = 0,
-                cm.observaciones = CONCAT(
-                    COALESCE(cm.observaciones, ''),
-                    IF(cm.observaciones IS NOT NULL AND cm.observaciones != '', '\n', ''),
-                    'Vivienda asignada a núcleo el ', DATE_FORMAT(NOW(), '%d/%m/%Y %H:%i')
-                )
-            WHERE u.id_nucleo = NEW.id_nucleo
-                AND cm.pendiente_asignacion = 1
-                AND (
-                    (cm.anio = YEAR(CURDATE()) AND cm.mes >= MONTH(CURDATE()))
-                    OR cm.anio > YEAR(CURDATE())
-                );
-
-            INSERT INTO notificaciones (titulo, mensaje, tipo)
-            VALUES (
-                'Vivienda Asignada a tu Núcleo',
-                'Se ha asignado una vivienda a tu núcleo familiar. Tus cuotas han sido actualizadas.',
-                'exito'
-            );
-
-            INSERT INTO usuario_notificaciones (id_usuario, id_notificacion)
-            SELECT u.id_usuario, LAST_INSERT_ID()
-            FROM Usuario u
-            WHERE u.id_nucleo = NEW.id_nucleo;
-        END IF;
-    END IF;
-END $$
-
-DELIMITER ;
-
--- ==========================================
--- TRIGGER 3: Generar cuota automáticamente cuando un usuario es aceptado
--- ==========================================
-DROP TRIGGER IF EXISTS generar_cuota_usuario_nuevo;
-
-DELIMITER $$
-
-CREATE TRIGGER generar_cuota_usuario_nuevo
-AFTER UPDATE ON Usuario
-FOR EACH ROW
-BEGIN
-    DECLARE v_mes_actual INT;
-    DECLARE v_anio_actual INT;
-    DECLARE v_id_vivienda INT;
-    DECLARE v_id_tipo INT;
-    DECLARE v_monto_base DECIMAL(10, 2);
-    DECLARE v_fecha_vencimiento DATE;
-    DECLARE v_pendiente_asignacion TINYINT(1);
-
-    IF NEW.estado = 'aceptado' AND OLD.estado != 'aceptado' THEN
-        SET v_mes_actual = MONTH(CURDATE());
-        SET v_anio_actual = YEAR(CURDATE());
-        SET v_fecha_vencimiento = LAST_DAY(CURDATE());
-
-        IF NOT EXISTS (
-            SELECT 1
-            FROM Cuotas_Mensuales
-            WHERE id_usuario = NEW.id_usuario
-                AND mes = v_mes_actual
-                AND anio = v_anio_actual
-        ) THEN
-            SELECT av.id_vivienda, v.id_tipo
-            INTO v_id_vivienda, v_id_tipo
-            FROM Asignacion_Vivienda av
-                INNER JOIN Viviendas v ON av.id_vivienda = v.id_vivienda
-            WHERE (
-                av.id_usuario = NEW.id_usuario
-                OR av.id_nucleo = NEW.id_nucleo
-            )
-                AND av.activa = 1
-            LIMIT 1;
-
-            IF v_id_vivienda IS NOT NULL THEN
-                SELECT monto_mensual
-                INTO v_monto_base
-                FROM Config_Cuotas
-                WHERE id_tipo = v_id_tipo AND activo = 1
-                LIMIT 1;
-                SET v_monto_base = COALESCE(v_monto_base, 0);
-                SET v_pendiente_asignacion = 0;
-            ELSE
-                SET v_monto_base = 0;
-                SET v_pendiente_asignacion = 1;
-            END IF;
-
-            INSERT INTO Cuotas_Mensuales (
-                id_usuario,
-                id_vivienda,
-                mes,
-                anio,
-                monto,
-                monto_pendiente_anterior,
-                fecha_vencimiento,
-                horas_requeridas,
-                estado,
-                pendiente_asignacion,
-                observaciones
-            ) VALUES (
-                NEW.id_usuario,
-                v_id_vivienda,
-                v_mes_actual,
-                v_anio_actual,
-                v_monto_base,
-                0,
-                v_fecha_vencimiento,
-                84.00,
-                'pendiente',
-                v_pendiente_asignacion,
-                IF(
-                    v_pendiente_asignacion = 1,
-                    CONCAT(
-                        'Usuario aceptado el ', DATE_FORMAT(NOW(), '%d/%m/%Y'),
-                        '. Pendiente asignación de vivienda.'
-                    ),
-                    CONCAT(
-                        'Usuario aceptado el ', DATE_FORMAT(NOW(), '%d/%m/%Y')
-                    )
-                )
-            );
-
-            INSERT INTO notificaciones (titulo, mensaje, tipo)
-            VALUES (
-                'Bienvenido al Sistema de Cuotas',
-                CONCAT(
-                    'Tu cuota de ', MONTHNAME(CURDATE()),
-                    ' ha sido generada. ',
-                    IF(
-                        v_pendiente_asignacion = 1,
-                        'Estás en espera de asignación de vivienda.',
-                        CONCAT(
-                            'Monto: ', CAST(v_monto_base AS CHAR),
-                            '. Horas requeridas: 84'
-                        )
-                    )
-                ),
-                'info'
-            );
-
-            INSERT INTO usuario_notificaciones (id_usuario, id_notificacion)
-            VALUES (NEW.id_usuario, LAST_INSERT_ID());
-        END IF;
-    END IF;
-END $$
-
-DELIMITER ;
--- ==========================================
--- PROCEDIMIENTOS ALMACENADOS
--- ==========================================
-DROP PROCEDURE IF EXISTS GenerarCuotasMensuales;
-
-DELIMITER $$
-
-CREATE PROCEDURE GenerarCuotasMensuales(IN p_mes INT, IN p_anio INT) BEGIN
-DECLARE done INT DEFAULT FALSE;
-DECLARE v_id_usuario INT;
-DECLARE v_id_vivienda INT;
-DECLARE v_id_tipo INT;
-DECLARE v_monto_base DECIMAL(10, 2);
-DECLARE v_deuda_anterior DECIMAL(10, 2);
-DECLARE v_fecha_vencimiento DATE;
-DECLARE v_pendiente_asignacion TINYINT(1);
-DECLARE v_cuotas_generadas INT DEFAULT 0;
-DECLARE v_cuotas_sin_vivienda INT DEFAULT 0;
-DECLARE v_cuotas_existentes INT DEFAULT 0;
-DECLARE cur_usuarios CURSOR FOR
-SELECT DISTINCT u.id_usuario
-FROM Usuario u
-WHERE u.estado = 'aceptado'
-ORDER BY u.id_usuario;
-DECLARE CONTINUE HANDLER FOR NOT FOUND
-SET done = TRUE;
-SET v_fecha_vencimiento = LAST_DAY(CONCAT(p_anio, '-', LPAD(p_mes, 2, '0'), '-01'));
-OPEN cur_usuarios;
-read_loop: LOOP FETCH cur_usuarios INTO v_id_usuario;
-IF done THEN LEAVE read_loop;
-END IF;
-IF EXISTS (
-    SELECT 1
-    FROM Cuotas_Mensuales
-    WHERE id_usuario = v_id_usuario
-        AND mes = p_mes
-        AND anio = p_anio
-) THEN
-SET v_cuotas_existentes = v_cuotas_existentes + 1;
-ITERATE read_loop;
-END IF;
-SET v_id_vivienda = NULL;
-SET v_id_tipo = NULL;
-SET v_monto_base = 0;
-SET v_pendiente_asignacion = 0;
-SELECT av.id_vivienda,
-    v.id_tipo INTO v_id_vivienda,
-    v_id_tipo
-FROM Asignacion_Vivienda av
-    INNER JOIN Viviendas v ON av.id_vivienda = v.id_vivienda
-    INNER JOIN Usuario u ON (
-        av.id_usuario = u.id_usuario
-        OR av.id_nucleo = u.id_nucleo
-    )
-WHERE u.id_usuario = v_id_usuario
-    AND av.activa = 1
-LIMIT 1;
-IF v_id_vivienda IS NOT NULL THEN
-SELECT monto_mensual INTO v_monto_base
-FROM Config_Cuotas
-WHERE id_tipo = v_id_tipo
-    AND activo = 1
-LIMIT 1;
-SET v_monto_base = COALESCE(v_monto_base, 0);
-ELSE
-SET v_monto_base = 0;
-SET v_pendiente_asignacion = 1;
-SET v_cuotas_sin_vivienda = v_cuotas_sin_vivienda + 1;
-END IF;
-SELECT COALESCE(SUM(monto + monto_pendiente_anterior), 0) INTO v_deuda_anterior
-FROM Cuotas_Mensuales
-WHERE id_usuario = v_id_usuario
-    AND estado != 'pagada'
-    AND (
-        anio < p_anio
-        OR (
-            anio = p_anio
-            AND mes < p_mes
-        )
-    );
-INSERT INTO Cuotas_Mensuales (
-        id_usuario,
-        id_vivienda,
-        mes,
-        anio,
-        monto,
-        monto_pendiente_anterior,
-        fecha_vencimiento,
-        horas_requeridas,
-        estado,
-        pendiente_asignacion,
-        observaciones
-    )
-VALUES (
-        v_id_usuario,
-        v_id_vivienda,
-        p_mes,
-        p_anio,
-        v_monto_base,
-        v_deuda_anterior,
-        v_fecha_vencimiento,
-        84.00,
-        'pendiente',
-        v_pendiente_asignacion,
-        IF(
-            v_pendiente_asignacion = 1,
-            'Pendiente: Asignar vivienda',
-            NULL
-        )
-    );
-SET v_cuotas_generadas = v_cuotas_generadas + 1;
-END LOOP;
-CLOSE cur_usuarios;
-IF v_cuotas_sin_vivienda > 0 THEN
-INSERT INTO notificaciones (titulo, mensaje, tipo)
-VALUES (
-        'Usuarios sin Vivienda',
-        CONCAT(
-            'Hay ',
-            v_cuotas_sin_vivienda,
-            ' usuario(s) sin vivienda. Cuotas pendientes de asignacion.'
-        ),
-        'urgente'
-    );
-INSERT INTO usuario_notificaciones (id_usuario, id_notificacion)
-SELECT u.id_usuario,
-    LAST_INSERT_ID()
-FROM Usuario u
-WHERE u.id_rol = 1;
-END IF;
-INSERT INTO notificaciones (titulo, mensaje, tipo)
-VALUES (
-        'Cuotas Generadas',
-        CONCAT(
-            'Mes ',
-            p_mes,
-            '/',
-            p_anio,
-            ': ',
-            v_cuotas_generadas,
-            ' nuevas | ',
-            v_cuotas_existentes,
-            ' existian | ',
-            v_cuotas_sin_vivienda,
-            ' sin vivienda'
-        ),
-        'exito'
-    );
-INSERT INTO usuario_notificaciones (id_usuario, id_notificacion)
-SELECT u.id_usuario,
-    LAST_INSERT_ID()
-FROM Usuario u
-WHERE u.id_rol = 1;
-END $$
-
-DELIMITER ;
--- ==========================================
--- FUNCIONES
--- ==========================================
-DROP FUNCTION IF EXISTS CalcularDeudaUsuario;
-
-DELIMITER $$
-
-CREATE FUNCTION CalcularDeudaUsuario(p_id_usuario INT) RETURNS DECIMAL(10, 2) DETERMINISTIC READS SQL DATA BEGIN
-DECLARE v_deuda DECIMAL(10, 2);
-SELECT COALESCE(SUM(monto + monto_pendiente_anterior), 0) INTO v_deuda
-FROM Cuotas_Mensuales
-WHERE id_usuario = p_id_usuario
-    AND estado != 'pagada';
-RETURN v_deuda;
-END $$
-
-DELIMITER ;
--- ==========================================
--- EVENTOS AUTOMATICOS
--- ==========================================
-SET GLOBAL event_scheduler = ON;
-
-DROP EVENT IF EXISTS GenerarCuotasAutomatico;
-
-DELIMITER $$
-
-CREATE EVENT GenerarCuotasAutomatico ON SCHEDULE EVERY 1 MONTH STARTS CASE
-    WHEN DAY(CURDATE()) = 1 THEN CONCAT(
-        DATE_FORMAT(
-            DATE_ADD(LAST_DAY(CURDATE()), INTERVAL 1 DAY),
-            '%Y-%m-01'
-        ),
-        ' 00:01:00'
-    )
-    ELSE CONCAT(
-        DATE_FORMAT(
-            DATE_ADD(LAST_DAY(CURDATE()), INTERVAL 1 DAY),
-            '%Y-%m-01'
-        ),
-        ' 00:01:00'
-    )
-END
-
-DO BEGIN
-DECLARE v_mes INT;
-DECLARE v_anio INT;
-SET v_mes = MONTH(CURDATE());
-SET v_anio = YEAR(CURDATE());
-CALL GenerarCuotasMensuales(v_mes, v_anio);
-END $$
-
-DELIMITER ;
 -- ==========================================
 -- INDICES ADICIONALES
 -- ==========================================
 CREATE INDEX idx_vivienda_tipo ON Viviendas (id_tipo);
-
 CREATE INDEX idx_vivienda_estado ON Viviendas (estado);
-
 CREATE INDEX idx_asignacion_activa ON Asignacion_Vivienda (activa);
-
 CREATE INDEX idx_cuota_mes_anio ON Cuotas_Mensuales (mes, anio);
-
 CREATE INDEX idx_pago_fecha ON Pagos_Cuotas (fecha_pago);
-
 CREATE INDEX idx_telefono_busqueda ON Telefonos (telefono);
--- ==========================================
--- GENERAR CUOTAS DEL MES ACTUAL
--- ==========================================
-CALL GenerarCuotasMensuales ( MONTH(CURDATE()), YEAR(CURDATE()) );
+
 -- ==========================================
 -- MENSAJE FINAL
 -- ==========================================
-SELECT 'Base de datos proyecto2025 inicializada correctamente' as status;
+SELECT 'Estructura de base de datos proyecto2025 creada correctamente' as status;

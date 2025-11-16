@@ -52,81 +52,7 @@
     font-weight: 500;
 }
 
-.users-table-wrapper {
-    overflow-x: auto;
-    border-radius: var(--border-radius-md);
-    box-shadow: var(--shadow-md);
-    background: var(--bg-card);
-}
 
-.users-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: var(--bg-card);
-    font-size: var(--font-size-sm);
-    min-width: 1200px;
-}
-
-.users-table thead {
-    background: var(--color-primary);
-    color: var(--color-white);
-    position: sticky;
-    top: 0;
-    z-index: 10;
-}
-
-.users-table th {
-    padding: var(--spacing-xl) var(--spacing-lg);
-    text-align: left;
-    font-weight: 600;
-    white-space: nowrap;
-    text-transform: uppercase;
-    font-size: var(--font-size-xs);
-    letter-spacing: 0.5px;
-    color: var(--color-white);
-}
-
-.users-table td {
-    padding: var(--spacing-lg);
-    border-bottom: 1px solid var(--border-color);
-    vertical-align: middle;
-}
-
-.users-table tbody tr {
-    transition: all var(--transition-base);
-    background: var(--bg-card);
-}
-
-.users-table tbody tr:hover {
-    background-color: var(--bg-hover);
-    transform: translateX(5px);
-    box-shadow: var(--shadow-sm);
-}
-
-.users-table tbody tr.estado-enviado {
-    background: linear-gradient(90deg, #fff9c4 0%, #fff59d 100%);
-    border-left: 5px solid var(--color-warning-light);
-    font-weight: 500;
-}
-
-.users-table tbody tr.estado-enviado:hover {
-    background: linear-gradient(90deg, #fff59d 0%, #ffee58 100%);
-    transform: translateX(8px);
-    box-shadow: var(--shadow-md);
-}
-
-@keyframes pulse-payment {
-    0%, 100% {
-        box-shadow: 0 0 0 0 rgba(255, 167, 38, 0.4);
-    }
-    50% {
-        box-shadow: 0 0 0 10px rgba(255, 167, 38, 0);
-    }
-}
-
-.users-table tbody tr.estado-enviado .estado-badge {
-    animation: pulse-payment 2s infinite;
-}
 
 .estado-badge {
     display: inline-block;
@@ -213,13 +139,6 @@
     box-shadow: var(--shadow-md);
 }
 
-.users-table tbody tr.estado-enviado td:first-child::before {
-    content: '⚠️';
-    display: inline-block;
-    margin-right: var(--spacing-sm);
-    font-size: var(--font-size-lg);
-    animation: bounce 1s infinite;
-}
 
 @keyframes bounce {
     0%, 100% { transform: translateY(0); }
@@ -236,16 +155,7 @@
     border: 2px dashed #90caf9;
 }
 
-.users-table td:first-child {
-    font-weight: 700;
-    color: var(--color-primary);
-    font-size: var(--font-size-base);
-}
 
-.users-table td:nth-child(2) {
-    font-weight: 600;
-    color: var(--color-secondary);
-}
 
 @media (max-width: 768px) {
     .users-table-header {

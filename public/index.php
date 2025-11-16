@@ -158,8 +158,9 @@ $privateRoutes = [
     '/api/cuotas/precios',
     '/api/cuotas/verificar-auto',
     '/api/cuotas/actualizar-precio',
-    '/api/cuotas/resumen-deuda',        // ✅ NUEVO
-    '/api/cuotas/recalcular-deuda',     // ✅ NUEVO
+    '/api/cuotas/resumen-deuda',       
+    '/api/cuotas/recalcular-deuda', 
+    '/api/cuotas/liquidar',  
     '/api/solicitudes/create',
     '/api/solicitudes/mis-solicitudes',
     '/api/solicitudes/detalle',
@@ -516,6 +517,9 @@ switch ($uri) {
         break;
     case '/api/cuotas/recalcular-deuda':
         (new App\controllers\CuotaController())->recalcularDeuda();
+        break;
+        case '/api/cuotas/liquidar':
+        (new App\controllers\CuotaController())->liquidarCuota();
         break;
 
     // API SOLICITUDES - USUARIO
