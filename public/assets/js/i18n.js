@@ -127,7 +127,7 @@
       }
     });
     
-    console.log('✅ Página traducida a:', currentLang);
+    console.log(' Página traducida a:', currentLang);
   }
 
   // Actualizar el botón de idioma
@@ -258,7 +258,7 @@
     translatePage();
     
     isInitialized = true;
-    console.log('✅ i18n inicializado correctamente en idioma:', currentLang);
+    console.log(' i18n inicializado correctamente en idioma:', currentLang);
     
     // Disparar evento de inicialización
     window.dispatchEvent(new CustomEvent('i18nReady', { detail: { language: currentLang } }));

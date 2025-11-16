@@ -1,27 +1,3 @@
-// 🧪 MODO TEST: Simular último día del mes
-(function() {
-    const TEST_MODE = true; // Cambiar a false para volver a normal
-    
-    if (TEST_MODE) {
-        // Sobrescribir Date para simular último día del mes
-        const fechaOriginal = Date;
-        const ultimoDiaMes = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0);
-        
-        window.Date = function(...args) {
-            if (args.length === 0) {
-                return ultimoDiaMes;
-            }
-            return new fechaOriginal(...args);
-        };
-        
-        // Copiar métodos estáticos
-        Object.setPrototypeOf(window.Date, fechaOriginal);
-        window.Date.prototype = fechaOriginal.prototype;
-        
-        console.log('🧪 TEST MODE: Fecha simulada =', ultimoDiaMes.toLocaleDateString());
-    }
-})();
-
 // Sistema SPA - Navegación entre secciones
 document.addEventListener('DOMContentLoaded', function () {
 
@@ -78,6 +54,32 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+});
+document.addEventListener('DOMContentLoaded', () => {
+    const toggleMenuBtn = document.querySelector('.toggle-menu-btn');
+    const menu = document.querySelector('nav.menu');
+    const miniToggleBtn = document.querySelector('.mini-toggle-menu-btn');
+
+    // Función al minimizar/expandir
+    toggleMenuBtn.addEventListener('click', () => {
+        menu.classList.toggle('menu-minimized');
+
+        // Si el menú se minimiza, mostramos el botón mini
+        if (menu.classList.contains('menu-minimized')) {
+            miniToggleBtn.style.display = 'block';
+            menu.style.display = 'none'; // opcional: ocultar menú al minimizar
+        } else {
+            miniToggleBtn.style.display = 'none';
+            menu.style.display = 'block';
+        }
+    });
+
+    // Función del botón mini para mostrar el menú de nuevo
+    miniToggleBtn.addEventListener('click', () => {
+        menu.classList.remove('menu-minimized');
+        menu.style.display = 'block';
+        miniToggleBtn.style.display = 'none';
+    });
 });
 
 
@@ -322,9 +324,7 @@ function showUserDetailModal(user) {
 // ==========================================
 //  Crear/Editar Vivienda
 // ==========================================
-
 function showCreateViviendaModal() {
-
 
     //  LIMPIAR MODALES ANTERIORES
     limpiarModalesAnteriores();
@@ -350,6 +350,17 @@ function showCreateViviendaModal() {
         
         //  MOSTRAR EL MODAL
         modal.style.display = 'flex';
+        
+ 
+        
+        //  PREVENIR que se cierre al hacer clic fuera
+        modal.onclick = null;
+        const modalContent = modal.querySelector('.material-modal-content');
+        if (modalContent) {
+            modalContent.onclick = function(event) {
+                event.stopPropagation();
+            };
+        }
    
     }).catch(error => {
         console.error(' Error al cargar tipos:', error);
@@ -359,7 +370,6 @@ function showCreateViviendaModal() {
 
 function editVivienda(id) {
  
-
     //  LIMPIAR MODALES ANTERIORES
     limpiarModalesAnteriores();
 
@@ -389,6 +399,18 @@ function editVivienda(id) {
 
             //  MOSTRAR EL MODAL
             modal.style.display = 'flex';
+            
+            //  PREVENIR SCROLL DEL BODY
+            document.body.style.overflow = 'hidden';
+            
+            //  PREVENIR que se cierre al hacer clic fuera
+            modal.onclick = null;
+            const modalContent = modal.querySelector('.material-modal-content');
+            if (modalContent) {
+                modalContent.onclick = function(event) {
+                    event.stopPropagation();
+                };
+            }
          
         } else {
             alert('Error al cargar vivienda');
@@ -405,6 +427,9 @@ function closeViviendaModal() {
         modal.style.display = 'none';
         document.getElementById('viviendaForm').reset();
     }
+    
+    //  RESTAURAR SCROLL DEL BODY
+    document.body.style.overflow = 'auto';
    
     limpiarModalesAnteriores();
 }
@@ -414,8 +439,6 @@ function closeViviendaModal() {
 // ==========================================
 
 function showAsignarModal(viviendaId, numeroVivienda) {
-
-
     
     limpiarModalesAnteriores();
 
@@ -438,7 +461,21 @@ function showAsignarModal(viviendaId, numeroVivienda) {
 
             document.getElementById('asignar-vivienda-info').textContent = `Vivienda: ${numeroVivienda}`;
             document.getElementById('asignar-vivienda-id').value = viviendaId;
-            document.getElementById('asignarViviendaModal').style.display = 'flex';
+            
+            const modal = document.getElementById('asignarViviendaModal');
+            modal.style.display = 'flex';
+            
+            //  PREVENIR SCROLL DEL BODY
+            document.body.style.overflow = 'hidden';
+            
+            //  PREVENIR que se cierre al hacer clic fuera
+            modal.onclick = null;
+            const modalContent = modal.querySelector('.material-modal-content');
+            if (modalContent) {
+                modalContent.onclick = function(event) {
+                    event.stopPropagation();
+                };
+            }
         }
     }).catch(error => {
         console.error('Error:', error);
@@ -454,6 +491,9 @@ function closeAsignarModal() {
         document.getElementById('asignar-usuario-group').style.display = 'none';
         document.getElementById('asignar-nucleo-group').style.display = 'none';
     }
+    
+    //  RESTAURAR SCROLL DEL BODY
+    document.body.style.overflow = 'auto';
    
     limpiarModalesAnteriores();
 }
@@ -1602,7 +1642,7 @@ function renderUserRow(user) {
     `;
 }
 
-console.log('✅ [USERS TABLE] Tabla con estilos de cuotas aplicados');
+console.log(' [USERS TABLE] Tabla con estilos de cuotas aplicados');
 console.log('🎨 [USERS TABLE] Diseño moderno y consistente');
 // ========== FUNCIONES AUXILIARES ==========
 function formatEstadoUsuario(estado) {
@@ -2066,7 +2106,7 @@ function renderNucleosTable(nucleos) {
     container.innerHTML = html;
 }
 
-console.log('✅ [NÚCLEOS TABLE] Tabla con estilos de cuotas aplicados');
+console.log(' [NÚCLEOS TABLE] Tabla con estilos de cuotas aplicados');
 console.log('🎨 [NÚCLEOS TABLE] Diseño moderno y consistente');
 
 // ========== RENDERIZAR FILA DE NÚCLEO ==========
@@ -2161,16 +2201,19 @@ function showCreateNucleoForm() {
                                      style="
                                          display: flex;
                                          flex-direction: column;
-                                         gap: 6px;
-                                         max-height: 180px;
+                                         gap: 8px;
+                                         max-height: 250px;
                                          overflow-y: auto;
-                                         border: 1px solid #ddd;
+                                         border: 1px solid #E0E0E0;
                                          border-radius: 8px;
-                                         padding: 10px;
-                                         background: #fafafa;
+                                         padding: 12px;
+                                         background: #FAFAFA;
                                      ">
                                     ${renderUsersCheckboxes(usuarios)}
                                 </div>
+                                <small style="color: #6C757D; font-size: 12px; margin-top: -5px;">
+                                    Selecciona los miembros que formarán parte de este núcleo familiar
+                                </small>
                             </div>
                         </div>
 
@@ -2202,6 +2245,139 @@ function showCreateNucleoForm() {
     });
 }
 
+// Renderizar checkboxes de usuarios de forma simple
+function renderUsersCheckboxes(usuarios) {
+    if (!usuarios || usuarios.length === 0) {
+        return '<p style="color: #6C757D; text-align: center; padding: 20px;">No hay usuarios disponibles</p>';
+    }
+
+    return usuarios.map(usuario => {
+        const isInNucleo = usuario.id_nucleo !== null;
+        const isDisabled = isInNucleo ? 'disabled' : '';
+        const checkboxStyle = isInNucleo ? 'opacity: 0.5; cursor: not-allowed;' : 'cursor: pointer;';
+        
+        return `
+            <label style="
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                padding: 10px 12px;
+                background: ${isInNucleo ? '#FFF3E0' : '#FFFFFF'};
+                border: 1px solid ${isInNucleo ? '#FFB74D' : '#E0E0E0'};
+                border-radius: 6px;
+                ${checkboxStyle}
+                transition: all 0.2s ease;
+            " ${!isInNucleo ? `onmouseover="this.style.borderColor='#005CB9'; this.style.background='#F5F9FF'" onmouseout="this.style.borderColor='#E0E0E0'; this.style.background='#FFFFFF'"` : ''}>
+                <input type="checkbox" 
+                       name="miembros[]" 
+                       value="${usuario.id_usuario}" 
+                       ${isDisabled}
+                       style="
+                           width: 18px;
+                           height: 18px;
+                           cursor: ${isInNucleo ? 'not-allowed' : 'pointer'};
+                           accent-color: #005CB9;
+                       ">
+                <div style="flex: 1;">
+                    <div style="
+                        font-weight: 500;
+                        color: ${isInNucleo ? '#795548' : '#212529'};
+                        font-size: 14px;
+                    ">
+                        ${usuario.nombre} ${usuario.apellido}
+                    </div>
+                    <div style="
+                        font-size: 12px;
+                        color: ${isInNucleo ? '#8D6E63' : '#6C757D'};
+                        margin-top: 2px;
+                    ">
+                        CI: ${usuario.cedula}
+                    </div>
+                </div>
+                ${isInNucleo ? `
+                    <span style="
+                        font-size: 11px;
+                        color: #E65100;
+                        background: #FFE0B2;
+                        padding: 4px 10px;
+                        border-radius: 12px;
+                        font-weight: 600;
+                    ">
+                        Ya en núcleo
+                    </span>
+                ` : ''}
+            </label>
+        `;
+    }).join('');
+}
+
+// Filtrar usuarios en el modal de núcleo
+function filterUsersNucleo() {
+    const searchValue = document.getElementById('search-users-nucleo').value.toLowerCase();
+    const labels = document.querySelectorAll('#usersListNucleo label');
+    
+    labels.forEach(label => {
+        const text = label.textContent.toLowerCase();
+        if (text.includes(searchValue)) {
+            label.style.display = 'flex';
+        } else {
+            label.style.display = 'none';
+        }
+    });
+}
+
+// Cerrar modal
+function closeCreateNucleoModal() {
+    const modal = document.getElementById('createNucleoModal');
+    if (modal) {
+        modal.style.display = 'none';
+        modal.remove();
+    }
+    document.body.style.overflow = 'auto';
+}
+
+// Submit del formulario
+function submitCreateNucleo(event) {
+    event.preventDefault();
+    
+    const formData = new FormData(event.target);
+    const miembros = formData.getAll('miembros[]');
+    
+    if (miembros.length === 0) {
+        alert('Debes seleccionar al menos un miembro para el núcleo');
+        return;
+    }
+    
+    const data = {
+        nombre_nucleo: formData.get('nombre_nucleo'),
+        direccion: formData.get('direccion'),
+        miembros: miembros
+    };
+    
+    // Aquí iría tu llamada al backend
+    console.log('Datos del núcleo:', data);
+    
+    // Ejemplo de llamada fetch (ajustar a tu API)
+    fetch('/api/nucleos/crear', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(result => {
+        alert('Núcleo creado exitosamente');
+        closeCreateNucleoModal();
+        // Recargar la lista de núcleos
+        loadNucleos();
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error al crear el núcleo');
+    });
+}
+
 function closeCreateNucleoModal() {
     const modal = document.getElementById('createNucleoModal');
     if (modal) {
@@ -2212,7 +2388,7 @@ function closeCreateNucleoModal() {
     document.body.style.overflow = '';
 }
 
-console.log('✅ Modal crear núcleo corregido con material-modal');
+console.log(' Modal crear núcleo corregido con material-modal');
 
 // Renderizar checkboxes de usuarios
 function renderUsersCheckboxes(usuarios) {
@@ -2411,16 +2587,21 @@ function editNucleo(nucleoId) {
                                  style="
                                      display: flex;
                                      flex-direction: column;
-                                     gap: 6px;
-                                     max-height: 180px;
+                                     gap: 8px;
+                                     max-height: 250px;
                                      overflow-y: auto;
-                                     border: 1px solid #ddd;
+                                     border: 1px solid #E0E0E0;
                                      border-radius: 8px;
-                                     padding: 10px;
-                                     background: #fafafa;
+                                     padding: 12px;
+                                     background: #FAFAFA;
+                                     scrollbar-width: none;
+                                     -ms-overflow-style: none;
                                  ">
                                 ${renderUsersCheckboxesEdit(usuarios, miembrosActuales, nucleoId)}
                             </div>
+                            <small style="color: #6C757D; font-size: 12px; margin-top: -5px;">
+                                Selecciona los miembros que formarán parte de este núcleo familiar
+                            </small>
                         </div>
                     </div>
 
@@ -2455,7 +2636,6 @@ function closeNucleoModal() {
     const modal = document.getElementById("nucleoModal");
     if (modal) modal.remove();
 }
-
 
 
 
@@ -2725,7 +2905,7 @@ function renderMaterialesTable(materiales) {
     container.innerHTML = html;
 }
 
-console.log('✅ [MATERIALES TABLE] Tabla con estilos de cuotas aplicados');
+console.log(' [MATERIALES TABLE] Tabla con estilos de cuotas aplicados');
 console.log('🎨 [MATERIALES TABLE] Diseño moderno y consistente');
 
 // ========== BUSCAR MATERIALES ==========
@@ -2946,7 +3126,12 @@ function loadMaterialesParaTarea() {
     }
 
    
-    container.innerHTML = '<p class="loading">Cargando materiales...</p>';
+    container.innerHTML = `
+        <div class="loading-state">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Cargando materiales disponibles...</p>
+        </div>
+    `;
 
     fetch('/api/materiales/all', {
         method: 'GET',
@@ -2954,20 +3139,28 @@ function loadMaterialesParaTarea() {
         credentials: 'same-origin'
     })
         .then(response => {
-          
             return response.json();
         })
         .then(data => {
-         
             if (data.success) {
                 renderMaterialesSelectorTarea(data.materiales);
             } else {
-                container.innerHTML = `<p class="error">Error: ${data.message}</p>`;
+                container.innerHTML = `
+                    <div class="error-state">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <p>Error al cargar materiales: ${data.message}</p>
+                    </div>
+                `;
             }
         })
         .catch(error => {
             console.error('Error al cargar materiales:', error);
-            container.innerHTML = '<p class="error">Error de conexión</p>';
+            container.innerHTML = `
+                <div class="error-state">
+                    <i class="fas fa-times-circle"></i>
+                    <p>Error de conexión. Por favor, intenta nuevamente.</p>
+                </div>
+            `;
         });
 }
 
@@ -2977,43 +3170,166 @@ function renderMaterialesSelectorTarea(materiales) {
     const container = document.getElementById('materiales-tarea-list');
 
     if (!materiales || materiales.length === 0) {
-        container.innerHTML = '<p style="color: #999; padding: 10px;">No hay materiales disponibles. <a href="#" onclick="event.preventDefault(); document.querySelector(\'[data-section=\\\'materiales\\\']\').click();">Crear materiales</a></p>';
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-box-open" style="font-size: 48px; color: #ccc; margin-bottom: 16px;"></i>
+                <p style="color: #666; margin-bottom: 12px; font-size: 16px;">No hay materiales disponibles en el inventario</p>
+                <a href="#" 
+                   onclick="event.preventDefault(); document.querySelector('[data-section=\\'materiales\\']').click();" 
+                   class="btn btn-primary btn-small">
+                    <i class="fas fa-plus"></i> Crear Primer Material
+                </a>
+            </div>
+        `;
         return;
     }
 
-    container.innerHTML = materiales.map(material => {
-        const stock = parseInt(material.stock) || 0;
-        const stockClass = stock === 0 ? 'agotado' : (stock < 10 ? 'bajo' : 'disponible');
+    // Categorizar materiales por stock
+    const materialesDisponibles = materiales.filter(m => (parseInt(m.stock) || 0) > 0);
+    const materialesAgotados = materiales.filter(m => (parseInt(m.stock) || 0) === 0);
 
-        return `
-            <div class="material-selector-item" data-material-id="${material.id_material}">
-                <div class="material-selector-info">
-                    <div class="material-selector-name">
-                        <strong>${material.nombre}</strong>
-                        <span class="stock-badge-small ${stockClass}">${stock} disponible</span>
-                    </div>
-                    ${material.caracteristicas ? `<small style="color: #666;">${material.caracteristicas}</small>` : ''}
+    let html = '';
+
+    // Header con resumen
+    html += `
+        <div class="materiales-summary">
+            <div class="summary-item">
+                <i class="fas fa-boxes"></i>
+                <span><strong>${materiales.length}</strong> materiales totales</span>
+            </div>
+            <div class="summary-item success">
+                <i class="fas fa-check-circle"></i>
+                <span><strong>${materialesDisponibles.length}</strong> disponibles</span>
+            </div>
+            ${materialesAgotados.length > 0 ? `
+                <div class="summary-item error">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span><strong>${materialesAgotados.length}</strong> agotados</span>
                 </div>
-                <div class="material-selector-actions">
-                    <input type="number" 
-                           class="material-cantidad-input" 
-                           id="cantidad-${material.id_material}"
-                           min="1" 
-                           max="${stock > 0 ? stock : 999}"
-                           placeholder="Cant." 
-                           style="width: 70px;">
-                    <button type="button" 
-                            class="btn-small btn-add-material" 
-                            onclick="addMaterialToTask(${material.id_material}, '${material.nombre.replace(/'/g, "\\'")}', ${stock})"
-                            ${stock === 0 ? 'disabled title="Sin stock"' : ''}>
-                        <i class="fas fa-plus"></i>
-                    </button>
+            ` : ''}
+        </div>
+    `;
+
+    // Materiales disponibles
+    if (materialesDisponibles.length > 0) {
+        html += '<div class="materiales-section">';
+        html += '<h4 class="section-subtitle"><i class="fas fa-check-circle"></i> Materiales Disponibles</h4>';
+        
+        html += materialesDisponibles.map(material => {
+            const stock = parseInt(material.stock) || 0;
+            const stockClass = stock < 10 ? 'bajo' : 'disponible';
+            const categoria = material.categoria || 'Sin categoría';
+            const unidadMedida = material.unidad_medida || 'unidades';
+
+            return `
+                <div class="material-selector-item expanded" data-material-id="${material.id_material}">
+                    <div class="material-selector-header">
+                        <div class="material-icon">
+                            <i class="fas fa-box"></i>
+                        </div>
+                        <div class="material-selector-info">
+                            <div class="material-selector-name">
+                                <strong>${material.nombre}</strong>
+                                <span class="stock-badge-small ${stockClass}">
+                                    <i class="fas fa-warehouse"></i> ${stock} ${unidadMedida}
+                                </span>
+                            </div>
+                            <div class="material-metadata">
+                                <span class="metadata-item">
+                                    <i class="fas fa-tag"></i> ${categoria}
+                                </span>
+                                ${material.marca ? `
+                                    <span class="metadata-item">
+                                        <i class="fas fa-copyright"></i> ${material.marca}
+                                    </span>
+                                ` : ''}
+                                ${material.modelo ? `
+                                    <span class="metadata-item">
+                                        <i class="fas fa-barcode"></i> ${material.modelo}
+                                    </span>
+                                ` : ''}
+                            </div>
+                            ${material.caracteristicas ? `
+                                <div class="material-description">
+                                    <i class="fas fa-info-circle"></i> ${material.caracteristicas}
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                    <div class="material-selector-actions">
+                        <div class="quantity-control">
+                            <label for="cantidad-${material.id_material}">Cantidad:</label>
+                            <input type="number" 
+                                   class="material-cantidad-input" 
+                                   id="cantidad-${material.id_material}"
+                                   min="1" 
+                                   max="${stock}"
+                                   value="1"
+                                   placeholder="Cant.">
+                            <span class="max-available">máx: ${stock}</span>
+                        </div>
+                        <button type="button" 
+                                class="btn btn-primary btn-add-material" 
+                                onclick="addMaterialToTask(${material.id_material}, '${material.nombre.replace(/'/g, "\\'")}', ${stock})"
+                                title="Agregar a la tarea">
+                            <i class="fas fa-plus"></i> Agregar
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        html += '</div>';
+    }
+
+    // Materiales agotados (colapsados)
+    if (materialesAgotados.length > 0) {
+        html += `
+            <div class="materiales-section agotados">
+                <h4 class="section-subtitle collapsed" onclick="toggleAgotadosSection()">
+                    <i class="fas fa-chevron-right"></i> 
+                    Materiales Agotados (${materialesAgotados.length})
+                </h4>
+                <div class="agotados-list" style="display: none;">
+                    ${materialesAgotados.map(material => `
+                        <div class="material-selector-item agotado" data-material-id="${material.id_material}">
+                            <div class="material-selector-info">
+                                <div class="material-selector-name">
+                                    <strong>${material.nombre}</strong>
+                                    <span class="stock-badge-small agotado">
+                                        <i class="fas fa-times-circle"></i> Sin stock
+                                    </span>
+                                </div>
+                                ${material.caracteristicas ? `<small style="color: #999;">${material.caracteristicas}</small>` : ''}
+                            </div>
+                            <button type="button" class="btn btn-secondary btn-small" disabled title="Sin stock disponible">
+                                <i class="fas fa-ban"></i> No disponible
+                            </button>
+                        </div>
+                    `).join('')}
                 </div>
             </div>
         `;
-    }).join('');
+    }
 
+    container.innerHTML = html;
+}
 
+// ========== TOGGLE SECCIÓN DE AGOTADOS ==========
+function toggleAgotadosSection() {
+    const subtitle = document.querySelector('.section-subtitle.collapsed');
+    const list = document.querySelector('.agotados-list');
+    const icon = subtitle.querySelector('i');
+    
+    if (list.style.display === 'none') {
+        list.style.display = 'block';
+        icon.className = 'fas fa-chevron-down';
+        subtitle.classList.remove('collapsed');
+    } else {
+        list.style.display = 'none';
+        icon.className = 'fas fa-chevron-right';
+        subtitle.classList.add('collapsed');
+    }
 }
 
 // ========== AGREGAR MATERIAL A LA LISTA ==========
@@ -3243,6 +3559,7 @@ function loadViviendas() {
         });
 }
 
+
 // ========== RENDERIZAR TABLA DE VIVIENDAS ==========
 function renderViviendasTable(viviendas) {
     const container = document.getElementById('viviendasTableContainer');
@@ -3265,11 +3582,11 @@ function renderViviendasTable(viviendas) {
             <table style="width: 100%; border-collapse: collapse; background: #FFFFFF; min-width: 1200px;">
                 <thead>
                     <tr style="background: linear-gradient(135deg, #005CB9 0%, #004494 100%); color: #FFFFFF;">
+                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">ID</th>
                         <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;">Número</th>
                         <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;">Dirección</th>
                         <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;">Tipo</th>
                         <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Estado</th>
-                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Metros²</th>
                         <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;">Asignada a</th>
                         <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Acciones</th>
                     </tr>
@@ -3300,17 +3617,21 @@ function renderViviendasTable(viviendas) {
                 onmouseover="this.style.background='#F5F7FA'" 
                 onmouseout="this.style.background='#FFFFFF'">
                 
+                <td style="padding: 14px 12px; text-align: center;">
+                    <div style="font-weight: 600; color: #005CB9; font-size: 14px;">#${vivienda.id_vivienda}</div>
+                </td>
+                
                 <td style="padding: 14px 12px; font-size: 13px;">
-                    <div style="font-weight: 600; color: #005CB9; font-size: 14px;">${vivienda.numero_vivienda}</div>
+                    <div style="font-weight: 600; color: #495057;">${vivienda.numero_vivienda}</div>
                 </td>
                 
                 <td style="padding: 14px 12px; font-size: 13px; color: #495057;">
                     ${vivienda.direccion || '-'}
                 </td>
                 
-                <td style="padding: 14px 12px; font-size: 13px; color: #495057;">
-                    <div style="font-weight: 600;">${vivienda.tipo_nombre}</div>
-                    <div style="font-size: 11px; color: #6C757D; margin-top: 3px;">${vivienda.habitaciones} habitaciones</div>
+                <td style="padding: 14px 12px; font-size: 13px;">
+                    <div style="font-weight: 600; color: #495057;">${vivienda.tipo_nombre}</div>
+                    <div style="font-size: 11px; color: #6C757D; margin-top: 3px;">${vivienda.habitaciones} hab. • ${vivienda.metros_cuadrados ? vivienda.metros_cuadrados + ' m²' : '-'}</div>
                 </td>
                 
                 <td style="padding: 14px 12px; text-align: center;">
@@ -3320,18 +3641,15 @@ function renderViviendasTable(viviendas) {
                         border-radius: 20px;
                         font-size: 11px;
                         font-weight: 600;
-                        text-transform: uppercase;
                         background: ${estadoColor};
                         color: #FFFFFF;
                     ">${estadoText}</span>
                 </td>
                 
-                <td style="padding: 14px 12px; text-align: center; font-size: 13px; color: #495057; font-weight: 600;">
-                    ${vivienda.metros_cuadrados ? vivienda.metros_cuadrados + ' m²' : '-'}
-                </td>
-                
-                <td style="padding: 14px 12px; font-size: 13px; color: #495057;">
-                    ${asignada !== '-' ? `<div style="font-weight: 600; color: #005CB9;">${asignada}</div>` : '<span style="color: #6C757D;">Sin asignar</span>'}
+                <td style="padding: 14px 12px; font-size: 13px;">
+                    ${asignada !== '-' 
+                        ? `<div style="color: #495057;">${asignada}</div>` 
+                        : '<span style="color: #6C757D; font-style: italic;">Sin asignar</span>'}
                 </td>
                 
                 <td style="padding: 14px 12px;">
@@ -3352,12 +3670,12 @@ function renderViviendasTable(viviendas) {
                         ${!tieneAsignacion ? `
                             <button class="btn-small btn-success" 
                                     onclick="showAsignarModal(${vivienda.id_vivienda}, '${vivienda.numero_vivienda.replace(/'/g, "\\'")}')">
-                                <i class="fas fa-user-plus"></i> Asignar
+                                <i class="fas fa-user-plus"></i>
                             </button>
                         ` : `
                             <button class="btn-small btn-warning" 
                                     onclick="desasignarVivienda(${vivienda.id_asignacion})">
-                                <i class="fas fa-user-minus"></i> Desasignar
+                                <i class="fas fa-user-minus"></i>
                             </button>
                         `}
                         
@@ -3375,7 +3693,7 @@ function renderViviendasTable(viviendas) {
     container.innerHTML = html;
 }
 
-console.log('✅ [VIVIENDAS TABLE] Tabla con estilos de cuotas aplicados');
+console.log(' [VIVIENDAS TABLE] Tabla con estilos de cuotas aplicados');
 console.log('🎨 [VIVIENDAS TABLE] Diseño moderno y consistente');
 
 // ========== FORMATEAR ESTADO ==========
@@ -3424,54 +3742,36 @@ function loadTiposVivienda() {
         .catch(error => console.error('Error al cargar tipos:', error));
 }
 
-// ========== MOSTRAR MODAL CREAR ==========
-function showCreateViviendaModal() {
-  
-
-    loadTiposVivienda().then(() => {
-        document.getElementById('viviendaModalTitle').textContent = 'Nueva Vivienda';
-        document.getElementById('vivienda-id').value = '';
-        document.getElementById('vivienda-numero').value = '';
-        document.getElementById('vivienda-direccion').value = '';
-        document.getElementById('vivienda-tipo').value = '';
-        document.getElementById('vivienda-metros').value = '';
-        document.getElementById('vivienda-fecha').value = '';
-        document.getElementById('vivienda-estado').value = 'disponible';
-        document.getElementById('vivienda-observaciones').value = '';
-        document.getElementById('viviendaModal').style.display = 'flex';
-    });
-}
-
 // ========== EDITAR VIVIENDA ==========
 function editVivienda(id) {
-    ('>>> Editando vivienda ID:', id);
-    ('🧹 Limpiando modales anteriores...');
+    console.log('>>> Editando vivienda ID:', id);
+    console.log('🧹 Limpiando modales anteriores...');
 
     // 🧹 LIMPIAR MODALES ANTERIORES
     limpiarModalesAnteriores();
 
     const modal = document.getElementById('viviendaModal');
-    ('🔍 Modal encontrado:', modal);
-    ('🔍 Modal display actual:', modal ? modal.style.display : 'NULL');
+    console.log('🔍 Modal encontrado:', modal);
+    console.log('🔍 Modal display actual:', modal ? modal.style.display : 'NULL');
     
     if (!modal) {
-        console.error(' Modal viviendaModal NO encontrado');
+        console.error('❌ Modal viviendaModal NO encontrado');
         alert('ERROR: Modal no encontrado. Recarga la página.');
         return;
     }
 
-    ('🌐 Cargando datos de vivienda...');
+    console.log('🌐 Cargando datos de vivienda...');
 
     Promise.all([
         fetch(`/api/viviendas/details?id=${id}`).then(r => r.json()),
         loadTiposVivienda()
     ]).then(([data]) => {
-        ('📦 Datos recibidos:', data);
+        console.log('📦 Datos recibidos:', data);
         
         if (data.success && data.vivienda) {
             const v = data.vivienda;
             
-            ('📝 Llenando formulario...');
+            console.log('📝 Llenando formulario...');
             document.getElementById('viviendaModalTitle').textContent = 'Editar Vivienda';
             document.getElementById('vivienda-id').value = v.id_vivienda;
             document.getElementById('vivienda-numero').value = v.numero_vivienda;
@@ -3482,19 +3782,42 @@ function editVivienda(id) {
             document.getElementById('vivienda-estado').value = v.estado;
             document.getElementById('vivienda-observaciones').value = v.observaciones || '';
 
-            ('👁️ Mostrando modal...');
+            console.log('👁️ Mostrando modal...');
             modal.style.display = 'flex';
-            (' Modal display después de mostrar:', modal.style.display);
-            (' Modal de edición mostrado correctamente');
+            console.log(' Modal display después de mostrar:', modal.style.display);
+            console.log(' Modal de edición mostrado correctamente');
+            
+            // Prevenir cierre al hacer clic fuera
+            setupModalNoCloseOutside(modal);
         } else {
-            console.error(' Error en data.success o data.vivienda');
+            console.error('❌ Error en data.success o data.vivienda');
             alert('Error al cargar vivienda');
         }
     }).catch(error => {
-        console.error(' Error completo:', error);
-        console.error(' Error stack:', error.stack);
+        console.error('❌ Error completo:', error);
+        console.error('❌ Error stack:', error.stack);
         alert('Error al cargar vivienda: ' + error.message);
     });
+}
+
+// ========== FUNCIÓN PARA EVITAR CIERRE AL CLIC EXTERIOR ==========
+function setupModalNoCloseOutside(modal) {
+    // Remover listeners previos si existen
+    const newModal = modal.cloneNode(true);
+    modal.parentNode.replaceChild(newModal, modal);
+    
+    // Obtener el contenido del modal
+    const modalContent = newModal.querySelector('.material-modal-content');
+    
+    if (modalContent) {
+        // Evitar que clics en el contenido cierren el modal
+        modalContent.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+    }
+    
+    // El modal ya NO se cierra al hacer clic en el fondo
+    // Solo se cierra con botones específicos (X o Cancelar)
 }
 
 // ========== GUARDAR VIVIENDA ==========
@@ -5439,14 +5762,14 @@ console.log('🟢 [LIQUIDACIÓN FIX] Cargando versión corregida...');
 window.liquidarDeudaCuota = async function(idCuota) {
     console.log('💰 [LIQUIDAR] Iniciando liquidación de cuota:', idCuota);
     
-    // ✅ PASO 1: VALIDACIÓN INICIAL
+    //  PASO 1: VALIDACIÓN INICIAL
     if (!idCuota || isNaN(idCuota)) {
         console.error('❌ [LIQUIDAR] ID de cuota inválido:', idCuota);
         alert('⚠️ Error: ID de cuota inválido');
         return;
     }
     
-    // ✅ PASO 2: OBTENER DETALLES DE LA CUOTA
+    //  PASO 2: OBTENER DETALLES DE LA CUOTA
     try {
         console.log('🔍 [LIQUIDAR] Obteniendo detalles de la cuota...');
         
@@ -5465,7 +5788,7 @@ window.liquidarDeudaCuota = async function(idCuota) {
         
         const cuota = data.cuota;
         
-        // ✅ PASO 3: VALIDAR ESTADO DE LA CUOTA
+        //  PASO 3: VALIDAR ESTADO DE LA CUOTA
         const estadoFinal = cuota.estado_actual || cuota.estado;
         
         if (estadoFinal === 'pagada') {
@@ -5480,7 +5803,7 @@ window.liquidarDeudaCuota = async function(idCuota) {
             return;
         }
         
-        // ✅ PASO 4: CALCULAR DEUDA TOTAL
+        //  PASO 4: CALCULAR DEUDA TOTAL
         const horasFaltantes = Math.max(0, (cuota.horas_requeridas || 0) - (cuota.horas_cumplidas || 0));
         const deudaHoras = horasFaltantes * 160; // $160 por hora
         const montoCuota = parseFloat(cuota.monto_total || cuota.monto_base || cuota.monto || 0);
@@ -5493,7 +5816,7 @@ window.liquidarDeudaCuota = async function(idCuota) {
             deudaTotal
         });
         
-        // ✅ PASO 5: CONFIRMACIÓN DEL ADMIN
+        //  PASO 5: CONFIRMACIÓN DEL ADMIN
         const nombreMes = obtenerNombreMes(cuota.mes);
         const nombreUsuario = cuota.nombre_completo || 'Usuario';
         
@@ -5522,7 +5845,7 @@ Esto significa que el usuario cubrió esta deuda con un pago actual.
             return;
         }
         
-        // ✅ PASO 6: EJECUTAR LIQUIDACIÓN
+        //  PASO 6: EJECUTAR LIQUIDACIÓN
         console.log('📤 [LIQUIDAR] Enviando solicitud de liquidación...');
         
         // Mostrar indicador de carga
@@ -5572,7 +5895,7 @@ Esto significa que el usuario cubrió esta deuda con un pago actual.
         let liquidarData;
         try {
             liquidarData = JSON.parse(responseText);
-            console.log('✅ [LIQUIDAR] JSON parseado correctamente:', liquidarData);
+            console.log(' [LIQUIDAR] JSON parseado correctamente:', liquidarData);
         } catch (parseError) {
             console.error('❌ [LIQUIDAR] Error al parsear JSON:', parseError);
             console.error('📄 [LIQUIDAR] Texto recibido:', responseText);
@@ -5586,8 +5909,8 @@ Esto significa que el usuario cubrió esta deuda con un pago actual.
         }
         
         if (liquidarData.success) {
-            // ✅ ÉXITO
-            alert(`✅ ${liquidarData.message || 'Deuda liquidada correctamente'}\n\nLa cuota ha sido marcada como PAGADA.`);
+            //  ÉXITO
+            alert(` ${liquidarData.message || 'Deuda liquidada correctamente'}\n\nLa cuota ha sido marcada como PAGADA.`);
             
             // Recargar tabla de cuotas
             if (typeof loadAllCuotasAdmin === 'function') {
@@ -5601,7 +5924,7 @@ Esto significa que el usuario cubrió esta deuda con un pago actual.
                 await loadEstadisticasCuotas();
             }
             
-            console.log('✅ [LIQUIDAR] Liquidación completada exitosamente');
+            console.log(' [LIQUIDAR] Liquidación completada exitosamente');
         } else {
             throw new Error(liquidarData.message || 'Error desconocido al liquidar');
         }
@@ -5850,7 +6173,7 @@ window.renderAllCuotasAdmin = function(cuotas) {
     container.innerHTML = html;
 };
 
-console.log('✅ [LIQUIDACIÓN FIX] Sistema corregido completamente');
+console.log(' [LIQUIDACIÓN FIX] Sistema corregido completamente');
 console.log('📦 [LIQUIDACIÓN FIX] Datos se envían como application/x-www-form-urlencoded');
 console.log('🎯 [LIQUIDACIÓN FIX] Listo para usar');
 
@@ -7195,7 +7518,7 @@ limpiarModalesUsuarios = function() {
     (' [OVERRIDE] renderUserRow actualizado sin columna Pago');
 })();
 
-// ========== SOBRESCRIBIR renderUsersTable PARA QUITAR HEADER DE PAGO ==========
+
 (function() {
     ('🔄 [OVERRIDE] Sobrescribiendo renderUsersTable para quitar header Pago...');
 

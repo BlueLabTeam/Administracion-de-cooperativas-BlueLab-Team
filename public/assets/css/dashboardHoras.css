@@ -183,20 +183,21 @@
     margin-bottom: var(--spacing-md);
     padding-bottom: var(--spacing-md);
     border-bottom: 2px solid rgba(0, 102, 204, 0.1);
-    flex-wrap: wrap;
-    gap: var(--spacing-xs);
+    gap: var(--spacing-sm);
 }
 
 .dia-header strong {
     font-size: 1.1em;
     color: var(--color-primary);
     font-weight: 700;
+    white-space: nowrap;
 }
 
 .dia-fecha {
     font-size: 0.8em;
     color: var(--color-gray-600);
     font-weight: 500;
+    white-space: nowrap;
 }
 
 .badge-hoy {

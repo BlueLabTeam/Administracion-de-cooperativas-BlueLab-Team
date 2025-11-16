@@ -233,7 +233,7 @@ const translations = {
         newMonthlyAmount: "Nuevo Monto Mensual *",
         amountPlaceholder: "Ej: 7500.00",
         priceChangeWarning: "Este cambio aplicará para las nuevas cuotas que se generen. Las cuotas ya existentes mantendrán su monto original.",
-        validatePayment: "✅ Validar Pago de Cuota",
+        validatePayment: " Validar Pago de Cuota",
         observationsOptional: "Observaciones (opcional)",
         validationComments: "Comentarios sobre la validación..."
       },
@@ -721,7 +721,7 @@ const translations = {
         newMonthlyAmount: "New Monthly Amount *",
         amountPlaceholder: "Ex: 7500.00",
         priceChangeWarning: "This change will apply to new fees that are generated. Existing fees will maintain their original amount.",
-        validatePayment: "✅ Validate Fee Payment",
+        validatePayment: " Validate Fee Payment",
         observationsOptional: "Observations (optional)",
         validationComments: "Comments about validation..."
       },

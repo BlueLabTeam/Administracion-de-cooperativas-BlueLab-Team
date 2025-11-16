@@ -250,7 +250,7 @@ class TaskController
 {
     header('Content-Type: application/json');
 
-    // ✅ LOGS DE DEBUG
+    //  LOGS DE DEBUG
     error_log("=== addAvance DEBUG ===");
     error_log("POST completo: " . print_r($_POST, true));
     error_log("FILES completo: " . print_r($_FILES, true));
@@ -265,7 +265,7 @@ class TaskController
         $comentario = $_POST['comentario'] ?? '';
         $progresoReportado = intval($_POST['progreso_reportado'] ?? 0);
 
-        // ✅ VALIDACIÓN CON DEBUG MEJORADO
+        //  VALIDACIÓN CON DEBUG MEJORADO
         if (empty($tareaId) || empty($comentario)) {
             echo json_encode([
                 'success' => false, 
@@ -279,9 +279,9 @@ class TaskController
                 ]
             ]);
             return;
-        } // ✅ ESTA LLAVE FALTABA - CIERRA EL IF DE VALIDACIÓN
+        } //  ESTA LLAVE FALTABA - CIERRA EL IF DE VALIDACIÓN
 
-        // ✅ AHORA EL CÓDIGO DE ARCHIVO ESTÁ EN EL NIVEL CORRECTO
+        //  AHORA EL CÓDIGO DE ARCHIVO ESTÁ EN EL NIVEL CORRECTO
         $archivoPath = null;
         if (isset($_FILES['archivo']) && $_FILES['archivo']['error'] === UPLOAD_ERR_OK) {
             $uploadDir = _DIR_ . '/../../storage/avances/';
@@ -302,7 +302,7 @@ class TaskController
             }
         }
 
-        // ✅ AHORA SÍ SE EJECUTA EL MODELO
+        //  AHORA SÍ SE EJECUTA EL MODELO
         $this->taskModel->addAvance(
             $tareaId,
             $_SESSION['user_id'],
