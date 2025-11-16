@@ -550,42 +550,89 @@
 
 
 		<!-- Modal para validar pago -->
-		<div id="validarPagoModal" class="modal-overlay" style="display: none;">
-			<div class="modal-content-large">
-				<button class="modal-close-btn" onclick="closeValidarPagoModal()">×</button>
-				
-				<h2 class="modal-title" data-i18n="dashboardAdmin.billing.validatePayment"> Validar Pago de Cuota</h2>
-				
-				<div id="pago-info-validar">
-					<!-- Info se carga dinámicamente -->
-				</div>
-				
-				<form id="validarPagoForm" onsubmit="submitValidarPago(event)">
-					<input type="hidden" id="validar-pago-id">
-					<input type="hidden" id="validar-accion">
-					
-					<div class="form-group">
-						<label for="validar-observaciones" data-i18n="dashboardAdmin.billing.observationsOptional">Observaciones (opcional)</label>
-						<textarea id="validar-observaciones" 
-								  rows="3" 
-								  data-i18n-placeholder="dashboardAdmin.billing.validationComments"
-								  placeholder="Comentarios sobre la validación..."></textarea>
-					</div>
-					
-					<div class="form-actions">
-						<button type="button" class="btn btn-secondary" onclick="closeValidarPagoModal()" data-i18n="common.cancel">
-							Cancelar
-						</button>
-						<button type="button" class="btn btn-danger" onclick="rechazarPagoAdmin()">
-							<i class="fas fa-times"></i> <span data-i18n="common.reject">Rechazar</span>
-						</button>
-						<button type="button" class="btn btn-primary" onclick="aprobarPagoAdmin()">
-							<i class="fas fa-check"></i> <span data-i18n="common.approve">Aprobar</span>
-						</button>
-					</div>
-				</form>
-			</div>
-		</div>
+<div id="validarPagoModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:10000;align-items:center;justify-content:center;padding:20px;">
+    <div style="background:white;border-radius:16px;max-width:600px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,0.2);">
+        <!-- Header -->
+        <div style="background:linear-gradient(135deg,#005CB9 0%,#004494 100%);color:white;padding:24px;border-radius:16px 16px 0 0;position:relative;">
+            <h3 style="margin:0;font-size:20px;font-weight:700;">
+                <i class="fas fa-check-circle" style="margin-right:10px;"></i>
+                Validar Pago de Cuota
+            </h3>
+            <button onclick="closeValidarPagoModal()" style="position:absolute;top:20px;right:20px;background:rgba(255,255,255,0.2);border:none;color:white;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;transition:all 0.3s;">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <!-- Body -->
+        <div style="padding:24px;">
+            <input type="hidden" id="validar-id-pago">
+            
+            <!-- Información de la cuota -->
+            <div style="background:#F5F7FA;border-radius:12px;padding:20px;margin-bottom:20px;">
+                <div style="margin-bottom:15px;">
+                    <label style="color:#6C757D;font-size:13px;font-weight:600;display:block;margin-bottom:5px;">Usuario:</label>
+                    <div id="validar-usuario" style="color:#005CB9;font-size:16px;font-weight:700;"></div>
+                </div>
+                
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;">
+                    <div>
+                        <label style="color:#6C757D;font-size:13px;font-weight:600;display:block;margin-bottom:5px;">Período:</label>
+                        <div id="validar-periodo" style="color:#495057;font-size:14px;font-weight:600;"></div>
+                    </div>
+                    <div>
+                        <label style="color:#6C757D;font-size:13px;font-weight:600;display:block;margin-bottom:5px;">Monto:</label>
+                        <div id="validar-monto" style="color:#005CB9;font-size:16px;font-weight:700;"></div>
+                    </div>
+                </div>
+                
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-top:15px;">
+                    <div>
+                        <label style="color:#6C757D;font-size:13px;font-weight:600;display:block;margin-bottom:5px;">Método de Pago:</label>
+                        <div id="validar-metodo" style="color:#495057;font-size:14px;"></div>
+                    </div>
+                    <div>
+                        <label style="color:#6C757D;font-size:13px;font-weight:600;display:block;margin-bottom:5px;">Fecha de Pago:</label>
+                        <div id="validar-fecha" style="color:#495057;font-size:14px;"></div>
+                    </div>
+                </div>
+                
+                <div style="margin-top:15px;">
+                    <label style="color:#6C757D;font-size:13px;font-weight:600;display:block;margin-bottom:5px;">Número de Comprobante:</label>
+                    <div id="validar-numero" style="color:#495057;font-size:14px;"></div>
+                </div>
+            </div>
+            
+            <!-- Comprobante -->
+            <div style="margin-bottom:20px;">
+                <label style="color:#6C757D;font-size:13px;font-weight:600;display:block;margin-bottom:10px;">
+                    <i class="fas fa-image" style="margin-right:5px;"></i>
+                    Comprobante:
+                </label>
+                <div id="validar-comprobante-img" style="border:2px solid #E8EBF0;border-radius:12px;padding:15px;min-height:200px;display:flex;align-items:center;justify-content:center;"></div>
+            </div>
+            
+            <!-- Observaciones -->
+            <div style="margin-bottom:24px;">
+                <label style="color:#6C757D;font-size:13px;font-weight:600;display:block;margin-bottom:8px;">
+                    Observaciones (opcional):
+                </label>
+                <textarea id="validar-observaciones" rows="3" placeholder="Agrega comentarios sobre esta validación..." style="width:100%;padding:12px;border:2px solid #E8EBF0;border-radius:8px;font-size:14px;font-family:inherit;resize:vertical;"></textarea>
+            </div>
+            
+            <!-- Botones -->
+            <div style="display:flex;gap:12px;">
+                <button onclick="submitValidarPago('rechazar')" style="flex:1;padding:14px;background:#F44336;color:white;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;transition:all 0.3s;">
+                    <i class="fas fa-times-circle" style="margin-right:8px;"></i>
+                    Rechazar Pago
+                </button>
+                <button onclick="submitValidarPago('aprobar')" style="flex:1;padding:14px;background:#4CAF50;color:white;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;transition:all 0.3s;">
+                    <i class="fas fa-check-circle" style="margin-right:8px;"></i>
+                    Aprobar Pago
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
 		<!-- SECCIÓN MATERIALES -->
 		<section id="materiales-section" class="section-content">

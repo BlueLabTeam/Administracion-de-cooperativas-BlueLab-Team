@@ -1,10 +1,6 @@
-
-
 (function() {
     'use strict';
     
-  
-
     // Evitar carga duplicada
     if (window.GestionCuotasCargado) {
         console.warn('⚠️ [CUOTAS] Ya cargado');
@@ -87,8 +83,6 @@
     // ========== CARGAR PRECIOS ==========
 
     window.loadPreciosCuotas = async function() {
-   
-        
         const container = document.getElementById('preciosCuotasContainer');
         if (!container) {
             console.error('❌ [CUOTAS] Container no encontrado');
@@ -100,8 +94,6 @@
         try {
             const response = await fetch('/api/cuotas/precios');
             const data = await response.json();
-            
-         
             
             if (data.success) {
                 renderPreciosCuotas(data.precios);
@@ -115,50 +107,42 @@
     };
 
     function renderPreciosCuotas(precios) {
- 
-    
-    const container = document.getElementById('preciosCuotasContainer');
-    container.innerHTML = '';
-    
-    if (!precios || precios.length === 0) {
-        container.innerHTML = '<p>No hay precios configurados</p>';
-        return;
-    }
-
-    precios.sort(function(a, b) { return a.habitaciones - b.habitaciones; });
-    
-    let html = '<div class="precios-grid">';
-    
-    precios.forEach(function(precio) {
-        const iconos = { 1: '🏠', 2: '🏡', 3: '👨‍👩‍👧‍👦' };
-        const icono = iconos[precio.habitaciones] || '🏠';
-        const monto = parseFloat(precio.monto_mensual).toLocaleString('es-UY', {minimumFractionDigits: 2});
-        const fecha = formatearFechaUY(precio.fecha_vigencia_desde);
-
-        html += '<div style="background:' + COLORS.white + ';border-radius:12px;padding:24px;box-shadow:' + COLORS.shadow + ';border-top:4px solid ' + COLORS.primary + ';">';
-        html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">';
-        html += '<div><span style="font-size:40px;">' + icono + '</span><h4 style="color:' + COLORS.primary + ';margin:10px 0 0 0;">' + precio.tipo_vivienda + '</h4></div>';
+        const container = document.getElementById('preciosCuotasContainer');
+        container.innerHTML = '';
         
-       
+        if (!precios || precios.length === 0) {
+            container.innerHTML = '<p>No hay precios configurados</p>';
+            return;
+        }
+
+        precios.sort(function(a, b) { return a.habitaciones - b.habitaciones; });
+        
+        let html = '<div class="precios-grid">';
+        
+        precios.forEach(function(precio) {
+            const iconos = { 1: '🏠', 2: '🏡', 3: '👨‍👩‍👧‍👦' };
+            const icono = iconos[precio.habitaciones] || '🏠';
+            const monto = parseFloat(precio.monto_mensual).toLocaleString('es-UY', {minimumFractionDigits: 2});
+            const fecha = formatearFechaUY(precio.fecha_vigencia_desde);
+
+            html += '<div style="background:' + COLORS.white + ';border-radius:12px;padding:24px;box-shadow:' + COLORS.shadow + ';border-top:4px solid ' + COLORS.primary + ';">';
+            html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">';
+            html += '<div><span style="font-size:40px;">' + icono + '</span><h4 style="color:' + COLORS.primary + ';margin:10px 0 0 0;">' + precio.tipo_vivienda + '</h4></div>';
+            html += '</div>';
+            html += '<div style="margin:20px 0;"><span style="color:' + COLORS.gray500 + ';font-size:13px;">Cuota Mensual:</span><br><span style="color:' + COLORS.primary + ';font-size:32px;font-weight:700;">$' + monto + '</span></div>';
+            html += '<div style="display:flex;justify-content:space-between;padding-top:15px;border-top:1px solid ' + COLORS.gray100 + ';">';
+            html += '<small style="color:' + COLORS.gray500 + ';">Vigente desde: ' + fecha + '</small>';
+            html += '<button class="btn-small btn-edit" onclick="editarPrecioCuota(' + precio.id_tipo + ',\'' + precio.tipo_vivienda + '\',' + precio.monto_mensual + ')"><i class="fas fa-edit"></i> Editar</button>';
+            html += '</div></div>';
+        });
         
         html += '</div>';
-        html += '<div style="margin:20px 0;"><span style="color:' + COLORS.gray500 + ';font-size:13px;">Cuota Mensual:</span><br><span style="color:' + COLORS.primary + ';font-size:32px;font-weight:700;">$' + monto + '</span></div>';
-        html += '<div style="display:flex;justify-content:space-between;padding-top:15px;border-top:1px solid ' + COLORS.gray100 + ';">';
-        html += '<small style="color:' + COLORS.gray500 + ';">Vigente desde: ' + fecha + '</small>';
-        html += '<button class="btn-small btn-edit" onclick="editarPrecioCuota(' + precio.id_tipo + ',\'' + precio.tipo_vivienda + '\',' + precio.monto_mensual + ')"><i class="fas fa-edit"></i> Editar</button>';
-        html += '</div></div>';
-    });
-    
-    html += '</div>';
-    container.innerHTML = html;
-
-}
+        container.innerHTML = html;
+    }
 
     // ========== EDITAR PRECIO ==========
 
     window.editarPrecioCuota = function(idTipo, nombreTipo, montoActual) {
-  
-        
         document.getElementById('precio-id-tipo').value = idTipo;
         document.getElementById('precio-tipo-nombre').innerHTML = '<strong style="font-size:18px;color:' + COLORS.primary + ';">' + nombreTipo + '</strong><p style="margin:10px 0 0 0;font-size:13px;color:' + COLORS.gray500 + ';">Monto actual: $' + parseFloat(montoActual).toLocaleString('es-UY', {minimumFractionDigits: 2}) + '</p>';
         document.getElementById('precio-monto').value = '';
@@ -246,8 +230,6 @@
     // ========== ESTADÍSTICAS ==========
 
     window.loadEstadisticasCuotas = async function() {
-       
-        
         try {
             const mes = document.getElementById('admin-filtro-mes') ? document.getElementById('admin-filtro-mes').value : '';
             const anio = document.getElementById('admin-filtro-anio') ? document.getElementById('admin-filtro-anio').value : '';
@@ -271,8 +253,6 @@
                 if (pagadasEl) pagadasEl.textContent = stats.pagadas || 0;
                 if (pendientesEl) pendientesEl.textContent = stats.pendientes || 0;
                 if (montoEl) montoEl.textContent = '$' + parseFloat(stats.monto_cobrado || 0).toLocaleString('es-UY', {minimumFractionDigits: 2});
-                
-          
             }
         } catch (error) {
             console.error('❌ [CUOTAS] Error:', error);
@@ -282,8 +262,6 @@
     // ========== CARGAR CUOTAS ==========
 
     window.loadAllCuotasAdmin = async function() {
-      
-        
         const container = document.getElementById('allCuotasAdminContainer');
         if (!container) {
             console.error('❌ [CUOTAS] Container no encontrado');
@@ -302,11 +280,8 @@
             if (anio) url += 'anio=' + anio + '&';
             if (estado) url += 'estado=' + estado + '&';
             
-       
-            
             const response = await fetch(url);
             const data = await response.json();
- 
             
             if (data.success) {
                 renderAllCuotasAdmin(data.cuotas);
@@ -321,8 +296,6 @@
     };
 
     function renderAllCuotasAdmin(cuotas) {
-
-        
         const container = document.getElementById('allCuotasAdminContainer');
 
         if (!cuotas || cuotas.length === 0) {
@@ -362,12 +335,19 @@
             html += '<td style="padding:14px 12px;text-align:center;">' + formatearFechaUY(cuota.fecha_vencimiento) + '</td>';
             html += '<td style="padding:14px 12px;"><div style="display:flex;gap:5px;justify-content:center;">';
             
+            // Botón ver comprobante
             if (cuota.comprobante_archivo) {
                 html += '<button class="btn-small btn-secondary" onclick="window.open(\'/files/?path=' + cuota.comprobante_archivo + '\',\'_blank\')"><i class="fas fa-image"></i></button>';
             }
             
+            // 🆕 Botón validar pago (solo si hay pago pendiente)
+            if (cuota.id_pago && cuota.estado_pago === 'pendiente') {
+                html += '<button class="btn-small btn-warning" onclick="abrirModalValidarPago(' + cuota.id_pago + ',' + cuota.id_cuota + ')" title="Validar Pago"><i class="fas fa-check-circle"></i></button>';
+            }
+            
+            // Botón liquidar deuda
             if (estadoFinal !== 'pagada') {
-                html += '<button class="btn-small btn-success" onclick="liquidarDeudaCuota(' + cuota.id_cuota + ')"><i class="fas fa-hand-holding-usd"></i></button>';
+                html += '<button class="btn-small btn-success" onclick="liquidarDeudaCuota(' + cuota.id_cuota + ')" title="Liquidar Deuda"><i class="fas fa-hand-holding-usd"></i></button>';
             }
             
             html += '</div></td></tr>';
@@ -375,9 +355,95 @@
         
         html += '</tbody></table></div>';
         container.innerHTML = html;
-        
-   
     }
+
+    // ========== VALIDAR PAGO ==========
+
+    window.abrirModalValidarPago = async function(idPago, idCuota) {
+        mostrarCargando('Cargando información del pago...');
+        
+        try {
+            const response = await fetch('/api/cuotas/detalle?cuota_id=' + idCuota);
+            const data = await response.json();
+            
+            if (!data.success) {
+                alert('❌ Error al cargar información del pago');
+                ocultarCargando();
+                return;
+            }
+            
+            const cuota = data.cuota;
+            
+            // Llenar modal con información
+            document.getElementById('validar-id-pago').value = idPago;
+            document.getElementById('validar-usuario').textContent = cuota.nombre_completo || 'Usuario';
+            document.getElementById('validar-periodo').textContent = obtenerNombreMes(cuota.mes) + ' ' + cuota.anio;
+            document.getElementById('validar-monto').textContent = '$' + parseFloat(cuota.monto_total || 0).toLocaleString('es-UY', {minimumFractionDigits: 2});
+            document.getElementById('validar-metodo').textContent = cuota.metodo_pago || '-';
+            document.getElementById('validar-numero').textContent = cuota.numero_comprobante || 'Sin número';
+            document.getElementById('validar-fecha').textContent = formatearFechaUY(cuota.fecha_pago);
+            
+            // Mostrar comprobante
+            const imgContainer = document.getElementById('validar-comprobante-img');
+            if (cuota.comprobante_archivo) {
+                imgContainer.innerHTML = '<img src="/files/?path=' + cuota.comprobante_archivo + '" style="max-width:100%;height:auto;border-radius:8px;cursor:pointer;" onclick="window.open(\'/files/?path=' + cuota.comprobante_archivo + '\',\'_blank\')">';
+            } else {
+                imgContainer.innerHTML = '<p style="color:' + COLORS.gray500 + ';text-align:center;">Sin comprobante</p>';
+            }
+            
+            ocultarCargando();
+            document.getElementById('validarPagoModal').style.display = 'flex';
+            
+        } catch (error) {
+            console.error('❌ Error:', error);
+            alert('❌ Error al cargar información');
+            ocultarCargando();
+        }
+    };
+
+    window.closeValidarPagoModal = function() {
+        document.getElementById('validarPagoModal').style.display = 'none';
+        document.getElementById('validar-observaciones').value = '';
+    };
+
+    window.submitValidarPago = async function(accion) {
+        const idPago = document.getElementById('validar-id-pago').value;
+        const observaciones = document.getElementById('validar-observaciones').value;
+        
+        const textoAccion = accion === 'aprobar' ? 'aprobar' : 'rechazar';
+        
+        if (!confirm('¿Confirmas que deseas ' + textoAccion + ' este pago?')) return;
+        
+        mostrarCargando('Procesando...');
+        
+        try {
+            const formData = new FormData();
+            formData.append('pago_id', idPago);
+            formData.append('accion', accion);
+            formData.append('observaciones', observaciones);
+            
+            const response = await fetch('/api/cuotas/validar-pago', {
+                method: 'POST',
+                body: formData
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                alert('✅ ' + data.message);
+                window.closeValidarPagoModal();
+                await window.loadAllCuotasAdmin();
+                await window.loadEstadisticasCuotas();
+            } else {
+                alert('❌ ' + data.message);
+            }
+        } catch (error) {
+            console.error('❌ Error:', error);
+            alert('❌ Error al validar pago');
+        } finally {
+            ocultarCargando();
+        }
+    };
 
     // ========== LIQUIDAR ==========
 
@@ -416,13 +482,13 @@
     // ========== INICIALIZACIÓN ==========
 
     function inicializar() {
-
         poblarSelectorAnios();
         console.log('✅ [CUOTAS] Módulo cargado completamente');
         console.log('✅ [CUOTAS] Funciones disponibles:', {
             loadPreciosCuotas: typeof window.loadPreciosCuotas,
             loadAllCuotasAdmin: typeof window.loadAllCuotasAdmin,
-            loadEstadisticasCuotas: typeof window.loadEstadisticasCuotas
+            loadEstadisticasCuotas: typeof window.loadEstadisticasCuotas,
+            abrirModalValidarPago: typeof window.abrirModalValidarPago
         });
     }
 

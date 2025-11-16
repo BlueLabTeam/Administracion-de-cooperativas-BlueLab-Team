@@ -1,4 +1,3 @@
-
 console.log('🟢 [MÓDULO VIVIENDAS] Cargando...');
 
 // ========== NAMESPACE ==========
@@ -25,25 +24,19 @@ const COLORS = {
 
 // ========== INICIALIZACIÓN ==========
 function inicializarModuloViviendas() {
-
-    
     const viviendasMenuItem = document.querySelector('.menu li[data-section="viviendas"]');
     if (viviendasMenuItem) {
         viviendasMenuItem.addEventListener('click', function() {
-          
             loadViviendas();
             loadTiposVivienda();
         });
     }
     
     window.ViviendasModule.loaded = true;
-   
 }
 
 // ========== CARGAR VIVIENDAS ==========
 async function loadViviendas() {
- 
-    
     const container = document.getElementById('viviendasTableContainer');
 
     if (!container) {
@@ -227,8 +220,6 @@ async function loadTiposVivienda() {
 
 // ========== MOSTRAR MODAL CREAR ==========
 function showCreateViviendaModal() {
-
-    
     limpiarModalesAnteriores();
 
     const modal = document.getElementById('viviendaModal');
@@ -262,8 +253,6 @@ function showCreateViviendaModal() {
 
 // ========== EDITAR VIVIENDA ==========
 function editVivienda(id) {
-  
-    
     limpiarModalesAnteriores();
 
     const modal = document.getElementById('viviendaModal');
@@ -318,7 +307,6 @@ function closeViviendaModal() {
 async function saveVivienda(event) {
     event.preventDefault();
 
-
     const id = document.getElementById('vivienda-id').value;
     const formData = new FormData();
 
@@ -356,8 +344,6 @@ async function saveVivienda(event) {
 
 // ========== VER DETALLES ==========
 async function viewViviendaDetails(id) {
- 
-    
     try {
         const response = await fetch(`/api/viviendas/details?id=${id}`);
         const data = await response.json();
@@ -408,96 +394,266 @@ function showViviendaDetailsModal(vivienda) {
     document.body.insertAdjacentHTML('beforeend', modal);
 }
 
-// ========== ASIGNAR VIVIENDA ==========
+// ========== ASIGNAR VIVIENDA - MODAL ÚNICO ==========
 async function asignarVivienda(viviendaId, numeroVivienda) {
-  
+    limpiarModalesAnteriores();
+
+    // Cargar usuarios y núcleos en paralelo
+    try {
+        const [usuariosResponse, nucleosResponse] = await Promise.all([
+            fetch('/api/users/all').then(r => r.json()),
+            fetch('/api/nucleos/all').then(r => r.json())
+        ]);
+
+        if (!usuariosResponse.success || !nucleosResponse.success) {
+            alert('❌ Error al cargar datos');
+            return;
+        }
+
+        const usuarios = usuariosResponse.users.filter(u => u.estado === 'aceptado');
+        const nucleos = nucleosResponse.nucleos;
+
+        mostrarModalAsignacion(viviendaId, numeroVivienda, usuarios, nucleos);
+
+    } catch (error) {
+        console.error('❌ [VIVIENDAS] Error:', error);
+        alert('❌ Error al cargar datos');
+    }
+}
+
+// ========== MOSTRAR MODAL DE ASIGNACIÓN ==========
+function mostrarModalAsignacion(viviendaId, numeroVivienda, usuarios, nucleos) {
+    const modalHTML = `
+        <div class="modal-overlay" id="asignarModalOverlay" style="
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        ">
+            <div class="modal-content" style="
+                background: white;
+                border-radius: 12px;
+                padding: 0;
+                max-width: 700px;
+                width: 90%;
+                max-height: 85vh;
+                overflow: hidden;
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+                position: relative;
+            ">
+                <div style="
+                    background: linear-gradient(135deg, ${COLORS.primary} 0%, ${COLORS.primaryDark} 100%);
+                    padding: 25px 30px;
+                    color: white;
+                    position: relative;
+                ">
+                    <button onclick="closeAsignarModal()" style="
+                        position: absolute;
+                        top: 15px;
+                        right: 15px;
+                        background: rgba(255,255,255,0.2);
+                        border: none;
+                        width: 32px;
+                        height: 32px;
+                        border-radius: 50%;
+                        font-size: 20px;
+                        cursor: pointer;
+                        color: white;
+                        transition: all 0.2s;
+                    " onmouseover="this.style.background='rgba(255,255,255,0.3)'" 
+                       onmouseout="this.style.background='rgba(255,255,255,0.2)'">×</button>
+                    
+                    <h2 style="margin: 0; font-size: 22px; font-weight: 600;">
+                        <i class="fas fa-user-plus"></i> Asignar Vivienda
+                    </h2>
+                    <p style="margin: 8px 0 0 0; opacity: 0.9; font-size: 14px;">
+                        Vivienda: <strong>${numeroVivienda}</strong>
+                    </p>
+                </div>
+
+                <form id="asignarForm" onsubmit="submitAsignacion(event, ${viviendaId})" style="padding: 30px;">
+                    
+                    <!-- Tipo de asignación -->
+                    <div class="form-group" style="margin-bottom: 25px;">
+                        <label style="display: block; margin-bottom: 10px; font-weight: 600; color: ${COLORS.gray700};">
+                            Tipo de Asignación <span style="color: red;">*</span>
+                        </label>
+                        <div style="display: flex; gap: 15px;">
+                            <label style="
+                                flex: 1;
+                                display: flex;
+                                align-items: center;
+                                padding: 15px;
+                                border: 2px solid ${COLORS.gray100};
+                                border-radius: 8px;
+                                cursor: pointer;
+                                transition: all 0.2s;
+                            " onmouseover="this.style.borderColor='${COLORS.primary}'; this.style.background='${COLORS.primaryLight}'" 
+                               onmouseout="if(!this.querySelector('input').checked) {this.style.borderColor='${COLORS.gray100}'; this.style.background='white'}">
+                                <input type="radio" name="tipoAsignacion" value="usuario" 
+                                       onchange="toggleAsignacionListas()" 
+                                       style="margin-right: 10px; width: 18px; height: 18px; cursor: pointer;">
+                                <div>
+                                    <div style="font-weight: 600; color: ${COLORS.gray700};">
+                                        <i class="fas fa-user" style="margin-right: 8px; color: ${COLORS.primary};"></i>
+                                        Usuario Individual
+                                    </div>
+                                    <div style="font-size: 12px; color: ${COLORS.gray500}; margin-top: 3px;">
+                                        Asignar a una persona
+                                    </div>
+                                </div>
+                            </label>
+                            
+                            <label style="
+                                flex: 1;
+                                display: flex;
+                                align-items: center;
+                                padding: 15px;
+                                border: 2px solid ${COLORS.gray100};
+                                border-radius: 8px;
+                                cursor: pointer;
+                                transition: all 0.2s;
+                            " onmouseover="this.style.borderColor='${COLORS.success}'; this.style.background='#E8F5E9'" 
+                               onmouseout="if(!this.querySelector('input').checked) {this.style.borderColor='${COLORS.gray100}'; this.style.background='white'}">
+                                <input type="radio" name="tipoAsignacion" value="nucleo" 
+                                       onchange="toggleAsignacionListas()" 
+                                       style="margin-right: 10px; width: 18px; height: 18px; cursor: pointer;">
+                                <div>
+                                    <div style="font-weight: 600; color: ${COLORS.gray700};">
+                                        <i class="fas fa-users" style="margin-right: 8px; color: ${COLORS.success};"></i>
+                                        Núcleo Familiar
+                                    </div>
+                                    <div style="font-size: 12px; color: ${COLORS.gray500}; margin-top: 3px;">
+                                        Asignar a una familia
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Lista de Usuarios -->
+                    <div id="usuariosContainer" style="display: none;">
+                        <label style="display: block; margin-bottom: 10px; font-weight: 600; color: ${COLORS.gray700};">
+                            Seleccionar Usuario <span style="color: red;">*</span>
+                        </label>
+                        <select id="selectUsuario" class="form-control" style="
+                            width: 100%;
+                            padding: 12px;
+                            border: 2px solid ${COLORS.gray100};
+                            border-radius: 8px;
+                            font-size: 14px;
+                            background: white;
+                        ">
+                            <option value="">-- Seleccione un usuario --</option>
+                            ${usuarios.map(u => `
+                                <option value="${u.id_usuario}">${u.nombre_completo} (${u.email})</option>
+                            `).join('')}
+                        </select>
+                    </div>
+
+                    <!-- Lista de Núcleos -->
+                    <div id="nucleosContainer" style="display: none;">
+                        <label style="display: block; margin-bottom: 10px; font-weight: 600; color: ${COLORS.gray700};">
+                            Seleccionar Núcleo Familiar <span style="color: red;">*</span>
+                        </label>
+                        <select id="selectNucleo" class="form-control" style="
+                            width: 100%;
+                            padding: 12px;
+                            border: 2px solid ${COLORS.gray100};
+                            border-radius: 8px;
+                            font-size: 14px;
+                            background: white;
+                        ">
+                            <option value="">-- Seleccione un núcleo --</option>
+                            ${nucleos.map(n => `
+                                <option value="${n.id_nucleo}">${n.nombre_nucleo || 'Núcleo sin nombre'} (${n.total_miembros} miembros)</option>
+                            `).join('')}
+                        </select>
+                    </div>
+
+                    <!-- Botones -->
+                    <div style="display: flex; gap: 10px; margin-top: 30px; justify-content: flex-end;">
+                        <button type="button" onclick="closeAsignarModal()" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-check"></i> Asignar Vivienda
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    document.body.style.overflow = 'hidden';
+}
+
+// ========== TOGGLE ENTRE LISTAS ==========
+function toggleAsignacionListas() {
+    const tipo = document.querySelector('input[name="tipoAsignacion"]:checked')?.value;
+    const usuariosContainer = document.getElementById('usuariosContainer');
+    const nucleosContainer = document.getElementById('nucleosContainer');
+    const selectUsuario = document.getElementById('selectUsuario');
+    const selectNucleo = document.getElementById('selectNucleo');
+
+    if (tipo === 'usuario') {
+        usuariosContainer.style.display = 'block';
+        nucleosContainer.style.display = 'none';
+        selectNucleo.value = '';
+    } else if (tipo === 'nucleo') {
+        usuariosContainer.style.display = 'none';
+        nucleosContainer.style.display = 'block';
+        selectUsuario.value = '';
+    }
+}
+
+// ========== CERRAR MODAL ASIGNACIÓN ==========
+function closeAsignarModal() {
+    const modal = document.getElementById('asignarModalOverlay');
+    if (modal) {
+        modal.remove();
+    }
+    document.body.style.overflow = 'auto';
+}
+
+// ========== SUBMIT ASIGNACIÓN ==========
+async function submitAsignacion(event, viviendaId) {
+    event.preventDefault();
+
+    const tipo = document.querySelector('input[name="tipoAsignacion"]:checked')?.value;
     
-    const tipo = prompt(
-        `🏠 Asignar Vivienda: ${numeroVivienda}\n\n` +
-        `Selecciona el tipo de asignación:\n` +
-        `1 = Usuario Individual\n` +
-        `2 = Núcleo Familiar\n\n` +
-        `Escribe 1 o 2:`
-    );
-    
-    if (!tipo || (tipo !== '1' && tipo !== '2')) {
+    if (!tipo) {
+        alert('❌ Debes seleccionar el tipo de asignación');
         return;
     }
-    
-    const esUsuario = tipo === '1';
-    
+
+    const formData = new FormData();
+    formData.append('vivienda_id', viviendaId);
+
+    if (tipo === 'usuario') {
+        const usuarioId = document.getElementById('selectUsuario').value;
+        if (!usuarioId) {
+            alert('❌ Debes seleccionar un usuario');
+            return;
+        }
+        formData.append('usuario_id', usuarioId);
+    } else {
+        const nucleoId = document.getElementById('selectNucleo').value;
+        if (!nucleoId) {
+            alert('❌ Debes seleccionar un núcleo familiar');
+            return;
+        }
+        formData.append('nucleo_id', nucleoId);
+    }
+
     try {
-        let opciones = [];
-        let titulo = '';
-        
-        if (esUsuario) {
-            const response = await fetch('/api/users/all');
-            const data = await response.json();
-            
-            if (!data.success) throw new Error('Error al cargar usuarios');
-            
-            opciones = data.users.filter(u => u.estado === 'aceptado');
-            titulo = '👤 USUARIOS DISPONIBLES';
-            
-        } else {
-            const response = await fetch('/api/nucleos/all');
-            const data = await response.json();
-            
-            if (!data.success) throw new Error('Error al cargar núcleos');
-            
-            opciones = data.nucleos;
-            titulo = '👨‍👩‍👧‍👦 NÚCLEOS FAMILIARES';
-        }
-        
-        if (opciones.length === 0) {
-            alert('❌ No hay ' + (esUsuario ? 'usuarios' : 'núcleos') + ' disponibles');
-            return;
-        }
-        
-        let mensaje = `${titulo}\n\n`;
-        
-        if (esUsuario) {
-            opciones.forEach((u, idx) => {
-                mensaje += `${idx + 1}. ${u.nombre_completo} (${u.email})\n`;
-            });
-            mensaje += `\n📝 Ingresa el número del usuario:`;
-        } else {
-            opciones.forEach((n, idx) => {
-                mensaje += `${idx + 1}. ${n.nombre_nucleo || 'Sin nombre'} (${n.total_miembros} miembros)\n`;
-            });
-            mensaje += `\n📝 Ingresa el número del núcleo:`;
-        }
-        
-        const seleccion = prompt(mensaje);
-        
-        if (!seleccion) return;
-        
-        const index = parseInt(seleccion) - 1;
-        
-        if (index < 0 || index >= opciones.length) {
-            alert('❌ Selección inválida');
-            return;
-        }
-        
-        const opcionSeleccionada = opciones[index];
-        
-        const nombreMostrar = esUsuario ? 
-            opcionSeleccionada.nombre_completo : 
-            opcionSeleccionada.nombre_nucleo || 'Núcleo sin nombre';
-        
-        if (!confirm(`¿Asignar vivienda ${numeroVivienda} a ${nombreMostrar}?`)) {
-            return;
-        }
-        
-        const formData = new FormData();
-        formData.append('vivienda_id', viviendaId);
-        
-        if (esUsuario) {
-            formData.append('usuario_id', opcionSeleccionada.id_usuario);
-        } else {
-            formData.append('nucleo_id', opcionSeleccionada.id_nucleo);
-        }
-        
         const response = await fetch('/api/viviendas/asignar', {
             method: 'POST',
             body: formData
@@ -507,6 +663,7 @@ async function asignarVivienda(viviendaId, numeroVivienda) {
         
         if (data.success) {
             alert('✅ ' + data.message);
+            closeAsignarModal();
             loadViviendas();
         } else {
             alert('❌ Error: ' + data.message);
@@ -514,14 +671,12 @@ async function asignarVivienda(viviendaId, numeroVivienda) {
         
     } catch (error) {
         console.error('❌ [VIVIENDAS] Error:', error);
-        alert('❌ Error: ' + error.message);
+        alert('❌ Error de conexión');
     }
 }
 
 // ========== DESASIGNAR VIVIENDA ==========
 async function desasignarVivienda(asignacionId) {
- 
-    
     if (!confirm('¿Desasignar esta vivienda?\n\nLos usuarios/núcleo quedarán sin vivienda asignada.')) {
         return;
     }
