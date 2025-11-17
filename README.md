@@ -1,4 +1,4 @@
-# 🏡 Proyecto de Cooperativas de Vivienda – Repositorio de Pruebas
+#  Proyecto de Cooperativas de Vivienda – Repositorio de Pruebas
 
 Este repositorio contiene las **pruebas iniciales** y experimentales del sistema de gestión para cooperativas de vivienda de ayuda mutua.  
 Aquí se desarrollan y testean componentes antes de ser integrados en la aplicación principal.

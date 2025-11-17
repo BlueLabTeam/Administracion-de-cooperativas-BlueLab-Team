@@ -405,7 +405,7 @@ class DeudaHoras
                     'deuda_generada' => round($deuda_final, 2),
                     'fue_pagada' => $fue_pagada,
                     'estado' => $fue_pagada ? 'pagado' : ($horas_efectivas >= $this->horas_mensuales_requeridas ? 'cumplido' : 'deuda'),
-                    'icono' => $fue_pagada ? '💰' : ($horas_efectivas >= $this->horas_mensuales_requeridas ? '' : '⚠')
+                    'icono' => $fue_pagada ? '' : ($horas_efectivas >= $this->horas_mensuales_requeridas ? '' : '⚠')
                 ];
             }
 
@@ -449,7 +449,7 @@ class DeudaHoras
                     'observaciones' => $just['observaciones'] ?? '',
                     'archivo_adjunto' => $just['archivo_adjunto'] ?? null,
                     'estado' => 'aprobada',
-                    'icono' => '📋'
+                    'icono' => ''
                 ];
             }
 
@@ -496,7 +496,7 @@ class DeudaHoras
                     'comprobante' => $pago['comprobante_archivo'] ?? '',
                     'numero_comprobante' => $pago['numero_comprobante'] ?? '',
                     'estado' => 'pagado',
-                    'icono' => '💰'
+                    'icono' => ''
                 ];
             }
 

@@ -1,5 +1,5 @@
 // ==========================================
-// 👤 MÓDULO: MI PERFIL
+//  MÓDULO: MI PERFIL
 // Gestiona la edición y visualización del perfil de usuario
 // Incluye: datos personales, cambio de contraseña, validaciones
 // ==========================================
@@ -11,7 +11,7 @@ let profileData = {};
 
 // ========== INICIALIZACIÓN ==========
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('📋 Inicializando módulo de perfil');
+    console.log(' Inicializando módulo de perfil');
     
     // Cargar datos del perfil al inicio
     cargarDatosUsuario();
@@ -90,7 +90,7 @@ async function loadProfileData() {
         
         if (data.success) {
             profileData = data.user;
-            console.log('✅ Datos del perfil cargados:', profileData);
+            console.log(' Datos del perfil cargados:', profileData);
             
             // Llenar formulario de edición
             document.getElementById('edit-nombre').value = profileData.nombre_completo || '';
@@ -160,7 +160,7 @@ function updateProfileView(user) {
         telefonoEl.textContent = user.telefono || 'No especificado';
     }
     
-    console.log('✅ Vista de perfil actualizada');
+    console.log(' Vista de perfil actualizada');
 }
 
 /**
@@ -194,7 +194,7 @@ async function cargarDatosUsuario() {
             // Guardar datos globalmente
             profileData = data.user;
             
-            console.log('✅ Datos de usuario cargados correctamente');
+            console.log(' Datos de usuario cargados correctamente');
         } else {
             console.error('Error en respuesta:', data);
         }
@@ -298,8 +298,8 @@ async function submitProfileEdit(event) {
         const data = await response.json();
         
         if (data.success) {
-            console.log('✅ Perfil actualizado exitosamente');
-            alert('✅ ' + data.message);
+            console.log(' Perfil actualizado exitosamente');
+            alert(' ' + data.message);
             
             // Recargar los datos del usuario para actualizar la vista
             await cargarDatosUsuario();
@@ -498,8 +498,8 @@ window.validarEmail = validarEmail;
 window.validarPassword = validarPassword;
 window.formatearFechaUY = formatearFechaUY;
 
-console.log('✅ Módulo de perfil de usuario cargado completamente');
-console.log('📦 Funciones exportadas:', {
+console.log(' Módulo de perfil de usuario cargado completamente');
+console.log(' Funciones exportadas:', {
     toggleEditProfile: typeof window.toggleEditProfile,
     submitProfileEdit: typeof window.submitProfileEdit,
     loadProfileData: typeof window.loadProfileData,

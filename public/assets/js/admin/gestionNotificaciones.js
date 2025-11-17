@@ -151,7 +151,7 @@
             const data = await response.json();
             
             if (data.success) {
-                alert('✅ ' + data.message);
+                alert(' ' + data.message);
                 form.reset();
                 document.querySelectorAll('input[name="usuarios[]"]').forEach(function(cb) {
                     cb.checked = false;
@@ -209,7 +209,7 @@
             '<button class="modal-close-btn" onclick="this.closest(\'.modal-overlay\').remove()">×</button>' +
             '<h2 class="modal-title"><i class="fas fa-eye"></i> Vista Previa</h2>' +
             '<div style="background:' + COLORS.gray50 + ';padding:15px;border-radius:8px;margin-bottom:20px;">' +
-            '<strong style="color:' + COLORS.primary + ';">📊 Resumen:</strong>' +
+            '<strong style="color:' + COLORS.primary + ';"> Resumen:</strong>' +
             '<p style="margin:10px 0 0 0;color:' + COLORS.gray700 + ';">Se enviará a <strong>' + selectedUsers + '</strong> usuario(s)</p>' +
             '</div>' +
             '<div style="border:2px solid ' + prioridadColor + ';border-radius:12px;padding:20px;background:' + COLORS.white + ';box-shadow:' + COLORS.shadow + ';">' +
@@ -269,7 +269,7 @@
             }
         };
         
-        const opcion = prompt('📋 PLANTILLAS\n\n1 = Cuota\n2 = Tarea\n3 = Urgente\n\nEscribe el número:');
+        const opcion = prompt(' PLANTILLAS\n\n1 = Cuota\n2 = Tarea\n3 = Urgente\n\nEscribe el número:');
         
         if (!opcion || !templates[opcion]) return;
         
@@ -290,8 +290,8 @@
 
     function inicializar() {
         console.log('🎯 [NOTIFICACIONES] Inicializando...');
-        console.log('✅ [NOTIFICACIONES] Módulo cargado completamente');
-        console.log('✅ [NOTIFICACIONES] Funciones disponibles:', {
+        console.log(' [NOTIFICACIONES] Módulo cargado completamente');
+        console.log(' [NOTIFICACIONES] Funciones disponibles:', {
             loadUsersForNotifications: typeof window.loadUsersForNotifications,
             toggleAllUsers: typeof window.toggleAllUsers,
             sendNotification: typeof window.sendNotification

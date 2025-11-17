@@ -224,7 +224,7 @@ class SolicitudController
                 $prioridad
             );
 
-            error_log("📊 Resultado de create():");
+            error_log(" Resultado de create():");
             error_log(json_encode($resultado));
 
             if (!$resultado['success']) {

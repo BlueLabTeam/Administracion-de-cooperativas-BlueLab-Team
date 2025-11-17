@@ -163,7 +163,7 @@ function cargarDatosSeccion(section) {
     }
 }
 
-console.log('✅ [NAV] Sistema de navegación listo');
+console.log(' [NAV] Sistema de navegación listo');
 
 document.addEventListener('DOMContentLoaded', () => {
     const toggleMenuBtn = document.querySelector('.toggle-menu-btn');

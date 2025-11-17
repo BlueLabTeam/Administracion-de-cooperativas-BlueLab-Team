@@ -1,6 +1,5 @@
-
 // ==========================================
-// 📊 MÓDULO: REGISTRO DE HORAS
+//  MÓDULO: REGISTRO DE HORAS
 // Sistema completo de control de entrada/salida
 // y gestión de horas trabajadas
 // ==========================================
@@ -14,7 +13,7 @@ let registroAbiertoData = null;
 
 // ========== INICIALIZACIÓN ==========
 document.addEventListener('DOMContentLoaded', function () {
-    console.log('📋 Inicializando módulo de horas');
+    console.log(' Inicializando módulo de horas');
 
     // Iniciar reloj en tiempo real
     updateClock();
@@ -114,7 +113,7 @@ async function cargarDeudaHorasWidget() {
         const response = await fetch('/api/horas/deuda-actual');
         const data = await response.json();
         
-        console.log('💰 Deuda de horas recibida:', data);
+        console.log(' Deuda de horas recibida:', data);
         
         if (data.success && data.deuda) {
             renderDeudaHorasWidget(data.deuda);
@@ -242,7 +241,7 @@ async function inicializarSeccionHoras() {
             cargarDeudaHorasWidget()
         ]);
 
-        console.log('✅ Sección inicializada correctamente');
+        console.log(' Sección inicializada correctamente');
 
     } catch (error) {
         console.error('❌ Error al inicializar:', error);
@@ -274,20 +273,20 @@ async function verificarRegistroAbierto() {
             throw new Error('El servidor devolvió HTML en lugar de JSON. Revisa los logs de PHP.');
         }
 
-        console.log('📊 Verificación de registro:', data);
+        console.log(' Verificación de registro:', data);
 
         if (data.success && data.registro) {
             // Hay un registro abierto
             registroAbiertoId = data.registro.id_registro;
             registroAbiertoData = data.registro;
             mostrarBotonSalida(data.registro.hora_entrada);
-            console.log('✅ Registro abierto encontrado:', registroAbiertoId);
+            console.log(' Registro abierto encontrado:', registroAbiertoId);
         } else {
             // No hay registro abierto
             registroAbiertoId = null;
             registroAbiertoData = null;
             mostrarBotonEntrada();
-            console.log('ℹ️ No hay registro abierto');
+            console.log(' No hay registro abierto');
         }
 
     } catch (error) {
@@ -325,11 +324,11 @@ function mostrarBotonSalida(horaEntrada) {
 
 // ========== MARCAR ENTRADA ==========
 async function marcarEntrada() {
-    console.log('✅ Iniciando marcación de entrada');
+    console.log(' Iniciando marcación de entrada');
 
     const descripcion = prompt('Describe brevemente tu trabajo de hoy (opcional):');
     if (descripcion === null) {
-        console.log('ℹ️ Usuario canceló la entrada');
+        console.log(' Usuario canceló la entrada');
         return;
     }
 
@@ -356,7 +355,7 @@ async function marcarEntrada() {
         console.log('📥 Respuesta del servidor:', data);
 
         if (data.success) {
-            alert(`✅ ${data.message}\nHora registrada: ${data.hora_entrada}`);
+            alert(` ${data.message}\nHora registrada: ${data.hora_entrada}`);
             registroAbiertoId = data.id_registro;
             
             // Restablecer botón antes de recargar
@@ -380,7 +379,7 @@ async function marcarEntrada() {
 
 // ========== MARCAR SALIDA ==========
 async function marcarSalida() {
-    console.log('✅ Iniciando marcación de salida');
+    console.log(' Iniciando marcación de salida');
 
     if (!registroAbiertoId) {
         alert('❌ No hay registro activo para cerrar');
@@ -388,7 +387,7 @@ async function marcarSalida() {
     }
 
     if (!confirm('¿Deseas registrar tu salida ahora?')) {
-        console.log('ℹ️ Usuario canceló la salida');
+        console.log(' Usuario canceló la salida');
         return;
     }
 
@@ -415,7 +414,7 @@ async function marcarSalida() {
         console.log('📥 Respuesta del servidor:', data);
 
         if (data.success) {
-            alert(`✅ ${data.message}\n\n⏱️ Total trabajado: ${data.total_horas} horas`);
+            alert(` ${data.message}\n\n⏱️ Total trabajado: ${data.total_horas} horas`);
             registroAbiertoId = null;
             registroAbiertoData = null;
             
@@ -470,7 +469,7 @@ async function cargarEstadisticas() {
             }
         }
 
-        console.log('✅ Estadísticas actualizadas');
+        console.log(' Estadísticas actualizadas');
 
     } catch (error) {
         console.error('❌ Error al cargar estadísticas:', error);
@@ -490,7 +489,7 @@ async function loadResumenSemanal() {
 
         if (data.success && data.resumen) {
             renderResumenSemanal(data.resumen);
-            console.log('✅ Resumen semanal cargado');
+            console.log(' Resumen semanal cargado');
         } else {
             container.innerHTML = '<p class="error">Error al cargar resumen semanal</p>';
         }
@@ -527,7 +526,7 @@ function renderResumenSemanal(resumen) {
         <div class="resumen-semana-header">
             <p><strong>Semana del ${formatearFechaSimple(resumen.semana.inicio)} al ${formatearFechaSimple(resumen.semana.fin)}</strong></p>
             <p>
-                📊 Total: <strong>${resumen.total_horas}h</strong> | 
+                 Total: <strong>${resumen.total_horas}h</strong> | 
                 📅 Días trabajados: <strong>${resumen.dias_trabajados}</strong>
             </p>
         </div>
@@ -614,7 +613,7 @@ async function loadMisRegistros() {
 
         if (data.success && data.registros) {
             renderHistorialRegistros(data.registros);
-            console.log(`✅ ${data.registros.length} registros cargados`);
+            console.log(` ${data.registros.length} registros cargados`);
         } else {
             container.innerHTML = '<p class="error">Error al cargar registros</p>';
         }
@@ -638,274 +637,292 @@ function renderHistorialRegistros(registros) {
         return;
     }
 
-    // Agrupar por semanas
-    const semanas = agruparPorSemanas(registros);
-    
-    let html = '<div class="registros-accordion">';
+    // Ordenar por fecha descendente (más reciente primero)
+    registros.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
 
-    semanas.forEach((semana, index) => {
-        const isOpen = index === 0; // Solo la primera semana abierta
-        const totalHoras = semana.registros.reduce((sum, r) => sum + parseFloat(r.total_horas || 0), 0);
-        const promedioHoras = (totalHoras / semana.registros.length).toFixed(1);
+    let html = `
+        <div class="tabla-registros-wrapper">
+            <table class="tabla-registros">
+                <thead>
+                    <tr>
+                        <th><i class="fas fa-calendar"></i> Fecha</th>
+                        <th><i class="fas fa-clock"></i> Entrada</th>
+                        <th><i class="fas fa-clock"></i> Salida</th>
+                        <th><i class="fas fa-hourglass-half"></i> Horas Trabajadas</th>
+                        <th><i class="fas fa-minus-circle"></i> Horas Justificadas</th>
+                        <th><i class="fas fa-calculator"></i> Horas Netas</th>
+                        <th><i class="fas fa-info-circle"></i> Estado</th>
+                        <th><i class="fas fa-tools"></i> Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+
+    registros.forEach(reg => {
+        const fecha = new Date(reg.fecha + 'T00:00:00');
+        const fechaFormateada = formatearFecha(fecha);
+        const diaSemana = obtenerDiaSemana(fecha);
+        
+        // Calcular horas trabajadas correctamente
+        let horasTrabajadas = 0;
+        if (reg.hora_entrada && reg.hora_salida) {
+            const [hE, mE, sE] = reg.hora_entrada.split(':').map(Number);
+            const [hS, mS, sS] = reg.hora_salida.split(':').map(Number);
+            const entrada = hE + mE/60 + sE/3600;
+            const salida = hS + mS/60 + sS/3600;
+            horasTrabajadas = Math.max(0, salida - entrada);
+        }
+        
+        const horasJustificadas = parseFloat(reg.horas_justificadas || 0);
+        const horasNetas = Math.max(0, horasTrabajadas - horasJustificadas);
+        
+        const entrada = reg.hora_entrada ? reg.hora_entrada.substring(0, 5) : '--:--';
+        const salida = reg.hora_salida ? reg.hora_salida.substring(0, 5) : '--:--';
+        
+        // Determinar estado
+        let estadoBadge = '';
+        let estadoClase = '';
+        
+        if (reg.hora_salida) {
+            estadoBadge = '<span class="badge-completo">✓ Completo</span>';
+            estadoClase = 'registro-completo';
+        } else {
+            estadoBadge = '<span class="badge-pendiente">⏳ En curso</span>';
+            estadoClase = 'registro-pendiente';
+        }
 
         html += `
-            <div class="semana-card ${isOpen ? 'open' : ''}" data-semana="${index}">
-                <div class="semana-header" onclick="toggleSemana(${index})">
-                    <div class="semana-info">
-                        <div class="semana-icono">
-                            <i class="fas fa-calendar-week"></i>
-                        </div>
-                        <div class="semana-texto">
-                            <span class="semana-rango">${semana.rango}</span>
-                        </div>
+            <tr class="registro-row ${estadoClase}">
+                <td class="fecha-cell">
+                    <div class="fecha-info">
+                        <span class="fecha-dia">${diaSemana}</span>
+                        <span class="fecha-numero">${fechaFormateada}</span>
                     </div>
-                    <div class="semana-stats">
-                        <div class="stat-item">
-                   
-                        </div>
-                        <div class="stat-item">
-                            
-                        </div>
-                        <div class="stat-item">
-                            
-                        </div>
-                    </div>
-                    <div class="semana-toggle">
-                        <i class="fas fa-chevron-down"></i>
-                    </div>
-                </div>
-                
-                <div class="semana-content ${isOpen ? 'show' : ''}">
-                    <table class="registros-mini-table">
-                        <thead>
-                            <tr>
-                                <th>Fecha</th>
-                                <th>Entrada</th>
-                                <th>Salida</th>
-                                <th>Horas</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${semana.registros.map(reg => renderRegistroRow(reg)).join('')}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+                </td>
+                <td class="hora-cell">
+                    <span class="hora-valor">${entrada}</span>
+                </td>
+                <td class="hora-cell">
+                    <span class="hora-valor">${salida}</span>
+                </td>
+                <td class="horas-cell">
+                    <span class="horas-total">${horasTrabajadas.toFixed(2)}h</span>
+                </td>
+                <td class="horas-cell">
+                    <span class="horas-justificadas ${horasJustificadas > 0 ? 'con-justificacion' : ''}">${horasJustificadas.toFixed(2)}h</span>
+                    ${horasJustificadas > 0 && reg.motivo_justificacion ? 
+                        `<button class="btn-mini" onclick="verMotivoJustificacion('${reg.motivo_justificacion}', '${fechaFormateada}')" title="Ver motivo"><i class="fas fa-comment"></i></button>` 
+                        : ''}
+                </td>
+                <td class="horas-cell">
+                    <span class="horas-netas">${horasNetas.toFixed(2)}h</span>
+                </td>
+                <td class="estado-cell">
+                    ${estadoBadge}
+                </td>
+                <td class="acciones-cell">
+                    ${reg.hora_salida ? 
+                        `<button class="btn-small btn-warning" onclick="abrirModalJustificar(${reg.id_registro}, '${fechaFormateada}', ${horasTrabajadas.toFixed(2)}, ${horasJustificadas.toFixed(2)})" title="Justificar horas">
+                            <i class="fas fa-file-medical"></i> Justificar
+                        </button>` 
+                        : '<span style="color: #999; font-size: 12px;">Registro abierto</span>'}
+                </td>
+            </tr>
         `;
     });
 
-    html += '</div>';
-    html += getEstilosRegistros();
+    html += `
+                </tbody>
+            </table>
+        </div>
+    `;
+
+    html += getEstilosTablaRegistros();
     
     container.innerHTML = html;
 }
 
-function renderRegistroRow(reg) {
-    const fecha = formatearFechaSimple(reg.fecha);
-    const entrada = reg.hora_entrada ? reg.hora_entrada.substring(0, 5) : '--:--';
-    const salida = reg.hora_salida ? reg.hora_salida.substring(0, 5) : 'En curso';
-    const horas = reg.total_horas || 0;
-    
-    return `
-        <tr>
-            <td><strong>${fecha}</strong></td>
-            <td>${entrada}</td>
-            <td>${salida}</td>
-            <td><strong>${horas}h</strong></td>
-            <td>
-                ${reg.descripcion ? `
-                    <button class="btn-icon" onclick="verDescripcionRegistro('${reg.descripcion.replace(/'/g, "\\'")}', '${fecha}')" title="Ver descripción">
-                        <i class="fas fa-file-alt"></i>
-                    </button>
-                ` : ''}
-            </td>
-        </tr>
-    `;
+function formatearFecha(fecha) {
+    const dia = fecha.getDate().toString().padStart(2, '0');
+    const mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
+    const anio = fecha.getFullYear();
+    return `${dia}/${mes}/${anio}`;
 }
 
-function agruparPorSemanas(registros) {
-    const semanas = [];
-    const registrosOrdenados = [...registros].sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
-    
-    registrosOrdenados.forEach(reg => {
-        const fecha = new Date(reg.fecha + 'T00:00:00');
-        const diaSemana = fecha.getDay();
-        const lunes = new Date(fecha);
-        lunes.setDate(fecha.getDate() - (diaSemana === 0 ? 6 : diaSemana - 1));
-        
-        const keyLunes = lunes.toISOString().split('T')[0];
-        
-        let semana = semanas.find(s => s.key === keyLunes);
-        
-        if (!semana) {
-            const domingo = new Date(lunes);
-            domingo.setDate(lunes.getDate() + 6);
-            
-            semana = {
-                key: keyLunes,
-                titulo: `Semana del ${lunes.getDate()} de ${getNombreMes(lunes.getMonth() + 1)}`,
-                rango: `${formatearFechaSimple(keyLunes)} - ${formatearFechaSimple(domingo.toISOString().split('T')[0])}`,
-                registros: []
-            };
-            semanas.push(semana);
-        }
-        
-        semana.registros.push(reg);
-    });
-    
-    return semanas;
+function obtenerDiaSemana(fecha) {
+    const dias = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+    return dias[fecha.getDay()];
 }
 
-function toggleSemana(index) {
-    const semanaCard = document.querySelector(`.semana-card[data-semana="${index}"]`);
-    const content = semanaCard.querySelector('.semana-content');
-    const icon = semanaCard.querySelector('.semana-toggle i');
-    
-    if (semanaCard.classList.contains('open')) {
-        semanaCard.classList.remove('open');
-        content.classList.remove('show');
-        icon.classList.remove('fa-chevron-up');
-        icon.classList.add('fa-chevron-down');
-    } else {
-        semanaCard.classList.add('open');
-        content.classList.add('show');
-        icon.classList.remove('fa-chevron-down');
-        icon.classList.add('fa-chevron-up');
-    }
-}
-
-function getEstilosRegistros() {
+function getEstilosTablaRegistros() {
     return `
         <style>
-            .registros-accordion {
-                display: flex;
-                flex-direction: column;
-                gap: 15px;
-            }
-            
-            .semana-card {
+            .tabla-registros-wrapper {
                 background: white;
                 border-radius: 12px;
                 box-shadow: 0 2px 8px rgba(0,0,0,0.1);
                 overflow: hidden;
-                transition: all 0.3s ease;
             }
-            
-            .semana-header {
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                padding: 20px;
-                cursor: pointer;
-                background: linear-gradient(135deg, #003366 0%, #3399FF 100%);
-                color: white;
-            }
-            
-            .semana-header:hover {
-                opacity: 0.95;
-            }
-            
-            .semana-info {
-                display: flex;
-                align-items: center;
-                gap: 15px;
-            }
-            
-            .semana-icono {
-                font-size: 24px;
-            }
-            
-            .semana-texto h4 {
-                margin: 0 0 5px 0;
-                font-size: 16px;
-            }
-            
-            .semana-rango {
-                font-size: 13px;
-                opacity: 0.9;
-            }
-            
-            .semana-stats {
-                display: flex;
-                gap: 20px;
-            }
-            
-            .stat-item {
-                text-align: center;
-            }
-            
-            .stat-valor {
-                display: block;
-                font-size: 20px;
-                font-weight: 700;
-            }
-            
-            .stat-label {
-                display: block;
-                font-size: 11px;
-                opacity: 0.9;
-                text-transform: uppercase;
-            }
-            
-            .semana-toggle {
-                font-size: 20px;
-                transition: transform 0.3s;
-            }
-            
-            .semana-card.open .semana-toggle i {
-                transform: rotate(180deg);
-            }
-            
-            .semana-content {
-                max-height: 0;
-                overflow: hidden;
-                transition: max-height 0.3s ease;
-            }
-            
-            .semana-content.show {
-                max-height: 1000px;
-            }
-            
-            .registros-mini-table {
+
+            .tabla-registros {
                 width: 100%;
                 border-collapse: collapse;
             }
-            
-            .registros-mini-table thead {
-                background: #f8f9fa;
+
+            .tabla-registros thead {
+                background: linear-gradient(135deg, #005CB9 0%, #004494 100%);
+                color: white;
             }
-            
-            .registros-mini-table th {
-                padding: 12px;
+
+            .tabla-registros thead th {
+                padding: 16px;
                 text-align: left;
-                font-size: 12px;
+                font-weight: 600;
+                font-size: 14px;
                 text-transform: uppercase;
-                color: #666;
+                letter-spacing: 0.5px;
+            }
+
+            .tabla-registros thead th i {
+                margin-right: 8px;
+                opacity: 0.9;
+            }
+
+            .tabla-registros tbody tr {
+                border-bottom: 1px solid #e9ecef;
+                transition: all 0.2s ease;
+            }
+
+            .tabla-registros tbody tr:hover {
+                background: #f8f9fa;
+                transform: scale(1.01);
+            }
+
+            .tabla-registros tbody tr:last-child {
+                border-bottom: none;
+            }
+
+            .tabla-registros tbody td {
+                padding: 16px;
+                vertical-align: middle;
+            }
+
+            /* Celda de fecha */
+            .fecha-cell {
+                min-width: 150px;
+            }
+
+            .fecha-info {
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+            }
+
+            .fecha-dia {
+                font-size: 12px;
+                color: #6c757d;
+                font-weight: 500;
+                text-transform: uppercase;
+            }
+
+            .fecha-numero {
+                font-size: 14px;
+                color: #212529;
                 font-weight: 600;
             }
-            
-            .registros-mini-table td {
-                padding: 12px;
-                border-top: 1px solid #e9ecef;
+
+            /* Celda de hora */
+            .hora-cell {
+                min-width: 100px;
             }
-            
-            .registros-mini-table tbody tr:hover {
-                background: #f8f9fa;
+
+            .hora-valor {
+                font-family: 'Courier New', monospace;
+                font-size: 15px;
+                font-weight: 600;
+                color: #495057;
             }
-            
-            .btn-icon {
-                background: none;
-                border: none;
-                color: #667eea;
-                cursor: pointer;
+
+            /* Celda de horas totales */
+            .horas-cell {
+                min-width: 100px;
+            }
+
+            .horas-total {
+                display: inline-block;
+                padding: 6px 12px;
+                background: #e3f2fd;
+                color: #1976d2;
+                border-radius: 20px;
+                font-weight: 700;
+                font-size: 14px;
+            }
+
+            /* Badges de estado */
+            .estado-cell {
+                min-width: 120px;
+            }
+
+            .badge-completo {
+                display: inline-block;
+                padding: 6px 14px;
+                background: #d4edda;
+                color: #155724;
+                border-radius: 20px;
+                font-size: 12px;
+                font-weight: 600;
+                text-transform: uppercase;
+                border: 1px solid #c3e6cb;
+            }
+
+            .badge-pendiente {
+                display: inline-block;
+                padding: 6px 14px;
+                background: #fff3cd;
+                color: #856404;
+                border-radius: 20px;
+                font-size: 12px;
+                font-weight: 600;
+                text-transform: uppercase;
+                border: 1px solid #ffeaa7;
+            }
+
+            /* Estados de registro */
+            .registro-row.registro-completo {
+                background: #f8fff9;
+            }
+
+            .registro-row.registro-pendiente {
+                background: #fffef8;
+            }
+
+            /* Loading y error */
+            .loading, .error {
+                text-align: center;
+                padding: 40px;
+                color: #6c757d;
                 font-size: 16px;
-                padding: 5px;
-                transition: color 0.2s;
             }
-            
-            .btn-icon:hover {
-                color: #764ba2;
+
+            .error {
+                color: #dc3545;
+            }
+
+            /* Responsive */
+            @media (max-width: 768px) {
+                .tabla-registros-wrapper {
+                    overflow-x: auto;
+                }
+
+                .tabla-registros {
+                    min-width: 700px;
+                }
+
+                .tabla-registros thead th,
+                .tabla-registros tbody td {
+                    padding: 12px 8px;
+                    font-size: 13px;
+                }
             }
         </style>
     `;
@@ -949,11 +966,6 @@ function formatearFechaSimple(fecha) {
     });
 }
 
-function obtenerDiaSemana(fecha) {
-    const dias = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
-    return dias[fecha.getDay()];
-}
-
 // ========== FILTRAR REGISTROS ==========
 async function filtrarRegistros() {
     const fechaInicio = document.getElementById('filtro-fecha-inicio')?.value;
@@ -985,8 +997,8 @@ window.cargarDeudaHorasWidget = cargarDeudaHorasWidget;
 window.verDescripcionRegistro = verDescripcionRegistro;
 window.toggleSemana = toggleSemana;
 
-console.log('✅ Módulo de registro de horas cargado completamente');
-console.log('📦 Funciones exportadas:', {
+console.log(' Módulo de registro de horas cargado completamente');
+console.log(' Funciones exportadas:', {
     inicializarSeccionHoras: typeof window.inicializarSeccionHoras,
     marcarEntrada: typeof window.marcarEntrada,
     marcarSalida: typeof window.marcarSalida,

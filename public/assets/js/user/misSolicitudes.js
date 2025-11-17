@@ -8,7 +8,7 @@ console.log('🟢 Cargando módulo de solicitudes de usuario');
 
 // ========== INICIALIZACIÓN ==========
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('📋 Inicializando módulo de solicitudes');
+    console.log(' Inicializando módulo de solicitudes');
     
     // Listener para la sección de solicitudes
     const solicitudesMenuItem = document.querySelector('.menu li[data-section="solicitudes"]');
@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', function() {
  */
 async function loadMisSolicitudes() {
     console.log('==========================================');
-    console.log('📋 INICIANDO CARGA DE SOLICITUDES');
+    console.log(' INICIANDO CARGA DE SOLICITUDES');
     console.log('==========================================');
     
     const container = document.getElementById('misSolicitudesContainer');
@@ -58,7 +58,7 @@ async function loadMisSolicitudes() {
         return;
     }
 
-    console.log('✅ Container encontrado:', container);
+    console.log(' Container encontrado:', container);
     container.innerHTML = '<p class="loading" data-i18n="dashboardUser.requests.loading">Cargando solicitudes...</p>';
     i18n.translatePage(); // Actualizar traducciones
     try {
@@ -90,7 +90,7 @@ async function loadMisSolicitudes() {
         let data;
         try {
             data = JSON.parse(responseText);
-            console.log('✅ JSON parseado correctamente');
+            console.log(' JSON parseado correctamente');
         } catch (parseError) {
             console.error('❌ Error al parsear JSON:', parseError);
             console.error('📄 Respuesta completa:', responseText);
@@ -108,22 +108,22 @@ async function loadMisSolicitudes() {
             return;
         }
 
-        console.log('📊 Data recibida:', data);
+        console.log(' Data recibida:', data);
         console.log('   - success:', data.success);
         console.log('   - count:', data.count);
         console.log('   - solicitudes length:', data.solicitudes?.length);
 
         if (data.success) {
-            console.log('✅ Petición exitosa, renderizando...');
+            console.log(' Petición exitosa, renderizando...');
             
             if (data.solicitudes && data.solicitudes.length > 0) {
-                console.log('📋 Primera solicitud:', data.solicitudes[0]);
+                console.log(' Primera solicitud:', data.solicitudes[0]);
             }
             
             renderMisSolicitudes(data.solicitudes);
             updateSolicitudesStats(data.solicitudes);
             
-            console.log('✅ Renderizado completado');
+            console.log(' Renderizado completado');
         } else {
             console.error('❌ success = false');
             container.innerHTML = `
@@ -158,7 +158,7 @@ async function loadMisSolicitudes() {
     }
     
     console.log('==========================================');
-    console.log('📋 FIN CARGA DE SOLICITUDES');
+    console.log(' FIN CARGA DE SOLICITUDES');
     console.log('==========================================');
 }
 
@@ -283,10 +283,10 @@ function abrirModalNuevaSolicitud() {
                             <i class="fas fa-tag"></i> <span data-i18n="dashboardUser.requests.form.typeLabel">Tipo de Solicitud *</span>
                         </label>
                         <select id="tipo-solicitud" name="tipo_solicitud" required>
-                            <option value="horas" data-i18n="dashboardUser.requests.form.types.hours">📊 Registro de Horas</option>
-                            <option value="pago" data-i18n="dashboardUser.requests.form.types.payment">💳 Pagos/Cuotas</option>
-                            <option value="vivienda" data-i18n="dashboardUser.requests.form.types.housing">🏡 Vivienda</option>
-                            <option value="general" data-i18n="dashboardUser.requests.form.types.general">📋 Consulta General</option>
+                            <option value="horas" data-i18n="dashboardUser.requests.form.types.hours"> Registro de Horas</option>
+                            <option value="pago" data-i18n="dashboardUser.requests.form.types.payment"> Pagos/Cuotas</option>
+                            <option value="vivienda" data-i18n="dashboardUser.requests.form.types.housing"> Vivienda</option>
+                            <option value="general" data-i18n="dashboardUser.requests.form.types.general"> Consulta General</option>
                             <option value="otro" data-i18n="dashboardUser.requests.form.types.other">❓ Otro</option>
                         </select>
                     </div>
@@ -350,7 +350,7 @@ function abrirModalNuevaSolicitud() {
                     </div>
 
                     <div class="alert-info">
-                        <strong data-i18n="dashboardUser.requests.form.infoTitle">ℹ️ Información:</strong>
+                        <strong data-i18n="dashboardUser.requests.form.infoTitle"> Información:</strong>
                         <p data-i18n="dashboardUser.requests.form.infoDescription">Tu solicitud será revisada por un administrador. Recibirás una notificación cuando haya novedades.</p>
                     </div>
 
@@ -427,8 +427,8 @@ async function submitNuevaSolicitud(event) {
         // 🔥 CREAR FormData CORRECTAMENTE
         const formData = new FormData(form);
         
-        // 📋 DEBUG: Verificar contenido
-        console.log('📋 FormData contenido:');
+        //  DEBUG: Verificar contenido
+        console.log(' FormData contenido:');
         for (let [key, value] of formData.entries()) {
             if (value instanceof File) {
                 console.log(`  ${key}: [File] ${value.name} (${value.size} bytes)`);
@@ -459,10 +459,10 @@ async function submitNuevaSolicitud(event) {
             throw new Error('El servidor devolvió HTML en lugar de JSON. Revisa los logs de PHP.');
         }
 
-        console.log('✅ Data parseada:', data);
+        console.log(' Data parseada:', data);
 
         if (data.success) {
-            alert('✅ ' + data.message);
+            alert(' ' + data.message);
             cerrarModalNuevaSolicitud();
             loadMisSolicitudes();
         } else {
@@ -540,7 +540,7 @@ async function verDetalleSolicitud(solicitudId) {
                                         <div class="respuesta-item ${resp.es_admin ? 'respuesta-admin' : 'respuesta-usuario'}">
                                             <div class="respuesta-header">
                                                 <strong>
-                                                    ${resp.es_admin ? '👨‍💼 Administrador' : '👤 ' + resp.nombre_completo}
+                                                    ${resp.es_admin ? '👨‍💼 Administrador' : ' ' + resp.nombre_completo}
                                                 </strong>
                                                 <span class="respuesta-fecha">${fechaResp}</span>
                                             </div>
@@ -672,7 +672,7 @@ async function submitRespuesta(event, solicitudId) {
         const data = await response.json();
 
         if (data.success) {
-            alert('✅ ' + data.message);
+            alert(' ' + data.message);
             cerrarModalResponder();
             loadMisSolicitudes();
         } else {
@@ -698,10 +698,10 @@ async function submitRespuesta(event, solicitudId) {
  */
 function formatTipoSolicitud(tipo) {
     const tipos = {
-        'horas': '📊 Registro de Horas',
-        'pago': '💳 Pagos/Cuotas',
-        'vivienda': '🏡 Vivienda',
-        'general': '📋 Consulta General',
+        'horas': ' Registro de Horas',
+        'pago': ' Pagos/Cuotas',
+        'vivienda': ' Vivienda',
+        'general': ' Consulta General',
         'otro': '❓ Otro'
     };
     return tipos[tipo] || tipo;
@@ -760,8 +760,8 @@ window.formatEstado = formatEstado;
 window.formatPrioridad = formatPrioridad;
 window.truncarTexto = truncarTexto;
 
-console.log('✅ Módulo de solicitudes cargado completamente');
-console.log('📦 Funciones exportadas:', {
+console.log(' Módulo de solicitudes cargado completamente');
+console.log(' Funciones exportadas:', {
     loadMisSolicitudes: typeof window.loadMisSolicitudes,
     abrirModalNuevaSolicitud: typeof window.abrirModalNuevaSolicitud,
     verDetalleSolicitud: typeof window.verDetalleSolicitud,

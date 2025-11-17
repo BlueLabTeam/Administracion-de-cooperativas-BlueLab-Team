@@ -43,7 +43,7 @@ if (!isset($_SESSION['user_id'])) {
 	<main class="content-area">
 		<!-- INICIO -->
 		<section id="inicio-section" class="section-content active">
-			<h2 class="section-title" data-i18n="dashboardUser.home.title">🏠 Inicio</h2>
+			<h2 class="section-title" data-i18n="dashboardUser.home.title"> Inicio</h2>
 			
 			<div class="info-card">
 				<h3><span data-i18n="dashboardUser.home.welcome">Bienvenido/a</span> <?php echo htmlspecialchars($_SESSION['nombre_completo'] ?? 'Usuario'); ?></h3>
@@ -53,7 +53,7 @@ if (!isset($_SESSION['user_id'])) {
 			<!-- Notificaciones -->
 			<div class="notifications-container">
 				<div class="notifications-header">
-					<h3 data-i18n="dashboardUser.home.notifications">🔔 Notificaciones</h3>
+					<h3 data-i18n="dashboardUser.home.notifications"> Notificaciones</h3>
 					<span class="notifications-badge" id="notificationsBadge" data-i18n="dashboardUser.home.notificationsBadge">0</span>
 				</div>
 				<div id="notificationsList" class="notifications-list">
@@ -66,7 +66,7 @@ if (!isset($_SESSION['user_id'])) {
 
 		<!-- MI PERFIL -->
 <section id="perfil-section" class="section-content">
-	<h2 class="section-title" data-i18n="dashboardUser.profile.title">👤 Mi Perfil</h2>
+	<h2 class="section-title" data-i18n="dashboardUser.profile.title"> Mi Perfil</h2>
 	
 	<div class="info-card">
 		<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
@@ -285,7 +285,7 @@ if (!isset($_SESSION['user_id'])) {
 
 		<!-- SOLICITUDES -->
 <section id="solicitudes-section" class="section-content">
-    <h2 class="section-title" data-i18n="dashboardUser.requests.title">📩 Mis Solicitudes</h2>
+    <h2 class="section-title" data-i18n="dashboardUser.requests.title"> Mis Solicitudes</h2>
 
     <!-- Botón Nueva Solicitud -->
     <div class="info-card">
@@ -339,7 +339,7 @@ if (!isset($_SESSION['user_id'])) {
 
 		<!-- MI VIVIENDA -->
 		<section id="vivienda-section" class="section-content">
-			<h2 class="section-title" data-i18n="dashboardUser.housing.title">🏡 Mi Vivienda</h2>
+			<h2 class="section-title" data-i18n="dashboardUser.housing.title"> Mi Vivienda</h2>
 			<div class="info-card">
 				<h3 data-i18n="dashboardUser.housing.subtitle">Información de tu Vivienda</h3>
 				<div id="myViviendaContainer">
@@ -350,7 +350,7 @@ if (!isset($_SESSION['user_id'])) {
 
 	<!-- APORTES / CUOTAS -->
 <section id="cuotas-section" class="section-content">
-    <h2 class="section-title" data-i18n="dashboardUser.billing.title">💳 Mis Cuotas Mensuales</h2>
+    <h2 class="section-title" data-i18n="dashboardUser.billing.title"> Mis Cuotas Mensuales</h2>
     
     
 
@@ -514,7 +514,7 @@ if (!isset($_SESSION['user_id'])) {
 
 		<!-- HORAS -->
 <section id="horas-section" class="section-content">
-	<h2 class="section-title" data-i18n="dashboardUser.hours.title">⏰ Registro de Horas</h2>
+	<h2 class="section-title" data-i18n="dashboardUser.hours.title"> Registro de Horas</h2>
 	
 	<!-- Botones de Entrada/Salida -->
 	<div class="info-card">
@@ -593,7 +593,7 @@ if (!isset($_SESSION['user_id'])) {
 
 <!-- DEUDA DE HORAS - WIDGET PRINCIPAL -->
 <div class="info-card">
-    <h3 data-i18n="dashboardUser.billing.debtStatus.title">💳 Estado de Deuda de Horas</h3>
+    <h3 data-i18n="dashboardUser.billing.debtStatus.title"> Estado de Deuda de Horas</h3>
     <div id="deuda-actual-container">
         <p class="loading" data-i18n="dashboardUser.billing.debtStatus.calculating">Calculando deuda...</p>
     </div>
@@ -620,7 +620,7 @@ if (!isset($_SESSION['user_id'])) {
 
 		<!-- TAREAS -->
 		<section id="tareas-section" class="section-content">
-			<h2 class="section-title" data-i18n="dashboardUser.tasks.title">📋 Mis Tareas</h2>
+			<h2 class="section-title" data-i18n="dashboardUser.tasks.title"> Mis Tareas</h2>
 			
 		<!-- Resumen de Tareas -->
 <div class="stats-grid-wide" style="margin-bottom: 20px;">
@@ -657,7 +657,7 @@ if (!isset($_SESSION['user_id'])) {
 			
 			<!-- Tareas personales -->
 			<div class="info-card">
-				<h3 data-i18n="dashboardUser.tasks.individual">📋 Tareas Individuales</h3>
+				<h3 data-i18n="dashboardUser.tasks.individual"> Tareas Individuales</h3>
 				<div id="tareasUsuarioList">
 					<p class="loading" data-i18n="dashboardUser.tasks.loading">Cargando tareas...</p>
 				</div>
@@ -665,7 +665,7 @@ if (!isset($_SESSION['user_id'])) {
 
 			<!-- Tareas del núcleo familiar -->
 			<div class="info-card">
-				<h3 data-i18n="dashboardUser.tasks.family">👨‍👩‍👧‍👦 Tareas del Núcleo Familiar</h3>
+				<h3 data-i18n="dashboardUser.tasks.family"> Tareas del Núcleo Familiar</h3>
 				<div id="tareasNucleoList">
 					<p class="loading" data-i18n="dashboardUser.tasks.loading">Cargando tareas...</p>
 				</div>

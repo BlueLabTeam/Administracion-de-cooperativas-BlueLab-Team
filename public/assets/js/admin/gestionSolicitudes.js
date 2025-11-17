@@ -347,7 +347,7 @@ const SolicitudesAdmin = {
             </h2>
 
             <div style="background: #E3F2FD; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #005CB9;">
-                <h3 style="color: #005CB9; margin-bottom: 15px; font-size: 16px;">👤 Información del Usuario</h3>
+                <h3 style="color: #005CB9; margin-bottom: 15px; font-size: 16px;"> Información del Usuario</h3>
                 <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
                     <div style="color: #495057;"><strong style="color: #005CB9;">Nombre:</strong> ${solicitud.nombre_completo}</div>
                     <div style="color: #495057;"><strong style="color: #005CB9;">Email:</strong> ${solicitud.email}</div>
@@ -357,7 +357,7 @@ const SolicitudesAdmin = {
             </div>
 
             <div style="background: #F5F7FA; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-                <h3 style="color: #005CB9; margin-bottom: 15px; font-size: 16px;">📋 Detalles de la Solicitud</h3>
+                <h3 style="color: #005CB9; margin-bottom: 15px; font-size: 16px;"> Detalles de la Solicitud</h3>
                 <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
                     <div style="color: #495057;"><strong style="color: #005CB9;">Tipo:</strong> ${Utils.formatTipoSolicitud(solicitud.tipo_solicitud)}</div>
                     <div><strong style="color: #005CB9;">Estado:</strong> <span class="badge badge-${solicitud.estado}">${Utils.formatEstado(solicitud.estado)}</span></div>
@@ -410,7 +410,7 @@ const SolicitudesAdmin = {
                             ">
                                 <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
                                     <strong style="color: #005CB9; font-size: 14px;">
-                                        ${resp.es_admin ? '👨‍💼 Administrador' : '👤 ' + resp.nombre_completo}
+                                        ${resp.es_admin ? '👨‍💼 Administrador' : ' ' + resp.nombre_completo}
                                     </strong>
                                     <span style="color: #6C757D; font-size: 12px;">${fechaResp}</span>
                                 </div>
@@ -491,7 +491,7 @@ const SolicitudesAdmin = {
                         </div>
 
                         <div class="alert-info-admin">
-                            <strong>ℹ️ Nota:</strong>
+                            <strong> Nota:</strong>
                             <p>El usuario recibirá una notificación sobre tu respuesta.</p>
                         </div>
 
@@ -539,7 +539,7 @@ const SolicitudesAdmin = {
             const data = await response.json();
 
             if (data.success) {
-                alert('✅ ' + data.message);
+                alert(' ' + data.message);
                 this.cerrarModalResponder();
                 this.loadAllSolicitudes();
                 this.loadEstadisticas();
@@ -583,7 +583,7 @@ const SolicitudesAdmin = {
             const data = await response.json();
 
             if (data.success) {
-                alert('✅ ' + data.message);
+                alert(' ' + data.message);
                 this.loadAllSolicitudes();
                 this.loadEstadisticas();
             } else {
@@ -611,4 +611,4 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-console.log('✅ [SOLICITUDES] Módulo cargado completamente');
+console.log(' [SOLICITUDES] Módulo cargado completamente');

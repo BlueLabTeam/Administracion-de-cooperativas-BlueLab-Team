@@ -1,5 +1,5 @@
 // ==========================================
-// 📋 MÓDULO: MIS TAREAS
+//  MÓDULO: MIS TAREAS
 // Sistema completo de gestión de tareas asignadas
 // al usuario y su núcleo familiar
 // ==========================================
@@ -8,7 +8,7 @@ console.log('🟢 Iniciando módulo de mis tareas');
 
 // ========== INICIALIZACIÓN ==========
 document.addEventListener('DOMContentLoaded', function () {
-    console.log('📋 Configurando listeners de tareas');
+    console.log(' Configurando listeners de tareas');
 
     // Listener para Tareas - SOLO cuando se hace click
     const tareasMenuItem = document.querySelector('.menu li[data-section="tareas"]');
@@ -70,7 +70,7 @@ function renderUserTasks(tareas, containerId, esNucleo = false) {
         return;
     }
 
-    // ✅ PASO 1: Detectar tareas vencidas
+    //  PASO 1: Detectar tareas vencidas
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
 
@@ -90,20 +90,20 @@ function renderUserTasks(tareas, containerId, esNucleo = false) {
         };
     });
 
-    // ✅ PASO 2: Renderizar
+    //  PASO 2: Renderizar
     container.innerHTML = tareasConEstado.map(tarea => {
         const fechaInicio = formatearFechaUY(tarea.fecha_inicio);
         const fechaFin = formatearFechaUY(tarea.fecha_fin);
         const progreso = tarea.progreso || 0;
 
-        // ✅ DETERMINAR ESTADO VISUAL
+        //  DETERMINAR ESTADO VISUAL
         let estadoTexto, estadoBadgeClass, tareaClass;
 
         if (tarea.esVencida) {
-            estadoTexto = '⏰ Vencida';
+            estadoTexto = ' Vencida';
             estadoBadgeClass = 'vencida';
             tareaClass = 'tarea-vencida';
-            console.log(`✅ Badge VENCIDA aplicado: ${tarea.titulo}`);
+            console.log(` Badge VENCIDA aplicado: ${tarea.titulo}`);
         } else if (tarea.esCompletada) {
             estadoTexto = formatEstadoUsuario(tarea.estado_usuario);
             estadoBadgeClass = 'completada';
@@ -168,7 +168,7 @@ function renderUserTasks(tareas, containerId, esNucleo = false) {
         `;
     }).join('');
 
-    console.log('✅ [RENDER USER TASKS] Completado');
+    console.log(' [RENDER USER TASKS] Completado');
 }
 
 // ========== ACTUALIZAR RESUMEN DE TAREAS ==========
@@ -253,9 +253,9 @@ function updateTaskProgress(asignacionId, tipoAsignacion, tareaId) {
 
 // ========== AGREGAR AVANCE A TAREA ==========
 function addTaskAvance(tareaId) {
-    console.log('✅ addTaskAvance llamado con tareaId:', tareaId);
+    console.log(' addTaskAvance llamado con tareaId:', tareaId);
     
-    // ✅ Validar que tareaId existe
+    //  Validar que tareaId existe
     if (!tareaId || tareaId === 'undefined') {
         alert('❌ Error: ID de tarea inválido');
         console.error('tareaId recibido:', tareaId);
@@ -281,12 +281,12 @@ function addTaskAvance(tareaId) {
     }
 
     const formData = new FormData();
-    // ✅ CAMBIO CRÍTICO: Usar 'id_tarea' en lugar de 'tarea_id'
+    //  CAMBIO CRÍTICO: Usar 'id_tarea' en lugar de 'tarea_id'
     formData.append('id_tarea', tareaId);
     formData.append('comentario', comentario.trim());
     formData.append('progreso_reportado', progresoNum);
 
-    // ✅ DEBUG: Ver qué estamos enviando
+    //  DEBUG: Ver qué estamos enviando
     console.log('📤 Enviando a /api/tasks/add-avance:');
     console.log('   id_tarea:', tareaId);
     console.log('   comentario:', comentario.trim());
@@ -567,8 +567,8 @@ window.updateTasksSummary = updateTasksSummary;
 window.formatEstadoUsuario = formatEstadoUsuario;
 window.formatPrioridad = formatPrioridad;
 
-console.log('✅ Módulo de mis tareas cargado completamente');
-console.log('📦 Funciones exportadas:', {
+console.log(' Módulo de mis tareas cargado completamente');
+console.log(' Funciones exportadas:', {
     loadUserTasks: typeof window.loadUserTasks,
     renderUserTasks: typeof window.renderUserTasks,
     updateTaskProgress: typeof window.updateTaskProgress,

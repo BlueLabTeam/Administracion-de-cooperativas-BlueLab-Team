@@ -2,7 +2,7 @@ console.log('🟢 Cargando módulo de vivienda de usuario (Premium Design)');
 
 // ========== INICIALIZACIÓN ==========
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('📋 Inicializando módulo de vivienda');
+    console.log(' Inicializando módulo de vivienda');
     
     // Listener para la sección de vivienda
     const viviendaMenuItem = document.querySelector('.menu li[data-section="vivienda"]');
@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
  */
 function loadMyVivienda() {
     console.log('==========================================');
-    console.log('🏡 INICIANDO CARGA DE VIVIENDA');
+    console.log(' INICIANDO CARGA DE VIVIENDA');
     console.log('==========================================');
     
     const container = document.getElementById('myViviendaContainer');
@@ -33,7 +33,7 @@ function loadMyVivienda() {
         return;
     }
 
-    console.log('✅ Container encontrado');
+    console.log(' Container encontrado');
     container.innerHTML = `
         <div class="loading-vivienda">
             <div class="loading-spinner">
@@ -54,11 +54,11 @@ function loadMyVivienda() {
             return response.json();
         })
         .then(data => {
-            console.log('📊 Data recibida:', data);
+            console.log(' Data recibida:', data);
             
             if (data.success) {
                 if (data.vivienda) {
-                    console.log('✅ Vivienda encontrada:', data.vivienda);
+                    console.log(' Vivienda encontrada:', data.vivienda);
                     renderMyVivienda(data.vivienda);
                 } else {
                     console.log('⚠️ Usuario sin vivienda asignada');
@@ -80,7 +80,7 @@ function loadMyVivienda() {
         });
         
     console.log('==========================================');
-    console.log('🏡 FIN SOLICITUD DE VIVIENDA');
+    console.log(' FIN SOLICITUD DE VIVIENDA');
     console.log('==========================================');
 }
 
@@ -271,7 +271,7 @@ function renderMyVivienda(vivienda) {
                     <div style="
                         width: 50px;
                         height: 50px;
-                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                        background: linear-gradient(135deg, #0064ff 0%, #21bdeb 100%);
                         border-radius: 12px;
                         display: flex;
                         align-items: center;
@@ -286,7 +286,7 @@ function renderMyVivienda(vivienda) {
 
                 <div class="info-list" style="display: flex; flex-direction: column; gap: 15px;">
                     <div class="info-list-item" style="display: flex; align-items: start; gap: 12px;">
-                        <i class="fas fa-hashtag" style="color: #667eea; margin-top: 3px;"></i>
+                        <i class="fas fa-hashtag" style="color: #0064ff; margin-top: 3px;"></i>
                         <div style="flex: 1;">
                             <div style="font-size: 12px; color: #999; margin-bottom: 3px;">Número de Vivienda</div>
                             <div style="font-weight: 600; color: #333;">${vivienda.numero_vivienda}</div>
@@ -294,7 +294,7 @@ function renderMyVivienda(vivienda) {
                     </div>
 
                     <div class="info-list-item" style="display: flex; align-items: start; gap: 12px;">
-                        <i class="fas fa-home" style="color: #667eea; margin-top: 3px;"></i>
+                        <i class="fas fa-home" style="color: #0064ff; margin-top: 3px;"></i>
                         <div style="flex: 1;">
                             <div style="font-size: 12px; color: #999; margin-bottom: 3px;">Tipo de Vivienda</div>
                             <div style="font-weight: 600; color: #333;">${vivienda.tipo_nombre}</div>
@@ -302,7 +302,7 @@ function renderMyVivienda(vivienda) {
                     </div>
 
                     <div class="info-list-item" style="display: flex; align-items: start; gap: 12px;">
-                        <i class="fas fa-map-marker-alt" style="color: #667eea; margin-top: 3px;"></i>
+                        <i class="fas fa-map-marker-alt" style="color: #0064ff; margin-top: 3px;"></i>
                         <div style="flex: 1;">
                             <div style="font-size: 12px; color: #999; margin-bottom: 3px;">Dirección</div>
                             <div style="font-weight: 600; color: #333;">${vivienda.direccion || 'No especificada'}</div>
@@ -310,7 +310,7 @@ function renderMyVivienda(vivienda) {
                     </div>
 
                     <div class="info-list-item" style="display: flex; align-items: start; gap: 12px;">
-                        <i class="fas fa-calendar-alt" style="color: #667eea; margin-top: 3px;"></i>
+                        <i class="fas fa-calendar-alt" style="color: #0064ff; margin-top: 3px;"></i>
                         <div style="flex: 1;">
                             <div style="font-size: 12px; color: #999; margin-bottom: 3px;">Fecha de Asignación</div>
                             <div style="font-weight: 600; color: #333;">${fechaAsignacion}</div>
@@ -349,8 +349,8 @@ function renderMyVivienda(vivienda) {
 
                 <div class="caracteristicas-grid" style="display: grid; gap: 12px;">
                     <div class="caracteristica-item" style="
-                        background: linear-gradient(135deg, #667eea15 0%, #667eea05 100%);
-                        border: 1px solid #667eea20;
+                        background: linear-gradient(135deg, #0064ff15 0%, #0064ff05 100%);
+                        border: 1px solid #0064ff20;
                         border-radius: 10px;
                         padding: 15px;
                         display: flex;
@@ -365,7 +365,7 @@ function renderMyVivienda(vivienda) {
                             display: flex;
                             align-items: center;
                             justify-content: center;
-                            color: #667eea;
+                            color: #0064ff;
                             font-size: 20px;
                         ">
                             <i class="fas fa-bed"></i>
@@ -558,7 +558,7 @@ function renderMyVivienda(vivienda) {
 
             .loading-spinner {
                 font-size: 48px;
-                color: #667eea;
+                color: #0064ff;
                 margin-bottom: 20px;
             }
 
@@ -572,7 +572,7 @@ function renderMyVivienda(vivienda) {
             }
 
             .quick-stat-item:hover {
-                background: linear-gradient(135deg, #667eea05 0%, #764ba205 100%);
+                background: linear-gradient(135deg, #0064ff05 0%, #21bdeb05 100%);
             }
 
             .info-card-premium {
@@ -586,13 +586,13 @@ function renderMyVivienda(vivienda) {
                 left: 0;
                 right: 0;
                 height: 4px;
-                background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+                background: linear-gradient(90deg, #0064ff 0%, #21bdeb 100%);
                 border-radius: 16px 16px 0 0;
             }
         </style>
     `;
     
-    console.log('✅ Vivienda renderizada con diseño premium');
+    console.log(' Vivienda renderizada con diseño premium');
 }
 
 // ==========================================
@@ -618,17 +618,17 @@ function renderSinVivienda(container) {
                 width: 180px;
                 height: 180px;
                 margin: 0 auto 30px;
-                background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+                background: linear-gradient(135deg, #0064ff15 0%, #21bdeb15 100%);
                 border-radius: 50%;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                border: 3px dashed #667eea40;
+                border: 3px dashed #0064ff40;
                 animation: pulse 2s ease-in-out infinite;
             ">
                 <i class="fas fa-home" style="
                     font-size: 80px;
-                    color: #667eea;
+                    color: #0064ff;
                     opacity: 0.6;
                 "></i>
             </div>
@@ -669,14 +669,14 @@ function renderSinVivienda(container) {
                     transition: all 0.3s ease;
                     cursor: pointer;
                 " onclick="crearSolicitudVivienda()"
-                   onmouseover="this.style.borderColor='#667eea'; this.style.transform='translateY(-5px)'; this.style.boxShadow='0 8px 24px rgba(102, 126, 234, 0.15)'"
+                   onmouseover="this.style.borderColor='#0064ff'; this.style.transform='translateY(-5px)'; this.style.boxShadow='0 8px 24px rgba(102, 126, 234, 0.15)'"
                    onmouseout="this.style.borderColor='#e0e0e0'; this.style.transform='translateY(0)'; this.style.boxShadow='none'">
                     
                     <div style="display: flex; align-items: start; gap: 20px;">
                         <div style="
                             width: 60px;
                             height: 60px;
-                            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                            background: linear-gradient(135deg, #0064ff 0%, #21bdeb 100%);
                             border-radius: 12px;
                             display: flex;
                             align-items: center;
@@ -700,7 +700,7 @@ function renderSinVivienda(container) {
                                 display: inline-flex;
                                 align-items: center;
                                 gap: 8px;
-                                color: #667eea;
+                                color: #0064ff;
                                 font-weight: 600;
                                 font-size: 14px;
                             ">
@@ -821,7 +821,7 @@ function renderError(container, mensaje) {
 
             <!-- Botón de reintento -->
             <button class="btn btn-primary" onclick="loadMyVivienda()" style="
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                background: linear-gradient(135deg, #0064ff 0%, #21bdeb 100%);
                 color: white;
                 border: none;
                 padding: 12px 30px;
@@ -884,7 +884,7 @@ function formatearFechaUY(fecha) {
  * Obtener color según tipo de vivienda
  */
 function getColorTipoVivienda(tipo) {
-    if (!tipo) return '#667eea';
+    if (!tipo) return '#0064ff';
     
     const colores = {
         'casa': '#4caf50',
@@ -897,7 +897,7 @@ function getColorTipoVivienda(tipo) {
         'loft': '#795548'
     };
     
-    return colores[tipo.toLowerCase()] || '#667eea';
+    return colores[tipo.toLowerCase()] || '#0064ff';
 }
 
 // ==========================================
@@ -947,7 +947,7 @@ function crearSolicitudVivienda() {
                         position: fixed;
                         top: 20px;
                         right: 20px;
-                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                        background: linear-gradient(135deg, #0064ff 0%, #21bdeb 100%);
                         color: white;
                         padding: 15px 20px;
                         border-radius: 10px;
@@ -963,7 +963,7 @@ function crearSolicitudVivienda() {
                 setTimeout(() => notif.remove(), 5000);
             }, 500);
         } else {
-            alert('ℹ️ Por favor, ve a la sección de "Solicitudes" para enviar tu solicitud de vivienda.');
+            alert(' Por favor, ve a la sección de "Solicitudes" para enviar tu solicitud de vivienda.');
         }
     }
 }
@@ -980,7 +980,7 @@ function contactarAdministrador() {
                 <button onclick="this.closest('.modal-detail').remove()" class="modal-close-button">×</button>
                 
                 <h2 class="modal-detail-header" style="
-                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    background: linear-gradient(135deg, #0064ff 0%, #21bdeb 100%);
                     -webkit-background-clip: text;
                     -webkit-text-fill-color: transparent;
                     background-clip: text;
@@ -996,8 +996,8 @@ function contactarAdministrador() {
 
                 <!-- Opción 1: Solicitud Formal -->
                 <div style="
-                    background: linear-gradient(135deg, #667eea10 0%, #764ba210 100%);
-                    border: 2px solid #667eea30;
+                    background: linear-gradient(135deg, #0064ff10 0%, #21bdeb10 100%);
+                    border: 2px solid #0064ff30;
                     border-radius: 12px;
                     padding: 25px;
                     margin-bottom: 20px;
@@ -1006,7 +1006,7 @@ function contactarAdministrador() {
                         <div style="
                             width: 50px;
                             height: 50px;
-                            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                            background: linear-gradient(135deg, #0064ff 0%, #21bdeb 100%);
                             border-radius: 10px;
                             display: flex;
                             align-items: center;
@@ -1019,14 +1019,14 @@ function contactarAdministrador() {
                         </div>
                         <div style="flex: 1;">
                             <h4 style="margin: 0 0 10px 0; color: #333; font-size: 16px;" data-i18n="dashboardUser.housing.contactAdmin.option1.title">
-                                📋 Opción 1: Solicitud Formal
+                                 Opción 1: Solicitud Formal
                             </h4>
                             <p style="margin: 0 0 15px 0; color: #666; font-size: 14px; line-height: 1.6;" dashboardUser.housing.contactAdmin.option1.description>
                                 Envía una solicitud desde la sección de "Solicitudes" del sistema. 
                                 Será revisada y procesada por el equipo administrativo.
                             </p>
                             <button class="btn btn-primary" onclick="crearSolicitudVivienda()" style="
-                                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                                background: linear-gradient(135deg, #0064ff 0%, #21bdeb 100%);
                                 color: white;
                                 border: none;
                                 padding: 10px 20px;
@@ -1163,8 +1163,8 @@ window.calcularTiempoAsignacion = calcularTiempoAsignacion;
 window.formatearFechaUY = formatearFechaUY;
 window.getColorTipoVivienda = getColorTipoVivienda;
 
-console.log('✅ Módulo de vivienda cargado completamente (Diseño Premium)');
-console.log('📦 Funciones exportadas:', {
+console.log(' Módulo de vivienda cargado completamente (Diseño Premium)');
+console.log(' Funciones exportadas:', {
     loadMyVivienda: typeof window.loadMyVivienda,
     renderMyVivienda: typeof window.renderMyVivienda,
     crearSolicitudVivienda: typeof window.crearSolicitudVivienda,

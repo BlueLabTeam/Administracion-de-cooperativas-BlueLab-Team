@@ -6,7 +6,7 @@
 console.log('🟢 [NAV-USER] Sistema de navegación de usuario cargado');
 
 document.addEventListener('DOMContentLoaded', function () {
-    console.log('📋 [NAV-USER] Inicializando navegación');
+    console.log(' [NAV-USER] Inicializando navegación');
 
     const menuItems = document.querySelectorAll('.menu li[data-section]');
     
@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function () {
         return;
     }
 
-    console.log(`✅ [NAV-USER] ${menuItems.length} items de menú encontrados`);
+    console.log(` [NAV-USER] ${menuItems.length} items de menú encontrados`);
 
     menuItems.forEach(item => {
         item.addEventListener('click', function (e) {
@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', function () {
             
             if (targetSection) {
                 targetSection.classList.add('active');
-                console.log(`✅ [NAV-USER] Sección "${section}" activada`);
+                console.log(` [NAV-USER] Sección "${section}" activada`);
 
                 // Cargar datos según la sección
                 cargarDatosSeccionUsuario(section);
@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Activar sección inicial (inicio)
     const seccionInicial = document.querySelector('.menu li[data-section="inicio"]');
     if (seccionInicial) {
-        console.log('🏠 [NAV-USER] Activando sección inicial');
+        console.log(' [NAV-USER] Activando sección inicial');
         seccionInicial.click();
     }
 });
@@ -64,7 +64,7 @@ function cargarDatosSeccionUsuario(section) {
 
     switch(section) {
         case 'inicio':
-            console.log('🏠 [NAV-USER] Sección Inicio');
+            console.log(' [NAV-USER] Sección Inicio');
             // Cargar núcleo familiar
             if (typeof verificarEstadoNucleo === 'function') {
                 verificarEstadoNucleo();
@@ -74,7 +74,7 @@ function cargarDatosSeccionUsuario(section) {
             break;
 
         case 'perfil':
-            console.log('👤 [NAV-USER] Sección Perfil');
+            console.log(' [NAV-USER] Sección Perfil');
             // Cargar datos del usuario
             if (typeof cargarDatosUsuario === 'function') {
                 cargarDatosUsuario();
@@ -84,7 +84,7 @@ function cargarDatosSeccionUsuario(section) {
             break;
 
         case 'horas':
-            console.log('⏰ [NAV-USER] Sección Horas');
+            console.log(' [NAV-USER] Sección Horas');
             // Inicializar sección de horas
             if (typeof inicializarSeccionHoras === 'function') {
                 inicializarSeccionHoras();
@@ -94,7 +94,7 @@ function cargarDatosSeccionUsuario(section) {
             break;
 
         case 'tareas':
-            console.log('📋 [NAV-USER] Sección Tareas');
+            console.log(' [NAV-USER] Sección Tareas');
             // Cargar tareas del usuario
             if (typeof loadUserTasks === 'function') {
                 loadUserTasks();
@@ -104,7 +104,7 @@ function cargarDatosSeccionUsuario(section) {
             break;
 
         case 'vivienda':
-            console.log('🏡 [NAV-USER] Sección Vivienda');
+            console.log(' [NAV-USER] Sección Vivienda');
             // Cargar información de vivienda
             if (typeof loadMyVivienda === 'function') {
                 loadMyVivienda();
@@ -114,7 +114,7 @@ function cargarDatosSeccionUsuario(section) {
             break;
 
         case 'cuotas':
-            console.log('💰 [NAV-USER] Sección Cuotas');
+            console.log(' [NAV-USER] Sección Cuotas');
             // Inicializar sección de cuotas
             if (typeof inicializarSeccionCuotas === 'function') {
                 inicializarSeccionCuotas();
@@ -134,7 +134,7 @@ function cargarDatosSeccionUsuario(section) {
             break;
 
         case 'notificaciones':
-            console.log('🔔 [NAV-USER] Sección Notificaciones');
+            console.log(' [NAV-USER] Sección Notificaciones');
             // Cargar notificaciones
             if (typeof loadNotifications === 'function') {
                 loadNotifications();
@@ -151,7 +151,7 @@ function cargarDatosSeccionUsuario(section) {
 // ========== FUNCIÓN AUXILIAR: VERIFICAR FUNCIÓN DISPONIBLE ==========
 function verificarFuncionDisponible(nombreFuncion, seccion) {
     if (typeof window[nombreFuncion] === 'function') {
-        console.log(`✅ [NAV-USER] ${nombreFuncion} disponible para ${seccion}`);
+        console.log(` [NAV-USER] ${nombreFuncion} disponible para ${seccion}`);
         return true;
     } else {
         console.error(`❌ [NAV-USER] ${nombreFuncion} NO está definida para ${seccion}`);
@@ -232,8 +232,8 @@ window.navegarASeccion = navegarASeccion;
 window.obtenerSeccionActual = obtenerSeccionActual;
 window.onCambioSeccion = onCambioSeccion;
 
-console.log('✅ [NAV-USER] Sistema de navegación listo');
-console.log('📦 [NAV-USER] Funciones exportadas:', {
+console.log(' [NAV-USER] Sistema de navegación listo');
+console.log(' [NAV-USER] Funciones exportadas:', {
     cargarDatosSeccionUsuario: typeof window.cargarDatosSeccionUsuario,
     navegarASeccion: typeof window.navegarASeccion,
     obtenerSeccionActual: typeof window.obtenerSeccionActual,

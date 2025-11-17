@@ -377,7 +377,7 @@ class RegistroHoras
                 error_log("   Hora entrada: " . $registro['hora_entrada']);
                 return $registro;
             } else {
-                error_log("ℹ️ No hay registro abierto para " . $fecha_hoy);
+                error_log(" No hay registro abierto para " . $fecha_hoy);
                 return null;
             }
 

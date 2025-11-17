@@ -31,7 +31,7 @@
     <main class="content-area">
         <!-- INICIO -->
         <section id="inicio-section" class="section-content active">
-            <h2 class="section-title">🏠 Inicio</h2>
+            <h2 class="section-title"> Inicio</h2>
 
             <div class="info-card">
                 <h3>Bienvenido/a <?php echo htmlspecialchars($_SESSION['nombre_completo'] ?? 'Usuario'); ?></h3>
@@ -41,7 +41,7 @@
             <!-- Notificaciones -->
             <div class="notifications-container">
                 <div class="notifications-header">
-                    <h3>🔔 Notificaciones</h3>
+                    <h3> Notificaciones</h3>
                     <span class="notifications-badge" id="notificationsBadge">0</span>
                 </div>
                 <div id="notificationsList" class="notifications-list">
@@ -70,7 +70,7 @@
 
         <!-- MI PERFIL -->
         <section id="perfil-section" class="section-content">
-            <h2 class="section-title">👤 Mi Perfil</h2>
+            <h2 class="section-title"> Mi Perfil</h2>
             <div class="info-card">
                 <h3>Información Personal</h3>
                 <p><strong>Nombre:</strong> <?php echo htmlspecialchars($_SESSION['nombre_completo'] ?? 'Usuario'); ?>
@@ -92,7 +92,7 @@
 
         <!-- MI VIVIENDA -->
         <section id="vivienda-section" class="section-content">
-            <h2 class="section-title">🏡 Mi Vivienda</h2>
+            <h2 class="section-title"> Mi Vivienda</h2>
             <div class="info-card">
                 <h3>Información de tu Vivienda</h3>
                 <p>Aquí encontrarás toda la información relacionada con tu vivienda asignada.</p>
@@ -102,7 +102,7 @@
 
         <!-- APORTES -->
         <section id="aportes-section" class="section-content">
-            <h2 class="section-title">💰 Mis Aportes</h2>
+            <h2 class="section-title"> Mis Aportes</h2>
             <div class="info-card">
                 <h3>Historial de Aportes</h3>
                 <p>Registro de todos tus aportes económicos a la cooperativa.</p>
@@ -128,7 +128,7 @@
 
         <!-- HORAS -->
         <section id="horas-section" class="section-content">
-            <h2 class="section-title">⏰ Registro de Horas</h2>
+            <h2 class="section-title"> Registro de Horas</h2>
             <div class="info-card">
                 <h3>Horas de Trabajo Cooperativo</h3>
                 <p>Registro de las horas trabajadas en actividades de la cooperativa.</p>
@@ -158,7 +158,7 @@
 
             <div class="tasks-summary">
                 <div class="summary-card">
-                    <div class="summary-icon">📋</div>
+                    <div class="summary-icon"></div>
                     <div class="summary-content">
                         <h4>Tareas Pendientes</h4>
                         <p id="pending-count">0</p>
@@ -201,7 +201,7 @@
 
             <!-- Tareas del núcleo familiar -->
             <div class="info-card">
-                <h3>👨‍👩‍👧‍👦 Tareas del Núcleo Familiar</h3>
+                <h3> Tareas del Núcleo Familiar</h3>
                 <div id="tareasNucleoList">
                     <p class="loading">Cargando tareas...</p>
                 </div>

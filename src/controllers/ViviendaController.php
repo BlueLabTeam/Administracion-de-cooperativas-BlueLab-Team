@@ -221,7 +221,7 @@ class ViviendaController
         $idNucleo = !empty($_POST['nucleo_id']) ? intval($_POST['nucleo_id']) : null;
         $observaciones = $_POST['observaciones'] ?? '';
 
-        error_log("🏠 [ASIGNAR] Vivienda: $idVivienda | Usuario: " . var_export($idUsuario, true) . " | Núcleo: " . var_export($idNucleo, true));
+        error_log(" [ASIGNAR] Vivienda: $idVivienda | Usuario: " . var_export($idUsuario, true) . " | Núcleo: " . var_export($idNucleo, true));
 
         // Validar
         if (!$idVivienda) {
@@ -276,7 +276,7 @@ class ViviendaController
         // 🔧 SOLUCIÓN: SQL condicional según el tipo de asignación
         if ($idUsuario) {
             //  Asignar a USUARIO - Solo insertar columnas necesarias
-            error_log("👤 [ASIGNAR] Insertando asignación a USUARIO $idUsuario");
+            error_log(" [ASIGNAR] Insertando asignación a USUARIO $idUsuario");
             
             $sql = "INSERT INTO Asignacion_Vivienda 
                     (id_vivienda, id_usuario, activa, observaciones, fecha_asignacion)
@@ -287,7 +287,7 @@ class ViviendaController
             
         } else {
             //  Asignar a NÚCLEO - Solo insertar columnas necesarias
-            error_log("👨‍👩‍👧‍👦 [ASIGNAR] Insertando asignación a NÚCLEO $idNucleo");
+            error_log(" [ASIGNAR] Insertando asignación a NÚCLEO $idNucleo");
             
             $sql = "INSERT INTO Asignacion_Vivienda 
                     (id_vivienda, id_nucleo, activa, observaciones, fecha_asignacion)
@@ -306,9 +306,9 @@ class ViviendaController
 
         $cuotasActualizadas = 0;
 
-        // 👤 ACTUALIZAR CUOTAS DEL USUARIO
+        //  ACTUALIZAR CUOTAS DEL USUARIO
         if ($idUsuario) {
-            error_log("📊 [ASIGNAR] Actualizando cuotas para usuario $idUsuario");
+            error_log(" [ASIGNAR] Actualizando cuotas para usuario $idUsuario");
             
             $stmtUpdateCuotas = $this->conn->prepare("
                 UPDATE Cuotas_Mensuales cm
@@ -337,13 +337,13 @@ class ViviendaController
             ]);
 
             $cuotasActualizadas = $stmtUpdateCuotas->rowCount();
-            error_log("📊 [ASIGNAR] Cuotas actualizadas: $cuotasActualizadas");
+            error_log(" [ASIGNAR] Cuotas actualizadas: $cuotasActualizadas");
 
             // Notificar
             if ($cuotasActualizadas > 0) {
                 $stmtNotif = $this->conn->prepare("
                     INSERT INTO notificaciones (titulo, mensaje, tipo)
-                    VALUES ('🏠 Vivienda Asignada', ?, 'exito')
+                    VALUES (' Vivienda Asignada', ?, 'exito')
                 ");
                 
                 $mensaje = sprintf(
@@ -365,9 +365,9 @@ class ViviendaController
             }
         }
 
-        // 👨‍👩‍👧‍👦 ACTUALIZAR CUOTAS DEL NÚCLEO
+        //  ACTUALIZAR CUOTAS DEL NÚCLEO
         if ($idNucleo) {
-            error_log("👨‍👩‍👧‍👦 [ASIGNAR] Obteniendo miembros del núcleo $idNucleo");
+            error_log(" [ASIGNAR] Obteniendo miembros del núcleo $idNucleo");
             
             $stmtMiembros = $this->conn->prepare("
                 SELECT id_usuario, nombre_completo 
@@ -377,7 +377,7 @@ class ViviendaController
             $stmtMiembros->execute([$idNucleo]);
             $miembros = $stmtMiembros->fetchAll(PDO::FETCH_ASSOC);
 
-            error_log("👨‍👩‍👧‍👦 [ASIGNAR] Miembros encontrados: " . count($miembros));
+            error_log(" [ASIGNAR] Miembros encontrados: " . count($miembros));
 
             foreach ($miembros as $miembro) {
                 error_log("   → Procesando: {$miembro['nombre_completo']} (ID: {$miembro['id_usuario']})");
@@ -416,7 +416,7 @@ class ViviendaController
                 if ($cuotasMiembro > 0) {
                     $stmtNotif = $this->conn->prepare("
                         INSERT INTO notificaciones (titulo, mensaje, tipo)
-                        VALUES ('🏠 Vivienda Asignada a tu Núcleo', ?, 'exito')
+                        VALUES (' Vivienda Asignada a tu Núcleo', ?, 'exito')
                     ");
                     
                     $mensaje = sprintf(

@@ -29,7 +29,7 @@
 
     // ========== INICIALIZACIÓN ==========
     function inicializarModuloTareas() {
-       ('📋 [TAREAS] Inicializando módulo...');
+       (' [TAREAS] Inicializando módulo...');
         
         const tareasMenuItem = document.querySelector('.menu li[data-section="tareas"]');
         if (tareasMenuItem) {
@@ -226,7 +226,7 @@
             const data = await response.json();
             
             if (data.success) {
-                alert('✅ ' + data.message);
+                alert(' ' + data.message);
                 form.reset();
                 document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
 
@@ -330,7 +330,7 @@
             let estadoTexto = '', estadoBadgeClass = '', claseVencida = '';
 
             if (tarea.esVencida === true) {
-                estadoTexto = '⏰ Vencida';
+                estadoTexto = ' Vencida';
                 estadoBadgeClass = 'vencida';
                 claseVencida = 'tarea-vencida';
             } else if (tarea.esCompletada) {
@@ -474,7 +474,7 @@
                 if (data.materiales && data.materiales.length > 0) {
                     showTaskMaterialsModal(data.materiales, tareaId);
                 } else {
-                    alert('ℹ️ Esta tarea no tiene materiales asignados');
+                    alert(' Esta tarea no tiene materiales asignados');
                 }
             } else {
                 alert('❌ Error: ' + (data.message || 'Error desconocido'));
@@ -566,7 +566,7 @@
             const data = await response.json();
             
             if (data.success) {
-                alert('✅ ' + data.message);
+                alert(' ' + data.message);
                 window.loadAllTasks();
             } else {
                 alert('❌ Error: ' + data.message);

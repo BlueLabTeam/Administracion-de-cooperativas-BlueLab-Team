@@ -73,10 +73,11 @@
     color: var(--color-white);
 }
 
-/* ========== DESGLOSE DE DEUDA (COMPACTO) ========== */
+/* ========== DESGLOSE DE DEUDA (HORIZONTAL) ========== */
 .deuda-breakdown {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
     gap: var(--spacing-lg);
     margin-bottom: var(--spacing-xl);
 }
@@ -91,6 +92,8 @@
     gap: var(--spacing-md);
     border: 1px solid rgba(255, 255, 255, 0.15);
     transition: all var(--transition-base);
+    flex: 1 1 0;
+    min-width: 200px;
 }
 
 .deuda-breakdown-item:hover {
@@ -159,17 +162,17 @@
 
 /* Divisor */
 .deuda-breakdown-divider {
-    grid-column: 1 / -1;
+    flex: 0 0 auto;
     text-align: center;
     font-size: 24px;
     font-weight: 700;
     color: rgba(255, 255, 255, 0.5);
-    padding: var(--spacing-xs) 0;
+    padding: 0 var(--spacing-md);
 }
 
 /* Item de total */
 .deuda-breakdown-item.deuda-total {
-    grid-column: 1 / -1;
+    flex: 1 1 100%;
     background: rgba(255, 255, 255, 0.2);
     border: 2px solid rgba(255, 255, 255, 0.3);
     padding: var(--spacing-xl);
@@ -259,11 +262,12 @@
 /* ========== RESPONSIVE ========== */
 @media (max-width: 992px) {
     .deuda-breakdown {
-        grid-template-columns: 1fr;
+        flex-direction: column;
+        align-items: stretch;
     }
     
-    .deuda-breakdown-item.deuda-total {
-        grid-column: 1;
+    .deuda-breakdown-divider {
+        padding: var(--spacing-xs) 0;
     }
 }
 

@@ -308,7 +308,7 @@
             const data = await response.json();
             
             if (data.success) {
-                alert('✅ ' + data.message);
+                alert(' ' + data.message);
                 window.closeMaterialModal();
                 window.loadMateriales();
             } else {
@@ -336,7 +336,7 @@
             const data = await response.json();
             
             if (data.success) {
-                alert('✅ Material eliminado');
+                alert(' Material eliminado');
                 window.loadMateriales();
             } else {
                 alert('❌ Error: ' + (data.message || 'Error al eliminar'));
@@ -394,7 +394,7 @@
             const data = await response.json();
             
             if (data.success) {
-                alert('✅ Stock actualizado');
+                alert(' Stock actualizado');
                 window.closeStockModal();
                 window.loadMateriales();
             } else {
@@ -620,7 +620,7 @@
         const existente = materialesAsignados.find(m => m.id === materialId);
         if (existente) {
             existente.cantidad = cantidad;
-            alert('✅ Cantidad actualizada');
+            alert(' Cantidad actualizada');
         } else {
             materialesAsignados.push({
                 id: materialId,

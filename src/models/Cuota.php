@@ -387,7 +387,7 @@ public function getResumenDeuda($idUsuario)
                 error_log("⚠️ Usuario sin vivienda - Cuota creada con monto = 0");
             }
 
-            // 💰 CALCULAR DEUDA ACUMULADA CORRECTAMENTE
+            //  CALCULAR DEUDA ACUMULADA CORRECTAMENTE
 // Incluir TODAS las cuotas pendientes/vencidas de meses anteriores
 // INCLUYENDO la deuda por horas no trabajadas
 $stmtDeuda = $this->conn->prepare("
@@ -411,11 +411,11 @@ $stmtDeuda = $this->conn->prepare("
 ");
 $stmtDeuda->execute([$idUsuario, $anio, $anio, $mes]);
 $deudaAnterior = floatval($stmtDeuda->fetchColumn());
-error_log("💰 Deuda acumulada de meses anteriores: $$deudaAnterior");
+error_log(" Deuda acumulada de meses anteriores: $$deudaAnterior");
 
             // Calcular horas cumplidas
             $horasCumplidas = $this->calcularHorasCumplidasMes($idUsuario, $mes, $anio);
-            error_log("⏰ Horas cumplidas: $horasCumplidas");
+            error_log(" Horas cumplidas: $horasCumplidas");
 
             // Fecha de vencimiento
             $fechaVencimiento = date('Y-m-t', strtotime("$anio-$mes-01"));
@@ -652,7 +652,7 @@ error_log("💰 Deuda acumulada de meses anteriores: $$deudaAnterior");
             
             $sql .= " ORDER BY cm.anio DESC, cm.mes DESC";
             
-            error_log("📋 SQL directo: " . substr($sql, 0, 200) . "...");
+            error_log(" SQL directo: " . substr($sql, 0, 200) . "...");
             
             $stmt = $this->conn->prepare($sql);
             $stmt->execute($params);
@@ -757,15 +757,15 @@ error_log("💰 Deuda acumulada de meses anteriores: $$deudaAnterior");
     vcj.anio DESC, 
     vcj.mes DESC";
             
-            error_log("📋 SQL Query: " . $sql);
-            error_log("📋 Params: " . json_encode($params));
+            error_log(" SQL Query: " . $sql);
+            error_log(" Params: " . json_encode($params));
             
             $stmt = $this->conn->prepare($sql);
             $stmt->execute($params);
             
             $resultados = $stmt->fetchAll(PDO::FETCH_ASSOC);
             
-            error_log("📊 Resultados encontrados: " . count($resultados));
+            error_log(" Resultados encontrados: " . count($resultados));
             
             if (count($resultados) > 0) {
                 error_log("📄 Primera cuota:");
@@ -784,7 +784,7 @@ error_log("💰 Deuda acumulada de meses anteriores: $$deudaAnterior");
                 $checkDirecto->execute([$idUsuario]);
                 $totalDirecto = $checkDirecto->fetchColumn();
                 
-                error_log("📊 Cuotas en tabla directa: $totalDirecto");
+                error_log(" Cuotas en tabla directa: $totalDirecto");
                 
                 if ($totalDirecto > 0) {
                     error_log("⚠️ Hay cuotas en la tabla pero no en la vista. Usando consulta directa...");
@@ -812,9 +812,9 @@ public function liquidarCuotaForzada($cuotaId, $adminId)
 {
     try {
         error_log("===========================================");
-        error_log("💰 [MODELO] liquidarCuotaForzada iniciado");
+        error_log(" [MODELO] liquidarCuotaForzada iniciado");
         error_log("🔑 Cuota ID: $cuotaId");
-        error_log("👤 Admin ID: $adminId");
+        error_log(" Admin ID: $adminId");
         error_log("🔍 Conexión BD: " . ($this->conn ? "OK" : "NULL"));
         
         //  VALIDACIÓN: Verificar que tenemos conexión a BD
@@ -883,7 +883,7 @@ public function liquidarCuotaForzada($cuotaId, $adminId)
             ];
         }
         
-        error_log("📊 [MODELO] Cuota encontrada: " . json_encode($cuota));
+        error_log(" [MODELO] Cuota encontrada: " . json_encode($cuota));
         
         //  PASO 2: VALIDAR QUE NO ESTÉ YA PAGADA
         if ($cuota['estado'] === 'pagada') {

@@ -20,7 +20,7 @@ SQL_FILE="$BACKUP_DIR/backup_${DB}_$FECHA.sql"
 UPLOADS_FILE="$BACKUP_DIR/uploads_$FECHA.tar.gz"
 LOG_FILE="$LOGS_DIR/backup.log"
 
-echo "📦 Iniciando proceso de backup - $FECHA"
+echo " Iniciando proceso de backup - $FECHA"
 
 # === Backup de la base de datos ===
 echo "🗄️  Respaldo de base de datos..."

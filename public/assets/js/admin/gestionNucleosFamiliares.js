@@ -340,7 +340,7 @@ async function submitCreateNucleo(event) {
         const data = await response.json();
         
         if (data.success) {
-            alert('✅ ' + data.message);
+            alert(' ' + data.message);
             closeCreateNucleoModal();
             loadNucleosFamiliares();
         } else {
@@ -571,7 +571,7 @@ async function submitEditNucleo(event, nucleoId) {
         const data = await response.json();
         
         if (data.success) {
-            alert('✅ ' + data.message);
+            alert(' ' + data.message);
             closeEditNucleoModal();
             loadNucleosFamiliares();
         } else {
@@ -601,7 +601,7 @@ async function deleteNucleo(nucleoId) {
         const data = await response.json();
         
         if (data.success) {
-            alert('✅ ' + data.message);
+            alert(' ' + data.message);
             loadNucleosFamiliares();
         } else {
             alert('❌ Error: ' + data.message);
@@ -639,4 +639,4 @@ if (document.readyState === 'loading') {
     inicializarModuloNucleos();
 }
 
-console.log('✅ [MÓDULO NÚCLEOS] Cargado completamente');
+console.log(' [MÓDULO NÚCLEOS] Cargado completamente');

@@ -1,5 +1,5 @@
 // ==========================================
-// 📋 MÓDULO: INICIO USUARIO
+//  MÓDULO: INICIO USUARIO
 // Gestiona la sección de inicio del dashboard de usuario
 // Incluye: notificaciones, núcleo familiar, datos de perfil
 // ==========================================
@@ -12,7 +12,7 @@ let verificacionEnCurso = false;
 
 // ========== INICIALIZACIÓN ==========
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('📋 Inicializando módulo de inicio');
+    console.log(' Inicializando módulo de inicio');
     
     // Cargar datos del usuario
     cargarDatosUsuario();
@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const inicioMenuItem = document.querySelector('.menu li[data-section="inicio"]');
     if (inicioMenuItem) {
         inicioMenuItem.addEventListener('click', function() {
-            console.log('🏠 Click en sección Inicio');
+            console.log(' Click en sección Inicio');
             
             // Solo recargar núcleo si no se ha mostrado aún
             if (!nucleoYaCargado) {
@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // ==========================================
-// 🔔 SISTEMA DE NOTIFICACIONES
+//  SISTEMA DE NOTIFICACIONES
 // ==========================================
 
 /**
@@ -117,12 +117,12 @@ function renderNotifications(notifications, unreadCount) {
  */
 function getTipoIcon(tipo) {
     const icons = {
-        'info': 'ℹ️',
+        'info': '',
         'importante': '⚠️',
-        'urgente': '🚨',
-        'exito': '✅'
+        'urgente': '',
+        'exito': ''
     };
-    return icons[tipo] || 'ℹ️';
+    return icons[tipo] || '';
 }
 
 /**
@@ -185,7 +185,7 @@ async function markAsRead(notifId, element) {
 
 /**
  * Verificar si el usuario tiene núcleo o debe solicitar uno
- * ✅ CON PROTECCIÓN CONTRA DUPLICADOS
+ *  CON PROTECCIÓN CONTRA DUPLICADOS
  */
 async function verificarEstadoNucleo() {
     // PROTECCIÓN: Evitar múltiples ejecuciones simultáneas
@@ -195,7 +195,7 @@ async function verificarEstadoNucleo() {
     }
     
     if (nucleoYaCargado) {
-        console.log('✅ Núcleo ya cargado previamente, saltando...');
+        console.log(' Núcleo ya cargado previamente, saltando...');
         return;
     }
     
@@ -206,7 +206,7 @@ async function verificarEstadoNucleo() {
         const response = await fetch('/api/users/my-profile');
         const data = await response.json();
         
-        console.log('📊 Datos de perfil:', data);
+        console.log(' Datos de perfil:', data);
         
         if (data.success && data.user) {
             // 🎯 BUSCAR SECCIÓN DE INICIO
@@ -230,8 +230,8 @@ async function verificarEstadoNucleo() {
             console.log('🔍 id_nucleo del usuario:', idNucleo);
             
             if (idNucleo) {
-                // ✅ TIENE NÚCLEO - Mostrar info
-                console.log('✅ Usuario tiene núcleo:', idNucleo);
+                //  TIENE NÚCLEO - Mostrar info
+                console.log(' Usuario tiene núcleo:', idNucleo);
                 await mostrarInfoNucleoEnInicio(idNucleo, inicioSection);
             } else {
                 // ❌ NO TIENE NÚCLEO - Mostrar banner
@@ -239,9 +239,9 @@ async function verificarEstadoNucleo() {
                 mostrarBannerNucleoEnInicio(inicioSection);
             }
             
-            // ✅ Marcar como cargado
+            //  Marcar como cargado
             nucleoYaCargado = true;
-            console.log('✅ Núcleo cargado correctamente');
+            console.log(' Núcleo cargado correctamente');
         }
     } catch (error) {
         console.error('❌ Error al verificar núcleo:', error);
@@ -269,7 +269,7 @@ async function mostrarInfoNucleoEnInicio(idNucleo, inicioSection) {
         const miembros = data.miembros || [];
         const miId = data.mi_id;
         
-        console.log('📋 Núcleo:', nucleo.nombre_nucleo, '- Miembros:', miembros.length);
+        console.log(' Núcleo:', nucleo.nombre_nucleo, '- Miembros:', miembros.length);
         
         let miembrosHTML = '';
         
@@ -398,7 +398,7 @@ async function mostrarInfoNucleoEnInicio(idNucleo, inicioSection) {
             inicioSection.insertAdjacentHTML('afterbegin', infoHTML);
         }
         i18n.translatePage();
-        console.log('✅ Card de núcleo insertado en inicio');
+        console.log(' Card de núcleo insertado en inicio');
         
     } catch (error) {
         console.error('❌ Error al mostrar núcleo en inicio:', error);
@@ -420,7 +420,7 @@ function mostrarBannerNucleoEnInicio(inicioSection) {
             animation: slideInDown 0.5s ease-out;
         ">
             <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
-                <div style="font-size: 48px;">👨‍👩‍👧‍👦</div>
+                <div style="font-size: 48px;"></div>
                 <div style="flex: 1; min-width: 250px;">
                     <h3 style="margin: 0 0 10px 0; font-size: 20px;" data-i18n="dashboardUser.home.bannerUnit.joinMessage">¿Quieres unirte a un Núcleo Familiar?</h3>
                     <p style="margin: 0; opacity: 0.9;" data-i18n="dashboardUser.home.bannerUnit.unitDescription">
@@ -460,7 +460,7 @@ function mostrarBannerNucleoEnInicio(inicioSection) {
     }
     i18n.translatePage();
     
-    console.log('✅ Banner de núcleo insertado en inicio');
+    console.log(' Banner de núcleo insertado en inicio');
 }
 
 /**
@@ -600,7 +600,7 @@ function cerrarModalDetallesNucleo() {
     document.body.style.overflow = '';
 }
 // ==========================================
-// 👤 DATOS DEL USUARIO
+//  DATOS DEL USUARIO
 // ==========================================
 
 /**
@@ -628,7 +628,7 @@ async function cargarDatosUsuario() {
                 emailElement.textContent = data.user.email || '';
             }
             
-            console.log('✅ Datos de usuario cargados correctamente');
+            console.log(' Datos de usuario cargados correctamente');
         } else {
             console.error('Error en respuesta:', data);
         }
@@ -647,8 +647,8 @@ window.verificarEstadoNucleo = verificarEstadoNucleo;
 window.verDetallesNucleoDesdeInicio = verDetallesNucleoDesdeInicio;
 window.cargarDatosUsuario = cargarDatosUsuario;
 
-console.log('✅ Módulo de inicio de usuario cargado completamente');
-console.log('📦 Funciones exportadas:', {
+console.log(' Módulo de inicio de usuario cargado completamente');
+console.log(' Funciones exportadas:', {
     loadNotifications: typeof window.loadNotifications,
     verificarEstadoNucleo: typeof window.verificarEstadoNucleo,
     cargarDatosUsuario: typeof window.cargarDatosUsuario

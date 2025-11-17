@@ -243,7 +243,7 @@ backups() {
 
 	# Asegurar que cron esté instalado
 	if ! command -v cron &>/dev/null; then
-		echo "📦 Instalando cron..."
+		echo " Instalando cron..."
 		sudo apt update && sudo apt install -y cron
 	fi
 

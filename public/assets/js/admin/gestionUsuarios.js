@@ -448,7 +448,7 @@ const GestionUsuarios = (function() {
                     </h2>
                     
                     <div style="background: #E3F2FD; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-                        <h3 style="color: #005CB9; margin-bottom: 15px;">👤 Información del Usuario</h3>
+                        <h3 style="color: #005CB9; margin-bottom: 15px;"> Información del Usuario</h3>
                         <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
                             <div><strong>Nombre:</strong> ${usuario.nombre_completo}</div>
                             <div><strong>Cédula:</strong> ${usuario.cedula}</div>
@@ -459,7 +459,7 @@ const GestionUsuarios = (function() {
                     
                     ${pago ? `
                         <div style="background: #F5F7FA; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-                            <h3 style="color: #005CB9; margin-bottom: 15px;">💰 Información del Pago</h3>
+                            <h3 style="color: #005CB9; margin-bottom: 15px;"> Información del Pago</h3>
                             <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px;">
                                 <div><strong>Fecha:</strong> ${formatFecha(pago.fecha_pago)}</div>
                                 <div><strong>Monto:</strong> $${parseFloat(pago.monto).toLocaleString('es-UY', {minimumFractionDigits: 2})}</div>

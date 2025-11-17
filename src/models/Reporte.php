@@ -257,7 +257,7 @@ class Reporte
 
     private function getTareasUsuarioMes($idUsuario, $mes, $anio)
     {
-        error_log("📋 Obteniendo tareas para usuario $idUsuario: mes=$mes, año=$anio");
+        error_log(" Obteniendo tareas para usuario $idUsuario: mes=$mes, año=$anio");
         
         //  CALCULAR primer y último día del mes
         $primerDia = "$anio-" . str_pad($mes, 2, '0', STR_PAD_LEFT) . "-01";
@@ -300,7 +300,7 @@ class Reporte
      */
     private function getCuotaUsuarioMes($idUsuario, $mes, $anio)
     {
-        error_log("💰 Obteniendo cuota para usuario $idUsuario: mes=$mes, año=$anio");
+        error_log(" Obteniendo cuota para usuario $idUsuario: mes=$mes, año=$anio");
         
         $sql = "SELECT 
                     c.estado,

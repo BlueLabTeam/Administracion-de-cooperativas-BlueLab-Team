@@ -161,8 +161,8 @@ es: {
     },
 
     reports: {
-      title: "📊 Reportes Mensuales",
-      selectPeriod: "⚙️ Seleccionar Período",
+      title: " Reportes Mensuales",
+      selectPeriod: " Seleccionar Período",
       selectMonth: "Seleccionar mes...",
       selectYear: "Seleccionar año...",
       generate: "Generar Reporte",
@@ -171,7 +171,7 @@ es: {
       hoursWorked: "Horas Trabajadas",
       completedTasks: "Tareas Completadas",
       avgCompliance: "Cumplimiento Promedio",
-      detailByUser: "📋 Detalle por Usuario"
+      detailByUser: " Detalle por Usuario"
     },
 
     housing: {
@@ -218,26 +218,26 @@ es: {
     },
 
     billing: {
-      title: "💰 Gestión de Cuotas Mensuales",
+      title: " Gestión de Cuotas Mensuales",
       totalQuotas: "Total de Cuotas",
       paid: "Pagadas",
       pending: "Pendientes",
       amountCollected: "Monto Recaudado",
-      priceConfig: "⚙️ Configuración de Precios",
-      quickActions: "🚀 Acciones Rápidas",
+      priceConfig: " Configuración de Precios",
+      quickActions: " Acciones Rápidas",
       generateCurrentMonth: "Generar Cuotas del Mes Actual",
       filterAllYears: "Todos los años",
       filterAllMonths: "Todos los meses",
       filterAllStates: "Todos los estados",
       filterPending: "Pendiente",
       filterPaid: "Pagada",
-      allQuotas: "📋 Todas las Cuotas",
+      allQuotas: " Todas las Cuotas",
       updatePrice: "💵 Actualizar Precio de la Cuota",
       housingType: "Tipo de Vivienda",
       newMonthlyAmount: "Nuevo Monto Mensual *",
       amountPlaceholder: "Ej: 7500.00",
       priceChangeWarning: "Este cambio se aplicará a las nuevas cuotas generadas. Las ya existentes mantienen su valor original.",
-      validatePayment: "✅ Validar Pago",
+      validatePayment: " Validar Pago",
       observationsOptional: "Observaciones (opcional)",
       validationComments: "Comentarios sobre la validación..."
     },
@@ -278,7 +278,7 @@ es: {
       selectUsers: "Seleccionar Usuarios:",
       selectNuclei: "Seleccionar Núcleos:",
       selectAll: "Seleccionar Todos",
-      materialsNeeded: "📦 Materiales necesarios para la tarea:",
+      materialsNeeded: " Materiales necesarios para la tarea:",
       searchMaterial: "Buscar material...",
       noMaterialsAssigned: "No hay materiales asignados",
       createTask: "Crear Tarea",
@@ -286,7 +286,7 @@ es: {
     },
 
     requests: {
-      title: "📩 Gestión de Solicitudes",
+      title: " Gestión de Solicitudes",
       inReview: "En Revisión",
       resolved: "Resueltas",
       highPriority: "Alta Prioridad",
@@ -319,7 +319,7 @@ es: {
     },
 
     home: {
-        title: "🏠 Inicio",
+        title: " Inicio",
         welcome: "Bienvenido",
         nucleoInfoCard: {
           title: "Tu Núcleo Familiar",
@@ -340,7 +340,7 @@ es: {
           viewButton: "Ver Núcleos"
         },
         description: "Este es tu panel de usuario de la Cooperativa de Vivienda.",
-        notifications: "🔔 Notificaciones",
+        notifications: " Notificaciones",
         notificationsBadge: "0",
         loadingNotifications: "Cargando notificaciones...",
         notificationsContent: {
@@ -372,7 +372,7 @@ es: {
       },
       
     profile: {
-      title: "👤 Mi Perfil",
+      title: " Mi Perfil",
       personalInfo: "Información Personal",
       editProfile: "Editar Perfil",
       cancelEdit: "Cancelar",
@@ -396,24 +396,24 @@ es: {
     },
 
     requests: {
-      title: "📩 Mis Solicitudes",
+      title: " Mis Solicitudes",
       manage: "Gestioná tus solicitudes",
       description: "Enviá consultas, justificaciones o reportes al administrador",
       newRequest: "Nueva Solicitud",
       noRequests: "No tenés solicitudes",
       types: {
-        hours: " 📊 Registro de Horas",
-        payment: " 💳 Pagos/Cuotas",
-        housing: " 🏡 Vivienda",
+        hours: "  Registro de Horas",
+        payment: "  Pagos/Cuotas",
+        housing: "  Vivienda",
         general: " 📝 Consulta General",
         other: " ❓ Otro"
       },
       form: {
         typeLabel: "Tipo de Solicitud:",
         types: {
-          hours: " 📊 Registro de Horas",
-          payment: " 💳 Pagos/Cuotas",
-          housing: " 🏡 Vivienda",
+          hours: "  Registro de Horas",
+          payment: "  Pagos/Cuotas",
+          housing: "  Vivienda",
           general: " 📝 Consulta General",
           other: " ❓ Otro"
         },
@@ -454,14 +454,14 @@ es: {
     },
 
     housing: {
-      title: "🏡 Mi Vivienda",
+      title: " Mi Vivienda",
       subtitle: "Información de la Vivienda",
       loading: "Cargando...",
       noAssigned: "No tenés una vivienda asignada"
     },
 
     billing: {
-      title: "💳 Mis Cuotas",
+      title: " Mis Cuotas",
       description: "Gestioná los pagos de tu vivienda y tu deuda por horas",
       stats: {
         pending: "Pendientes",
@@ -503,7 +503,7 @@ es: {
       },
 
       debtStatus: {
-        title: "💳 Estado de Deuda por Horas",
+        title: " Estado de Deuda por Horas",
         calculating: "Calculando deuda...",
         debtType: {
           period: "período:",
@@ -511,7 +511,7 @@ es: {
           withoutDebt: "No tenés horas pendientes"
         },
         debtBreakdown: {
-          debtForTheCurrentMonth: "💰 Deuda del Mes Actual:",
+          debtForTheCurrentMonth: " Deuda del Mes Actual:",
           debtItems: {
             hoursRequired: "Horas Requeridas",
             WeeklySystem: "Sistema Semanal",
@@ -539,7 +539,7 @@ es: {
       enabledPaymentPeriod: "Período de Pago Habilitado",
       enabledPaymentPeriodMessage: "Ya podés realizar el pago de tu cuota. El período de pago está activo hasta fin de mes.",
       pendingPayment: "⏳ Pago en Revisión",
-      noPendingPayment: "✅ No tenés pagos pendientes",
+      noPendingPayment: " No tenés pagos pendientes",
       blockedPayment: "Pago Bloqueado",
       workingPeriod: " 🔒 Período de Trabajo Activo",
       workingPeriodNote: "Podrás pagar en",
@@ -557,7 +557,7 @@ es: {
         totalDue: "Total a Pagar",
         totalPaid: "Total Pagado",
         totalOverdue: "Total Vencido",
-        housingFee: "🏠 Cuota Habitacional:",
+        housingFee: " Cuota Habitacional:",
         houseFee: "Total de tu Vivienda",
         paymentCompleted: " 🎉 ¡Pago realizado con éxito!",
         paymentSuccess: "Pagaste correctamente la cuota de",
@@ -567,15 +567,15 @@ es: {
         dueFeeExpired: "❌ Cuota Vencida",
         dueFeeExpiredNote: "La deuda se acumulará.",
         openPaymentPeriod: "⚠️ Período de Pago Abierto",
-        paid: "✅ Pagada",
+        paid: " Pagada",
         inReview: "⏳ En Revisión",
         overdue: "❌ Vencida",
         day: "DÍA",
         toPay: "A PAGAR",
         total: "TOTAL",
-        paymentBreakdown: "📋 Detalle del Pago:",
-        unworkedHoursDebt: "⏰ Deuda por Horas no Trabajadas:",
-        totalPaidTxt: "💰 Total Pagado:"
+        paymentBreakdown: " Detalle del Pago:",
+        unworkedHoursDebt: " Deuda por Horas no Trabajadas:",
+        totalPaidTxt: " Total Pagado:"
       },
       history: {
         title: "Historial de Pagos",
@@ -585,7 +585,7 @@ es: {
     },
 
     hours: {
-      title: "⏰ Registro de Horas",
+      title: " Registro de Horas",
       currentTime: "Hora actual",
       registering: "Registrando...",
       clockIn: "Registrar Entrada",
@@ -629,7 +629,7 @@ es: {
         }
       },
       history: {
-        title: "📜 Historial de Registros",
+        title: " Historial de Registros",
         startDate: "Fecha inicio",
         endDate: "Fecha fin",
         filter: "Filtrar",
@@ -660,7 +660,7 @@ es: {
     },
 
     tasks: {
-      title: "📋 Mis Tareas",
+      title: " Mis Tareas",
       stats: {
         pending: "Pendientes",
         inProgress: "En Progreso",
@@ -679,8 +679,8 @@ es: {
       viewFullDetails: "Ver Detalles Completos",
       showCompleted: "Mostrar completadas",
       assignedTasks: "Mis Tareas Asignadas",
-      individual: "📋 Tareas Individuales",
-      family: "👨‍👩‍👧‍👦 Tareas del Núcleo Familiar",
+      individual: " Tareas Individuales",
+      family: " Tareas del Núcleo Familiar",
       loading: "Cargando tareas...",
       inicio: "Inicio:",
       fin: "Fin:",
@@ -877,7 +877,7 @@ es: {
       },
 
       reports: {
-        title: "📊 Monthly Reports",
+        title: " Monthly Reports",
         selectPeriod: " Select Period",
         selectMonth: "Select month...",
         selectYear: "Select year...",
@@ -887,7 +887,7 @@ es: {
         hoursWorked: "Hours Worked",
         completedTasks: "Completed Tasks",
         avgCompliance: "Average Compliance",
-        detailByUser: "📋 Detail by User"
+        detailByUser: " Detail by User"
       },
 
       housing: {
@@ -934,7 +934,7 @@ es: {
       },
 
       billing: {
-        title: "💰 Monthly Fee Management",
+        title: " Monthly Fee Management",
         totalQuotas: "Total Fees",
         paid: "Paid",
         pending: "Pending",
@@ -947,7 +947,7 @@ es: {
         filterAllStates: "All states",
         filterPending: "Pending",
         filterPaid: "Paid",
-        allQuotas: "📋 All Fees",
+        allQuotas: " All Fees",
         updatePrice: "💵 Update Fee Price",
         housingType: "Housing Type",
         newMonthlyAmount: "New Monthly Amount *",
@@ -994,7 +994,7 @@ es: {
         selectUsers: "Select Users:",
         selectNuclei: "Select Family Units:",
         selectAll: "Select All",
-        materialsNeeded: "📦 Materials needed for this task:",
+        materialsNeeded: " Materials needed for this task:",
         searchMaterial: "Search material...",
         noMaterialsAssigned: "No materials assigned",
         createTask: "Create Task",
@@ -1002,7 +1002,7 @@ es: {
       },
 
       requests: {
-        title: "📩 Request Management",
+        title: " Request Management",
         inReview: "In Review",
         resolved: "Resolved",
         highPriority: "High Priority",
@@ -1035,7 +1035,7 @@ es: {
       },
 
       home: {
-        title: "🏠 Home",
+        title: " Home",
         welcome: "Welcome",
         nucleoInfoCard: {
           title: "Your Family Unit",
@@ -1045,7 +1045,7 @@ es: {
           withoutMembers: "There are no members in this unit"
         },
         description: "This is your Housing Cooperative user panel.",
-        notifications: "🔔 Notifications",
+        notifications: " Notifications",
         notificationsBadge: "0",
         loadingNotifications: "Loading notifications...",
         notificationsContent: {
@@ -1072,7 +1072,7 @@ es: {
       },
 
       profile: {
-        title: "👤 My Profile",
+        title: " My Profile",
         personalInfo: "Personal Information",
         editProfile: "Edit Profile",
         cancelEdit: "Cancel",
@@ -1101,7 +1101,7 @@ es: {
       },
 
       requests: {
-        title: "📩 My Requests",
+        title: " My Requests",
         manage: "Manage your Requests",
         description: "Send queries, justifications or report problems to the administrator",
         newRequest: "New Request",
@@ -1110,18 +1110,18 @@ es: {
         viewDetail: "View Detail",
         reply: "Reply",
         types: {
-          hours: " 📊 Hours Log",
-          payment: " 💳 Payments/Fees",
-          housing: " 🏡 Housing",
+          hours: "  Hours Log",
+          payment: "  Payments/Fees",
+          housing: "  Housing",
           general: " 📝 General Inquiry",
           other: " ❓ Other"
         },
         form: {
           typeLabel: "Type of Request *",
           types: {
-            hours: " 📊 Hours Log",
-            payment: " 💳 Payments/Fees",
-            housing: " 🏡 Housing",
+            hours: "  Hours Log",
+            payment: "  Payments/Fees",
+            housing: "  Housing",
             general: " 📝 General Inquiry",
             other: " ❓ Other"
           },
@@ -1138,7 +1138,7 @@ es: {
           },
           attachmentLabel: "Attachment (optional):",
           attachmentHelp: "Upload a file (image or PDF, max. 5MB)",
-          infoTitle: "ℹ️ Information:",
+          infoTitle: " Information:",
           infoDescription: "Your request will be reviewed by an administrator. You will receive a notification when it is addressed.",
           submitButton: "Submit Request",
           cancelButton: "Cancel",
@@ -1188,7 +1188,7 @@ es: {
       },
 
       housing: {
-        title: "🏡 My Housing",
+        title: " My Housing",
         subtitle: "Housing Information",
         loading: "Loading...",
         roomsTitle: "rooms",
@@ -1222,7 +1222,7 @@ es: {
           description: "To apply for a home or inquire about the allocation process, you can use any of these options:",
           closeButton: "close",
           option1: {
-              title: "📋 Option 1: Formal Request",
+              title: " Option 1: Formal Request",
               description: "Send a request from the 'Requests' section of the system. It will be reviewed and processed by the administrative team.",
               button: "create request"
             },
@@ -1237,7 +1237,7 @@ es: {
       },
 
       billing: {
-        title: "💳 My Monthly Fees",
+        title: " My Monthly Fees",
         description: "Manage your housing payments and hours debt",
         stats: {
           pending: "Pending",
@@ -1278,7 +1278,7 @@ es: {
           }
         },
         debtStatus: {
-          title: "💳 Hours Debt Status",
+          title: " Hours Debt Status",
           calculating: "Calculating debt...",
           debtType: {
             period: "period:",
@@ -1286,7 +1286,7 @@ es: {
             withoutDebt: "No outstanding hours"
           },
           debtBreakdown: {
-            debtForTheCurrentMonth: "💰 Debt for the Current Month:",
+            debtForTheCurrentMonth: " Debt for the Current Month:",
             debtItems: {
               hoursRequired: "Required Hours",
               WeeklySystem: "Weekly System",
@@ -1314,7 +1314,7 @@ es: {
         enabledPaymentPeriod: "Enabled Payment Period",
         enabledPaymentPeriodMessage: "You can now make the payment of your fee. The payment period is active until the end of the month.",
         pendingPayment: "⏳ Payment Under Review",
-        noPendingPayment: "✅ There are no pending payments",
+        noPendingPayment: " There are no pending payments",
         blockedPayment: "Payment Blocked",
         workingPeriod: " 🔒 Ongoing Work Period",
         workingPeriodNote: "You will be able to pay in",
@@ -1332,7 +1332,7 @@ es: {
           totalDue: "Total Due",
           totalPaid: "Total Paid",
           totalOverdue: "Total Overdue",
-          housingFee: "🏠 house Fee:",
+          housingFee: " house Fee:",
           houseFee: "Total for Your Housing",
           paymentCompleted: " 🎉 Payment completed successfully!",
           paymentSuccess: "You have successfully paid your fee of",
@@ -1342,16 +1342,16 @@ es: {
           dueFeeExpired: "❌ Overdue Installment",
           dueFeeExpiredNote: "The debt will pile up.",
           openPaymentPeriod: "⚠️ Open Payment Period",
-          paid: "✅ Paid",
+          paid: " Paid",
           inReview: "⏳ In Review",
           overdue: "❌ Overdue",
           day: "DAY",
           toPay: "TO PAY",
           total: "TOTAL",
           totalPaid: "PAID",
-          paymentBreakdown: "📋 Payment Breakdown:",
-          unworkedHoursDebt: "⏰ Debt from Unworked Hours:",
-          totalPaid: "💰 Total Amount Paid:"
+          paymentBreakdown: " Payment Breakdown:",
+          unworkedHoursDebt: " Debt from Unworked Hours:",
+          totalPaid: " Total Amount Paid:"
         },
         history: {
           title: "Payment History",
@@ -1361,7 +1361,7 @@ es: {
       },
 
       hours: {
-        title: "⏰ Hours Log",
+        title: " Hours Log",
         currentTime: "Current time",
         registering: "Registering...",
         clockIn: "Clock In",
@@ -1405,7 +1405,7 @@ es: {
           },
         },
         history: {
-          title: "📜 Records History",
+          title: " Records History",
           startDate: "Start date",
           endDate: "End date",
           filter: "Filter",
@@ -1435,7 +1435,7 @@ es: {
         }
       },
       tasks: {
-        title: "📋 My Tasks",
+        title: " My Tasks",
 
         stats: {
           pending: "Pending",
@@ -1456,8 +1456,8 @@ es: {
         viewFullDetails: "View Full Details",
         showCompleted: "Show completed",
         assignedTasks: "My Assigned Tasks",
-        individual: "📋 Individual Tasks",
-        family: "👨‍👩‍👧‍👦 Family Unit Tasks",
+        individual: " Individual Tasks",
+        family: " Family Unit Tasks",
         loading: "Loading tasks...",
         inicio: "Start:",
         fin: "End:",

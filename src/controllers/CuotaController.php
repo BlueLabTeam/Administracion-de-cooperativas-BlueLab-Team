@@ -56,7 +56,7 @@ class CuotaController
             
             $cuotas = $this->cuotaModel->getCuotasUsuario($userId, $filtros);
             
-            error_log("📊 Cuotas obtenidas: " . count($cuotas));
+            error_log(" Cuotas obtenidas: " . count($cuotas));
             error_log("===========================================");
             
             echo json_encode([

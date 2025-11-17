@@ -330,7 +330,7 @@ async function saveVivienda(event) {
         const data = await response.json();
         
         if (data.success) {
-            alert('✅ ' + data.message);
+            alert(' ' + data.message);
             closeViviendaModal();
             loadViviendas();
         } else {
@@ -662,7 +662,7 @@ async function submitAsignacion(event, viviendaId) {
         const data = await response.json();
         
         if (data.success) {
-            alert('✅ ' + data.message);
+            alert(' ' + data.message);
             closeAsignarModal();
             loadViviendas();
         } else {
@@ -693,7 +693,7 @@ async function desasignarVivienda(asignacionId) {
         const data = await response.json();
         
         if (data.success) {
-            alert('✅ ' + data.message);
+            alert(' ' + data.message);
             loadViviendas();
         } else {
             alert('❌ Error: ' + data.message);
@@ -723,7 +723,7 @@ async function deleteVivienda(id, numero) {
         const data = await response.json();
         
         if (data.success) {
-            alert('✅ Vivienda eliminada');
+            alert(' Vivienda eliminada');
             loadViviendas();
         } else {
             alert('❌ Error: ' + (data.message || 'Error al eliminar'));
@@ -811,4 +811,4 @@ if (document.readyState === 'loading') {
     inicializarModuloViviendas();
 }
 
-console.log('✅ [MÓDULO VIVIENDAS] Cargado completamente');
+console.log(' [MÓDULO VIVIENDAS] Cargado completamente');

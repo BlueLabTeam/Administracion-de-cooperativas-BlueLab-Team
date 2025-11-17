@@ -35,7 +35,7 @@ public function generarReporteMensual()
         $mes = isset($_GET['mes']) ? intval($_GET['mes']) : intval(date('n'));
         $anio = isset($_GET['anio']) ? intval($_GET['anio']) : intval(date('Y'));
 
-        error_log("📊 VALORES PROCESADOS:");
+        error_log(" VALORES PROCESADOS:");
         error_log("   mes (raw): " . var_export($_GET['mes'] ?? 'NOT_SET', true));
         error_log("   mes (int): $mes");
         error_log("   anio (raw): " . var_export($_GET['anio'] ?? 'NOT_SET', true));

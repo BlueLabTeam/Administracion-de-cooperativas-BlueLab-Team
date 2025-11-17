@@ -142,7 +142,7 @@
 
 	<!-- SECCIÓN REPORTES -->
 <section id="reportes-section" class="section-content">
-	<h2 class="section-title" data-i18n="dashboardAdmin.reports.title">📊 Reportes Mensuales</h2>
+	<h2 class="section-title" data-i18n="dashboardAdmin.reports.title"> Reportes Mensuales</h2>
 	
 	<div class="info-card">
 		<h3 data-i18n="dashboardAdmin.reports.selectPeriod"> Seleccionar Período</h3>
@@ -222,7 +222,7 @@
 </div>
 	
 	<div class="info-card" id="reporte-tabla-container" style="display: none;">
-		<h3 data-i18n="dashboardAdmin.reports.detailByUser">📋 Detalle por Usuario</h3>
+		<h3 data-i18n="dashboardAdmin.reports.detailByUser"> Detalle por Usuario</h3>
 		<div class="table-responsive" id="reporteTableContainer">
 			<p class="loading" data-i18n="common.loading">Cargando reporte...</p>
 		</div>
@@ -378,7 +378,7 @@
 </div>
 		<!-- SECCIÓN FACTURACIÓN -->
 <section id="cuotas-section" class="section-content">
-	<h2 class="section-title" data-i18n="dashboardAdmin.billing.title">💰 Gestión de Cuotas Mensuales</h2>
+	<h2 class="section-title" data-i18n="dashboardAdmin.billing.title"> Gestión de Cuotas Mensuales</h2>
 	
 
 <!-- Estadísticas Rápidas -->
@@ -475,7 +475,7 @@
 			
 			<div class="info-card">
 				<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-					<h3 data-i18n="dashboardAdmin.billing.allQuotas">📋 Todas las Cuotas</h3>
+					<h3 data-i18n="dashboardAdmin.billing.allQuotas"> Todas las Cuotas</h3>
 					<button class="btn btn-secondary" onclick="loadAllCuotasAdmin()">
 						<i class="fas fa-sync-alt"></i> <span data-i18n="common.update">Actualizar</span>
 					</button>
@@ -793,7 +793,7 @@
 			</div>
 
 			<div class="form-group">
-				<label data-i18n="dashboardAdmin.tasks.materialsNeeded">📦 Materiales necesarios para esta tarea:</label>
+				<label data-i18n="dashboardAdmin.tasks.materialsNeeded"> Materiales necesarios para esta tarea:</label>
 				<div class="materiales-tarea-selector">
 					<div class="materiales-search-box">
 						<input type="text" 
@@ -839,7 +839,7 @@
 
 		<!-- SECCIÓN SOLICITUDES ADMIN -->
 <section id="solicitudes-section" class="section-content">
-	<h2 class="section-title" data-i18n="dashboardAdmin.requests.title">📩 Gestión de Solicitudes</h2>
+	<h2 class="section-title" data-i18n="dashboardAdmin.requests.title"> Gestión de Solicitudes</h2>
 
 	<div class="stats-grid">
 		<div class="stat-card">
@@ -937,7 +937,7 @@
 	
 	<div class="info-card">
 		<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-			<h3 data-i18n="dashboardAdmin.requests.tableTitle">📋 Todas las Solicitudes</h3>
+			<h3 data-i18n="dashboardAdmin.requests.tableTitle"> Todas las Solicitudes</h3>
 			<button class="btn btn-secondary" onclick="loadAllSolicitudes()">
 				<i class="fas fa-sync-alt"></i> <span data-i18n="common.update">Actualizar</span>
 			</button>
