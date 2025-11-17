@@ -361,9 +361,10 @@ function renderMisCuotasOrganizadas(cuotas) {
         container.innerHTML = `
             <div class="no-data">
                 <i class="fas fa-inbox" style="font-size: 48px; color: #ddd; margin-bottom: 10px;"></i>
-                <p>No se encontraron cuotas con los filtros seleccionados</p>
+                <p data-i18n="dashboardUser.billing.summary.notFoundFilters">No se encontraron cuotas con los filtros seleccionados</p>
             </div>
         `;
+        i18n.translatePage();
         return;
     }
     
@@ -460,7 +461,7 @@ function renderMisCuotasOrganizadas(cuotas) {
         html += `
             <div class="cuotas-section">
                 <h3 style="color: #f44336; margin-bottom: 20px;">
-                    <i class="fas fa-exclamation-circle"></i> Otras Cuotas Pendientes (${cuotasPagables.length - 1})
+                    <i class="fas fa-exclamation-circle"></i> <span data-i18n="dashboardUser.billing.summary.otherPendingFees">Otras Cuotas Pendientes</span> (${cuotasPagables.length - 1})
                 </h3>
                 <div class="cuotas-grid">
         `;
@@ -480,7 +481,7 @@ function renderMisCuotasOrganizadas(cuotas) {
     html += `
         <div class="cuotas-section">
             <h3 style="color: #666; margin-bottom: 20px;">
-                <i class="fas fa-history"></i> Historial de Cuotas
+                <i class="fas fa-history"></i> <span data-i18n="dashboardUser.billing.history.title">Historial de Cuotas</span>
             </h3>
     `;
     
@@ -491,13 +492,13 @@ function renderMisCuotasOrganizadas(cuotas) {
         });
         html += '</div>';
     } else {
-        html += '<p style="color: #999; text-align: center;">No hay cuotas en el historial</p>';
+        html += '<p style="color: #999; text-align: center;" data-i18n="dashboardUser.billing.history.empty">No hay cuotas en el historial</p>';
     }
     
     html += '</div>';
     
     container.innerHTML = html;
-    
+    i18n.translatePage();
     console.log(' [RENDER] Completado\n');
 }
 
@@ -513,15 +514,15 @@ function renderSeccionDestacada(
             <div class="deuda-total-header">
                 <h2 style="margin: 0; color: #fff;">
                     <i class="fas ${estaPagada ? 'fa-check-circle' : puedePagar ? 'fa-exclamation-triangle' : 'fa-calendar-alt'}"></i>
-                    Resumen del Mes Actual
+                    <span data-i18n="dashboardUser.billing.summary.currentMonth">Resumen del Mes Actual</span>
                 </h2>
                 <span class="deuda-total-badge ${estaPagada ? 'badge-pagada' : tienePagoPendiente ? 'badge-pendiente' : puedePagar ? 'badge-requerida' : 'badge-bloqueado'}">
-                    ${estaPagada ? ' PAGADA' : 
-                      tienePagoPendiente ? '⏳ EN VALIDACIÓN' : 
-                      puedePagar ? '⚠️ PERIODO DE PAGO ABIERTO' : 
-                      esMesCuota && diasParaPagar > 0 ? `🔒 ${diasParaPagar} DÍA${diasParaPagar !== 1 ? 'S' : ''} PARA PAGAR` :
-                      !esMesCuota ? ' Mes cerrado' :
-                      '❌ VENCIDA'}
+                    ${estaPagada ? '<span data-i18n="dashboardUser.billing.summary.paid"> PAGADA</span>' : 
+                      tienePagoPendiente ? '<span data-i18n="dashboardUser.billing.summary.inReview">⏳ EN VALIDACIÓN</span>' : 
+                      puedePagar ? '<span data-i18n="dashboardUser.billing.summary.openPaymentPeriod">⚠️ PERIODO DE PAGO ABIERTO</span>' : 
+                      esMesCuota && diasParaPagar > 0 ? `🔒 ${diasParaPagar} <span data-i18n="dashboardUser.billing.summary.day">DÍA</span>${diasParaPagar !== 1 ? 'S' : ''} <span data-i18n="dashboardUser.billing.summary.toPay">PARA PAGAR</span>` :
+                      !esMesCuota ? '<span data-i18n="dashboardUser.billing.summary.closeMonth">MES CERRADO</span>' :
+                      '<span data-i18n="dashboardUser.billing.summary.overdue">❌ VENCIDA</span>'}
                 </span>
             </div>
             
@@ -530,7 +531,7 @@ function renderSeccionDestacada(
                     <div class="deuda-breakdown-item">
                         <i class="fas fa-home"></i>
                         <div>
-                            <span class="deuda-label">Cuota de Vivienda</span>
+                            <span class="deuda-label" data-i18n="dashboardUser.billing.summary.housingFee">Cuota de Vivienda</span>
                             <span class="deuda-monto">$${montoCuota.toLocaleString('es-UY', {minimumFractionDigits: 2})}</span>
                         </div>
                     </div>
@@ -540,11 +541,11 @@ function renderSeccionDestacada(
                         <div class="deuda-breakdown-item deuda-acumulada">
                             <i class="fas fa-exclamation-triangle"></i>
                             <div>
-                                <span class="deuda-label">Deuda de Meses Anteriores</span>
+                                <span class="deuda-label" data-i18n="dashboardUser.billing.summary.previousMonthsDebt">Deuda de Meses Anteriores</span>
                                 <span class="deuda-monto error">
                                     $${deudaAcumulada.toLocaleString('es-UY', {minimumFractionDigits: 2})}
                                 </span>
-                                <small style="color: #ff8a80; display: block; margin-top: 5px;">
+                                <small style="color: #ff8a80; display: block; margin-top: 5px;" data-i18n="dashboardUser.billing.summary.previousMonthsDebtNote">
                                     (Cuotas vencidas no pagadas)
                                 </small>
                             </div>
@@ -556,8 +557,8 @@ function renderSeccionDestacada(
                         <div class="deuda-breakdown-item deuda-horas">
                             <i class="fas fa-clock"></i>
                             <div>
-                                <span class="deuda-label">Deuda por Horas No Trabajadas</span>
-                                <small style="color: #ff8a80; display: block; margin-top: 3px; margin-bottom: 5px;">
+                                <span class="deuda-label" data-i18n="dashboardUser.billing.summary.hoursNotWorkedDebt">Deuda por Horas No Trabajadas</span>
+                                <small style="color: #ff8a80; display: block; margin-top: 3px; margin-bottom: 5px;" data-i18n="dashboardUser.billing.summary.hoursNotWorkedDebtNote">
                                     ($160 por hora × horas faltantes)
                                 </small>
                                 <span class="deuda-monto error">$${deudaHoras.toLocaleString('es-UY', {minimumFractionDigits: 2})}</span>
@@ -570,7 +571,7 @@ function renderSeccionDestacada(
                     <div class="deuda-breakdown-item deuda-total">
                         <i class="fas fa-calculator"></i>
                         <div>
-                            <span class="deuda-label">TOTAL ${estaPagada ? 'PAGADO' : 'A PAGAR'}</span>
+                            <span class="deuda-label" data-i18n="dashboardUser.billing.summary.total">TOTAL</span> ${estaPagada ? '<span data-i18n="dashboardUser.billing.summary.paid">PAGADO</span>' : '<span data-i18n="dashboardUser.billing.summary.toPay">A PAGAR</span>'}
                             <span class="deuda-monto-total" style="color: ${estaPagada ? '#4caf50' : '#fff'};">
                                 $${montoTotal.toLocaleString('es-UY', {minimumFractionDigits: 2})}
                             </span>
@@ -677,15 +678,15 @@ function renderEstadoPago(estaPagada, tienePagoPendiente, puedePagar, diasParaPa
                             gap: 10px;
                         ">
                     <i class="fas fa-lock"></i>
-                    Pago Bloqueado
+                    <span data-i18n="dashboardUser.billing.summary.blockedPayment">Pago Bloqueado</span>
                 </button>
             </div>
             
             <div class="alert-warning" style="margin-top: 20px;">
-                <strong style="color: #ff9800;">🔒 Periodo de Trabajo en Curso</strong>
+                <strong style="color: #ff9800;" data-i18n="dashboardUser.billing.summary.periodOfWorkInProgress">🔒 Periodo de Trabajo en Curso</strong>
                 <p style="color: rgba(255, 255, 255, 0.9); margin: 10px 0 0 0;">
-                    El período de pago se habilitará en <strong>${diasParaPagar} día${diasParaPagar !== 1 ? 's' : ''}</strong> (desde el 25 del mes).
-                    <br>Por ahora, enfócate en cumplir tus <strong>21 horas semanales</strong> para evitar cargos adicionales.
+                    <span data-i18n="dashboardUser.billing.summary.periodOfWorkInProgressNote1">El período de pago se habilitará en</span> <strong>${diasParaPagar} <span data-i18n="dashboardUser.billing.summary.day">día</span>${diasParaPagar !== 1 ? 'S' : ''}</strong> <span data-i18n="dashboardUser.billing.summary.periodOfWorkInProgressNote2">(desde el 25 del mes).</span>
+                    <br><span data-i18n="dashboardUser.billing.summary.periodOfWorkInProgressNote3">Por ahora, enfócate en cumplir tus </span><strong data-i18n="dashboardUser.billing.summary.periodOfWorkInProgressNote4">21 horas semanales</strong> <span data-i18n="dashboardUser.billing.summary.periodOfWorkInProgressNote5"> para evitar cargos adicionales.</span>
                 </p>
             </div>
         `;
@@ -693,8 +694,8 @@ function renderEstadoPago(estaPagada, tienePagoPendiente, puedePagar, diasParaPa
     
     return `
         <div class="alert-error" style="margin-top: 20px;">
-            <strong style="color: #f44336;">❌ Cuota Vencida</strong>
-            <p style="color: rgba(255, 255, 255, 0.9); margin: 10px 0 0 0;">
+            <strong style="color: #f44336;" data-i18n="dashboardUser.billing.summary.dueFeeExpired">❌ Cuota Vencida</strong>
+            <p style="color: rgba(255, 255, 255, 0.9); margin: 10px 0 0 0;" data-i18n="dashboardUser.billing.summary.dueFeeExpiredNote">
                 Esta cuota no fue pagada a tiempo. La deuda se acumulará al siguiente mes.
             </p>
         </div>

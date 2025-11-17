@@ -798,7 +798,6 @@ const translations = {
       loginError: "Incorrect credentials. Please try again."
     },
 
-
     // Dashboard Admin
     dashboardAdmin: {
       pageTitle: "Gestcoop — Admin Panel",
@@ -1327,6 +1326,7 @@ const translations = {
           hoursNotWorkedDebt: "Debt from Hours Not Worked",
           hoursNotWorkedDebtNote: "($160 per hour × missing hours)",
           noHoursNotWorkedDebt: "No hours owed!",
+          notFoundFilters: "No fees found with the selected filters.",
           totalDue: "Total Due",
           totalPaid: "Total Paid",
           totalOverdue: "Total Overdue",
@@ -1338,18 +1338,27 @@ const translations = {
           paymentEnabled: "Payment Available",
           paymentEnabledNote: "You can make the payment now.",
           dueFeeExpired: "❌ Overdue Installment",
-          dueFeeExpiredNote: "The debt will pile up.",
+          dueFeeExpiredNote: "This payment was not made on time. The debt will accrue to the next month.",
           openPaymentPeriod: "⚠️ Open Payment Period",
-          paid: " Paid",
-          inReview: "⏳ In Review",
-          overdue: "❌ Overdue",
+          blockedPayment: "Payment Blocked",
+          paid: "PAID",
+          inReview: "⏳ IN REVIEW",
+          overdue: "❌ OVERDUE",
+          closeMonth: "CLOSE MONTH",
           day: "DAY",
           toPay: "TO PAY",
           total: "TOTAL",
           totalPaid: "PAID",
           paymentBreakdown: " Payment Breakdown:",
           unworkedHoursDebt: " Debt from Unworked Hours:",
-          totalPaid: " Total Amount Paid:"
+          totalPaid: " Total Amount Paid:",
+          periodOfWorkInProgress: " 🔒 Period of Work in Progress",
+          periodOfWorkInProgressNote1: "The payment period will be enabled in",
+          periodOfWorkInProgressNote2: "(from the 25th of the month).",
+          periodOfWorkInProgressNote3: "For now, focus on achieving your goals.",
+          periodOfWorkInProgressNote4: "21 hours per week",
+          periodOfWorkInProgressNote5: "to avoid additional charges.",
+          otherPendingFees: " Other Fees Pending",
         },
         history: {
           title: "Payment History",
