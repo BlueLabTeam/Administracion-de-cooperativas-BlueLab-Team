@@ -1018,9 +1018,10 @@ es: {
         welcome: "Welcome",
         nucleoInfoCard: {
           title: "Your Family Unit",
-          members: "Family unit members:",
-          membersCount: 'member/s',
-          viewAllButton: "View All"
+          members: "Family unit members",
+          membersCount: 'member',
+          viewAllButton: "View All",
+          withoutMembers: "There are no members in this unit"
         },
         description: "This is your Housing Cooperative user panel.",
         notifications: "🔔 Notifications",
@@ -1028,13 +1029,19 @@ es: {
         loadingNotifications: "Loading notifications...",
         notificationsContent: {
           noNotifications: "You have no notifications",
-          errorNotifications: "Error loading notifications"
+          errorNotifications: "Error loading notifications",
+          newBadge: "NEW"
         },
         coreDetails: {
           coreInfoTitle: "Family Unit Information",
           totalMembers: "Total Members",
           membersTitle: "Members of the Unit",
           closeModal: "Close"
+        },
+        bannerUnit:{
+          joinMessage: "Do you want to join a Family Core?",
+          unitDescription: "Family units allow sharing housing and tasks. Explore the available units and submit a request.",
+          viewUnitsButton: "View Units"
         },
         stats: {
           contributions: "Current Contributions",

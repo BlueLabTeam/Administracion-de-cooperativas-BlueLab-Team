@@ -63,7 +63,8 @@ async function loadNotifications() {
         console.error('Error al cargar notificaciones:', error);
         const list = document.getElementById('notificationsList');
         if (list) {
-            list.innerHTML = '<div class="no-notifications">No se pudieron cargar las notificaciones</div>';
+            list.innerHTML = '<div class="no-notifications" data-i18n="dashboardUser.home.notificationsContent.errorNotifications">No se pudieron cargar las notificaciones</div>';
+            i18n.translatePage();
         }
     }
 }
@@ -83,7 +84,8 @@ function renderNotifications(notifications, unreadCount) {
 
     // Renderizar lista
     if (notifications.length === 0) {
-        list.innerHTML = '<div class="no-notifications">No tienes notificaciones</div>';
+        list.innerHTML = '<div class="no-notifications" data-i18n="dashboardUser.home.notificationsContent.noNotifications">No tienes notificaciones</div>';
+        i18n.translatePage();
         return;
     }
 
@@ -99,7 +101,7 @@ function renderNotifications(notifications, unreadCount) {
                     <div class="notification-title">
                         ${getTipoIcon(notif.tipo)}
                         ${notif.titulo}
-                        ${isUnread ? '<span class="notification-type-badge tipo-' + notif.tipo + '-badge">NUEVO</span>' : ''}
+                        ${isUnread ? '<span class="notification-type-badge tipo-' + notif.tipo + '-badge" data-i18n="dashboardUser.home.notificationsContent.newBadge">NUEVO</span>' : ''}
                     </div>
                     <span class="notification-date">${fechaFormateada}</span>
                 </div>
@@ -107,6 +109,7 @@ function renderNotifications(notifications, unreadCount) {
             </div>
         `;
     }).join('');
+    i18n.translatePage();
 }
 
 /**
@@ -343,7 +346,7 @@ async function mostrarInfoNucleoEnInicio(idNucleo, inicioSection) {
                         👨‍👩‍👧
                     </div>
                     <div style="flex: 1;">
-                        <p style="margin: 0 0 5px 0; opacity: 0.9; font-size: 13px; font-weight: 500;">
+                        <p style="margin: 0 0 5px 0; opacity: 0.9; font-size: 13px; font-weight: 500;" data-i18n="dashboardUser.home.nucleoInfoCard.title">
                             Tu Núcleo Familiar
                         </p>
                         <h3 style="margin: 0 0 10px 0; font-size: 22px; font-weight: 700;">
@@ -356,7 +359,7 @@ async function mostrarInfoNucleoEnInicio(idNucleo, inicioSection) {
                                 </span>
                             ` : ''}
                             <span style="display: flex; align-items: center; gap: 5px;">
-                                <i class="fas fa-users"></i> ${nucleo.total_miembros} miembro${nucleo.total_miembros != 1 ? 's' : ''}
+                                <i class="fas fa-users"></i> ${nucleo.total_miembros} <span data-i18n="dashboardUser.home.nucleoInfoCard.membersCount">miembro</span>${nucleo.total_miembros != 1 ? 's' : ''}
                             </span>
                         </div>
                     </div>
@@ -364,7 +367,7 @@ async function mostrarInfoNucleoEnInicio(idNucleo, inicioSection) {
                 
                 <div style="border-top: 1px solid rgba(255,255,255,0.2); padding-top: 15px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                        <strong style="font-size: 14px;">Miembros del Núcleo</strong>
+                        <strong style="font-size: 14px;" data-i18n="dashboardUser.home.nucleoInfoCard.members">Miembros del Núcleo</strong>
                         <button 
                             onclick="verDetallesNucleoDesdeInicio(${idNucleo})" 
                             style="
@@ -379,7 +382,7 @@ async function mostrarInfoNucleoEnInicio(idNucleo, inicioSection) {
                             "
                             onmouseover="this.style.background='rgba(255,255,255,0.3)'"
                             onmouseout="this.style.background='rgba(255,255,255,0.2)'">
-                            <i class="fas fa-info-circle"></i> Ver Todo
+                            <i class="fas fa-info-circle"></i> <span data-i18n="dashboardUser.home.nucleoInfoCard.viewAllButton">Ver Todo</span>
                         </button>
                     </div>
                     ${miembrosHTML}
@@ -394,7 +397,7 @@ async function mostrarInfoNucleoEnInicio(idNucleo, inicioSection) {
         } else {
             inicioSection.insertAdjacentHTML('afterbegin', infoHTML);
         }
-        
+        i18n.translatePage();
         console.log('✅ Card de núcleo insertado en inicio');
         
     } catch (error) {
@@ -419,8 +422,8 @@ function mostrarBannerNucleoEnInicio(inicioSection) {
             <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
                 <div style="font-size: 48px;">👨‍👩‍👧‍👦</div>
                 <div style="flex: 1; min-width: 250px;">
-                    <h3 style="margin: 0 0 10px 0; font-size: 20px;">¿Quieres unirte a un Núcleo Familiar?</h3>
-                    <p style="margin: 0; opacity: 0.9;">
+                    <h3 style="margin: 0 0 10px 0; font-size: 20px;" data-i18n="dashboardUser.home.bannerUnit.joinMessage">¿Quieres unirte a un Núcleo Familiar?</h3>
+                    <p style="margin: 0; opacity: 0.9;" data-i18n="dashboardUser.home.bannerUnit.unitDescription">
                         Los núcleos familiares permiten compartir viviendas y tareas. 
                         Explora los núcleos disponibles y envía una solicitud.
                     </p>
@@ -441,7 +444,7 @@ function mostrarBannerNucleoEnInicio(inicioSection) {
                     "
                     onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.2)';"
                     onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none';">
-                    <i class="fas fa-users"></i> Ver Núcleos
+                    <i class="fas fa-users"></i> <span data-i18n="dashboardUser.home.bannerUnit.viewUnitsButton">Ver Núcleos</span>
                 </button>
             </div>
         </div>
@@ -449,11 +452,13 @@ function mostrarBannerNucleoEnInicio(inicioSection) {
     
     // Insertar al principio (después del título)
     const tituloInicio = inicioSection.querySelector('.section-title, h2');
+    
     if (tituloInicio) {
         tituloInicio.insertAdjacentHTML('afterend', banner);
     } else {
         inicioSection.insertAdjacentHTML('afterbegin', banner);
     }
+    i18n.translatePage();
     
     console.log('✅ Banner de núcleo insertado en inicio');
 }
@@ -514,7 +519,8 @@ async function verDetallesNucleoDesdeInicio(idNucleo) {
                 </div>
             `;
         } else {
-            miembrosHTML = '<p style="color: #999; text-align: center; margin-top: 20px;">No hay miembros en este núcleo</p>';
+            miembrosHTML = '<p style="color: #999; text-align: center; margin-top: 20px;" data-i18n="dashboardUser.home.withoutMembers">No hay miembros en este núcleo</p>';
+            i18n.translatePage();
         }
         
         const modal = `
@@ -542,26 +548,26 @@ async function verDetallesNucleoDesdeInicio(idNucleo) {
                             border-radius: 12px;
                             margin-bottom: 25px;
                         ">
-                            <h4 style="margin: 0 0 10px 0; font-size: 16px; font-weight: 600;">
+                            <h4 style="margin: 0 0 10px 0; font-size: 16px; font-weight: 600;" data-i18n="dashboardUser.home.coreDetails.coreInfoTitle">
                                 Información del Núcleo
                             </h4>
                             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
                                 <div>
-                                    <div style="opacity: 0.9; font-size: 13px;">Total de Miembros</div>
+                                    <div style="opacity: 0.9; font-size: 13px;" data-i18n="dashboardUser.home.coreDetails.totalMembers">Total de Miembros</div>
                                     <div style="font-size: 28px; font-weight: 700;">${nucleo.total_miembros}</div>
                                 </div>
                             </div>
                         </div>
                         
                         <h4 style="margin: 0 0 15px 0; color: #333; font-size: 16px; font-weight: 600;">
-                            <i class="fas fa-users" style="margin-right: 6px;"></i> Miembros del Núcleo
+                            <i class="fas fa-users" style="margin-right: 6px;"></i> <span data-i18n="dashboardUser.home.coreDetails.membersTitle">Miembros del Núcleo</span>
                         </h4>
                         
                         ${miembrosHTML}
                         
                         <div class="form-actions" style="margin-top: 30px;">
                             <button type="button" class="btn btn-secondary" onclick="cerrarModalDetallesNucleo()">
-                                <i class="fas fa-times"></i> Cerrar
+                                <i class="fas fa-times"></i> <span data-i18n="dashboardUser.home.coreDetails.closeModal">Cerrar</span>
                             </button>
                         </div>
                     </div>
@@ -570,6 +576,7 @@ async function verDetallesNucleoDesdeInicio(idNucleo) {
         `;
         
         document.body.insertAdjacentHTML('beforeend', modal);
+        i18n.translatePage();
         
         // Prevenir scroll del body
         document.body.style.overflow = 'hidden';
