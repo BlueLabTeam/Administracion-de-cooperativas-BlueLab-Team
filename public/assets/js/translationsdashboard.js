@@ -1,4 +1,4 @@
-// translations.js - Sistema de traducciones completo para Conviconsu
+
 const translations = {
 es: {
   // Common
@@ -88,6 +88,19 @@ es: {
   // Dashboard Admin
   dashboardAdmin: {
     pageTitle: "Gestcoop — Panel Administrativo",
+
+      sections: {
+    home: "Inicio",
+    reports: "Reportes",
+    users: "Usuarios",
+    family: "Núcleo Familiar",
+    housing: "Viviendas",
+    billing: "Facturación",
+    notifications: "Notificaciones",
+    materials: "Materiales",
+    tasks: "Tareas",
+    requests: "Solicitudes"
+  },
 
     home: {
       title: "Inicio - Panel Administrativo",
@@ -748,9 +761,7 @@ es: {
       december: "December"
     },
 
-    // ==========================================================
-    // NEW SECTIONS ADDED
-    // ==========================================================
+    
 
     // Home (Landing Page)
     home: {
@@ -789,14 +800,24 @@ es: {
       loginError: "Incorrect credentials. Please try again."
     },
 
-    // ==========================================================
-    // END NEW SECTIONS
-    // ==========================================================
-
+  
     // Dashboard Admin
     dashboardAdmin: {
       pageTitle: "Gestcoop — Admin Panel",
 
+
+       sections: {
+    home: "Home",
+    reports: "Reports",
+    users: "Users",
+    family: "Family Unit",
+    housing: "Housing",
+    billing: "Billing",
+    notifications: "Notifications",
+    materials: "Materials",
+    tasks: "Tasks",
+    requests: "Requests"
+  },
       home: {
         title: "Home - Administrative Panel",
         welcome: "Welcome to the Administration Panel",

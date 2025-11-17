@@ -454,9 +454,15 @@
     position: relative;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
     animation: slideUp 0.5s ease;
-    /*  Mantener scrollbar oculta en el contenido */
+   
     scrollbar-width: none;
     -ms-overflow-style: none;
+}
+
+
+
+.material-modal textarea {
+    resize: none;
 }
 
 .material-modal-content::-webkit-scrollbar {

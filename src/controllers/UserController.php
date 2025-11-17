@@ -482,9 +482,7 @@ public function getPaymentDetails()
         exit();
     }
 
-    /**
-     *  FIXED: Aprobar o rechazar usuario + validar primer pago
-     */
+   
     public function aprobarRechazar()
     {
         while (ob_get_level()) {
