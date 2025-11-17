@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Si el menú se minimiza, mostramos el botón mini
         if (menu.classList.contains('menu-minimized')) {
             miniToggleBtn.style.display = 'block';
-            menu.style.display = 'none'; // opcional: ocultar menú al minimizar
+            menu.style.display = 'none';
         } else {
             miniToggleBtn.style.display = 'none';
             menu.style.display = 'block';

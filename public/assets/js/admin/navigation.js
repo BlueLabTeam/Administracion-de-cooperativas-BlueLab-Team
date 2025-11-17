@@ -164,3 +164,30 @@ function cargarDatosSeccion(section) {
 }
 
 console.log('✅ [NAV] Sistema de navegación listo');
+
+document.addEventListener('DOMContentLoaded', () => {
+    const toggleMenuBtn = document.querySelector('.toggle-menu-btn');
+    const menu = document.querySelector('nav.menu');
+    const miniToggleBtn = document.querySelector('.mini-toggle-menu-btn');
+
+    // Función al minimizar/expandir
+    toggleMenuBtn.addEventListener('click', () => {
+        menu.classList.toggle('menu-minimized');
+
+        // Si el menú se minimiza, mostramos el botón mini
+        if (menu.classList.contains('menu-minimized')) {
+            miniToggleBtn.style.display = 'block';
+            menu.style.display = 'none';
+        } else {
+            miniToggleBtn.style.display = 'none';
+            menu.style.display = 'block';
+        }
+    });
+
+    // Función del botón mini para mostrar el menú de nuevo
+    miniToggleBtn.addEventListener('click', () => {
+        menu.classList.remove('menu-minimized');
+        menu.style.display = 'block';
+        miniToggleBtn.style.display = 'none';
+    });
+});
