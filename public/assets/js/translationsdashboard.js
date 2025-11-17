@@ -1071,7 +1071,12 @@ es: {
         newPassword: "New Password",
         confirmPassword: "Confirm New Password",
         notSpecified: "Not specified",
-        notAvailable: "Not available"
+        notAvailable: "Not available",
+        saving: "Saving...",
+        table:{
+          field: "Field",
+          information: "Information"
+        }
       },
 
       requests: {

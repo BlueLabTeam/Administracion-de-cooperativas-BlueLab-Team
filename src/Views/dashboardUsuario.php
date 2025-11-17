@@ -82,10 +82,10 @@ if (!isset($_SESSION['user_id'])) {
         <table style="width: 100%; border-collapse: collapse; background: #FFFFFF;">
             <thead>
                 <tr style="background: linear-gradient(135deg, #005CB9 0%, #004494 100%); color: #FFFFFF;">
-                    <th style="padding: 15px 20px; text-align: left; font-weight: 600; font-size: 14px; width: 30%;">
+                    <th style="padding: 15px 20px; text-align: left; font-weight: 600; font-size: 14px; width: 30%;" data-i18n="dashboardUser.profile.table.field">
                         Campo
                     </th>
-                    <th style="padding: 15px 20px; text-align: left; font-weight: 600; font-size: 14px; width: 70%;">
+                    <th style="padding: 15px 20px; text-align: left; font-weight: 600; font-size: 14px; width: 70%;" data-i18n="dashboardUser.profile.table.information">
                         Información
                     </th>
                 </tr>

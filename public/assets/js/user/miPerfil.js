@@ -284,7 +284,8 @@ async function submitProfileEdit(event) {
     const btnOriginalText = submitBtn ? submitBtn.innerHTML : '';
     if (submitBtn) {
         submitBtn.disabled = true;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span data-i18n="dashboardUser.profile.saving">Guardando...</span>';
+        i18n.translatePage(); // Actualizar traducciones
     }
     
     try {
