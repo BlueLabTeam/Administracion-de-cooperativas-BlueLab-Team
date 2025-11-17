@@ -39,9 +39,10 @@ function loadMyVivienda() {
             <div class="loading-spinner">
                 <i class="fas fa-home fa-spin"></i>
             </div>
-            <p>Cargando tu vivienda...</p>
+            <p data-i18n="dashboardUser.housing.loading">Cargando tu vivienda...</p>
         </div>
     `;
+    i18n.translatePage(); // Actualizar traducciones
 
     fetch('/api/viviendas/my-vivienda', {
         method: 'GET',
@@ -370,8 +371,8 @@ function renderMyVivienda(vivienda) {
                             <i class="fas fa-bed"></i>
                         </div>
                         <div>
-                            <div style="font-size: 12px; color: #999;">Habitaciones</div>
-                            <div style="font-weight: 700; color: #333; font-size: 16px;">${vivienda.habitaciones} habitación${vivienda.habitaciones != 1 ? 'es' : ''}</div>
+                            <div style="font-size: 12px; color: #999;" data-i18n="dashboardUser.housing.roomsTitle">Habitaciones</div>
+                            <div style="font-weight: 700; color: #333; font-size: 16px;">${vivienda.habitaciones} <span data-i18n="dashboardUser.housing.roomMultiple"> Habitacion/es </span></div>
                         </div>
                     </div>
 
@@ -426,8 +427,8 @@ function renderMyVivienda(vivienda) {
                             <i class="fas fa-users"></i>
                         </div>
                         <div>
-                            <div style="font-size: 12px; color: #999;">Capacidad Estimada</div>
-                            <div style="font-weight: 700; color: #333; font-size: 16px;">${vivienda.habitaciones * 2} personas</div>
+                            <div style="font-size: 12px; color: #999;" data-i18n="dashboardUser.housing.estimatedCapacity">Capacidad Estimada</div>
+                            <div style="font-weight: 700; color: #333; font-size: 16px;">${vivienda.habitaciones * 2} <span data-i18n="dashboardUser.housing.persons">personas</span></div>
                         </div>
                     </div>
                 </div>
@@ -458,7 +459,7 @@ function renderMyVivienda(vivienda) {
                     ">
                         <i class="fas fa-clock"></i>
                     </div>
-                    <h3 style="margin: 0; font-size: 18px; color: #333;">Tiempo de Residencia</h3>
+                    <h3 style="margin: 0; font-size: 18px; color: #333;" data-i18n="dashboardUser.housing.residenceTime">Tiempo de Residencia</h3>
                 </div>
 
                 <div style="text-align: center; padding: 20px 0;">
@@ -473,7 +474,7 @@ function renderMyVivienda(vivienda) {
                     ">
                         ${tiempoAsignacion}
                     </div>
-                    <div style="font-size: 14px; color: #999; margin-bottom: 20px;">
+                    <div style="font-size: 14px; color: #999; margin-bottom: 20px;" data-i18n="dashboardUser.housing.residenceSubtitle">
                         viviendo en esta vivienda
                     </div>
                     
@@ -484,7 +485,7 @@ function renderMyVivienda(vivienda) {
                         padding: 15px;
                         margin-top: 20px;
                     ">
-                        <div style="font-size: 12px; color: #999; margin-bottom: 5px;">Fecha de asignación</div>
+                        <div style="font-size: 12px; color: #999; margin-bottom: 5px;" data-i18n="dashboardUser.housing.assignmentDate">Fecha de asignación</div>
                         <div style="font-weight: 600; color: #333; font-size: 16px;">
                             <i class="fas fa-calendar-check" style="color: #4facfe; margin-right: 8px;"></i>
                             ${fechaAsignacion}
@@ -518,7 +519,7 @@ function renderMyVivienda(vivienda) {
                     ">
                         <i class="fas fa-align-left"></i>
                     </div>
-                    <h3 style="margin: 0; font-size: 18px; color: #333;">Descripción de la Vivienda</h3>
+                    <h3 style="margin: 0; font-size: 18px; color: #333;" data-i18n="dashboardUser.housing.houseDescription">Descripción de la Vivienda</h3>
                 </div>
                 
                 <p style="
@@ -638,7 +639,7 @@ function renderSinVivienda(container) {
                 color: #333;
                 margin: 0 0 15px 0;
                 font-weight: 700;
-            ">
+            " data-i18n="dashboardUser.housing.withoutHouse.title">
                 Sin Vivienda Asignada
             </h2>
 
@@ -648,8 +649,8 @@ function renderSinVivienda(container) {
                 line-height: 1.6;
                 margin: 0 0 40px 0;
             ">
-                Actualmente no tienes una vivienda asignada en el sistema.<br>
-                No te preocupes, puedes solicitar una siguiendo los pasos a continuación.
+                <span data-i18n="dashboardUser.housing.withoutHouse.description1">Actualmente no tienes una vivienda asignada en el sistema.</span><br>
+                <span data-i18n="dashboardUser.housing.withoutHouse.description2">No te preocupes, puedes solicitar una siguiendo los pasos a continuación.</span>
             </p>
 
             <!-- Opciones de acción -->
@@ -688,10 +689,10 @@ function renderSinVivienda(container) {
                         </div>
                         
                         <div style="flex: 1;">
-                            <h3 style="margin: 0 0 10px 0; color: #333; font-size: 20px;">
+                            <h3 style="margin: 0 0 10px 0; color: #333; font-size: 20px;" data-i18n="dashboardUser.housing.withoutHouse.request.title">
                                 Solicitud Formal
                             </h3>
-                            <p style="margin: 0 0 15px 0; color: #666; font-size: 14px; line-height: 1.6;">
+                            <p style="margin: 0 0 15px 0; color: #666; font-size: 14px; line-height: 1.6;" data-i18n="dashboardUser.housing.withoutHouse.request.description">
                                 Envía una solicitud oficial desde el sistema. Será revisada por el equipo administrativo 
                                 y recibirás una respuesta en los próximos días.
                             </p>
@@ -703,7 +704,7 @@ function renderSinVivienda(container) {
                                 font-weight: 600;
                                 font-size: 14px;
                             ">
-                                <span>Crear Solicitud</span>
+                                <span data-i18n="dashboardUser.housing.withoutHouse.request.button">Crear Solicitud</span>
                                 <i class="fas fa-arrow-right"></i>
                             </div>
                         </div>
@@ -728,10 +729,10 @@ function renderSinVivienda(container) {
                         margin-top: 2px;
                     "></i>
                     <div>
-                        <strong style="color: #856404; font-size: 15px; display: block; margin-bottom: 8px;">
+                        <strong style="color: #856404; font-size: 15px; display: block; margin-bottom: 8px;" data-i18n="dashboardUser.housing.withoutHouse.advice.title">
                             💡 Consejo
                         </strong>
-                        <p style="margin: 0; color: #856404; font-size: 13px; line-height: 1.6;">
+                        <p style="margin: 0; color: #856404; font-size: 13px; line-height: 1.6;" data-i18n="dashboardUser.housing.withoutHouse.advice.description">
                             Al solicitar una vivienda, asegúrate de incluir información relevante como el número de integrantes 
                             de tu núcleo familiar y cualquier necesidad especial. Esto ayudará a asignarte la vivienda más adecuada.
                         </p>
@@ -762,6 +763,7 @@ function renderSinVivienda(container) {
             }
         </style>
     `;
+    i18n.translatePage();
 }
 
 // ==========================================
@@ -830,7 +832,7 @@ function renderError(container, mensaje) {
                 transition: all 0.3s ease;
             " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(102, 126, 234, 0.3)'"
                onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
-                <i class="fas fa-sync-alt"></i> Reintentar
+                <i class="fas fa-sync-alt"></i> <span data-i18n="dashboardUser.housing.error.button">Reintentar</span>
             </button>
         </div>
     `;
@@ -983,11 +985,11 @@ function contactarAdministrador() {
                     -webkit-text-fill-color: transparent;
                     background-clip: text;
                 ">
-                    <i class="fas fa-envelope"></i> Contactar Administrador
+                    <i class="fas fa-envelope"></i> <span data-i18n="dashboardUser.housing.contactAdmin.title">Contactar Administrador</span>
                 </h2>
 
                 <div class="modal-detail-section">
-                    <p style="color: #666; line-height: 1.6;">
+                    <p style="color: #666; line-height: 1.6;" data-i18n="dashboardUser.housing.contactAdmin.description">
                         Para solicitar una vivienda o consultar sobre el proceso de asignación, puedes utilizar cualquiera de estas opciones:
                     </p>
                 </div>
@@ -1016,10 +1018,10 @@ function contactarAdministrador() {
                             <i class="fas fa-file-alt"></i>
                         </div>
                         <div style="flex: 1;">
-                            <h4 style="margin: 0 0 10px 0; color: #333; font-size: 16px;">
+                            <h4 style="margin: 0 0 10px 0; color: #333; font-size: 16px;" data-i18n="dashboardUser.housing.contactAdmin.option1.title">
                                 📋 Opción 1: Solicitud Formal
                             </h4>
-                            <p style="margin: 0 0 15px 0; color: #666; font-size: 14px; line-height: 1.6;">
+                            <p style="margin: 0 0 15px 0; color: #666; font-size: 14px; line-height: 1.6;" dashboardUser.housing.contactAdmin.option1.description>
                                 Envía una solicitud desde la sección de "Solicitudes" del sistema. 
                                 Será revisada y procesada por el equipo administrativo.
                             </p>
@@ -1033,8 +1035,8 @@ function contactarAdministrador() {
                                 cursor: pointer;
                                 transition: all 0.3s;
                             " onmouseover="this.style.transform='translateY(-2px)'"
-                               onmouseout="this.style.transform='translateY(0)'">
-                                <i class="fas fa-paper-plane"></i> Crear Solicitud
+                                onmouseout="this.style.transform='translateY(0)'">
+                                <i class="fas fa-paper-plane"></i> <span data-i18n="dashboardUser.housing.contactAdmin.option1.button">Crear Solicitud</span>
                             </button>
                         </div>
                     </div>
@@ -1063,10 +1065,10 @@ function contactarAdministrador() {
                             <i class="fas fa-phone"></i>
                         </div>
                         <div style="flex: 1;">
-                            <h4 style="margin: 0 0 10px 0; color: #333; font-size: 16px;">
+                            <h4 style="margin: 0 0 10px 0; color: #333; font-size: 16px;" data-i18n="dashboardUser.housing.contactAdmin.option2.title">
                                 📞 Opción 2: Contacto Directo
                             </h4>
-                            <p style="margin: 0 0 15px 0; color: #666; font-size: 14px; line-height: 1.6;">
+                            <p style="margin: 0 0 15px 0; color: #666; font-size: 14px; line-height: 1.6;" data-i18n="dashboardUser.housing.contactAdmin.option2.description">
                                 También puedes contactar directamente con la administración:
                             </p>
                             <div style="display: flex; flex-direction: column; gap: 12px;">
@@ -1095,7 +1097,7 @@ function contactarAdministrador() {
                                 ">
                                     <i class="fas fa-phone" style="color: #4facfe; font-size: 18px;"></i>
                                     <div>
-                                        <div style="font-size: 11px; color: #999; margin-bottom: 2px;">Teléfono</div>
+                                        <div style="font-size: 11px; color: #999; margin-bottom: 2px;" data-i18n="dashboardUser.housing.contactAdmin.option2.phone">Teléfono</div>
                                         <strong style="color: #333; font-size: 14px;">(598) 2XXX-XXXX</strong>
                                     </div>
                                 </div>
@@ -1110,7 +1112,7 @@ function contactarAdministrador() {
                                 ">
                                     <i class="fas fa-clock" style="color: #4facfe; font-size: 18px;"></i>
                                     <div>
-                                        <div style="font-size: 11px; color: #999; margin-bottom: 2px;">Horario</div>
+                                        <div style="font-size: 11px; color: #999; margin-bottom: 2px;" data-i18n="dashboardUser.housing.contactAdmin.option2.schedule">Horario</div>
                                         <strong style="color: #333; font-size: 14px;">Lunes a Viernes, 9:00 - 17:00</strong>
                                     </div>
                                 </div>
@@ -1120,7 +1122,7 @@ function contactarAdministrador() {
                 </div>
 
                 <div class="modal-detail-footer" style="margin-top: 30px;">
-                    <button onclick="this.closest('.modal-detail').remove()" class="btn btn-secondary">
+                    <button onclick="this.closest('.modal-detail').remove()" class="btn btn-secondary" data-i18n="dashboardUser.housing.contactAdmin.close">
                         Cerrar
                     </button>
                 </div>
@@ -1142,6 +1144,7 @@ function contactarAdministrador() {
     `;
     
     document.body.insertAdjacentHTML('beforeend', modal);
+    i18n.translatePage(); 
 }
 
 // ==========================================

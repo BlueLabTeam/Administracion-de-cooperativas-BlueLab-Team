@@ -283,11 +283,11 @@ function abrirModalNuevaSolicitud() {
                             <i class="fas fa-tag"></i> <span data-i18n="dashboardUser.requests.form.typeLabel">Tipo de Solicitud *</span>
                         </label>
                         <select id="tipo-solicitud" name="tipo_solicitud" required>
-                            <option value="horas" data-i18n="dashboardUser.requests.form.type.hours">📊 Registro de Horas</option>
-                            <option value="pago" data-i18n="dashboardUser.requests.form.type.payment">💳 Pagos/Cuotas</option>
-                            <option value="vivienda" data-i18n="dashboardUser.requests.form.type.housing">🏡 Vivienda</option>
-                            <option value="general" data-i18n="dashboardUser.requests.form.type.general">📋 Consulta General</option>
-                            <option value="otro" data-i18n="dashboardUser.requests.form.type.other">❓ Otro</option>
+                            <option value="horas" data-i18n="dashboardUser.requests.form.types.hours">📊 Registro de Horas</option>
+                            <option value="pago" data-i18n="dashboardUser.requests.form.types.payment">💳 Pagos/Cuotas</option>
+                            <option value="vivienda" data-i18n="dashboardUser.requests.form.types.housing">🏡 Vivienda</option>
+                            <option value="general" data-i18n="dashboardUser.requests.form.types.general">📋 Consulta General</option>
+                            <option value="otro" data-i18n="dashboardUser.requests.form.types.other">❓ Otro</option>
                         </select>
                     </div>
 

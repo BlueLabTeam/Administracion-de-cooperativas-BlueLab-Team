@@ -1170,7 +1170,49 @@ es: {
         title: "🏡 My Housing",
         subtitle: "Housing Information",
         loading: "Loading...",
-        noAssigned: "You do not have an assigned housing"
+        roomsTitle: "rooms",
+        roomsMultiple: "room/s",
+        estimatedCapacity: "Estimated Capacity",
+        persons: "persons",
+        residenceTime: "Residence Time",
+        residenceSubtitle: "living in this housing",
+        assignmentDate: "Assignment Date",
+        houseDescription: "Housing Description",
+        noAssigned: "You do not have an assigned housing",
+        withoutHouse: {
+          title: "No Assigned Housing",
+          description1: "You currently do not have a housing assigned in the system.",
+          description2: "Don't worry, you can request one by following the steps below.",
+          request: { 
+            title: "Formal Request",
+            description: "Send an official request through the system. It will be reviewed by the administrative team, and you will receive a response in the next few days.",
+            button: "Create Request"
+          },
+          advice: {
+            title: "💡 Tip",
+            description: "When applying for housing, make sure to include relevant information such as the number of members in your household and any special needs. This will help assign you the most suitable housing.",
+          },
+        },
+        error: {
+          button: "Retry",
+        },
+        contactAdmin: {
+          title: "Contact Administration",
+          description: "To apply for a home or inquire about the allocation process, you can use any of these options:",
+          closeButton: "close",
+          option1: {
+              title: "📋 Option 1: Formal Request",
+              description: "Send a request from the 'Requests' section of the system. It will be reviewed and processed by the administrative team.",
+              button: "create request"
+            },
+          option2: {
+            title: "📞 Option 2: Direct Contact",
+            description: "You can also contact the administration directly:",
+            phone: "phone",
+            schedule: "schedule",
+            scheduleMessage: "Monday to Friday, 9:00 AM - 5:00 PM",
+          },
+        },
       },
 
       billing: {
