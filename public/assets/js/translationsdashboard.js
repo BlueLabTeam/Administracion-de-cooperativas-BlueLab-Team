@@ -1085,6 +1085,9 @@ es: {
         description: "Send queries, justifications or report problems to the administrator",
         newRequest: "New Request",
         noRequests: "You have no requests",
+        responses: "Response(s):",
+        viewDetail: "View Detail",
+        reply: "Reply",
         types: {
           hours: " 📊 Hours Log",
           payment: " 💳 Payments/Fees",
@@ -1093,7 +1096,7 @@ es: {
           other: " ❓ Other"
         },
         form: {
-          typeLabel: "Type of Request:",
+          typeLabel: "Type of Request *",
           types: {
             hours: " 📊 Hours Log",
             payment: " 💳 Payments/Fees",
@@ -1101,11 +1104,11 @@ es: {
             general: " 📝 General Inquiry",
             other: " ❓ Other"
           },
-          subjectLabel: "Subject:",
+          subjectLabel: "Subject *",
           subjectPlaceholder: "Example: Issue with my housing assignment",
-          descriptionLabel: "Description:",
+          descriptionLabel: "Description *",
           descriptionPlaceholder: "Provide detailed information about your request...",
-          priorityLabel: "Priority:",
+          priorityLabel: "Priority *",
           priorityUrgentHelp: "Select 'High' only for urgent matters",
           priority: {
             low: "Low",
@@ -1114,14 +1117,33 @@ es: {
           },
           attachmentLabel: "Attachment (optional):",
           attachmentHelp: "Upload a file (image or PDF, max. 5MB)",
-          infoTitle: "Important:",
-          infoText: "Your request will be reviewed by an administrator. You will receive a notification when it is addressed.",
-          submitButton: "Submit Request"
+          infoTitle: "ℹ️ Information:",
+          infoDescription: "Your request will be reviewed by an administrator. You will receive a notification when it is addressed.",
+          submitButton: "Submit Request",
+          cancelButton: "Cancel",
+          sending: "Sending..."
         },
         stats: {
           pending: "Pending",
           inReview: "In Review",
           resolved: "Resolved"
+        },
+        detail: {
+          viewAttachment: "View Attachment",
+          conversation: "Conversation",
+          noResponses: "No responses yet",
+          close: "Close",
+          reply: "Reply"
+        },
+        answerForm: {
+          title: "Submit your response",
+          responseLabel: "Message *",
+          responsePlaceholder: "Type your message here...",
+          attachmentLabel: "Attachment (optional):",
+          attachmentHelp: "Upload a file (image or PDF, max. 5MB)",
+          submitButton: "Submit Response",
+          cancelButton: "Cancel",
+          sending: "Sending..."
         },
         filters: {
           status: "Status:",
@@ -1132,6 +1154,13 @@ es: {
           inReview: "In Review",
           resolved: "Resolved",
           rejected: "Rejected"
+        },
+        error: {
+          title: "❌ Error",
+          titleConnection: "❌ Connection Error:",
+          titleParsingJson: "❌ Error parsing JSON:",
+          messageParsingJson: "The server returned HTML instead of JSON",
+          button: "Retry"
         },
 
         loading: "Loading requests..."

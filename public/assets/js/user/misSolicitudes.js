@@ -59,8 +59,8 @@ async function loadMisSolicitudes() {
     }
 
     console.log('✅ Container encontrado:', container);
-    container.innerHTML = '<p class="loading">Cargando solicitudes...</p>';
-
+    container.innerHTML = '<p class="loading" data-i18n="dashboardUser.requests.loading">Cargando solicitudes...</p>';
+    i18n.translatePage(); // Actualizar traducciones
     try {
         const estado = document.getElementById('filtro-estado-solicitudes')?.value || '';
         const tipo = document.getElementById('filtro-tipo-solicitudes')?.value || '';
@@ -96,14 +96,15 @@ async function loadMisSolicitudes() {
             console.error('📄 Respuesta completa:', responseText);
             container.innerHTML = `
                 <div class="error">
-                    <h3>❌ Error de Servidor</h3>
-                    <p>El servidor devolvió HTML en lugar de JSON</p>
+                    <h3 data-i18n="dashboardUser.requests.error.titleParsingJson">❌ Error de Servidor</h3>
+                    <p data-i18n="dashboardUser.requests.error.messageParsingJson">El servidor devolvió HTML en lugar de JSON</p>
                     <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px; overflow: auto; max-height: 300px;">${responseText.substring(0, 1000)}</pre>
                     <button class="btn btn-primary" onclick="loadMisSolicitudes()">
-                        <i class="fas fa-sync"></i> Reintentar
+                        <i class="fas fa-sync"></i> <span data-i18n="dashboardUser.requests.error.button">Reintentar</span>
                     </button>
                 </div>
             `;
+            i18n.translatePage(); // Actualizar traducciones
             return;
         }
 
@@ -127,13 +128,14 @@ async function loadMisSolicitudes() {
             console.error('❌ success = false');
             container.innerHTML = `
                 <div class="error">
-                    <h3>❌ Error</h3>
+                    <h3 data-i18n="dashboardUser.requests.error.title">❌ Error</h3>
                     <p>${data.message || 'Error desconocido'}</p>
                     <button class="btn btn-primary" onclick="loadMisSolicitudes()">
-                        <i class="fas fa-sync"></i> Reintentar
+                        <i class="fas fa-sync"></i> <span data-i18n="dashboardUser.requests.error.button">Reintentar</span>
                     </button>
                 </div>
             `;
+            i18n.translatePage(); // Actualizar traducciones
         }
 
     } catch (error) {
@@ -145,13 +147,14 @@ async function loadMisSolicitudes() {
         
         container.innerHTML = `
             <div class="error">
-                <h3>❌ Error de Conexión</h3>
+                <h3 data-i18n="dashboardUser.requests.error.titleConnection">❌ Error de Conexión</h3>
                 <p>${error.message}</p>
                 <button class="btn btn-primary" onclick="loadMisSolicitudes()">
-                    <i class="fas fa-sync"></i> Reintentar
+                    <i class="fas fa-sync"></i> <span data-i18n="dashboardUser.requests.error.button">Reintentar</span>
                 </button>
             </div>
         `;
+        i18n.translatePage(); // Actualizar traducciones
     }
     
     console.log('==========================================');
@@ -173,12 +176,13 @@ function renderMisSolicitudes(solicitudes) {
         container.innerHTML = `
             <div class="no-data">
                 <i class="fas fa-inbox" style="font-size: 48px; color: #ddd; margin-bottom: 10px;"></i>
-                <p>No tienes solicitudes registradas</p>
+                <p data-i18n="dashboardUser.requests.noRequests">No tienes solicitudes registradas</p>
                 <button class="btn btn-primary" onclick="abrirModalNuevaSolicitud()">
-                    <i class="fas fa-plus"></i> Nueva Solicitud
+                    <i class="fas fa-plus"></i> <span data-i18n="dashboardUser.requests.newRequest">Nueva Solicitud</span>
                 </button>
             </div>
         `;
+        i18n.translatePage(); // Actualizar traducciones
         return;
     }
 
@@ -211,17 +215,17 @@ function renderMisSolicitudes(solicitudes) {
                     
                     <div class="solicitud-meta">
                         <span><i class="fas fa-calendar"></i> ${fecha}</span>
-                        <span><i class="fas fa-comments"></i> ${sol.total_respuestas || 0} respuesta(s)</span>
+                        <span><i class="fas fa-comments"></i> ${sol.total_respuestas || 0} <span data-i18n="dashboardUser.requests.responses">respuesta(s)</span></span>
                     </div>
                 </div>
 
                 <div class="solicitud-footer">
                     <button class="btn btn-secondary btn-small" onclick="verDetalleSolicitud(${sol.id_solicitud})">
-                        <i class="fas fa-eye"></i> Ver Detalle
+                        <i class="fas fa-eye"></i> <span data-i18n="dashboardUser.requests.viewDetail">Ver Detalle</span>
                     </button>
                     ${sol.estado !== 'resuelta' && sol.estado !== 'rechazada' ? `
                         <button class="btn btn-primary btn-small" onclick="responderSolicitud(${sol.id_solicitud})">
-                            <i class="fas fa-reply"></i> Responder
+                            <i class="fas fa-reply"></i> <span data-i18n="dashboardUser.requests.reply">Responder</span>
                         </button>
                     ` : ''}
                 </div>
@@ -231,6 +235,7 @@ function renderMisSolicitudes(solicitudes) {
 
     html += '</div>';
     container.innerHTML = html;
+    i18n.translatePage(); // Actualizar traducciones
 }
 
 /**
@@ -268,27 +273,27 @@ function abrirModalNuevaSolicitud() {
         <div id="nuevaSolicitudModal" class="material-modal" style="display: flex;">
             <div class="material-modal-content" onclick="event.stopPropagation()">
                 <div class="material-modal-header">
-                    <h3 id="solicitudModalTitle">Nueva Solicitud</h3>
+                    <h3 id="solicitudModalTitle" data-i18n="dashboardUser.requests.newRequest">Nueva Solicitud</h3>
                     <button class="close-material-modal" onclick="cerrarModalNuevaSolicitud()">&times;</button>
                 </div>
                 
                 <form id="nuevaSolicitudForm" onsubmit="submitNuevaSolicitud(event)" enctype="multipart/form-data">
                     <div class="form-group">
                         <label for="tipo-solicitud">
-                            <i class="fas fa-tag"></i> Tipo de Solicitud *
+                            <i class="fas fa-tag"></i> <span data-i18n="dashboardUser.requests.form.typeLabel">Tipo de Solicitud *</span>
                         </label>
                         <select id="tipo-solicitud" name="tipo_solicitud" required>
-                            <option value="horas">📊 Registro de Horas</option>
-                            <option value="pago">💳 Pagos/Cuotas</option>
-                            <option value="vivienda">🏡 Vivienda</option>
-                            <option value="general">📋 Consulta General</option>
-                            <option value="otro">❓ Otro</option>
+                            <option value="horas" data-i18n="dashboardUser.requests.form.type.hours">📊 Registro de Horas</option>
+                            <option value="pago" data-i18n="dashboardUser.requests.form.type.payment">💳 Pagos/Cuotas</option>
+                            <option value="vivienda" data-i18n="dashboardUser.requests.form.type.housing">🏡 Vivienda</option>
+                            <option value="general" data-i18n="dashboardUser.requests.form.type.general">📋 Consulta General</option>
+                            <option value="otro" data-i18n="dashboardUser.requests.form.type.other">❓ Otro</option>
                         </select>
                     </div>
 
                     <div class="form-group">
                         <label for="asunto-solicitud">
-                            <i class="fas fa-heading"></i> Asunto *
+                            <i class="fas fa-heading"></i> <span data-i18n="dashboardUser.requests.form.subjectLabel">Asunto *</span>
                         </label>
                         <input 
                             type="text" 
@@ -296,12 +301,13 @@ function abrirModalNuevaSolicitud() {
                             name="asunto"
                             placeholder="Ej: Justificación de horas - Certificado médico"
                             maxlength="255"
-                            required>
+                            required 
+                            data-i18n-placeholder="dashboardUser.requests.form.subjectPlaceholder">
                     </div>
 
                     <div class="form-group">
                         <label for="descripcion-solicitud">
-                            <i class="fas fa-align-left"></i> Descripción *
+                            <i class="fas fa-align-left"></i> <span data-i18n="dashboardUser.requests.form.descriptionLabel">Descripción *</span>
                         </label>
                         <textarea 
                             id="descripcion-solicitud" 
@@ -312,6 +318,7 @@ function abrirModalNuevaSolicitud() {
                             required
                             style="resize: vertical; width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; font-size: 14px;"
                             oninput="actualizarContadorCaracteres(this)"
+                            data-i18n-placeholder="dashboardUser.requests.form.descriptionPlaceholder"
                         ></textarea>
                         <small id="charCount" style="color: #666; display: block; text-align: right; margin-top: 4px;">
                             0 / 250 caracteres
@@ -320,39 +327,39 @@ function abrirModalNuevaSolicitud() {
 
                     <div class="form-group">
                         <label for="prioridad-solicitud">
-                            <i class="fas fa-exclamation-circle"></i> Prioridad
+                            <i class="fas fa-exclamation-circle"></i> <span data-i18n="dashboardUser.requests.form.priorityLabel">Prioridad *</span>
                         </label>
                         <select id="prioridad-solicitud" name="prioridad">
-                            <option value="baja">Baja</option>
-                            <option value="media" selected>Media</option>
-                            <option value="alta">Alta</option>
+                            <option value="baja" data-i18n="dashboardUser.requests.form.priority.Low">Baja</option>
+                            <option value="media" data-i18n="dashboardUser.requests.form.priority.Medium" selected>Media</option>
+                            <option value="alta" data-i18n="dashboardUser.requests.form.priority.High">Alta</option>
                         </select>
-                        <small class="form-help">Selecciona "Alta" solo si es urgente</small>
+                        <small class="form-help" data-i18n="dashboardUser.requests.form.priorityUrgentHelp">Selecciona "Alta" solo si es urgente</small>
                     </div>
 
                     <div class="form-group">
                         <label for="archivo-solicitud">
-                            <i class="fas fa-paperclip"></i> Archivo Adjunto (Opcional)
+                            <i class="fas fa-paperclip"></i> <span data-i18n="dashboardUser.requests.form.attachmentLabel">Archivo Adjunto (Opcional)</span>
                         </label>
                         <input 
                             type="file" 
                             id="archivo-solicitud" 
                             name="archivo"
                             accept="image/*,.pdf">
-                        <small class="form-help">Puedes adjuntar certificados, comprobantes, etc. (máx. 5MB)</small>
+                        <small class="form-help" data-i18n="dashboardUser.requests.form.attachmentHelp">Puedes adjuntar certificados, comprobantes, etc. (máx. 5MB)</small>
                     </div>
 
                     <div class="alert-info">
-                        <strong>ℹ️ Información:</strong>
-                        <p>Tu solicitud será revisada por un administrador. Recibirás una notificación cuando haya novedades.</p>
+                        <strong data-i18n="dashboardUser.requests.form.infoTitle">ℹ️ Información:</strong>
+                        <p data-i18n="dashboardUser.requests.form.infoDescription">Tu solicitud será revisada por un administrador. Recibirás una notificación cuando haya novedades.</p>
                     </div>
 
                     <div class="form-actions">
                         <button type="button" class="btn btn-secondary" onclick="cerrarModalNuevaSolicitud()">
-                            <i class="fas fa-times"></i> Cancelar
+                            <i class="fas fa-times"></i> <span data-i18n="dashboardUser.requests.form.cancelButton">Cancelar</span>
                         </button>
                         <button type="submit" class="btn btn-primary" id="btn-submit-solicitud">
-                            <i class="fas fa-paper-plane"></i> Enviar Solicitud
+                            <i class="fas fa-paper-plane"></i> <span data-i18n="dashboardUser.requests.form.submitButton">Enviar Solicitud</span>
                         </button>
                     </div>
                 </form>
@@ -361,7 +368,7 @@ function abrirModalNuevaSolicitud() {
     `;
 
     document.body.insertAdjacentHTML('beforeend', modal);
-    
+    i18n.translatePage(); // Actualizar traducciones
     // Prevenir scroll del body
     document.body.style.overflow = 'hidden';
 }
@@ -414,7 +421,7 @@ async function submitNuevaSolicitud(event) {
     
     // Deshabilitar botón
     submitBtn.disabled = true;
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span data-i18n="dashboardUser.requests.form.sending">Enviando...</span>';
 
     try {
         // 🔥 CREAR FormData CORRECTAMENTE
@@ -518,14 +525,14 @@ async function verDetalleSolicitud(solicitudId) {
                         <p style="white-space: pre-wrap;">${solicitud.descripcion}</p>
                         ${solicitud.archivo_adjunto ? `
                             <a href="/files/?path=${solicitud.archivo_adjunto}" target="_blank" class="btn btn-secondary btn-small">
-                                <i class="fas fa-paperclip"></i> Ver Archivo Adjunto
+                                <i class="fas fa-paperclip"></i> <span data-i18n="dashboardUser.requests.detail.viewAttachment">Ver Archivo Adjunto</span>
                             </a>
                         ` : ''}
                     </div>
 
                     ${respuestas.length > 0 ? `
                         <div class="modal-detail-section">
-                            <h3><i class="fas fa-comments"></i> Conversación (${respuestas.length})</h3>
+                            <h3><i class="fas fa-comments"></i> <span data-i18n="dashboardUser.requests.detail.conversation">Conversación</span>(${respuestas.length})</h3>
                             <div class="respuestas-thread">
                                 ${respuestas.map(resp => {
                                     const fechaResp = new Date(resp.fecha_respuesta).toLocaleString('es-UY');
@@ -541,7 +548,7 @@ async function verDetalleSolicitud(solicitudId) {
                                                 <p style="white-space: pre-wrap;">${resp.mensaje}</p>
                                                 ${resp.archivo_adjunto ? `
                                                     <a href="/files/?path=${resp.archivo_adjunto}" target="_blank" class="file-link">
-                                                        <i class="fas fa-paperclip"></i> Ver Archivo
+                                                        <i class="fas fa-paperclip"></i> <span data-i18n="dashboardUser.requests.detail.viewAttachment">Ver Archivo Adjunto</span>
                                                     </a>
                                                 ` : ''}
                                             </div>
@@ -550,13 +557,13 @@ async function verDetalleSolicitud(solicitudId) {
                                 }).join('')}
                             </div>
                         </div>
-                    ` : '<p style="text-align: center; color: #999;">Sin respuestas aún</p>'}
+                    ` : `<p style="text-align: center; color: #999;" data-i18n="dashboardUser.requests.detail.noResponses">Sin respuestas aún</p>`}
 
                     <div class="modal-detail-footer">
-                        <button onclick="this.closest('.modal-detail').remove()" class="btn btn-secondary">Cerrar</button>
+                        <button onclick="this.closest('.modal-detail').remove()" class="btn btn-secondary" data-i18n="dashboardUser.requests.detail.close">Cerrar</button>
                         ${solicitud.estado !== 'resuelta' && solicitud.estado !== 'rechazada' ? `
                             <button onclick="this.closest('.modal-detail').remove(); responderSolicitud(${solicitudId})" class="btn btn-primary">
-                                <i class="fas fa-reply"></i> Responder
+                                <i class="fas fa-reply"></i> <span data-i18n="dashboardUser.requests.detail.reply">Responder</span>
                             </button>
                         ` : ''}
                     </div>
@@ -586,25 +593,26 @@ function responderSolicitud(solicitudId) {
                 <button class="modal-close-btn" onclick="cerrarModalResponder()">×</button>
                 
                 <h2 class="modal-title">
-                    <i class="fas fa-reply"></i> Responder Solicitud
+                    <i class="fas fa-reply"></i> <span data-i18n="dashboardUser.requests.answerForm.title">Responder Solicitud</span>
                 </h2>
 
                 <form id="responderSolicitudForm" onsubmit="submitRespuesta(event, ${solicitudId})" enctype="multipart/form-data">
                     <div class="form-group">
                         <label for="mensaje-respuesta">
-                            <i class="fas fa-comment"></i> Mensaje *
+                            <i class="fas fa-comment"></i> <span data-i18n="dashboardUser.requests.answerForm.responseLabel">Mensaje *</span>
                         </label>
                         <textarea 
                             id="mensaje-respuesta" 
                             name="mensaje"
                             rows="6"
                             placeholder="Escribe tu respuesta o información adicional..."
+                            data-i18n-placeholder="dashboardUser.requests.answerForm.responsePlaceholder"
                             required></textarea>
                     </div>
 
                     <div class="form-group">
                         <label for="archivo-respuesta">
-                            <i class="fas fa-paperclip"></i> Archivo Adjunto (Opcional)
+                            <i class="fas fa-paperclip"></i> <span data-i18n="dashboardUser.requests.answerForm.attachmentLabel">Archivo Adjunto (Opcional)</span>
                         </label>
                         <input 
                             type="file" 
@@ -615,10 +623,10 @@ function responderSolicitud(solicitudId) {
 
                     <div class="form-actions">
                         <button type="button" class="btn btn-secondary" onclick="cerrarModalResponder()">
-                            <i class="fas fa-times"></i> Cancelar
+                            <i class="fas fa-times"></i> <span data-i18n="dashboardUser.requests.answerForm.cancelButton">Cancelar</span>
                         </button>
                         <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-paper-plane"></i> Enviar Respuesta
+                            <i class="fas fa-paper-plane"></i> <span data-i18n="dashboardUser.requests.answerForm.submitButton">Enviar Respuesta</span>
                         </button>
                     </div>
                 </form>
@@ -627,6 +635,7 @@ function responderSolicitud(solicitudId) {
     `;
 
     document.body.insertAdjacentHTML('beforeend', modal);
+    i18n.translatePage(); // Actualizar traducciones
 }
 
 /**
@@ -650,7 +659,8 @@ async function submitRespuesta(event, solicitudId) {
     const submitBtn = form.querySelector('button[type="submit"]');
     const btnHTML = submitBtn.innerHTML;
     submitBtn.disabled = true;
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span data-i18n="dashboardUser.requests.answerForm.sending">Enviando...</span>';
+    i18n.translatePage(); // Actualizar traducciones
 
     try {
         const response = await fetch('/api/solicitudes/responder', {
