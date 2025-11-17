@@ -1375,6 +1375,8 @@ const translations = {
         clockOut: "Clock Out",
         activeSession: "Active session",
         entryTime: "Entry:",
+        markEntry: "Mark Entry",
+        markExit: "Mark Exit",
         stats: {
           weekHours: "Hours this Week",
           daysWorked: "Days Worked",
@@ -1383,11 +1385,14 @@ const translations = {
         weeklySummary: {
           title: "📅 Weekly Summary",
           refresh: "Refresh",
-          loading: "Loading summary...",
+          loading: "Loading weekly summary...",
+          errorConnection: "Connection error",
+          errorLoadingSummary: "Error loading weekly summary",
           calendarHeader: {
             week: "Week of ",
             to: "to",
-            daysWorked: "📅 Days Worked: "
+            daysWorked: "📅 Days Worked: ",
+            total: " Total: "
           },
           days: {
             monday: "Monday",
@@ -1411,20 +1416,62 @@ const translations = {
             }
           },
         },
+        months: {
+            january: "January",
+            february: "February",
+            march: "March",
+            april: "April",
+            may: "May",
+            june: "June",
+            july: "July",
+            august: "August",
+            september: "September",
+            october: "October",
+            november: "November",
+            december: "December"
+          },
+        widget:{
+          title1: "debt of hours", 
+          title2: "no outstanding hours",
+          progressMonthly: "Monthly Progress",
+          box: {
+            hoursWorked: "Hours Worked",
+            hoursRequired: "Hours Required",
+            hoursRemaining: "Hours Remaining",
+          },
+          breakdownItem: {
+            currentMonth: "Current Month",
+            cumulative: "Cumulative",
+          },
+        },
         history: {
           title: " Records History",
           startDate: "Start date",
           endDate: "End date",
           filter: "Filter",
           loading: "Loading records...",
+          noRecords: "No records were found to display",
+          errorLoading: "Error loading records",
+          connectionError: "Connection error",
           table: {
             columns: {
               date: "Date",
               day: "Day",
               entry: "Entry",
               exit: "Exit",
+              hoursWorked: "Hours Worked",
+              hoursJustified: "Hours Justified",
+              hoursTotal: "Total Hours",
+              status: "Status",
               total: "Total",
-              actions: "Actions"
+              actions: "Actions",
+              justify: "Justify",
+              openRegistration: "Open Registration",
+              statusTypes: {
+                completed: "✓ Completed",
+                pending: "⏳ in progress",
+                rejected: "Rejected"
+              },
             },
             inProgress: "In progress",
             row: {
@@ -1438,7 +1485,12 @@ const translations = {
                 sat: "Sat"
               },
             },
-          }
+          },
+          modal:{
+            descriptionTitle: "Record Description",
+            dateLabel: "Date:",
+            closeButton: "Close"
+          },
         }
       },
       tasks: {

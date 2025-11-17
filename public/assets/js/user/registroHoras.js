@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', function () {
 function updateClock() {
     // Obtener hora actual del navegador
     const now = new Date();
-    
+
     // Crear opciones para formato Uruguay
     const options = {
         timeZone: 'America/Montevideo',
@@ -51,10 +51,10 @@ function updateClock() {
         second: '2-digit',
         hour12: false
     };
-    
+
     // Formatear hora en zona horaria de Uruguay
     const timeString = now.toLocaleTimeString('es-UY', options);
-    
+
     const clockElement = document.getElementById('current-time-display');
     if (clockElement) {
         clockElement.textContent = timeString;
@@ -63,7 +63,7 @@ function updateClock() {
 
 function updateClockWithDate() {
     const now = new Date();
-    
+
     const dateOptions = {
         timeZone: 'America/Montevideo',
         weekday: 'long',
@@ -71,7 +71,7 @@ function updateClockWithDate() {
         month: 'long',
         day: 'numeric'
     };
-    
+
     const timeOptions = {
         timeZone: 'America/Montevideo',
         hour: '2-digit',
@@ -79,21 +79,21 @@ function updateClockWithDate() {
         second: '2-digit',
         hour12: false
     };
-    
+
     const dateString = now.toLocaleDateString('es-UY', dateOptions);
     const timeString = now.toLocaleTimeString('es-UY', timeOptions);
-    
+
     // Capitalizar primera letra del día
     const dateCapitalized = dateString.charAt(0).toUpperCase() + dateString.slice(1);
-    
+
     // Actualizar elementos si existen
     const clockElement = document.getElementById('current-time-display');
     const dateElement = document.getElementById('current-date-display');
-    
+
     if (clockElement) {
         clockElement.textContent = timeString;
     }
-    
+
     if (dateElement) {
         dateElement.textContent = dateCapitalized;
     }
@@ -106,21 +106,21 @@ async function cargarDeudaHorasWidget() {
         console.log('⚠️ Container deuda-actual-container no encontrado');
         return;
     }
-    
+
     container.innerHTML = '<p class="loading">Calculando deuda...</p>';
-    
+
     try {
         const response = await fetch('/api/horas/deuda-actual');
         const data = await response.json();
-        
+
         console.log(' Deuda de horas recibida:', data);
-        
+
         if (data.success && data.deuda) {
             renderDeudaHorasWidget(data.deuda);
         } else {
             container.innerHTML = '<p class="error">No se pudo cargar la deuda de horas</p>';
         }
-        
+
     } catch (error) {
         console.error('❌ Error al cargar deuda:', error);
         container.innerHTML = '<p class="error">Error de conexión</p>';
@@ -129,12 +129,12 @@ async function cargarDeudaHorasWidget() {
 
 function renderDeudaHorasWidget(deuda) {
     const container = document.getElementById('deuda-actual-container');
-    
+
     const deudaMesActual = parseFloat(deuda.deuda_en_pesos || 0);
     const deudaAcumulada = parseFloat(deuda.deuda_acumulada || 0);
     const totalAPagar = deudaMesActual + deudaAcumulada;
     const tieneDeuda = totalAPagar > 0;
-    
+
     container.innerHTML = `
         <div class="deuda-widget-compacto ${tieneDeuda ? 'con-deuda' : 'sin-deuda'}">
             <!-- VISTA COMPACTA (SIEMPRE VISIBLE) -->
@@ -142,13 +142,13 @@ function renderDeudaHorasWidget(deuda) {
                 <div class="deuda-resumen-left">
                     <i class="fas ${tieneDeuda ? 'fa-exclamation-triangle' : 'fa-check-circle'}"></i>
                     <div>
-                        <h4>${tieneDeuda ? 'Deuda de Horas' : 'Sin Deuda de Horas'}</h4>
+                        <h4>${tieneDeuda ? '<span data-i18n="dashboardUser.hours.widget.title1">Deuda de Horas</span>' : '<span data-i18n="dashboardUser.hours.widget.title2">Sin Deuda de Horas</span>'}</h4>
                         <p>${getNombreMes(deuda.mes)} ${deuda.anio}</p>
                     </div>
                 </div>
                 <div class="deuda-resumen-right">
                     <div class="deuda-monto-compacto">
-                        $${totalAPagar.toLocaleString('es-UY', {minimumFractionDigits: 2})}
+                        $${totalAPagar.toLocaleString('es-UY', { minimumFractionDigits: 2 })}
                     </div>
                     <i class="fas fa-chevron-down toggle-icon" id="toggle-deuda-icon"></i>
                 </div>
@@ -158,15 +158,15 @@ function renderDeudaHorasWidget(deuda) {
             <div class="deuda-detalle" id="deuda-detalle-content" style="display: none;">
                 <div class="deuda-stats-row">
                     <div class="stat-box">
-                        <small>Trabajadas</small>
+                        <small data-i18n="dashboardUser.hours.widget.box.hoursWorked">Trabajadas</small>
                         <strong>${deuda.horas_trabajadas}h</strong>
                     </div>
                     <div class="stat-box">
-                        <small>Requeridas</small>
+                        <small data-i18n="dashboardUser.hours.widget.box.hoursRequired">Requeridas</small>
                         <strong>${deuda.horas_requeridas_mensuales}h</strong>
                     </div>
                     <div class="stat-box ${tieneDeuda ? 'error' : 'success'}">
-                        <small>Faltantes</small>
+                        <small data-i18n="dashboardUser.hours.widget.box.hoursRemaining">Faltantes</small>
                         <strong>${deuda.horas_faltantes}h</strong>
                     </div>
                 </div>
@@ -174,38 +174,39 @@ function renderDeudaHorasWidget(deuda) {
                 ${totalAPagar > 0 && deudaAcumulada > 0 ? `
                     <div class="deuda-breakdown-box">
                         <div class="breakdown-item">
-                            <span>Mes actual:</span>
-                            <strong>$${deudaMesActual.toLocaleString('es-UY', {minimumFractionDigits: 2})}</strong>
+                            <span data-i18n="dashboardUser.hours.widget.breakdownItem.currentMonth">Mes actual:</span>
+                            <strong>$${deudaMesActual.toLocaleString('es-UY', { minimumFractionDigits: 2 })}</strong>
                         </div>
                         <div class="breakdown-item error">
-                            <span>Acumulada:</span>
-                            <strong>$${deudaAcumulada.toLocaleString('es-UY', {minimumFractionDigits: 2})}</strong>
+                            <span data-i18n="dashboardUser.hours.widget.breakdownItem.cumulative">Acumulada:</span>
+                            <strong>$${deudaAcumulada.toLocaleString('es-UY', { minimumFractionDigits: 2 })}</strong>
                         </div>
                     </div>
                 ` : ''}
                 
                 <div class="progreso-bar-container">
                     <div class="progreso-bar-header">
-                        <span>Progreso Mensual</span>
+                        <span data-i18n="dashboardUser.hours.widget.progressMonthly">Progreso Mensual</span>
                         <span>${deuda.porcentaje_cumplido}%</span>
                     </div>
                     <div class="progreso-bar">
                         <div class="progreso-fill" style="width: ${Math.min(deuda.porcentaje_cumplido, 100)}%; 
-                             background: ${deuda.porcentaje_cumplido >= 100 ? '#4caf50' : 
-                                          deuda.porcentaje_cumplido >= 50 ? '#ff9800' : '#f44336'}">
+                             background: ${deuda.porcentaje_cumplido >= 100 ? '#4caf50' :
+            deuda.porcentaje_cumplido >= 50 ? '#ff9800' : '#f44336'}">
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     `;
+    i18n.translatePage();
 }
 
 // Función para expandir/colapsar
 function toggleDeudaDetalle() {
     const detalle = document.getElementById('deuda-detalle-content');
     const icon = document.getElementById('toggle-deuda-icon');
-    
+
     if (detalle.style.display === 'none') {
         detalle.style.display = 'block';
         icon.classList.remove('fa-chevron-down');
@@ -219,9 +220,20 @@ function toggleDeudaDetalle() {
 
 function getNombreMes(mes) {
     const meses = [
-        'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-        'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+        '<span data-i18n="dashboardUser.hours.months.january">Enero</span>',
+        '<span data-i18n="dashboardUser.hours.months.february">Febrero</span>',
+        '<span data-i18n="dashboardUser.hours.months.march">Marzo</span>',
+        '<span data-i18n="dashboardUser.hours.months.april">Abril</span>',
+        '<span data-i18n="dashboardUser.hours.months.may">Mayo</span>',
+        '<span data-i18n="dashboardUser.hours.months.june">Junio</span>',
+        '<span data-i18n="dashboardUser.hours.months.july">Julio</span>',
+        '<span data-i18n="dashboardUser.hours.months.august">Agosto</span>',
+        '<span data-i18n="dashboardUser.hours.months.september">Septiembre</span>',
+        '<span data-i18n="dashboardUser.hours.months.october">Octubre</span>',
+        '<span data-i18n="dashboardUser.hours.months.november">Noviembre</span>',
+        '<span data-i18n="dashboardUser.hours.months.december">Diciembre</span>'
     ];
+
     return meses[parseInt(mes) - 1] || mes;
 }
 
@@ -334,8 +346,8 @@ async function marcarEntrada() {
 
     const btnEntrada = document.getElementById('btn-entrada');
     btnEntrada.disabled = true;
-    btnEntrada.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Registrando...';
-
+    btnEntrada.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span data-i18n="dashboardUser.hours.registering">Registrando...</span>';
+    i18n.translatePage();
     try {
         const hoy = new Date();
         const formData = new FormData();
@@ -357,23 +369,26 @@ async function marcarEntrada() {
         if (data.success) {
             alert(` ${data.message}\nHora registrada: ${data.hora_entrada}`);
             registroAbiertoId = data.id_registro;
-            
+
             // Restablecer botón antes de recargar
             btnEntrada.disabled = false;
-            btnEntrada.innerHTML = '<i class="fas fa-sign-in-alt"></i> Marcar Entrada';
-            
+            btnEntrada.innerHTML = '<i class="fas fa-sign-in-alt"></i> <span data-i18n="dashboardUser.hours.markEntry">Marcar Entrada</span>';
+            i18n.translatePage();
+
             await inicializarSeccionHoras();
         } else {
             alert(`❌ ${data.message}`);
             btnEntrada.disabled = false;
-            btnEntrada.innerHTML = '<i class="fas fa-sign-in-alt"></i> Marcar Entrada';
+            btnEntrada.innerHTML = '<i class="fas fa-sign-in-alt"></i> <span data-i18n="dashboardUser.hours.markEntry">Marcar Entrada</span>';
+            i18n.translatePage();
         }
 
     } catch (error) {
         console.error('❌ Error al marcar entrada:', error);
         alert('❌ Error de conexión. Por favor, intenta nuevamente.');
         btnEntrada.disabled = false;
-        btnEntrada.innerHTML = '<i class="fas fa-sign-in-alt"></i> Marcar Entrada';
+        btnEntrada.innerHTML = '<i class="fas fa-sign-in-alt"></i> <span data-i18n="dashboardUser.hours.markEntry">Marcar Entrada</span>';
+        i18n.translatePage();
     }
 }
 
@@ -394,7 +409,8 @@ async function marcarSalida() {
     const btnSalida = document.getElementById('btn-salida');
     const btnHTML = btnSalida.innerHTML;
     btnSalida.disabled = true;
-    btnSalida.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Registrando...';
+    btnSalida.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span data-i18n="dashboardUser.hours.registering">Registrando...</span>';
+    i18n.translatePage();
 
     try {
         const ahora = new Date();
@@ -417,16 +433,18 @@ async function marcarSalida() {
             alert(` ${data.message}\n\n⏱️ Total trabajado: ${data.total_horas} horas`);
             registroAbiertoId = null;
             registroAbiertoData = null;
-            
+
             // Restablecer botón antes de recargar
             btnSalida.disabled = false;
             btnSalida.innerHTML = btnHTML;
-            
+            i18n.translatePage();
+
             await inicializarSeccionHoras();
         } else {
             alert(`❌ ${data.message}`);
             btnSalida.disabled = false;
             btnSalida.innerHTML = btnHTML;
+            i18n.translatePage();
         }
 
     } catch (error) {
@@ -434,6 +452,7 @@ async function marcarSalida() {
         alert('❌ Error de conexión. Por favor, intenta nuevamente.');
         btnSalida.disabled = false;
         btnSalida.innerHTML = btnHTML;
+        i18n.translatePage();
     }
 }
 
@@ -481,8 +500,8 @@ async function loadResumenSemanal() {
     const container = document.getElementById('resumen-semanal-container');
     if (!container) return;
 
-    container.innerHTML = '<p class="loading">Cargando resumen semanal...</p>';
-
+    container.innerHTML = '<p class="loading" data-i18n="dashboardUser.hours.weeklySummary.loading">Cargando resumen semanal...</p>';
+    i18n.translatePage();
     try {
         const response = await fetch('/api/horas/resumen-semanal');
         const data = await response.json();
@@ -490,20 +509,32 @@ async function loadResumenSemanal() {
         if (data.success && data.resumen) {
             renderResumenSemanal(data.resumen);
             console.log(' Resumen semanal cargado');
+            i18n.translatePage();
         } else {
-            container.innerHTML = '<p class="error">Error al cargar resumen semanal</p>';
+            container.innerHTML = '<p class="error" data-i18n="dashboardUser.hours.weeklySummary.errorLoading">Error al cargar resumen semanal</p>';
+            i18n.translatePage();
         }
 
     } catch (error) {
         console.error('❌ Error al cargar resumen semanal:', error);
-        container.innerHTML = '<p class="error">Error de conexión</p>';
+        container.innerHTML = '<p class="error" data-i18n="dashboardUser.hours.weeklySummary.errorConnection">Error de conexión</p>';
+        i18n.translatePage();
     }
 }
 
 function renderResumenSemanal(resumen) {
     const container = document.getElementById('resumen-semanal-container');
 
-    const diasSemana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+    const diasSemana = [
+        '<span data-i18n="dashboardUser.hours.weeklySummary.days.monday">Lunes</span>',
+        '<span data-i18n="dashboardUser.hours.weeklySummary.days.tuesday">Martes</span>',
+        '<span data-i18n="dashboardUser.hours.weeklySummary.days.wednesday">Miércoles</span>',
+        '<span data-i18n="dashboardUser.hours.weeklySummary.days.thursday">Jueves</span>',
+        '<span data-i18n="dashboardUser.hours.weeklySummary.days.friday">Viernes</span>',
+        '<span data-i18n="dashboardUser.hours.weeklySummary.days.saturday">Sábado</span>',
+        '<span data-i18n="dashboardUser.hours.weeklySummary.days.sunday">Domingo</span>'
+    ];
+
     const registrosPorDia = {};
 
     // Organizar registros por día
@@ -524,10 +555,10 @@ function renderResumenSemanal(resumen) {
 
     let html = `
         <div class="resumen-semana-header">
-            <p><strong>Semana del ${formatearFechaSimple(resumen.semana.inicio)} al ${formatearFechaSimple(resumen.semana.fin)}</strong></p>
+            <p><strong><span data-i18n="dashboardUser.hours.weeklySummary.calendarHeader.week">Semana del </span>${formatearFechaSimple(resumen.semana.inicio)} <span data-i18n="dashboardUser.hours.weeklySummary.calendarHeader.to">al</span> ${formatearFechaSimple(resumen.semana.fin)}</strong></p>
             <p>
-                 Total: <strong>${resumen.total_horas}h</strong> | 
-                📅 Días trabajados: <strong>${resumen.dias_trabajados}</strong>
+                <span data-i18n="dashboardUser.hours.weeklySummary.calendarHeader.total">Total:</span> <strong>${resumen.total_horas}h</strong> | 
+                <span data-i18n="dashboardUser.hours.weeklySummary.calendarHeader.daysWorked"> 📅 Días trabajados:</span> <strong>${resumen.dias_trabajados}</strong>
             </p>
         </div>
         <div class="resumen-dias-grid">
@@ -538,9 +569,9 @@ function renderResumenSemanal(resumen) {
         const dia = diasSemana[index];
         const fechaFormateada = formatearFechaSimple(fecha);
         const esHoy = fecha === new Date().toISOString().split('T')[0];
-        const esFinDeSemana = index === 5 || index === 6; 
+        const esFinDeSemana = index === 5 || index === 6;
 
-       html += `
+        html += `
     <div class="dia-card ${registro ? 'con-registro' : 'sin-registro'} ${esHoy ? 'dia-hoy' : ''} ${esFinDeSemana ? 'fin-de-semana' : ''}">
         <div class="dia-header">
             <div class="dia-info">
@@ -563,14 +594,14 @@ function renderResumenSemanal(resumen) {
 
             html += `
                 <div class="registro-info">
-                    <p><i class="fas fa-sign-in-alt"></i> Entrada: <strong>${entrada}</strong></p>
-                    <p><i class="fas fa-sign-out-alt"></i> Salida: <strong>${salida}</strong></p>
-                    <p><i class="fas fa-clock"></i> Total: <strong>${horas}h</strong></p>
+                    <p><i class="fas fa-sign-in-alt"></i> <span data-i18n="dashboardUser.hours.weeklySummary.days.content.entry">Entrada:</span> <strong>${entrada}</strong></p>
+                    <p><i class="fas fa-sign-out-alt"></i> <span data-i18n="dashboardUser.hours.weeklySummary.days.content.exit">Salida:</span> <strong>${salida}</strong></p>
+                    <p><i class="fas fa-clock"></i> <span data-i18n="dashboardUser.hours.weeklySummary.days.content.total">Total:</span> <strong>${horas}h</strong></p>
                     ${estadoBadge}
                 </div>
             `;
         } else {
-            html += '<p class="no-registro"><i class="fas fa-calendar-times"></i> Sin registro</p>';
+            html += '<p class="no-registro"><i class="fas fa-calendar-times"></i> <span data-i18n="dashboardUser.hours.weeklySummary.days.content.withoutRegistration">Sin registro</span></p>';
         }
 
         html += `
@@ -581,14 +612,16 @@ function renderResumenSemanal(resumen) {
 
     html += '</div>';
     container.innerHTML = html;
+    i18n.translatePage();
 }
 
 function getEstadoBadge(estado) {
     const badges = {
-        'pendiente': '<span class="badge-estado pendiente"><i class="fas fa-clock"></i> Pendiente</span>',
-        'aprobado': '<span class="badge-estado aprobado"><i class="fas fa-check-circle"></i> Aprobado</span>',
-        'rechazado': '<span class="badge-estado rechazado"><i class="fas fa-times-circle"></i> Rechazado</span>'
+        'pendiente': '<span class="badge-estado pendiente"><i class="fas fa-clock"></i> <span data-i18n="dashboardUser.hours.weeklySummary.days.content.status.pending">Pendiente</span></span>',
+        'aprobado': '<span class="badge-estado aprobado"><i class="fas fa-check-circle"></i> <span data-i18n="dashboardUser.hours.weeklySummary.days.content.status.approved">Aprobado</span></span>',
+        'rechazado': '<span class="badge-estado rechazado"><i class="fas fa-times-circle"></i> <span data-i18n="dashboardUser.hours.weeklySummary.days.content.status.rejected">Rechazado</span></span>'
     };
+    i18n.translatePage();
     return badges[estado] || '';
 }
 
@@ -597,7 +630,8 @@ async function loadMisRegistros() {
     const container = document.getElementById('historial-registros-container');
     if (!container) return;
 
-    container.innerHTML = '<p class="loading">Cargando historial...</p>';
+    container.innerHTML = '<p class="loading" data-i18n="dashboardUser.hours.history.loading">Cargando historial...</p>';
+    i18n.translatePage();
 
     try {
         const fechaInicio = document.getElementById('filtro-fecha-inicio')?.value || '';
@@ -615,12 +649,14 @@ async function loadMisRegistros() {
             renderHistorialRegistros(data.registros);
             console.log(` ${data.registros.length} registros cargados`);
         } else {
-            container.innerHTML = '<p class="error">Error al cargar registros</p>';
+            container.innerHTML = '<p class="error" data-i18n="dashboardUser.hours.history.errorLoading">Error al cargar registros</p>';
+            i18n.translatePage();
         }
 
     } catch (error) {
         console.error('❌ Error al cargar registros:', error);
-        container.innerHTML = '<p class="error">Error de conexión</p>';
+        container.innerHTML = '<p class="error" data-i18n="dashboardUser.hours.history.connectionError">Error de conexión</p>';
+        i18n.translatePage();
     }
 }
 
@@ -631,9 +667,10 @@ function renderHistorialRegistros(registros) {
         container.innerHTML = `
             <div style="text-align: center; padding: 40px; background: #f8f9fa; border-radius: 12px;">
                 <i class="fas fa-inbox" style="font-size: 48px; color: #ccc; margin-bottom: 15px;"></i>
-                <p style="color: #6c757d; margin: 0;">No hay registros para mostrar</p>
+                <p style="color: #6c757d; margin: 0;" data-i18n="dashboardUser.hours.history.noRecords">No hay registros para mostrar</p>
             </div>
         `;
+        i18n.translatePage();
         return;
     }
 
@@ -645,14 +682,14 @@ function renderHistorialRegistros(registros) {
             <table class="tabla-registros">
                 <thead>
                     <tr>
-                        <th><i class="fas fa-calendar"></i> Fecha</th>
-                        <th><i class="fas fa-clock"></i> Entrada</th>
-                        <th><i class="fas fa-clock"></i> Salida</th>
-                        <th><i class="fas fa-hourglass-half"></i> Horas Trabajadas</th>
-                        <th><i class="fas fa-minus-circle"></i> Horas Justificadas</th>
-                        <th><i class="fas fa-calculator"></i> Horas Netas</th>
-                        <th><i class="fas fa-info-circle"></i> Estado</th>
-                        <th><i class="fas fa-tools"></i> Acciones</th>
+                        <th><i class="fas fa-calendar"></i> <span data-i18n="dashboardUser.hours.history.table.columns.date">Fecha</span></th>
+                        <th><i class="fas fa-clock"></i> <span data-i18n="dashboardUser.hours.history.table.columns.entry">Entrada</span></th>
+                        <th><i class="fas fa-clock"></i> <span data-i18n="dashboardUser.hours.history.table.columns.exit">Salida</span></th>
+                        <th><i class="fas fa-hourglass-half"></i> <span data-i18n="dashboardUser.hours.history.table.columns.hoursWorked">Horas Trabajadas</span></th>
+                        <th><i class="fas fa-minus-circle"></i> <span data-i18n="dashboardUser.hours.history.table.columns.hoursJustified">Horas Justificadas</span></th>
+                        <th><i class="fas fa-calculator"></i> <span data-i18n="dashboardUser.hours.history.table.columns.hoursTotal">Horas Netas</span></th>
+                        <th><i class="fas fa-info-circle"></i> <span data-i18n="dashboardUser.hours.history.table.columns.status">Estado</span></th>
+                        <th><i class="fas fa-tools"></i> <span data-i18n="dashboardUser.hours.history.table.columns.actions">Acciones</span></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -662,32 +699,32 @@ function renderHistorialRegistros(registros) {
         const fecha = new Date(reg.fecha + 'T00:00:00');
         const fechaFormateada = formatearFecha(fecha);
         const diaSemana = obtenerDiaSemana(fecha);
-        
+
         // Calcular horas trabajadas correctamente
         let horasTrabajadas = 0;
         if (reg.hora_entrada && reg.hora_salida) {
             const [hE, mE, sE] = reg.hora_entrada.split(':').map(Number);
             const [hS, mS, sS] = reg.hora_salida.split(':').map(Number);
-            const entrada = hE + mE/60 + sE/3600;
-            const salida = hS + mS/60 + sS/3600;
+            const entrada = hE + mE / 60 + sE / 3600;
+            const salida = hS + mS / 60 + sS / 3600;
             horasTrabajadas = Math.max(0, salida - entrada);
         }
-        
+
         const horasJustificadas = parseFloat(reg.horas_justificadas || 0);
         const horasNetas = Math.max(0, horasTrabajadas - horasJustificadas);
-        
+
         const entrada = reg.hora_entrada ? reg.hora_entrada.substring(0, 5) : '--:--';
         const salida = reg.hora_salida ? reg.hora_salida.substring(0, 5) : '--:--';
-        
+
         // Determinar estado
         let estadoBadge = '';
         let estadoClase = '';
-        
+
         if (reg.hora_salida) {
-            estadoBadge = '<span class="badge-completo">✓ Completo</span>';
+            estadoBadge = '<span class="badge-completo" data-i18n="dashboardUser.hours.history.table.columns.statusTypes.completed">✓ Completo</span>';
             estadoClase = 'registro-completo';
         } else {
-            estadoBadge = '<span class="badge-pendiente">⏳ En curso</span>';
+            estadoBadge = '<span class="badge-pendiente" data-i18n="dashboardUser.hours.history.table.columns.statusTypes.pending">⏳ En curso</span>';
             estadoClase = 'registro-pendiente';
         }
 
@@ -710,9 +747,9 @@ function renderHistorialRegistros(registros) {
                 </td>
                 <td class="horas-cell">
                     <span class="horas-justificadas ${horasJustificadas > 0 ? 'con-justificacion' : ''}">${horasJustificadas.toFixed(2)}h</span>
-                    ${horasJustificadas > 0 && reg.motivo_justificacion ? 
-                        `<button class="btn-mini" onclick="verMotivoJustificacion('${reg.motivo_justificacion}', '${fechaFormateada}')" title="Ver motivo"><i class="fas fa-comment"></i></button>` 
-                        : ''}
+                    ${horasJustificadas > 0 && reg.motivo_justificacion ?
+                `<button class="btn-mini" onclick="verMotivoJustificacion('${reg.motivo_justificacion}', '${fechaFormateada}')" title="Ver motivo"><i class="fas fa-comment"></i></button>`
+                : ''}
                 </td>
                 <td class="horas-cell">
                     <span class="horas-netas">${horasNetas.toFixed(2)}h</span>
@@ -721,11 +758,11 @@ function renderHistorialRegistros(registros) {
                     ${estadoBadge}
                 </td>
                 <td class="acciones-cell">
-                    ${reg.hora_salida ? 
-                        `<button class="btn-small btn-warning" onclick="abrirModalJustificar(${reg.id_registro}, '${fechaFormateada}', ${horasTrabajadas.toFixed(2)}, ${horasJustificadas.toFixed(2)})" title="Justificar horas">
-                            <i class="fas fa-file-medical"></i> Justificar
-                        </button>` 
-                        : '<span style="color: #999; font-size: 12px;">Registro abierto</span>'}
+                    ${reg.hora_salida ?
+                `<button class="btn-small btn-warning" onclick="abrirModalJustificar(${reg.id_registro}, '${fechaFormateada}', ${horasTrabajadas.toFixed(2)}, ${horasJustificadas.toFixed(2)})" title="Justificar horas">
+                            <i class="fas fa-file-medical"></i> <span data-i18n="dashboardUser.hours.history.table.columns.justify">Justificar</span>
+                        </button>`
+                : '<span style="color: #999; font-size: 12px;" data-i18n="dashboardUser.hours.history.table.columns.openRegistration">Registro abierto</span>'}
                 </td>
             </tr>
         `;
@@ -738,8 +775,9 @@ function renderHistorialRegistros(registros) {
     `;
 
     html += getEstilosTablaRegistros();
-    
+
     container.innerHTML = html;
+    i18n.translatePage();
 }
 
 function formatearFecha(fecha) {
@@ -750,7 +788,16 @@ function formatearFecha(fecha) {
 }
 
 function obtenerDiaSemana(fecha) {
-    const dias = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+    const dias = [
+        '<span data-i18n="dashboardUser.hours.history.table.row.days.sun">Dom</span>',
+        '<span data-i18n="dashboardUser.hours.history.table.row.days.mon">Lun</span>',
+        '<span data-i18n="dashboardUser.hours.history.table.row.days.tue">Mar</span>',
+        '<span data-i18n="dashboardUser.hours.history.table.row.days.wed">Mié</span>',
+        '<span data-i18n="dashboardUser.hours.history.table.row.days.thu">Jue</span>',
+        '<span data-i18n="dashboardUser.hours.history.table.row.days.fri">Vie</span>',
+        '<span data-i18n="dashboardUser.hours.history.table.row.days.sat">Sáb</span>'
+    ];
+
     return dias[fecha.getDay()];
 }
 
@@ -936,11 +983,11 @@ function verDescripcionRegistro(descripcion, fecha) {
                 <button onclick="this.closest('.modal-detail').remove()" class="modal-close-button">×</button>
                 
                 <h2 class="modal-detail-header">
-                    <i class="fas fa-file-alt"></i> Descripción del Registro
+                    <i class="fas fa-file-alt"></i> <span data-i18n="dashboardUser.hours.history.modal.descriptionTitle">Descripción del Registro</span>
                 </h2>
                 
                 <div class="modal-detail-section">
-                    <p><strong>Fecha:</strong> ${fecha}</p>
+                    <p><strong><span data-i18n="dashboardUser.hours.history.modal.dateLabel">Fecha:</span></strong> ${fecha}</p>
                 </div>
                 
                 <div class="modal-detail-section" style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
@@ -948,13 +995,14 @@ function verDescripcionRegistro(descripcion, fecha) {
                 </div>
                 
                 <div class="modal-detail-footer">
-                    <button onclick="this.closest('.modal-detail').remove()" class="btn btn-secondary">Cerrar</button>
+                    <button onclick="this.closest('.modal-detail').remove()" class="btn btn-secondary" data-i18n="dashboardUser.hours.history.modal.closeButton">Cerrar</button>
                 </div>
             </div>
         </div>
     `;
-    
+
     document.body.insertAdjacentHTML('beforeend', modal);
+    i18n.translatePage();
 }
 
 function formatearFechaSimple(fecha) {
