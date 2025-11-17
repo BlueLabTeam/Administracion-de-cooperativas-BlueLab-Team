@@ -704,7 +704,7 @@ if (!isset($_SESSION['user_id'])) {
     <script src="/assets/js/user/inicioUsuarios.js"></script>
     <script src="/assets/js/user/miPerfil.js"></script>
     <script src="/assets/js/user/miVivienda.js"></script>
-    <script src="/assets/js/user/misCUotas.js"></script>
+    <script src="/assets/js/user/misCuotas.js"></script>
     <script src="/assets/js/user/registroHoras.js"></script>
     <script src="/assets/js/user/misTareas.js"></script>
     <script src="/assets/js/user/misSolicitudes.js"></script>
