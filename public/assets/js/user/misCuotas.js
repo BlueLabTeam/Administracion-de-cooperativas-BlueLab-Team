@@ -1,3 +1,26 @@
+// 🧪 MODO TEST: Simular último día del mes
+(function() {
+    const TEST_MODE = true; // Cambiar a false para volver a normal
+    
+    if (TEST_MODE) {
+        // Sobrescribir Date para simular último día del mes
+        const fechaOriginal = Date;
+        const ultimoDiaMes = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0);
+        
+        window.Date = function(...args) {
+            if (args.length === 0) {
+                return ultimoDiaMes;
+            }
+            return new fechaOriginal(...args);
+        };
+        
+        // Copiar métodos estáticos
+        Object.setPrototypeOf(window.Date, fechaOriginal);
+        window.Date.prototype = fechaOriginal.prototype;
+        
+        console.log('🧪 TEST MODE: Fecha simulada =', ultimoDiaMes.toLocaleDateString());
+    }
+})();
 
 // ==========================================
 //  MÓDULO: MIS CUOTAS
@@ -839,6 +862,7 @@ async function abrirPagarDeudaTotal(cuotaId, montoTotal) {
     console.log('   Monto total:', montoTotal);
     
     try {
+        // 1. Obtener información de la cuota
         const response = await fetch(`/api/cuotas/detalle?cuota_id=${cuotaId}`);
         const data = await response.json();
         
@@ -848,23 +872,26 @@ async function abrirPagarDeudaTotal(cuotaId, montoTotal) {
         }
         
         const cuota = data.cuota;
-        const mes = obtenerNombreMes(cuota.mes);
+        // Asumiendo que 'obtenerNombreMes' es una función existente
+        const mes = obtenerNombreMes(cuota.mes); 
         
-        // Limpiar modal anterior si existe
+        // 2. Limpiar modal anterior si existe
         const modalExistente = document.getElementById('pagarCuotaModal');
         if (modalExistente) {
             modalExistente.remove();
         }
         
+        // 3. Crear el nuevo modal con el estilo 'material-modal'
         const modal = `
-            <div id="pagarCuotaModal" class="modal-overlay" style="display: flex;">
-                <div class="modal-content-large">
-                    <button class="modal-close-btn" onclick="closePagarCuotaModal()">×</button>
+            <div id="pagarCuotaModal" class="material-modal" style="display: flex;">
+                <div class="material-modal-content" onclick="event.stopPropagation()">
+                    <div class="material-modal-header">
+                        <h3 id="pagarModalTitle">
+                            <i class="fas fa-credit-card"></i> Pagar Cuota - ${mes} ${cuota.anio}
+                        </h3>
+                        <button class="close-material-modal" onclick="closePagarCuotaModal()">&times;</button>
+                    </div>
                     
-                    <h2 class="modal-title">
-                        <i class="fas fa-credit-card"></i> Pagar Cuota - ${mes} ${cuota.anio}
-                    </h2>
-
                     <form id="pagarCuotaForm" onsubmit="submitPagarCuota(event)" enctype="multipart/form-data">
                         <input type="hidden" id="pagar-cuota-id" name="cuota_id" value="${cuotaId}">
                         <input type="hidden" id="pagar-monto" name="monto_pagado" value="${montoTotal}">
@@ -936,6 +963,7 @@ async function abrirPagarDeudaTotal(cuotaId, montoTotal) {
             </div>
         `;
         
+        // 4. Insertar el modal y configurar el comportamiento
         document.body.insertAdjacentHTML('beforeend', modal);
         
         // Mostrar nombre del archivo seleccionado
@@ -951,7 +979,10 @@ async function abrirPagarDeudaTotal(cuotaId, montoTotal) {
                 }
             }
         });
-        
+
+        // Prevenir scroll del body
+        document.body.style.overflow = 'hidden';
+
     } catch (error) {
         console.error('Error:', error);
         alert('❌ Error al cargar información');
@@ -966,6 +997,7 @@ function closePagarCuotaModal() {
     if (modal) {
         modal.remove();
     }
+    // Restaurar scroll del body
     document.body.style.overflow = '';
 }
 

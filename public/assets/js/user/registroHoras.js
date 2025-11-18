@@ -13,7 +13,7 @@ let registroAbiertoData = null;
 
 // ========== INICIALIZACIÓN ==========
 document.addEventListener('DOMContentLoaded', function () {
-    console.log(' Inicializando módulo de horas');
+    console.log('✅ Inicializando módulo de horas');
 
     // Iniciar reloj en tiempo real
     updateClock();
@@ -113,7 +113,7 @@ async function cargarDeudaHorasWidget() {
         const response = await fetch('/api/horas/deuda-actual');
         const data = await response.json();
         
-        console.log(' Deuda de horas recibida:', data);
+        console.log('✅ Deuda de horas recibida:', data);
         
         if (data.success && data.deuda) {
             renderDeudaHorasWidget(data.deuda);
@@ -241,7 +241,7 @@ async function inicializarSeccionHoras() {
             cargarDeudaHorasWidget()
         ]);
 
-        console.log(' Sección inicializada correctamente');
+        console.log('✅ Sección inicializada correctamente');
 
     } catch (error) {
         console.error('❌ Error al inicializar:', error);
@@ -273,20 +273,20 @@ async function verificarRegistroAbierto() {
             throw new Error('El servidor devolvió HTML en lugar de JSON. Revisa los logs de PHP.');
         }
 
-        console.log(' Verificación de registro:', data);
+        console.log('✅ Verificación de registro:', data);
 
         if (data.success && data.registro) {
             // Hay un registro abierto
             registroAbiertoId = data.registro.id_registro;
             registroAbiertoData = data.registro;
             mostrarBotonSalida(data.registro.hora_entrada);
-            console.log(' Registro abierto encontrado:', registroAbiertoId);
+            console.log('✅ Registro abierto encontrado:', registroAbiertoId);
         } else {
             // No hay registro abierto
             registroAbiertoId = null;
             registroAbiertoData = null;
             mostrarBotonEntrada();
-            console.log(' No hay registro abierto');
+            console.log('ℹ️ No hay registro abierto');
         }
 
     } catch (error) {
@@ -324,11 +324,11 @@ function mostrarBotonSalida(horaEntrada) {
 
 // ========== MARCAR ENTRADA ==========
 async function marcarEntrada() {
-    console.log(' Iniciando marcación de entrada');
+    console.log('✅ Iniciando marcación de entrada');
 
     const descripcion = prompt('Describe brevemente tu trabajo de hoy (opcional):');
     if (descripcion === null) {
-        console.log(' Usuario canceló la entrada');
+        console.log('ℹ️ Usuario canceló la entrada');
         return;
     }
 
@@ -355,7 +355,7 @@ async function marcarEntrada() {
         console.log('📥 Respuesta del servidor:', data);
 
         if (data.success) {
-            alert(` ${data.message}\nHora registrada: ${data.hora_entrada}`);
+            alert(`✅ ${data.message}\nHora registrada: ${data.hora_entrada}`);
             registroAbiertoId = data.id_registro;
             
             // Restablecer botón antes de recargar
@@ -379,7 +379,7 @@ async function marcarEntrada() {
 
 // ========== MARCAR SALIDA ==========
 async function marcarSalida() {
-    console.log(' Iniciando marcación de salida');
+    console.log('✅ Iniciando marcación de salida');
 
     if (!registroAbiertoId) {
         alert('❌ No hay registro activo para cerrar');
@@ -387,7 +387,7 @@ async function marcarSalida() {
     }
 
     if (!confirm('¿Deseas registrar tu salida ahora?')) {
-        console.log(' Usuario canceló la salida');
+        console.log('ℹ️ Usuario canceló la salida');
         return;
     }
 
@@ -414,7 +414,7 @@ async function marcarSalida() {
         console.log('📥 Respuesta del servidor:', data);
 
         if (data.success) {
-            alert(` ${data.message}\n\n⏱️ Total trabajado: ${data.total_horas} horas`);
+            alert(`✅ ${data.message}\n\n⏱️ Total trabajado: ${data.total_horas} horas`);
             registroAbiertoId = null;
             registroAbiertoData = null;
             
@@ -469,7 +469,7 @@ async function cargarEstadisticas() {
             }
         }
 
-        console.log(' Estadísticas actualizadas');
+        console.log('✅ Estadísticas actualizadas');
 
     } catch (error) {
         console.error('❌ Error al cargar estadísticas:', error);
@@ -489,7 +489,7 @@ async function loadResumenSemanal() {
 
         if (data.success && data.resumen) {
             renderResumenSemanal(data.resumen);
-            console.log(' Resumen semanal cargado');
+            console.log('✅ Resumen semanal cargado');
         } else {
             container.innerHTML = '<p class="error">Error al cargar resumen semanal</p>';
         }
@@ -526,7 +526,7 @@ function renderResumenSemanal(resumen) {
         <div class="resumen-semana-header">
             <p><strong>Semana del ${formatearFechaSimple(resumen.semana.inicio)} al ${formatearFechaSimple(resumen.semana.fin)}</strong></p>
             <p>
-                 Total: <strong>${resumen.total_horas}h</strong> | 
+                ⏱️ Total: <strong>${resumen.total_horas}h</strong> | 
                 📅 Días trabajados: <strong>${resumen.dias_trabajados}</strong>
             </p>
         </div>
@@ -549,7 +549,7 @@ function renderResumenSemanal(resumen) {
             </div>
             <div class="dia-badges">
                 ${esHoy ? '<span class="badge-hoy">HOY</span>' : ''}
-                ${esFinDeSemana ? '<span class="badge-finde">🖐️</span>' : ''}
+                ${esFinDeSemana ? '<span class="badge-finde"></span>' : ''}
             </div>
         </div>
         <div class="dia-content">
@@ -592,7 +592,7 @@ function getEstadoBadge(estado) {
     return badges[estado] || '';
 }
 
-// ========== HISTORIAL DE REGISTROS ==========
+// ========== HISTORIAL DE REGISTROS (SIMPLIFICADO) ==========
 async function loadMisRegistros() {
     const container = document.getElementById('historial-registros-container');
     if (!container) return;
@@ -613,7 +613,7 @@ async function loadMisRegistros() {
 
         if (data.success && data.registros) {
             renderHistorialRegistros(data.registros);
-            console.log(` ${data.registros.length} registros cargados`);
+            console.log(`✅ ${data.registros.length} registros cargados`);
         } else {
             container.innerHTML = '<p class="error">Error al cargar registros</p>';
         }
@@ -649,10 +649,7 @@ function renderHistorialRegistros(registros) {
                         <th><i class="fas fa-clock"></i> Entrada</th>
                         <th><i class="fas fa-clock"></i> Salida</th>
                         <th><i class="fas fa-hourglass-half"></i> Horas Trabajadas</th>
-                        <th><i class="fas fa-minus-circle"></i> Horas Justificadas</th>
-                        <th><i class="fas fa-calculator"></i> Horas Netas</th>
                         <th><i class="fas fa-info-circle"></i> Estado</th>
-                        <th><i class="fas fa-tools"></i> Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -672,9 +669,6 @@ function renderHistorialRegistros(registros) {
             const salida = hS + mS/60 + sS/3600;
             horasTrabajadas = Math.max(0, salida - entrada);
         }
-        
-        const horasJustificadas = parseFloat(reg.horas_justificadas || 0);
-        const horasNetas = Math.max(0, horasTrabajadas - horasJustificadas);
         
         const entrada = reg.hora_entrada ? reg.hora_entrada.substring(0, 5) : '--:--';
         const salida = reg.hora_salida ? reg.hora_salida.substring(0, 5) : '--:--';
@@ -708,24 +702,8 @@ function renderHistorialRegistros(registros) {
                 <td class="horas-cell">
                     <span class="horas-total">${horasTrabajadas.toFixed(2)}h</span>
                 </td>
-                <td class="horas-cell">
-                    <span class="horas-justificadas ${horasJustificadas > 0 ? 'con-justificacion' : ''}">${horasJustificadas.toFixed(2)}h</span>
-                    ${horasJustificadas > 0 && reg.motivo_justificacion ? 
-                        `<button class="btn-mini" onclick="verMotivoJustificacion('${reg.motivo_justificacion}', '${fechaFormateada}')" title="Ver motivo"><i class="fas fa-comment"></i></button>` 
-                        : ''}
-                </td>
-                <td class="horas-cell">
-                    <span class="horas-netas">${horasNetas.toFixed(2)}h</span>
-                </td>
                 <td class="estado-cell">
                     ${estadoBadge}
-                </td>
-                <td class="acciones-cell">
-                    ${reg.hora_salida ? 
-                        `<button class="btn-small btn-warning" onclick="abrirModalJustificar(${reg.id_registro}, '${fechaFormateada}', ${horasTrabajadas.toFixed(2)}, ${horasJustificadas.toFixed(2)})" title="Justificar horas">
-                            <i class="fas fa-file-medical"></i> Justificar
-                        </button>` 
-                        : '<span style="color: #999; font-size: 12px;">Registro abierto</span>'}
                 </td>
             </tr>
         `;
@@ -795,7 +773,6 @@ function getEstilosTablaRegistros() {
 
             .tabla-registros tbody tr:hover {
                 background: #f8f9fa;
-                transform: scale(1.01);
             }
 
             .tabla-registros tbody tr:last-child {
@@ -845,7 +822,8 @@ function getEstilosTablaRegistros() {
 
             /* Celda de horas totales */
             .horas-cell {
-                min-width: 100px;
+                min-width: 120px;
+                text-align: center;
             }
 
             .horas-total {
@@ -928,35 +906,6 @@ function getEstilosTablaRegistros() {
     `;
 }
 
-// Función para ver la descripción en un modal
-function verDescripcionRegistro(descripcion, fecha) {
-    const modal = `
-        <div class="modal-detail" onclick="if(event.target.classList.contains('modal-detail')) this.remove()">
-            <div class="modal-detail-content" style="max-width: 600px;">
-                <button onclick="this.closest('.modal-detail').remove()" class="modal-close-button">×</button>
-                
-                <h2 class="modal-detail-header">
-                    <i class="fas fa-file-alt"></i> Descripción del Registro
-                </h2>
-                
-                <div class="modal-detail-section">
-                    <p><strong>Fecha:</strong> ${fecha}</p>
-                </div>
-                
-                <div class="modal-detail-section" style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
-                    <p style="margin: 0; white-space: pre-wrap;">${descripcion}</p>
-                </div>
-                
-                <div class="modal-detail-footer">
-                    <button onclick="this.closest('.modal-detail').remove()" class="btn btn-secondary">Cerrar</button>
-                </div>
-            </div>
-        </div>
-    `;
-    
-    document.body.insertAdjacentHTML('beforeend', modal);
-}
-
 function formatearFechaSimple(fecha) {
     const f = new Date(fecha + 'T00:00:00');
     return f.toLocaleDateString('es-UY', {
@@ -994,11 +943,9 @@ window.loadMisRegistros = loadMisRegistros;
 window.filtrarRegistros = filtrarRegistros;
 window.toggleDeudaDetalle = toggleDeudaDetalle;
 window.cargarDeudaHorasWidget = cargarDeudaHorasWidget;
-window.verDescripcionRegistro = verDescripcionRegistro;
-window.toggleSemana = toggleSemana;
 
-console.log(' Módulo de registro de horas cargado completamente');
-console.log(' Funciones exportadas:', {
+console.log('✅ Módulo de registro de horas cargado completamente');
+console.log('✅ Funciones exportadas:', {
     inicializarSeccionHoras: typeof window.inicializarSeccionHoras,
     marcarEntrada: typeof window.marcarEntrada,
     marcarSalida: typeof window.marcarSalida,

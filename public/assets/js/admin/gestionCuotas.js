@@ -119,8 +119,8 @@
         let html = '<div class="precios-grid">';
         
         precios.forEach(function(precio) {
-            const iconos = { 1: '', 2: '', 3: '' };
-            const icono = iconos[precio.habitaciones] || '';
+            const iconos = { 1: '🏠', 2: '🏡', 3: '🏘️' };
+            const icono = iconos[precio.habitaciones] || '🏘️';
             const monto = parseFloat(precio.monto_mensual).toLocaleString('es-UY', {minimumFractionDigits: 2});
             const fecha = formatearFechaUY(precio.fecha_vigencia_desde);
 
@@ -179,7 +179,7 @@
             const data = await response.json();
             
             if (data.success) {
-                alert(' ' + data.message);
+                alert('✅ ' + data.message);
                 window.closeEditarPrecioModal();
                 await window.loadPreciosCuotas();
             } else {
@@ -214,7 +214,7 @@
             const data = await response.json();
             
             if (data.success) {
-                alert(' ' + data.message);
+                alert('✅ ' + data.message);
                 await window.loadAllCuotasAdmin();
                 await window.loadEstadisticasCuotas();
             } else {
@@ -295,51 +295,95 @@
         }
     };
 
-    // 🆕 FUNCIÓN MEJORADA PARA OBTENER HORAS REALES Y JUSTIFICACIONES
+    // ========== ENRIQUECER CUOTAS CON HORAS ==========
     async function enriquecerCuotasConHoras(cuotas) {
+        console.log(`🔍 Enriqueciendo ${cuotas.length} cuotas con datos de horas...`);
+        
         const promises = cuotas.map(async (cuota) => {
             try {
-                // 1. Obtener estadísticas de horas trabajadas
-                const urlHoras = `/api/horas/estadisticas-usuario?usuario_id=${cuota.usuario_id}&mes=${cuota.mes}&anio=${cuota.anio}`;
-                const responseHoras = await fetch(urlHoras);
-                const dataHoras = await responseHoras.json();
+                const usuarioId = cuota.usuario_id || cuota.id_usuario;
                 
-                if (dataHoras.success && dataHoras.estadisticas) {
-                    cuota.horas_trabajadas = parseFloat(dataHoras.estadisticas.total_horas || 0);
-                } else {
+                if (!usuarioId) {
+                    console.error('❌ No se encontró usuario_id en cuota:', cuota);
                     cuota.horas_trabajadas = 0;
-                }
-
-                // 2. Obtener justificaciones del período
-                const urlJustificaciones = `/api/justificaciones/usuario?id_usuario=${cuota.usuario_id}&mes=${cuota.mes}&anio=${cuota.anio}`;
-                const responseJust = await fetch(urlJustificaciones);
-                const dataJust = await responseJust.json();
-                
-                if (dataJust.success && dataJust.justificaciones) {
-                    // Sumar todas las horas justificadas del período
-                    cuota.horas_justificadas = dataJust.justificaciones.reduce((total, j) => {
-                        return total + parseFloat(j.horas_justificadas || 0);
-                    }, 0);
-                    cuota.justificaciones = dataJust.justificaciones;
-                } else {
-                    cuota.horas_justificadas = 0;
+                    cuota.horas_justificadas_registros = 0;
+                    cuota.horas_justificadas_manuales = 0;
+                    cuota.horas_netas = 0;
                     cuota.justificaciones = [];
+                    return cuota;
                 }
-
-                // 3. Calcular horas netas (trabajadas - justificadas)
-                cuota.horas_netas = cuota.horas_trabajadas - cuota.horas_justificadas;
-
-                console.log(` Usuario ${cuota.usuario_id} - ${cuota.mes}/${cuota.anio}:`, {
-                    trabajadas: cuota.horas_trabajadas,
-                    justificadas: cuota.horas_justificadas,
-                    netas: cuota.horas_netas,
-                    requeridas: cuota.horas_requeridas
-                });
-
+                
+                const mes = String(cuota.mes).padStart(2, '0');
+                const fechaInicio = `${cuota.anio}-${mes}-01`;
+                const ultimoDia = new Date(cuota.anio, cuota.mes, 0).getDate();
+                const fechaFin = `${cuota.anio}-${mes}-${String(ultimoDia).padStart(2, '0')}`;
+                
+                let horasTrabajadas = 0;
+                let horasJustificadasRegistros = 0;
+                
+                try {
+                    const url = `/api/horas/mis-registros?fecha_inicio=${fechaInicio}&fecha_fin=${fechaFin}`;
+                    const response = await fetch(url);
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        
+                        if (data.success && data.registros && Array.isArray(data.registros)) {
+                            const registrosUsuario = data.registros.filter(reg => {
+                                const regUserId = reg.usuario_id || reg.id_usuario || reg.user_id;
+                                return String(regUserId) === String(usuarioId);
+                            });
+                            
+                            registrosUsuario.forEach(reg => {
+                                if (reg.hora_entrada && reg.hora_salida) {
+                                    const [hE, mE, sE] = reg.hora_entrada.split(':').map(Number);
+                                    const [hS, mS, sS] = reg.hora_salida.split(':').map(Number);
+                                    const entrada = hE + mE/60 + (sE || 0)/3600;
+                                    const salida = hS + mS/60 + (sS || 0)/3600;
+                                    const horasDelRegistro = Math.max(0, salida - entrada);
+                                    
+                                    horasTrabajadas += horasDelRegistro;
+                                    horasJustificadasRegistros += parseFloat(reg.horas_justificadas || 0);
+                                }
+                            });
+                        }
+                    }
+                } catch (error) {
+                    console.error(`❌ Error obteniendo registros:`, error);
+                }
+                
+                cuota.horas_trabajadas = horasTrabajadas;
+                cuota.horas_justificadas_registros = horasJustificadasRegistros;
+                
+                let horasJustificadasManuales = 0;
+                cuota.justificaciones = [];
+                
+                try {
+                    const urlJust = `/api/justificaciones/usuario?id_usuario=${usuarioId}&mes=${cuota.mes}&anio=${cuota.anio}`;
+                    const responseJust = await fetch(urlJust);
+                    
+                    if (responseJust.ok) {
+                        const dataJust = await responseJust.json();
+                        
+                        if (dataJust.success && dataJust.justificaciones && Array.isArray(dataJust.justificaciones)) {
+                            cuota.justificaciones = dataJust.justificaciones;
+                            horasJustificadasManuales = dataJust.justificaciones.reduce((sum, j) => {
+                                return sum + parseFloat(j.horas_justificadas || 0);
+                            }, 0);
+                        }
+                    }
+                } catch (error) {
+                    console.error(`❌ Error obteniendo justificaciones:`, error);
+                }
+                
+                cuota.horas_justificadas_manuales = horasJustificadasManuales;
+                cuota.horas_netas = Math.max(0, horasTrabajadas - horasJustificadasRegistros - horasJustificadasManuales);
+                
             } catch (error) {
-                console.warn('⚠️ Error al cargar datos para usuario:', cuota.usuario_id, error);
+                console.error('❌ Error general:', error);
                 cuota.horas_trabajadas = 0;
-                cuota.horas_justificadas = 0;
+                cuota.horas_justificadas_registros = 0;
+                cuota.horas_justificadas_manuales = 0;
                 cuota.horas_netas = 0;
                 cuota.justificaciones = [];
             }
@@ -358,7 +402,7 @@
             return;
         }
 
-        let html = '<div style="overflow-x:auto;border-radius:12px;box-shadow:' + COLORS.shadow + ';"><table style="width:100%;border-collapse:collapse;background:' + COLORS.white + ';min-width:1500px;"><thead><tr style="background:linear-gradient(135deg,' + COLORS.primary + ' 0%,' + COLORS.primaryDark + ' 100%);color:' + COLORS.white + ';">';
+        let html = '<div style="overflow-x:auto;border-radius:12px;box-shadow:' + COLORS.shadow + ';"><table style="width:100%;border-collapse:collapse;background:' + COLORS.white + ';min-width:1400px;"><thead><tr style="background:linear-gradient(135deg,' + COLORS.primary + ' 0%,' + COLORS.primaryDark + ' 100%);color:' + COLORS.white + ';">';
         html += '<th style="padding:15px 12px;text-align:left;">Usuario</th>';
         html += '<th style="padding:15px 12px;text-align:left;">Vivienda</th>';
         html += '<th style="padding:15px 12px;text-align:center;">Período</th>';
@@ -372,6 +416,7 @@
         html += '</tr></thead><tbody>';
         
         cuotas.forEach(function(cuota) {
+            const usuarioId = cuota.usuario_id || cuota.id_usuario || cuota.user_id;
             const estadoFinal = cuota.estado_actual || cuota.estado;
             const mes = obtenerNombreMes(cuota.mes);
             
@@ -381,8 +426,6 @@
             else if (estadoFinal === 'vencida') estadoColor = COLORS.danger;
             
             const monto = parseFloat(cuota.monto_total || cuota.monto || 0).toLocaleString('es-UY', {minimumFractionDigits: 2});
-            
-            // Calcular progreso de horas
             const horasTrabajadas = parseFloat(cuota.horas_trabajadas || 0);
             const horasJustificadas = parseFloat(cuota.horas_justificadas || 0);
             const horasNetas = parseFloat(cuota.horas_netas || 0);
@@ -393,36 +436,35 @@
             if (progresoHoras >= 100) colorProgreso = COLORS.success;
             else if (progresoHoras >= 50) colorProgreso = COLORS.warning;
             
+            const nombreCompleto = cuota.nombre_completo || cuota.nombre || 'Usuario';
+            const nombreEscaped = nombreCompleto.replace(/'/g, "\\'");
+            
             html += '<tr style="border-bottom:1px solid ' + COLORS.gray100 + ';">';
-            html += '<td style="padding:14px 12px;"><div style="font-weight:600;color:' + COLORS.primary + ';">' + (cuota.nombre_completo || 'Usuario') + '</div><small style="color:' + COLORS.gray500 + ';">' + (cuota.email || '') + '</small></td>';
+            html += '<td style="padding:14px 12px;"><div style="font-weight:600;color:' + COLORS.primary + ';">' + nombreCompleto + '</div><small style="color:' + COLORS.gray500 + ';">' + (cuota.email || '') + '</small></td>';
             html += '<td style="padding:14px 12px;">' + (cuota.numero_vivienda || 'N/A') + '</td>';
             html += '<td style="padding:14px 12px;text-align:center;font-weight:600;">' + mes + ' ' + cuota.anio + '</td>';
             html += '<td style="padding:14px 12px;text-align:right;font-weight:600;color:' + COLORS.primary + ';">$' + monto + '</td>';
             html += '<td style="padding:14px 12px;text-align:center;"><span style="padding:6px 12px;border-radius:20px;font-size:11px;font-weight:600;background:' + estadoColor + ';color:white;">' + estadoFinal.toUpperCase() + '</span></td>';
             
-            // COLUMNA DE HORAS TRABAJADAS CON PROGRESO
             html += '<td style="padding:14px 12px;text-align:center;">';
             html += '<div style="display:flex;flex-direction:column;align-items:center;gap:5px;">';
-            html += '<strong style="font-size:16px;color:' + colorProgreso + ';">' + horasTrabajadas.toFixed(1) + 'h</strong>';
+            html += '<strong style="font-size:16px;color:' + colorProgreso + ';">' + horasTrabajadas.toFixed(2) + 'h</strong>';
             html += '<div style="width:80px;height:6px;background:#e0e0e0;border-radius:3px;overflow:hidden;">';
             html += '<div style="width:' + Math.min(progresoHoras, 100) + '%;height:100%;background:' + colorProgreso + ';transition:width 0.3s;"></div>';
             html += '</div>';
             html += '<small style="color:' + COLORS.gray500 + ';">de ' + horasRequeridas + 'h</small>';
             html += '</div></td>';
             
-            // COLUMNA DE HORAS JUSTIFICADAS
             html += '<td style="padding:14px 12px;text-align:center;">';
             if (horasJustificadas > 0) {
-                html += '<span style="background:#fff3cd;color:#856404;padding:4px 10px;border-radius:12px;font-weight:600;">' + horasJustificadas.toFixed(1) + 'h</span>';
-                html += '<br><button class="btn-small btn-info" style="margin-top:5px;font-size:11px;padding:4px 8px;" onclick="verJustificaciones(' + cuota.usuario_id + ', ' + cuota.mes + ', ' + cuota.anio + ', \'' + (cuota.nombre_completo || 'Usuario') + '\')"><i class="fas fa-eye"></i> Ver</button>';
+                html += '<span style="background:#fff3cd;color:#856404;padding:4px 10px;border-radius:12px;font-weight:600;">' + horasJustificadas.toFixed(2) + 'h</span>';
             } else {
                 html += '<span style="color:' + COLORS.gray500 + ';">0h</span>';
             }
             html += '</td>';
             
-            // COLUMNA DE HORAS NETAS
             html += '<td style="padding:14px 12px;text-align:center;">';
-            html += '<strong style="font-size:15px;color:' + (horasNetas >= horasRequeridas ? COLORS.success : COLORS.danger) + ';">' + horasNetas.toFixed(1) + 'h</strong>';
+            html += '<strong style="font-size:15px;color:' + (horasNetas >= horasRequeridas ? COLORS.success : COLORS.danger) + ';">' + horasNetas.toFixed(2) + 'h</strong>';
             html += '</td>';
             
             html += '<td style="padding:14px 12px;text-align:center;">' + formatearFechaUY(cuota.fecha_vencimiento) + '</td>';
@@ -434,7 +476,9 @@
             }
             
             // Botón justificar horas
-            html += '<button class="btn-small btn-info" onclick="abrirModalJustificarHorasCuota(' + cuota.usuario_id + ', \'' + (cuota.nombre_completo || 'Usuario').replace(/'/g, "\\'") + '\', ' + cuota.mes + ', ' + cuota.anio + ', ' + horasTrabajadas + ', ' + horasJustificadas + ', ' + horasRequeridas + ')" title="Justificar Horas"><i class="fas fa-clock"></i></button>';
+            if (usuarioId) {
+                html += '<button class="btn-small btn-info" onclick="abrirModalJustificarHorasCuota(' + usuarioId + ', \'' + nombreEscaped + '\', ' + cuota.mes + ', ' + cuota.anio + ', ' + horasTrabajadas + ', ' + horasJustificadas + ', ' + horasRequeridas + ')" title="Justificar Horas"><i class="fas fa-clock"></i></button>';
+            }
             
             // Botón validar pago
             if (cuota.id_pago && cuota.estado_pago === 'pendiente') {
@@ -446,8 +490,7 @@
                 html += '<button class="btn-small btn-success" onclick="liquidarDeudaCuota(' + cuota.id_cuota + ')" title="Liquidar Deuda"><i class="fas fa-hand-holding-usd"></i></button>';
             }
             
-            // Botón actualizar horas
-            html += '<button class="btn-small" style="background:' + COLORS.info + ';color:white;" onclick="actualizarHorasCuota(' + cuota.id_cuota + ')" title="Actualizar Horas"><i class="fas fa-sync-alt"></i></button>';
+            // ❌ BOTÓN ACTUALIZAR HORAS REMOVIDO
             
             html += '</div></td></tr>';
         });
@@ -456,98 +499,16 @@
         container.innerHTML = html;
     }
 
-    // 🆕 VER JUSTIFICACIONES EXISTENTES
-    window.verJustificaciones = async function(idUsuario, mes, anio, nombreUsuario) {
-        mostrarCargando('Cargando justificaciones...');
-        
-        try {
-            const url = `/api/justificaciones/usuario?id_usuario=${idUsuario}&mes=${mes}&anio=${anio}`;
-            const response = await fetch(url);
-            const data = await response.json();
-            
-            if (!data.success) {
-                alert('❌ Error al cargar justificaciones');
-                ocultarCargando();
-                return;
-            }
-
-            const justificaciones = data.justificaciones || [];
-            const nombreMes = obtenerNombreMes(mes);
-            
-            let listaHTML = '';
-            if (justificaciones.length === 0) {
-                listaHTML = '<p style="text-align:center;color:' + COLORS.gray500 + ';padding:20px;">No hay justificaciones registradas</p>';
-            } else {
-                listaHTML = '<div style="max-height:400px;overflow-y:auto;">';
-                justificaciones.forEach(just => {
-                    const fecha = new Date(just.fecha_creacion).toLocaleDateString('es-UY');
-                    listaHTML += `
-                        <div style="background:${COLORS.gray50};padding:15px;border-radius:8px;margin-bottom:10px;border-left:4px solid ${COLORS.warning};">
-                            <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:10px;">
-                                <div>
-                                    <strong style="color:${COLORS.primary};font-size:18px;">${parseFloat(just.horas_justificadas).toFixed(1)}h</strong>
-                                    <span style="color:${COLORS.gray500};margin-left:10px;font-size:13px;">${fecha}</span>
-                                </div>
-                            </div>
-                            <p style="margin:10px 0;color:${COLORS.gray700};"><strong>Motivo:</strong> ${just.motivo}</p>
-                            ${just.observaciones ? '<p style="margin:5px 0;color:' + COLORS.gray500 + ';font-size:13px;"><strong>Observaciones:</strong> ' + just.observaciones + '</p>' : ''}
-                            ${just.archivo_adjunto ? '<p style="margin:5px 0;"><a href="/files/?path=' + just.archivo_adjunto + '" target="_blank" style="color:' + COLORS.info + ';text-decoration:none;"><i class="fas fa-file"></i> Ver archivo</a></p>' : ''}
-                        </div>
-                    `;
-                });
-                listaHTML += '</div>';
-            }
-
-            const totalHoras = justificaciones.reduce((sum, j) => sum + parseFloat(j.horas_justificadas || 0), 0);
-            
-            const modalHTML = `
-                <div id="verJustificacionesModal" class="modal-overlay" onclick="if(event.target===this) closeVerJustificacionesModal()">
-                    <div class="modal-box" style="max-width: 700px;" onclick="event.stopPropagation()">
-                        <button onclick="closeVerJustificacionesModal()" class="modal-close-btn">×</button>
-                        
-                        <h2 style="color:${COLORS.primary};margin-bottom:20px;">
-                            <i class="fas fa-list"></i> Justificaciones de Horas
-                        </h2>
-                        
-                        <div style="background:${COLORS.gray50};padding:20px;border-radius:8px;margin-bottom:20px;">
-                            <p><strong>Usuario:</strong> ${nombreUsuario}</p>
-                            <p><strong>Período:</strong> ${nombreMes} ${anio}</p>
-                            <p><strong>Total Horas Justificadas:</strong> <span style="color:${COLORS.warning};font-size:20px;font-weight:700;">${totalHoras.toFixed(1)}h</span></p>
-                        </div>
-                        
-                        ${listaHTML}
-                        
-                        <div style="text-align:right;margin-top:20px;">
-                            <button onclick="closeVerJustificacionesModal()" class="btn btn-secondary">
-                                <i class="fas fa-times"></i> Cerrar
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            const modalAnterior = document.getElementById('verJustificacionesModal');
-            if (modalAnterior) modalAnterior.remove();
-            
-            document.body.insertAdjacentHTML('beforeend', modalHTML);
-            ocultarCargando();
-            
-        } catch (error) {
-            console.error('❌ Error:', error);
-            alert('❌ Error al cargar justificaciones');
-            ocultarCargando();
-        }
-    };
-
-    window.closeVerJustificacionesModal = function() {
-        const modal = document.getElementById('verJustificacionesModal');
-        if (modal) modal.remove();
-    };
-
-    // 🆕 MODAL PARA JUSTIFICAR HORAS EN CUOTAS (MEJORADO)
+    // ========== MODAL JUSTIFICAR HORAS ==========
+    
     window.abrirModalJustificarHorasCuota = function(idUsuario, nombreUsuario, mes, anio, horasTrabajadas, horasJustificadas, horasRequeridas) {
+        if (!idUsuario || idUsuario === 'undefined') {
+            alert('❌ Error: No se pudo identificar al usuario');
+            return;
+        }
+        
         const nombreMes = obtenerNombreMes(mes);
-        const horasDisponibles = horasTrabajadas - horasJustificadas;
+        const horasDisponibles = Math.max(0, horasTrabajadas - horasJustificadas);
         
         const modalHTML = `
             <div id="justificarHorasCuotaModal" class="modal-overlay" onclick="if(event.target===this) closeJustificarHorasCuotaModal()">
@@ -677,10 +638,10 @@
             formData.append('mes', mes);
             formData.append('anio', anio);
             formData.append('horas_justificadas', horasCantidad);
-            formData.append('motivo', motivo);
+            formData.append('motivo', motivo.trim());
             
             if (observaciones.trim()) {
-                formData.append('observaciones', observaciones);
+                formData.append('observaciones', observaciones.trim());
             }
             
             if (archivoInput.files.length > 0) {
@@ -692,16 +653,23 @@
                 body: formData
             });
             
-            const data = await response.json();
+            const responseText = await response.text();
+            let data;
+            try {
+                data = JSON.parse(responseText);
+            } catch (parseError) {
+                throw new Error('El servidor devolvió una respuesta inválida');
+            }
             
             if (data.success) {
-                alert(' ' + data.message);
+                alert('✅ ' + data.message);
                 window.closeJustificarHorasCuotaModal();
                 await window.loadAllCuotasAdmin();
                 await window.loadEstadisticasCuotas();
             } else {
-                alert('❌ ' + data.message);
+                alert('❌ ' + (data.message || 'Error desconocido'));
             }
+            
         } catch (error) {
             console.error('❌ Error:', error);
             alert('❌ Error al justificar horas: ' + error.message);
@@ -710,36 +678,7 @@
         }
     };
 
-    // 🆕 ACTUALIZAR HORAS DE UNA CUOTA ESPECÍFICA
-    window.actualizarHorasCuota = async function(idCuota) {
-        if (!confirm('¿Actualizar las horas de esta cuota?\n\nSe recalcularán las horas trabajadas y justificadas del período.')) {
-            return;
-        }
-        
-        mostrarCargando('Actualizando horas...');
-        
-        try {
-            const response = await fetch('/api/cuotas/actualizar-horas?id_cuota=' + idCuota, {
-                method: 'GET'
-            });
-            
-            const data = await response.json();
-            
-            if (data.success) {
-                alert(' Horas actualizadas correctamente');
-                await window.loadAllCuotasAdmin();
-            } else {
-                alert('❌ ' + data.message);
-            }
-        } catch (error) {
-            console.error('❌ Error:', error);
-            alert('❌ Error al actualizar horas');
-        } finally {
-            ocultarCargando();
-        }
-    };
-
-    // ========== VALIDAR PAGO ==========
+    // ========== MODAL VALIDAR PAGO ==========
 
     window.abrirModalValidarPago = async function(idPago, idCuota) {
         mostrarCargando('Cargando información del pago...');
@@ -755,72 +694,97 @@
             }
             
             const cuota = data.cuota;
+            const nombreCompleto = cuota.nombre_completo || cuota.nombre || 'Usuario';
+            const mes = cuota.mes || new Date().getMonth() + 1;
+            const anio = cuota.anio || new Date().getFullYear();
+            const montoTotal = parseFloat(cuota.monto_total || cuota.monto || 0);
+            const metodoPago = cuota.metodo_pago || 'Transferencia';
+            const numeroComprobante = cuota.numero_comprobante || 'Sin número';
+            const fechaPago = cuota.fecha_pago || new Date().toISOString().split('T')[0];
+            const comprobanteArchivo = cuota.comprobante_archivo || null;
             
             const modalHTML = `
-                <div id="validarPagoModal" class="modal-overlay" onclick="if(event.target===this) closeValidarPagoModal()">
-                    <div class="modal-box" style="max-width: 700px;" onclick="event.stopPropagation()">
-                        <button onclick="closeValidarPagoModal()" class="modal-close-btn">×</button>
-                        
-                        <h2 style="color:${COLORS.primary};margin-bottom:20px;">
-                            <i class="fas fa-check-circle"></i> Validar Pago
-                        </h2>
+                <div id="validarPagoModal" class="material-modal" style="display: flex;">
+                    <div class="material-modal-content" onclick="event.stopPropagation()" style="max-width: 700px;">
+                        <div class="material-modal-header">
+                            <h3>
+                                <i class="fas fa-check-circle"></i> Validar Pago
+                            </h3>
+                            <button class="close-material-modal" onclick="closeValidarPagoModal()">&times;</button>
+                        </div>
                         
                         <input type="hidden" id="validar-id-pago" value="${idPago}">
                         
-                        <div style="background:${COLORS.gray50};padding:20px;border-radius:8px;margin-bottom:20px;">
-                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;">
+                        <div class="info-grid-box" style="background: #f8f9fa; padding: 20px; border-radius: 12px; margin-bottom: 20px; border-left: 4px solid #005CB9;">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                                 <div>
-                                    <small style="color:${COLORS.gray500};">Usuario</small>
-                                    <p style="font-weight:600;margin:5px 0;" id="validar-usuario">${cuota.nombre_completo || 'Usuario'}</p>
+                                    <small style="color: #6c757d; font-size: 12px; text-transform: uppercase; font-weight: 600;">Usuario</small>
+                                    <p style="font-weight: 600; margin: 5px 0; font-size: 15px;">${nombreCompleto}</p>
                                 </div>
                                 <div>
-                                    <small style="color:${COLORS.gray500};">Período</small>
-                                    <p style="font-weight:600;margin:5px 0;" id="validar-periodo">${obtenerNombreMes(cuota.mes)} ${cuota.anio}</p>
+                                    <small style="color: #6c757d; font-size: 12px; text-transform: uppercase; font-weight: 600;">Período</small>
+                                    <p style="font-weight: 600; margin: 5px 0; font-size: 15px;">${obtenerNombreMes(mes)} ${anio}</p>
                                 </div>
                                 <div>
-                                    <small style="color:${COLORS.gray500};">Monto</small>
-                                    <p style="font-size:20px;font-weight:700;color:${COLORS.primary};margin:5px 0;" id="validar-monto">${parseFloat(cuota.monto_total || 0).toLocaleString('es-UY', {minimumFractionDigits: 2})}</p>
+                                    <small style="color: #6c757d; font-size: 12px; text-transform: uppercase; font-weight: 600;">Monto</small>
+                                    <p style="font-size: 22px; font-weight: 700; color: #005CB9; margin: 5px 0;">${montoTotal.toLocaleString('es-UY', {minimumFractionDigits: 2})}</p>
                                 </div>
                                 <div>
-                                    <small style="color:${COLORS.gray500};">Método de Pago</small>
-                                    <p style="font-weight:600;margin:5px 0;" id="validar-metodo">${cuota.metodo_pago || '-'}</p>
+                                    <small style="color: #6c757d; font-size: 12px; text-transform: uppercase; font-weight: 600;">Método de Pago</small>
+                                    <p style="font-weight: 600; margin: 5px 0; font-size: 15px;">${metodoPago}</p>
                                 </div>
                                 <div>
-                                    <small style="color:${COLORS.gray500};">Número de Comprobante</small>
-                                    <p style="font-weight:600;margin:5px 0;" id="validar-numero">${cuota.numero_comprobante || 'Sin número'}</p>
+                                    <small style="color: #6c757d; font-size: 12px; text-transform: uppercase; font-weight: 600;">Número de Comprobante</small>
+                                    <p style="font-weight: 600; margin: 5px 0; font-size: 15px;">${numeroComprobante}</p>
                                 </div>
                                 <div>
-                                    <small style="color:${COLORS.gray500};">Fecha de Pago</small>
-                                    <p style="font-weight:600;margin:5px 0;" id="validar-fecha">${formatearFechaUY(cuota.fecha_pago)}</p>
+                                    <small style="color: #6c757d; font-size: 12px; text-transform: uppercase; font-weight: 600;">Fecha de Pago</small>
+                                    <p style="font-weight: 600; margin: 5px 0; font-size: 15px;">${formatearFechaUY(fechaPago)}</p>
                                 </div>
                             </div>
                         </div>
                         
-                        <div style="margin-bottom:20px;">
-                            <label style="font-weight:600;margin-bottom:10px;display:block;">Comprobante:</label>
-                            <div id="validar-comprobante-img" style="text-align:center;padding:20px;background:${COLORS.gray50};border-radius:8px;">
-                                ${cuota.comprobante_archivo ? 
-                                    `<img src="/files/?path=${cuota.comprobante_archivo}" style="max-width:100%;height:auto;border-radius:8px;cursor:pointer;" onclick="window.open('/files/?path=${cuota.comprobante_archivo}','_blank')">` 
-                                    : `<p style="color:${COLORS.gray500};">Sin comprobante</p>`}
+                        <div class="form-group" style="margin-bottom: 20px;">
+                            <label style="font-weight: 600; margin-bottom: 10px; display: block;">
+                                <i class="fas fa-file-image"></i> Comprobante:
+                            </label>
+                            <div style="text-align: center; padding: 20px; background: #f8f9fa; border-radius: 12px; border: 2px dashed #dee2e6;">
+                                ${comprobanteArchivo ? 
+                                    `<img src="/files/?path=${comprobanteArchivo}" 
+                                         style="max-width: 100%; max-height: 400px; height: auto; border-radius: 8px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" 
+                                         onclick="window.open('/files/?path=${comprobanteArchivo}','_blank')"
+                                         title="Click para ver en tamaño completo">
+                                     <p style="margin-top: 10px; color: #6c757d; font-size: 13px;">
+                                        <i class="fas fa-search-plus"></i> Click en la imagen para ampliar
+                                     </p>` 
+                                    : `<div style="padding: 40px;">
+                                        <i class="fas fa-file-invoice" style="font-size: 48px; color: #dee2e6; margin-bottom: 10px;"></i>
+                                        <p style="color: #6c757d; margin: 0;">Sin comprobante adjunto</p>
+                                       </div>`}
                             </div>
                         </div>
                         
                         <div class="form-group">
-                            <label>Observaciones (opcional)</label>
-                            <textarea id="validar-observaciones" 
-                                      rows="3" 
-                                      class="form-control"
-                                      placeholder="Agrega comentarios sobre la validación..."></textarea>
+                            <label for="validar-observaciones">
+                                <i class="fas fa-comment-alt"></i> Observaciones (opcional)
+                            </label>
+                            <textarea 
+                                id="validar-observaciones" 
+                                rows="3" 
+                                class="form-control"
+                                placeholder="Agrega comentarios sobre la validación..."
+                                style="resize: vertical;"></textarea>
+                            <small class="form-help">Estas observaciones serán visibles para el usuario</small>
                         </div>
                         
-                        <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:25px;">
+                        <div class="form-actions" style="justify-content: flex-end; gap: 10px;">
                             <button onclick="closeValidarPagoModal()" class="btn btn-secondary">
                                 <i class="fas fa-times"></i> Cancelar
                             </button>
-                            <button onclick="submitValidarPago('rechazar')" class="btn" style="background:${COLORS.danger};color:white;">
+                            <button onclick="submitValidarPago('rechazar')" class="btn btn-danger">
                                 <i class="fas fa-times-circle"></i> Rechazar
                             </button>
-                            <button onclick="submitValidarPago('aprobar')" class="btn" style="background:${COLORS.success};color:white;">
+                            <button onclick="submitValidarPago('aprobar')" class="btn btn-success">
                                 <i class="fas fa-check-circle"></i> Aprobar
                             </button>
                         </div>
@@ -832,11 +796,20 @@
             if (modalAnterior) modalAnterior.remove();
             
             document.body.insertAdjacentHTML('beforeend', modalHTML);
+            document.body.style.overflow = 'hidden';
+            
+            const modalOverlay = document.getElementById('validarPagoModal');
+            modalOverlay.addEventListener('click', function(e) {
+                if (e.target === modalOverlay) {
+                    closeValidarPagoModal();
+                }
+            });
+            
             ocultarCargando();
             
         } catch (error) {
             console.error('❌ Error:', error);
-            alert('❌ Error al cargar información');
+            alert('❌ Error al cargar información del pago');
             ocultarCargando();
         }
     };
@@ -844,17 +817,29 @@
     window.closeValidarPagoModal = function() {
         const modal = document.getElementById('validarPagoModal');
         if (modal) modal.remove();
+        document.body.style.overflow = '';
     };
 
     window.submitValidarPago = async function(accion) {
-        const idPago = document.getElementById('validar-id-pago').value;
-        const observaciones = document.getElementById('validar-observaciones').value;
+        const idPago = document.getElementById('validar-id-pago')?.value;
+        const observaciones = document.getElementById('validar-observaciones')?.value || '';
+        
+        if (!idPago) {
+            alert('❌ Error: No se pudo identificar el ID del pago');
+            return;
+        }
         
         const textoAccion = accion === 'aprobar' ? 'aprobar' : 'rechazar';
+        const emojiAccion = accion === 'aprobar' ? '✅' : '❌';
         
-        if (!confirm('¿Confirmas que deseas ' + textoAccion + ' este pago?')) return;
+        if (!confirm(`${emojiAccion} ¿Confirmas que deseas ${textoAccion} este pago?`)) {
+            return;
+        }
         
         mostrarCargando('Procesando...');
+        
+        const btns = document.querySelectorAll('#validarPagoModal button');
+        btns.forEach(btn => btn.disabled = true);
         
         try {
             const formData = new FormData();
@@ -864,28 +849,40 @@
             
             const response = await fetch('/api/cuotas/validar-pago', {
                 method: 'POST',
-                body: formData
+                body: formData,
+                credentials: 'same-origin'
             });
             
             const data = await response.json();
             
             if (data.success) {
-                alert(' ' + data.message);
-                window.closeValidarPagoModal();
-                await window.loadAllCuotasAdmin();
-                await window.loadEstadisticasCuotas();
+                const mensajeExito = data.message || `Pago ${accion === 'aprobar' ? 'aprobado' : 'rechazado'} correctamente`;
+                alert(`✅ ${mensajeExito}`);
+                
+                closeValidarPagoModal();
+                
+                if (typeof window.loadAllCuotasAdmin === 'function') {
+                    await window.loadAllCuotasAdmin();
+                }
+                if (typeof window.loadEstadisticasCuotas === 'function') {
+                    await window.loadEstadisticasCuotas();
+                }
             } else {
-                alert('❌ ' + data.message);
+                const mensajeError = data.message || 'Error al validar el pago';
+                alert(`❌ ${mensajeError}`);
+                btns.forEach(btn => btn.disabled = false);
             }
+            
         } catch (error) {
             console.error('❌ Error:', error);
-            alert('❌ Error al validar pago');
+            alert('❌ Error al validar pago. Por favor, intenta nuevamente.');
+            btns.forEach(btn => btn.disabled = false);
         } finally {
             ocultarCargando();
         }
     };
 
-    // ========== LIQUIDAR ==========
+    // ========== LIQUIDAR DEUDA ==========
 
     window.liquidarDeudaCuota = async function(idCuota) {
         if (!confirm('¿Liquidar esta deuda?\n\nLa cuota se marcará como pagada.')) return;
@@ -905,7 +902,7 @@
             const data = await response.json();
             
             if (data.success) {
-                alert(' ' + data.message);
+                alert('✅ ' + data.message);
                 await window.loadAllCuotasAdmin();
                 await window.loadEstadisticasCuotas();
             } else {
@@ -919,23 +916,7 @@
         }
     };
 
-    // ========== INICIALIZACIÓN ==========
-
-    function inicializar() {
-        poblarSelectorAnios();
-        agregarEstilosCSS();
-        
-        console.log(' [CUOTAS] Módulo cargado completamente');
-        console.log(' [CUOTAS] Funciones disponibles:', {
-            loadPreciosCuotas: typeof window.loadPreciosCuotas,
-            loadAllCuotasAdmin: typeof window.loadAllCuotasAdmin,
-            loadEstadisticasCuotas: typeof window.loadEstadisticasCuotas,
-            abrirModalValidarPago: typeof window.abrirModalValidarPago,
-            abrirModalJustificarHorasCuota: typeof window.abrirModalJustificarHorasCuota,
-            verJustificaciones: typeof window.verJustificaciones,
-            actualizarHorasCuota: typeof window.actualizarHorasCuota
-        });
-    }
+    // ========== ESTILOS CSS ==========
 
     function agregarEstilosCSS() {
         if (document.getElementById('cuotas-estilos')) return;
@@ -1070,6 +1051,16 @@
                     color: white;
                 }
                 
+                .btn-danger {
+                    background: ${COLORS.danger};
+                    color: white;
+                }
+                
+                .btn-success {
+                    background: ${COLORS.success};
+                    color: white;
+                }
+                
                 .btn:hover {
                     transform: translateY(-2px);
                     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -1094,6 +1085,23 @@
         `;
         
         document.head.insertAdjacentHTML('beforeend', estilos);
+    }
+
+    // ========== INICIALIZACIÓN ==========
+
+    function inicializar() {
+        poblarSelectorAnios();
+        agregarEstilosCSS();
+        
+        console.log('✅ [CUOTAS] Módulo cargado completamente');
+        console.log('✅ [CUOTAS] Funciones disponibles:', {
+            loadPreciosCuotas: typeof window.loadPreciosCuotas,
+            loadAllCuotasAdmin: typeof window.loadAllCuotasAdmin,
+            loadEstadisticasCuotas: typeof window.loadEstadisticasCuotas,
+            abrirModalValidarPago: typeof window.abrirModalValidarPago,
+            abrirModalJustificarHorasCuota: typeof window.abrirModalJustificarHorasCuota,
+            liquidarDeudaCuota: typeof window.liquidarDeudaCuota
+        });
     }
 
     if (document.readyState === 'loading') {
