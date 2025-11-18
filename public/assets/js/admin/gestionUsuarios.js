@@ -1,10 +1,10 @@
-const GestionUsuarios = (function() {
+const GestionUsuarios = (function () {
     'use strict';
 
     // ==========================================
     // CONSTANTES DEL MÓDULO
     // ==========================================
-    
+
     const ENDPOINTS = {
         ALL: '/api/users/all',
         DETAILS: '/api/users/details',
@@ -15,13 +15,14 @@ const GestionUsuarios = (function() {
     };
 
     const ESTADOS = {
-        'pendiente': 'Pendiente',
-        'enviado': 'Enviado',
-        'aceptado': 'Aceptado',
-        'rechazado': 'Rechazado',
-        'activo': 'Activo',
-        'inactivo': 'Inactivo'
+        pendiente: '<span data-i18n="dashboardAdmin.users.table.columns.actionsOptions.pending">Pendiente</span>',
+        enviado: '<span data-i18n="dashboardAdmin.users.table.columns.actionsOptions.sent">Enviado</span>',
+        aceptado: '<span data-i18n="dashboardAdmin.users.table.columns.actionsOptions.approved">Aceptado</span>',
+        rechazado: '<span data-i18n="dashboardAdmin.users.table.columns.actionsOptions.rejected">Rechazado</span>',
+        activo: '<span data-i18n="dashboardAdmin.users.table.columns.actionsOptions.active">Activo</span>',
+        inactivo: '<span data-i18n="dashboardAdmin.users.table.columns.actionsOptions.inactive">Inactivo</span>'
     };
+
 
     const COLORS = {
         primary: '#005CB9',
@@ -50,10 +51,10 @@ const GestionUsuarios = (function() {
     function formatFecha(fecha) {
         if (!fecha) return '-';
         const d = new Date(fecha);
-        return d.toLocaleDateString('es-UY', { 
-            day: '2-digit', 
-            month: '2-digit', 
-            year: 'numeric' 
+        return d.toLocaleDateString('es-UY', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
         });
     }
 
@@ -158,45 +159,45 @@ const GestionUsuarios = (function() {
                     ">
                         <p style="margin: 10px 0; display: flex; align-items: center; gap: 10px; color: ${COLORS.gray700};">
                             <strong style="min-width: 150px; color: ${COLORS.primary};">
-                                <i class="fas fa-id-card"></i> Cédula:
+                                <i class="fas fa-id-card"></i> <span data-i18n="dashboardAdmin.users.table.modal.idCard">Cédula:</span>
                             </strong>
                             <span>${user.cedula}</span>
                         </p>
                         <p style="margin: 10px 0; display: flex; align-items: center; gap: 10px; color: ${COLORS.gray700};">
                             <strong style="min-width: 150px; color: ${COLORS.primary};">
-                                <i class="fas fa-envelope"></i> Email:
+                                <i class="fas fa-envelope"></i> <span data-i18n="dashboardAdmin.users.table.modal.email">Email:</span>
                             </strong>
                             <span>${user.email}</span>
                         </p>
                         <p style="margin: 10px 0; display: flex; align-items: center; gap: 10px; color: ${COLORS.gray700};">
                             <strong style="min-width: 150px; color: ${COLORS.primary};">
-                                <i class="fas fa-map-marker-alt"></i> Dirección:
+                                <i class="fas fa-map-marker-alt"></i> <span data-i18n="dashboardAdmin.users.table.modal.address">Dirección:</span>
                             </strong>
                             <span>${user.direccion || '-'}</span>
                         </p>
                         <p style="margin: 10px 0; display: flex; align-items: center; gap: 10px; color: ${COLORS.gray700};">
                             <strong style="min-width: 150px; color: ${COLORS.primary};">
-                                <i class="fas fa-birthday-cake"></i> Fecha Nacimiento:
+                                <i class="fas fa-birthday-cake"></i> <span data-i18n="dashboardAdmin.users.table.modal.birthDate">Fecha Nacimiento:</span>
                             </strong>
                             <span>${formatFecha(user.fecha_nacimiento)}</span>
                         </p>
                         <p style="margin: 10px 0; display: flex; align-items: center; gap: 10px; color: ${COLORS.gray700};">
                             <strong style="min-width: 150px; color: ${COLORS.primary};">
-                                <i class="fas fa-calendar-plus"></i> Fecha Ingreso:
+                                <i class="fas fa-calendar-plus"></i> <span data-i18n="dashboardAdmin.users.table.modal.dateOfEntry">Fecha Ingreso:</span>
                             </strong>
                             <span>${formatFecha(user.fecha_ingreso)}</span>
                         </p>
                         <p style="margin: 10px 0; display: flex; align-items: center; gap: 10px; color: ${COLORS.gray700};">
                             <strong style="min-width: 150px; color: ${COLORS.primary};">
-                                <i class="fas fa-user-tag"></i> Rol:
+                                <i class="fas fa-user-tag"></i> <span data-i18n="dashboardAdmin.users.table.modal.role">Rol:</span>
                             </strong>
                             <span>${user.nombre_rol || 'Sin rol'}</span>
                         </p>
                         <p style="margin: 10px 0; display: flex; align-items: center; gap: 10px; color: ${COLORS.gray700};">
                             <strong style="min-width: 150px; color: ${COLORS.primary};">
-                                <i class="fas fa-users"></i> Núcleo:
+                                <i class="fas fa-users"></i> <span data-i18n="dashboardAdmin.users.table.modal.unit">Núcleo:</span>
                             </strong>
-                            <span>${user.nombre_nucleo || 'Sin núcleo'}</span>
+                            <span>${user.nombre_nucleo || '<span data-i18n="dashboardAdmin.users.table.modal.withoutUnit">Sin núcleo</span>'}</span>
                         </p>
                     </div>
                     
@@ -212,7 +213,7 @@ const GestionUsuarios = (function() {
                                     cursor: pointer;
                                     font-size: 14px;
                                 ">
-                            Cerrar
+                            <span data-i18n="dashboardAdmin.users.table.modal.closeButton">Cerrar</span>
                         </button>
                     </div>
                 </div>
@@ -220,6 +221,7 @@ const GestionUsuarios = (function() {
         `;
 
         document.body.insertAdjacentHTML('beforeend', modalHTML);
+        i18n.translatePage();
         document.body.style.overflow = 'hidden';
     }
 
@@ -231,29 +233,32 @@ const GestionUsuarios = (function() {
         const isPending = user.estado === 'pendiente' || user.estado === 'enviado';
         const isApproved = user.estado === 'aceptado';
         const isRejected = user.estado === 'rechazado';
-        
+
         // Colores según estado
         let estadoColor = '';
         let estadoText = '';
+
         if (user.estado === 'enviado') {
+            // "enviado" en tu lógica significa "Pendiente"
             estadoColor = '#FF9800';
-            estadoText = 'Pendiente';
+            estadoText = '<span data-i18n="dashboardAdmin.users.table.columns.actionsOptions.pending">Pendiente</span>';
         } else if (user.estado === 'aceptado') {
             estadoColor = '#4CAF50';
-            estadoText = 'Aprobado';
+            estadoText = '<span data-i18n="dashboardAdmin.users.table.columns.actionsOptions.approved">Aprobado</span>';
         } else if (user.estado === 'rechazado') {
             estadoColor = '#F44336';
-            estadoText = 'Rechazado';
+            estadoText = '<span data-i18n="dashboardAdmin.users.table.columns.actionsOptions.rejected">Rechazado</span>';
         } else if (user.estado === 'activo') {
             estadoColor = '#4CAF50';
-            estadoText = 'Activo';
+            estadoText = '<span data-i18n="dashboardAdmin.users.table.columns.actionsOptions.active">Activo</span>';
         } else if (user.estado === 'inactivo') {
             estadoColor = '#9E9E9E';
-            estadoText = 'Inactivo';
+            estadoText = '<span data-i18n="dashboardAdmin.users.table.columns.actionsOptions.inactive">Inactivo</span>';
         } else {
             estadoColor = '#6C757D';
-            estadoText = formatEstadoUsuario(user.estado);
+            estadoText = `<span data-i18n="dashboardAdmin.users.table.columns.actionsOptions.${user.estado}">${formatEstadoUsuario(user.estado)}</span>`;
         }
+
 
         const esAdmin = user.nombre_rol === 'Administrador' || user.nombre_rol === 'Admin';
         const rolColor = esAdmin ? '#005CB9' : '#6C757D';
@@ -376,13 +381,13 @@ const GestionUsuarios = (function() {
                         
                         ${isApproved ? `
                             <span style="color: #4CAF50; font-weight: 600; padding: 5px;">
-                                <i class="fas fa-check-circle"></i> Aprobado
+                                <i class="fas fa-check-circle"></i> <span data-i18n="dashboardAdmin.users.table.columns.isApproved">Aprobado</span>
                             </span>
                         ` : ''}
                         
                         ${isRejected ? `
                             <span style="color: #F44336; font-weight: 600; padding: 5px;">
-                                <i class="fas fa-times-circle"></i> Rechazado
+                                <i class="fas fa-times-circle"></i> <span data-i18n="dashboardAdmin.users.table.columns.isRejected">Rechazado</span>
                             </span>
                         ` : ''}
                     </div>
@@ -462,7 +467,7 @@ const GestionUsuarios = (function() {
                             <h3 style="color: #005CB9; margin-bottom: 15px;"> Información del Pago</h3>
                             <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px;">
                                 <div><strong>Fecha:</strong> ${formatFecha(pago.fecha_pago)}</div>
-                                <div><strong>Monto:</strong> $${parseFloat(pago.monto).toLocaleString('es-UY', {minimumFractionDigits: 2})}</div>
+                                <div><strong>Monto:</strong> $${parseFloat(pago.monto).toLocaleString('es-UY', { minimumFractionDigits: 2 })}</div>
                                 <div><strong>Estado:</strong> <span class="badge badge-${pago.estado_validacion}">${pago.estado_validacion}</span></div>
                                 <div><strong>Tipo:</strong> ${pago.tipo_pago}</div>
                             </div>
@@ -531,7 +536,7 @@ const GestionUsuarios = (function() {
                 </div>
             </div>
         `;
-        
+
         document.body.insertAdjacentHTML('beforeend', modal);
         document.body.style.overflow = 'hidden';
     }
@@ -544,14 +549,14 @@ const GestionUsuarios = (function() {
         /**
          * Cerrar todos los modales
          */
-        cerrarModales: function() {
+        cerrarModales: function () {
             limpiarModalesAnteriores();
         },
 
         /**
          * Cargar todos los usuarios
          */
-        cargarUsuarios: async function() {
+        cargarUsuarios: async function () {
             const container = document.getElementById('usersTableContainer');
 
             if (!container) {
@@ -595,7 +600,7 @@ const GestionUsuarios = (function() {
         /**
          * Renderizar tabla de usuarios
          */
-        renderizarTabla: function(users) {
+        renderizarTabla: function (users) {
             const container = document.getElementById('usersTableContainer');
 
             if (!users || users.length === 0) {
@@ -613,14 +618,14 @@ const GestionUsuarios = (function() {
                     <table style="width: 100%; border-collapse: collapse; background: #FFFFFF; min-width: 1400px;">
                         <thead>
                             <tr style="background: linear-gradient(135deg, #005CB9 0%, #004494 100%); color: #FFFFFF;">
-                                <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">ID</th>
-                                <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;">Nombre</th>
-                                <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;">Cédula</th>
-                                <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;">Email</th>
-                                <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Estado</th>
-                                <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Rol</th>
-                                <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;">Núcleo</th>
-                                <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Acciones</th>
+                                <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;" data-i18n="dashboardAdmin.users.table.columns.id">ID</th>
+                                <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;" data-i18n="dashboardAdmin.users.table.columns.name">Nombre</th>
+                                <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;" data-i18n="dashboardAdmin.users.table.columns.idCard">Cédula</th>
+                                <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;" data-i18n="dashboardAdmin.users.table.columns.email">Email</th>
+                                <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;" data-i18n="dashboardAdmin.users.table.columns.status">Estado</th>
+                                <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;" data-i18n="dashboardAdmin.users.table.columns.role">Rol</th>
+                                <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;" data-i18n="dashboardAdmin.users.table.columns.unit">Núcleo</th>
+                                <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;" data-i18n="dashboardAdmin.users.table.columns.actions">Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -632,21 +637,22 @@ const GestionUsuarios = (function() {
 
             html += '</tbody></table></div>';
             container.innerHTML = html;
+            i18n.translatePage();
         },
 
         /**
          * Ver detalles de usuario
          */
-        verDetalles: async function(userId) {
+        verDetalles: async function (userId) {
             console.log('🔍 [USUARIOS] Cargando detalles del usuario:', userId);
 
             try {
                 const response = await fetch(`${ENDPOINTS.DETAILS}?id_usuario=${userId}`);
-                
+
                 if (!response.ok) {
                     throw new Error(`Error HTTP: ${response.status}`);
                 }
-                
+
                 const data = await response.json();
 
                 if (data.success && data.user) {
@@ -663,16 +669,16 @@ const GestionUsuarios = (function() {
         /**
          * Ver detalles de pago
          */
-        verDetallesPago: async function(userId) {
+        verDetallesPago: async function (userId) {
             try {
                 const response = await fetch(`${ENDPOINTS.PAYMENT_DETAILS}?id_usuario=${userId}`);
-                
+
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}`);
                 }
-                
+
                 const data = await response.json();
-                
+
                 if (data.success) {
                     mostrarModalDetallesPago(data.pago, data.usuario);
                 } else {
@@ -687,23 +693,23 @@ const GestionUsuarios = (function() {
         /**
          * Aprobar usuario
          */
-        aprobarUsuario: async function(userId, nombreUsuario) {
+        aprobarUsuario: async function (userId, nombreUsuario) {
             if (!confirm(`¿Aprobar el registro de ${nombreUsuario}?\n\nEl usuario podrá acceder al sistema.`)) {
                 return;
             }
-            
+
             try {
                 const formData = new FormData();
                 formData.append('id_usuario', userId);
                 formData.append('accion', 'aprobar');
-                
+
                 const response = await fetch(ENDPOINTS.APROBAR_RECHAZAR, {
                     method: 'POST',
                     body: formData
                 });
-                
+
                 const data = await response.json();
-                
+
                 if (data.success) {
                     alert('✓ Usuario aprobado correctamente');
                     this.cargarUsuarios();
@@ -719,28 +725,28 @@ const GestionUsuarios = (function() {
         /**
          * Rechazar usuario
          */
-        rechazarUsuario: async function(userId, nombreUsuario) {
+        rechazarUsuario: async function (userId, nombreUsuario) {
             const motivo = prompt(`¿Por qué rechazas el registro de ${nombreUsuario}?\n\nMotivo (opcional):`);
-            
+
             if (motivo === null) return;
-            
+
             if (!confirm(`¿Confirmas el rechazo de ${nombreUsuario}?`)) {
                 return;
             }
-            
+
             try {
                 const formData = new FormData();
                 formData.append('id_usuario', userId);
                 formData.append('accion', 'rechazar');
                 formData.append('motivo', motivo || 'Sin motivo especificado');
-                
+
                 const response = await fetch(ENDPOINTS.APROBAR_RECHAZAR, {
                     method: 'POST',
                     body: formData
                 });
-                
+
                 const data = await response.json();
-                
+
                 if (data.success) {
                     alert('✓ Usuario rechazado');
                     this.cargarUsuarios();
@@ -756,9 +762,9 @@ const GestionUsuarios = (function() {
         /**
          * Aprobar pago desde modal
          */
-        aprobarPagoDesdeModal: async function(pagoId, userId) {
+        aprobarPagoDesdeModal: async function (pagoId, userId) {
             this.cerrarModales();
-            
+
             if (!confirm('¿Aprobar este pago?\n\nEl usuario será notificado.')) {
                 return;
             }
@@ -789,7 +795,7 @@ const GestionUsuarios = (function() {
         /**
          * Rechazar pago desde modal
          */
-        rechazarPagoDesdeModal: async function(pagoId, userId) {
+        rechazarPagoDesdeModal: async function (pagoId, userId) {
             this.cerrarModales();
 
             const motivo = prompt('¿Por qué rechazas este pago? (opcional)');
@@ -826,7 +832,7 @@ const GestionUsuarios = (function() {
         /**
          * Filtrar usuarios
          */
-        filtrarUsuarios: function() {
+        filtrarUsuarios: function () {
             const estadoFilter = document.getElementById('filtro-estado-usuarios')?.value.toLowerCase() || '';
             const searchText = document.getElementById('search-users')?.value.toLowerCase() || '';
             const rows = document.querySelectorAll('#usersTableContainer tbody tr');
@@ -852,7 +858,7 @@ const GestionUsuarios = (function() {
         /**
          * Inicializar módulo
          */
-        inicializar: function() {
+        inicializar: function () {
             // Listener para sección de usuarios
             const usuariosMenuItem = document.querySelector('.menu li[data-section="usuarios"]');
             if (usuariosMenuItem) {
@@ -879,7 +885,7 @@ const GestionUsuarios = (function() {
 // INICIALIZACIÓN AUTOMÁTICA
 // ==========================================
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     GestionUsuarios.inicializar();
 });
 
@@ -897,7 +903,7 @@ window.filterUsers = () => GestionUsuarios.filtrarUsuarios();
 window.limpiarModalesAnteriores = () => GestionUsuarios.cerrarModales();
 window.showUserDetailModal = (user) => {
     // Función de compatibilidad que usa la función interna
-    const mostrarModalDetallesUsuario = function(user) {
+    const mostrarModalDetallesUsuario = function (user) {
         GestionUsuarios.verDetalles(user.id_usuario);
     };
     mostrarModalDetallesUsuario(user);

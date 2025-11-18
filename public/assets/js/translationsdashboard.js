@@ -1,324 +1,324 @@
 
 const translations = {
-es: {
-  // Common
-  common: {
-    loading: "Cargando...",
-    all: "Todos",
-    status: "Estado",
-    type: "Tipo",
-    priority: "Prioridad",
-    priorityLow: "Baja",
-    priorityMedium: "Media",
-    priorityHigh: "Alta",
-    filter: "Filtrar",
-    update: "Actualizar",
-    cancel: "Cancelar",
-    approve: "Aprobar",
-    reject: "Rechazar",
-    saveChanges: "Guardar Cambios",
-    important: "Importante",
-    select: "Seleccionar...",
-    user: "Usuario",
-    observations: "Observaciones",
-    statusPending: "Pendiente",
-    statusCompleted: "Completado",
-    statusCanceled: "Cancelado",
-    statusExpired: "Vencido",
-    statusRejected: "Rechazado",
-    total: "Total",
-    name: "Nombre",
-    actions: "Acciones",
-    date: "Fecha",
-    amount: "Monto",
-    close: "Cerrar"
-  },
+  es: {
+    // Common
+    common: {
+      loading: "Cargando...",
+      all: "Todos",
+      status: "Estado",
+      type: "Tipo",
+      priority: "Prioridad",
+      priorityLow: "Baja",
+      priorityMedium: "Media",
+      priorityHigh: "Alta",
+      filter: "Filtrar",
+      update: "Actualizar",
+      cancel: "Cancelar",
+      approve: "Aprobar",
+      reject: "Rechazar",
+      saveChanges: "Guardar Cambios",
+      important: "Importante",
+      select: "Seleccionar...",
+      user: "Usuario",
+      observations: "Observaciones",
+      statusPending: "Pendiente",
+      statusCompleted: "Completado",
+      statusCanceled: "Cancelado",
+      statusExpired: "Vencido",
+      statusRejected: "Rechazado",
+      total: "Total",
+      name: "Nombre",
+      actions: "Acciones",
+      date: "Fecha",
+      amount: "Monto",
+      close: "Cerrar"
+    },
 
-  // Months
-  months: {
-    january: "Enero",
-    february: "Febrero",
-    march: "Marzo",
-    april: "Abril",
-    may: "Mayo",
-    june: "Junio",
-    july: "Julio",
-    august: "Agosto",
-    september: "Septiembre",
-    october: "Octubre",
-    november: "Noviembre",
-    december: "Diciembre"
-  },
+    // Months
+    months: {
+      january: "Enero",
+      february: "Febrero",
+      march: "Marzo",
+      april: "Abril",
+      may: "Mayo",
+      june: "Junio",
+      july: "Julio",
+      august: "Agosto",
+      september: "Septiembre",
+      october: "Octubre",
+      november: "Noviembre",
+      december: "Diciembre"
+    },
 
-  // Home (Landing Page)
-  home: {
-    pageTitle: "Gestcoop — Cooperativa de Vivienda",
-    welcome: "Bienvenido a Gestcoop",
-    subtitle: "Gestioná tu cooperativa de forma eficiente y transparente.",
-    loginButton: "Iniciar Sesión",
-    registerButton: "Registrarse",
-    aboutUs: "Sobre Nosotros",
-    contact: "Contacto"
-  },
+    // Home (Landing Page)
+    home: {
+      pageTitle: "Gestcoop — Cooperativa de Vivienda",
+      welcome: "Bienvenido a Gestcoop",
+      subtitle: "Gestioná tu cooperativa de forma eficiente y transparente.",
+      loginButton: "Iniciar Sesión",
+      registerButton: "Registrarse",
+      aboutUs: "Sobre Nosotros",
+      contact: "Contacto"
+    },
 
-  // Auth (Login/Register)
-  auth: {
-    loginTitle: "Iniciar Sesión",
-    registerTitle: "Crear tu Cuenta",
-    emailLabel: "Correo Electrónico *",
-    passwordLabel: "Contraseña *",
-    loginButton: "Ingresar",
-    noAccount: "¿No tenés una cuenta?",
-    hasAccount: "¿Ya tenés una cuenta?",
-    registerLink: "Registrate aquí",
-    loginLink: "Ingresá aquí",
+    // Auth (Login/Register)
+    auth: {
+      loginTitle: "Iniciar Sesión",
+      registerTitle: "Crear tu Cuenta",
+      emailLabel: "Correo Electrónico *",
+      passwordLabel: "Contraseña *",
+      loginButton: "Ingresar",
+      noAccount: "¿No tenés una cuenta?",
+      hasAccount: "¿Ya tenés una cuenta?",
+      registerLink: "Registrate aquí",
+      loginLink: "Ingresá aquí",
 
-    fullNameLabel: "Nombre Completo *",
-    idCardLabel: "Cédula / Documento *",
-    confirmPasswordLabel: "Confirmar Contraseña *",
-    registerButton: "Crear Cuenta",
+      fullNameLabel: "Nombre Completo *",
+      idCardLabel: "Cédula / Documento *",
+      confirmPasswordLabel: "Confirmar Contraseña *",
+      registerButton: "Crear Cuenta",
 
-    requiredField: "Este campo es obligatorio",
-    invalidEmail: "Formato de correo incorrecto",
-    passwordMismatch: "Las contraseñas no coinciden",
-    registrationSuccess: "Registro exitoso. Revisá tu correo para activar la cuenta.",
-    loginError: "Credenciales incorrectas. Intentá nuevamente."
-  },
+      requiredField: "Este campo es obligatorio",
+      invalidEmail: "Formato de correo incorrecto",
+      passwordMismatch: "Las contraseñas no coinciden",
+      registrationSuccess: "Registro exitoso. Revisá tu correo para activar la cuenta.",
+      loginError: "Credenciales incorrectas. Intentá nuevamente."
+    },
 
-  // Dashboard Admin
-  dashboardAdmin: {
-    pageTitle: "Gestcoop — Panel Administrativo",
+    // Dashboard Admin
+    dashboardAdmin: {
+      pageTitle: "Gestcoop — Panel Administrativo",
 
       sections: {
-    home: "Inicio",
-    reports: "Reportes",
-    users: "Usuarios",
-    family: "Núcleo Familiar",
-    housing: "Viviendas",
-    billing: "Facturación",
-    notifications: "Notificaciones",
-    materials: "Materiales",
-    tasks: "Tareas",
-    requests: "Solicitudes"
-  },
+        home: "Inicio",
+        reports: "Reportes",
+        users: "Usuarios",
+        family: "Núcleo Familiar",
+        housing: "Viviendas",
+        billing: "Facturación",
+        notifications: "Notificaciones",
+        materials: "Materiales",
+        tasks: "Tareas",
+        requests: "Solicitudes"
+      },
 
-    home: {
-      title: "Inicio - Panel Administrativo",
-      welcome: "Bienvenido al Panel de Administración",
-      description: "Desde aquí podés gestionar todos los aspectos de la cooperativa.",
-      sectionsTitle: "Secciones disponibles:",
-      sectionsUsers: "Usuarios:",
-      sectionsUsersDesc: "Gestionar usuarios y pagos pendientes",
-      sectionsNotifications: "Notificaciones:",
-      sectionsNotificationsDesc: "Enviar mensajes a los integrantes",
-      sectionsFamily: "Núcleos Familiares:",
-      sectionsFamilyDesc: "Gestionar grupos familiares",
-      sectionsTasks: "Tareas:",
-      sectionsTasksDesc: "Asignar y administrar tareas",
-      sectionsReports: "Reportes:",
-      sectionsReportsDesc: "Ver estadísticas"
+      home: {
+        title: "Inicio - Panel Administrativo",
+        welcome: "Bienvenido al Panel de Administración",
+        description: "Desde aquí podés gestionar todos los aspectos de la cooperativa.",
+        sectionsTitle: "Secciones disponibles:",
+        sectionsUsers: "Usuarios:",
+        sectionsUsersDesc: "Gestionar usuarios y pagos pendientes",
+        sectionsNotifications: "Notificaciones:",
+        sectionsNotificationsDesc: "Enviar mensajes a los integrantes",
+        sectionsFamily: "Núcleos Familiares:",
+        sectionsFamilyDesc: "Gestionar grupos familiares",
+        sectionsTasks: "Tareas:",
+        sectionsTasksDesc: "Asignar y administrar tareas",
+        sectionsReports: "Reportes:",
+        sectionsReportsDesc: "Ver estadísticas"
+      },
+
+      users: {
+        title: "Gestión de Usuarios",
+        allUsers: "Todos los Usuarios",
+        filterAllStates: "Todos los estados",
+        filterPending: "Pendiente",
+        filterSent: "Enviado (Pendiente de Aprobación)",
+        filterAccepted: "Aceptado",
+        filterRejected: "Rechazado",
+        searchPlaceholder: "Buscar usuario..."
+      },
+
+      notifications: {
+        title: "Gestión de Notificaciones",
+        sendNew: "Enviar Nueva Notificación",
+        titleLabel: "Título:",
+        messageLabel: "Mensaje:",
+        typeLabel: "Tipo:",
+        typeInfo: "Información",
+        typeImportant: "Importante",
+        typeUrgent: "Urgente",
+        typeSuccess: "Éxito",
+        recipientsLabel: "Destinatarios:",
+        selectAll: "Seleccionar Todos",
+        sendButton: "Enviar Notificación"
+      },
+
+      family: {
+        title: "Gestión de Núcleos Familiares",
+        registered: "Núcleos Registrados",
+        createNew: "Crear Nuevo Núcleo",
+        infoTitle: "Información sobre los Núcleos",
+        infoWhat: "¿Qué es un núcleo familiar?",
+        infoWhatDesc: "Grupo de usuarios que comparten vivienda o tienen parentesco",
+        infoTasks: "Asignación de tareas:",
+        infoTasksDesc: "Las tareas pueden asignarse a núcleos completos",
+        infoUsers: "Gestión de usuarios:",
+        infoUsersDesc: "Un usuario solo puede pertenecer a un núcleo",
+        infoDelete: "Eliminación:",
+        infoDeleteDesc: "Al eliminar un núcleo, los usuarios NO se eliminan, solo se desasocian"
+      },
+
+      reports: {
+        title: " Reportes Mensuales",
+        selectPeriod: " Seleccionar Período",
+        selectMonth: "Seleccionar mes...",
+        selectYear: "Seleccionar año...",
+        generate: "Generar Reporte",
+        exportCSV: "Exportar CSV",
+        totalUsers: "Total de Usuarios",
+        hoursWorked: "Horas Trabajadas",
+        completedTasks: "Tareas Completadas",
+        avgCompliance: "Cumplimiento Promedio",
+        detailByUser: " Detalle por Usuario"
+      },
+
+      housing: {
+        title: "Gestión de Viviendas",
+        registered: "Viviendas Registradas",
+        newHousing: "Nueva Vivienda",
+        filterAllStates: "Todos los estados",
+        filterAvailable: "Disponible",
+        filterOccupied: "Ocupada",
+        filterMaintenance: "En Mantenimiento",
+        filterAllRooms: "Todas las habitaciones",
+        filter1Room: "1 Habitación",
+        filter2Rooms: "2 Habitaciones",
+        filter3Rooms: "3 Habitaciones",
+        searchPlaceholder: "Buscar vivienda...",
+        infoTitle: "Información sobre las Viviendas",
+        infoStates: "Estados:",
+        infoStatesDesc: "Disponible, Ocupada, En Mantenimiento",
+        infoAssignment: "Asignación:",
+        infoAssignmentDesc: "La vivienda puede asignarse a un usuario individual o a un núcleo familiar",
+        infoTypes: "Tipos:",
+        infoTypesDesc: "1, 2 o 3 habitaciones según necesidad",
+        infoManagement: "Gestión:",
+        infoManagementDesc: "Podés crear, editar, asignar y desasignar viviendas",
+        modalNew: "Nueva Vivienda",
+        housingNumber: "Número de Vivienda *",
+        housingNumberPlaceholder: "Ej: A-101",
+        address: "Dirección *",
+        addressPlaceholder: "Ej: Bloque A, Planta Baja",
+        housingType: "Tipo de Vivienda *",
+        squareMeters: "Metros Cuadrados",
+        squareMetersPlaceholder: "Ej: 55.50",
+        constructionDate: "Fecha de Construcción",
+        statusAvailable: "Disponible",
+        statusOccupied: "Ocupada",
+        statusMaintenance: "Mantenimiento",
+        observationsPlaceholder: "Notas adicionales...",
+        saveHousing: "Guardar Vivienda",
+        assignHousing: "Asignar Vivienda",
+        housing: "Vivienda",
+        assignTo: "Asignar a *",
+        individualUser: "Usuario Individual",
+        familyNucleus: "Núcleo Familiar"
+      },
+
+      billing: {
+        title: " Gestión de Cuotas Mensuales",
+        totalQuotas: "Total de Cuotas",
+        paid: "Pagadas",
+        pending: "Pendientes",
+        amountCollected: "Monto Recaudado",
+        priceConfig: " Configuración de Precios",
+        quickActions: " Acciones Rápidas",
+        generateCurrentMonth: "Generar Cuotas del Mes Actual",
+        filterAllYears: "Todos los años",
+        filterAllMonths: "Todos los meses",
+        filterAllStates: "Todos los estados",
+        filterPending: "Pendiente",
+        filterPaid: "Pagada",
+        allQuotas: " Todas las Cuotas",
+        updatePrice: "💵 Actualizar Precio de la Cuota",
+        housingType: "Tipo de Vivienda",
+        newMonthlyAmount: "Nuevo Monto Mensual *",
+        amountPlaceholder: "Ej: 7500.00",
+        priceChangeWarning: "Este cambio se aplicará a las nuevas cuotas generadas. Las ya existentes mantienen su valor original.",
+        validatePayment: " Validar Pago",
+        observationsOptional: "Observaciones (opcional)",
+        validationComments: "Comentarios sobre la validación..."
+      },
+
+      materials: {
+        title: "Gestión de Materiales",
+        searchPlaceholder: "Buscar material...",
+        newMaterial: "Nuevo Material",
+        infoTitle: "Información sobre los Materiales",
+        infoWhat: "¿Qué son los materiales?",
+        infoWhatDesc: "Recursos necesarios para realizar tareas cooperativas",
+        infoStock: "Stock:",
+        infoStockDesc: "Control de cantidades disponibles de cada material",
+        infoTaskAssignment: "Asignación a tareas:",
+        infoTaskAssignmentDesc: "Los materiales pueden asignarse a tareas específicas",
+        infoRequests: "Solicitudes:",
+        infoRequestsDesc: "Los usuarios pueden solicitar materiales cuando lo necesiten",
+        materialName: "Nombre del Material *",
+        materialNamePlaceholder: "Ej: Cemento, Ladrillos, Arena",
+        characteristics: "Características / Descripción",
+        characteristicsPlaceholder: "Describí el material, sus especificaciones, etc.",
+        saveMaterial: "Guardar Material",
+        updateStock: "Actualizar Stock",
+        material: "Material",
+        availableQuantity: "Cantidad Disponible *"
+      },
+
+      tasks: {
+        title: "Gestión de Tareas",
+        createNew: "Crear Nueva Tarea",
+        titleLabel: "Título:",
+        descriptionLabel: "Descripción:",
+        startDate: "Fecha de Inicio:",
+        endDate: "Fecha de Fin:",
+        assignTo: "Asignar a:",
+        individualUsers: "Usuarios Individuales",
+        familyNuclei: "Núcleos Familiares",
+        selectUsers: "Seleccionar Usuarios:",
+        selectNuclei: "Seleccionar Núcleos:",
+        selectAll: "Seleccionar Todos",
+        materialsNeeded: " Materiales necesarios para la tarea:",
+        searchMaterial: "Buscar material...",
+        noMaterialsAssigned: "No hay materiales asignados",
+        createTask: "Crear Tarea",
+        createdTasks: "Tareas Creadas"
+      },
+
+      requests: {
+        title: " Gestión de Solicitudes",
+        inReview: "En Revisión",
+        resolved: "Resueltas",
+        highPriority: "Alta Prioridad",
+        filterAllStates: "Todos los estados",
+        filterAllTypes: "Todos los tipos",
+        filterAllPriorities: "Todas las prioridades",
+        typeHours: "Registro de Horas",
+        typePayment: "Pagos/Cuotas",
+        typeHousing: "Vivienda",
+        typeGeneral: "Consulta General",
+        typeOther: "Otro"
+      }
     },
 
-    users: {
-      title: "Gestión de Usuarios",
-      allUsers: "Todos los Usuarios",
-      filterAllStates: "Todos los estados",
-      filterPending: "Pendiente",
-      filterSent: "Enviado (Pendiente de Aprobación)",
-      filterAccepted: "Aceptado",
-      filterRejected: "Rechazado",
-      searchPlaceholder: "Buscar usuario..."
-    },
+    // Dashboard User
+    dashboardUser: {
+      title: "Gestcoop — Panel de Usuario",
+      logout: "Cerrar Sesión",
+      admin: "Admin",
 
-    notifications: {
-      title: "Gestión de Notificaciones",
-      sendNew: "Enviar Nueva Notificación",
-      titleLabel: "Título:",
-      messageLabel: "Mensaje:",
-      typeLabel: "Tipo:",
-      typeInfo: "Información",
-      typeImportant: "Importante",
-      typeUrgent: "Urgente",
-      typeSuccess: "Éxito",
-      recipientsLabel: "Destinatarios:",
-      selectAll: "Seleccionar Todos",
-      sendButton: "Enviar Notificación"
-    },
+      sections: {
+        home: "Inicio",
+        profile: "Perfil",
+        requests: "Solicitudes",
+        housing: "Vivienda",
+        billing: "Cuotas",
+        hours: "Horas",
+        tasks: "Tareas",
+        documents: "Documentos"
+      },
 
-    family: {
-      title: "Gestión de Núcleos Familiares",
-      registered: "Núcleos Registrados",
-      createNew: "Crear Nuevo Núcleo",
-      infoTitle: "Información sobre los Núcleos",
-      infoWhat: "¿Qué es un núcleo familiar?",
-      infoWhatDesc: "Grupo de usuarios que comparten vivienda o tienen parentesco",
-      infoTasks: "Asignación de tareas:",
-      infoTasksDesc: "Las tareas pueden asignarse a núcleos completos",
-      infoUsers: "Gestión de usuarios:",
-      infoUsersDesc: "Un usuario solo puede pertenecer a un núcleo",
-      infoDelete: "Eliminación:",
-      infoDeleteDesc: "Al eliminar un núcleo, los usuarios NO se eliminan, solo se desasocian"
-    },
-
-    reports: {
-      title: " Reportes Mensuales",
-      selectPeriod: " Seleccionar Período",
-      selectMonth: "Seleccionar mes...",
-      selectYear: "Seleccionar año...",
-      generate: "Generar Reporte",
-      exportCSV: "Exportar CSV",
-      totalUsers: "Total de Usuarios",
-      hoursWorked: "Horas Trabajadas",
-      completedTasks: "Tareas Completadas",
-      avgCompliance: "Cumplimiento Promedio",
-      detailByUser: " Detalle por Usuario"
-    },
-
-    housing: {
-      title: "Gestión de Viviendas",
-      registered: "Viviendas Registradas",
-      newHousing: "Nueva Vivienda",
-      filterAllStates: "Todos los estados",
-      filterAvailable: "Disponible",
-      filterOccupied: "Ocupada",
-      filterMaintenance: "En Mantenimiento",
-      filterAllRooms: "Todas las habitaciones",
-      filter1Room: "1 Habitación",
-      filter2Rooms: "2 Habitaciones",
-      filter3Rooms: "3 Habitaciones",
-      searchPlaceholder: "Buscar vivienda...",
-      infoTitle: "Información sobre las Viviendas",
-      infoStates: "Estados:",
-      infoStatesDesc: "Disponible, Ocupada, En Mantenimiento",
-      infoAssignment: "Asignación:",
-      infoAssignmentDesc: "La vivienda puede asignarse a un usuario individual o a un núcleo familiar",
-      infoTypes: "Tipos:",
-      infoTypesDesc: "1, 2 o 3 habitaciones según necesidad",
-      infoManagement: "Gestión:",
-      infoManagementDesc: "Podés crear, editar, asignar y desasignar viviendas",
-      modalNew: "Nueva Vivienda",
-      housingNumber: "Número de Vivienda *",
-      housingNumberPlaceholder: "Ej: A-101",
-      address: "Dirección *",
-      addressPlaceholder: "Ej: Bloque A, Planta Baja",
-      housingType: "Tipo de Vivienda *",
-      squareMeters: "Metros Cuadrados",
-      squareMetersPlaceholder: "Ej: 55.50",
-      constructionDate: "Fecha de Construcción",
-      statusAvailable: "Disponible",
-      statusOccupied: "Ocupada",
-      statusMaintenance: "Mantenimiento",
-      observationsPlaceholder: "Notas adicionales...",
-      saveHousing: "Guardar Vivienda",
-      assignHousing: "Asignar Vivienda",
-      housing: "Vivienda",
-      assignTo: "Asignar a *",
-      individualUser: "Usuario Individual",
-      familyNucleus: "Núcleo Familiar"
-    },
-
-    billing: {
-      title: " Gestión de Cuotas Mensuales",
-      totalQuotas: "Total de Cuotas",
-      paid: "Pagadas",
-      pending: "Pendientes",
-      amountCollected: "Monto Recaudado",
-      priceConfig: " Configuración de Precios",
-      quickActions: " Acciones Rápidas",
-      generateCurrentMonth: "Generar Cuotas del Mes Actual",
-      filterAllYears: "Todos los años",
-      filterAllMonths: "Todos los meses",
-      filterAllStates: "Todos los estados",
-      filterPending: "Pendiente",
-      filterPaid: "Pagada",
-      allQuotas: " Todas las Cuotas",
-      updatePrice: "💵 Actualizar Precio de la Cuota",
-      housingType: "Tipo de Vivienda",
-      newMonthlyAmount: "Nuevo Monto Mensual *",
-      amountPlaceholder: "Ej: 7500.00",
-      priceChangeWarning: "Este cambio se aplicará a las nuevas cuotas generadas. Las ya existentes mantienen su valor original.",
-      validatePayment: " Validar Pago",
-      observationsOptional: "Observaciones (opcional)",
-      validationComments: "Comentarios sobre la validación..."
-    },
-
-    materials: {
-      title: "Gestión de Materiales",
-      searchPlaceholder: "Buscar material...",
-      newMaterial: "Nuevo Material",
-      infoTitle: "Información sobre los Materiales",
-      infoWhat: "¿Qué son los materiales?",
-      infoWhatDesc: "Recursos necesarios para realizar tareas cooperativas",
-      infoStock: "Stock:",
-      infoStockDesc: "Control de cantidades disponibles de cada material",
-      infoTaskAssignment: "Asignación a tareas:",
-      infoTaskAssignmentDesc: "Los materiales pueden asignarse a tareas específicas",
-      infoRequests: "Solicitudes:",
-      infoRequestsDesc: "Los usuarios pueden solicitar materiales cuando lo necesiten",
-      materialName: "Nombre del Material *",
-      materialNamePlaceholder: "Ej: Cemento, Ladrillos, Arena",
-      characteristics: "Características / Descripción",
-      characteristicsPlaceholder: "Describí el material, sus especificaciones, etc.",
-      saveMaterial: "Guardar Material",
-      updateStock: "Actualizar Stock",
-      material: "Material",
-      availableQuantity: "Cantidad Disponible *"
-    },
-
-    tasks: {
-      title: "Gestión de Tareas",
-      createNew: "Crear Nueva Tarea",
-      titleLabel: "Título:",
-      descriptionLabel: "Descripción:",
-      startDate: "Fecha de Inicio:",
-      endDate: "Fecha de Fin:",
-      assignTo: "Asignar a:",
-      individualUsers: "Usuarios Individuales",
-      familyNuclei: "Núcleos Familiares",
-      selectUsers: "Seleccionar Usuarios:",
-      selectNuclei: "Seleccionar Núcleos:",
-      selectAll: "Seleccionar Todos",
-      materialsNeeded: " Materiales necesarios para la tarea:",
-      searchMaterial: "Buscar material...",
-      noMaterialsAssigned: "No hay materiales asignados",
-      createTask: "Crear Tarea",
-      createdTasks: "Tareas Creadas"
-    },
-
-    requests: {
-      title: " Gestión de Solicitudes",
-      inReview: "En Revisión",
-      resolved: "Resueltas",
-      highPriority: "Alta Prioridad",
-      filterAllStates: "Todos los estados",
-      filterAllTypes: "Todos los tipos",
-      filterAllPriorities: "Todas las prioridades",
-      typeHours: "Registro de Horas",
-      typePayment: "Pagos/Cuotas",
-      typeHousing: "Vivienda",
-      typeGeneral: "Consulta General",
-      typeOther: "Otro"
-    }
-  },
-
-  // Dashboard User
-  dashboardUser: {
-    title: "Gestcoop — Panel de Usuario",
-    logout: "Cerrar Sesión",
-    admin: "Admin",
-
-    sections: {
-      home: "Inicio",
-      profile: "Perfil",
-      requests: "Solicitudes",
-      housing: "Vivienda",
-      billing: "Cuotas",
-      hours: "Horas",
-      tasks: "Tareas",
-      documents: "Documentos"
-    },
-
-    home: {
+      home: {
         title: " Inicio",
         welcome: "Bienvenido",
         nucleoInfoCard: {
@@ -370,46 +370,37 @@ es: {
           tasks: "Tareas Pendientes"
         }
       },
-      
-    profile: {
-      title: " Mi Perfil",
-      personalInfo: "Información Personal",
-      editProfile: "Editar Perfil",
-      cancelEdit: "Cancelar",
-      saveChanges: "Guardar Cambios",
-      fullName: "Nombre Completo",
-      email: "Correo",
-      address: "Dirección",
-      birthDate: "Fecha de Nacimiento",
-      status: "Estado",
-      phone: "Teléfono",
-      phoneOptional: "Opcional - Podés agregar un número de contacto",
-      idCard: "Cédula",
-      idCardReadonly: "La cédula no puede modificarse",
-      changePassword: "Cambiar Contraseña (Opcional)",
-      currentPassword: "Contraseña Actual",
-      currentPasswordPlaceholder: "Dejar en blanco si no querés cambiarla",
-      newPassword: "Nueva Contraseña",
-      confirmPassword: "Confirmar Nueva Contraseña",
-      notSpecified: "No especificado",
-      notAvailable: "No disponible"
-    },
 
-    requests: {
-      title: " Mis Solicitudes",
-      manage: "Gestioná tus solicitudes",
-      description: "Enviá consultas, justificaciones o reportes al administrador",
-      newRequest: "Nueva Solicitud",
-      noRequests: "No tenés solicitudes",
-      types: {
-        hours: "  Registro de Horas",
-        payment: "  Pagos/Cuotas",
-        housing: "  Vivienda",
-        general: " 📝 Consulta General",
-        other: " ❓ Otro"
+      profile: {
+        title: " Mi Perfil",
+        personalInfo: "Información Personal",
+        editProfile: "Editar Perfil",
+        cancelEdit: "Cancelar",
+        saveChanges: "Guardar Cambios",
+        fullName: "Nombre Completo",
+        email: "Correo",
+        address: "Dirección",
+        birthDate: "Fecha de Nacimiento",
+        status: "Estado",
+        phone: "Teléfono",
+        phoneOptional: "Opcional - Podés agregar un número de contacto",
+        idCard: "Cédula",
+        idCardReadonly: "La cédula no puede modificarse",
+        changePassword: "Cambiar Contraseña (Opcional)",
+        currentPassword: "Contraseña Actual",
+        currentPasswordPlaceholder: "Dejar en blanco si no querés cambiarla",
+        newPassword: "Nueva Contraseña",
+        confirmPassword: "Confirmar Nueva Contraseña",
+        notSpecified: "No especificado",
+        notAvailable: "No disponible"
       },
-      form: {
-        typeLabel: "Tipo de Solicitud:",
+
+      requests: {
+        title: " Mis Solicitudes",
+        manage: "Gestioná tus solicitudes",
+        description: "Enviá consultas, justificaciones o reportes al administrador",
+        newRequest: "Nueva Solicitud",
+        noRequests: "No tenés solicitudes",
         types: {
           hours: "  Registro de Horas",
           payment: "  Pagos/Cuotas",
@@ -417,299 +408,308 @@ es: {
           general: " 📝 Consulta General",
           other: " ❓ Otro"
         },
-        subjectLabel: "Asunto:",
-        subjectPlaceholder: "Ej: Problema con mi asignación de vivienda",
-        descriptionLabel: "Descripción:",
-        descriptionPlaceholder: "Ingresá la información detallada de tu solicitud...",
-        priorityLabel: "Prioridad:",
-        priorityUrgentHelp: "Seleccioná 'Alta' solo para casos urgentes",
-        priority: {
-          low: "Baja",
-          medium: "Media",
-          high: "Alta"
-        },
-        attachmentLabel: "Adjunto (opcional):",
-        attachmentHelp: "Subí un archivo (imagen o PDF, máx. 5MB)",
-        infoTitle: "Importante:",
-        infoText: "Tu solicitud será revisada por un administrador. Recibirás una notificación cuando sea atendida.",
-        submitButton: "Enviar Solicitud"
-      },
-      stats: {
-        pending: "Pendiente",
-        inReview: "En Revisión",
-        resolved: "Resuelta"
-      },
-      filters: {
-        status: "Estado:",
-        type: "Tipo:",
-        allStates: "Todos los estados",
-        allTypes: "Todos los tipos",
-        pending: "Pendiente",
-        inReview: "En Revisión",
-        resolved: "Resuelta",
-        rejected: "Rechazada"
-      },
-
-      loading: "Cargando solicitudes..."
-    },
-
-    housing: {
-      title: " Mi Vivienda",
-      subtitle: "Información de la Vivienda",
-      loading: "Cargando...",
-      noAssigned: "No tenés una vivienda asignada"
-    },
-
-    billing: {
-      title: " Mis Cuotas",
-      description: "Gestioná los pagos de tu vivienda y tu deuda por horas",
-      stats: {
-        pending: "Pendientes",
-        paid: "Pagadas",
-        overdue: "Vencidas"
-      },
-      filters: {
-        month: "Mes:",
-        year: "Año:",
-        status: "Estado:",
-        allMonths: "Todos los meses",
-        allYears: "Todos los años",
-        allStates: "Todos los estados",
-        pending: "Pendiente",
-        paid: "Pagada",
-        overdue: "Vencida"
-      },
-      loading: "Cargando cuotas...",
-      paymentModal: {
-        title: "Realizar Pago",
-        paymentMethod: "Método de Pago",
-        voucherNumber: "Número de Comprobante",
-        voucherNumberPlaceholder: "Ej: 123456789",
-        voucherNumberHelp: "Opcional: número de referencia o transacción",
-        uploadVoucher: "Comprobante de Pago",
-        uploadHelp: "Subí una foto o PDF del comprobante (máx. 5MB)",
-        importantTitle: "⚠️ Importante:",
-        important1: "Asegurate de que el comprobante sea legible",
-        important2: "El pago será revisado por un administrador",
-        important3: "Recibirás una notificación cuando sea validado",
-        cancel: "Cancelar",
-        submit: "Enviar Pago",
-        methods: {
-          transfer: "Transferencia Bancaria",
-          deposit: "Depósito en Efectivo",
-          check: "Cheque",
-          cash: "Efectivo"
-        }
-      },
-
-      debtStatus: {
-        title: " Estado de Deuda por Horas",
-        calculating: "Calculando deuda...",
-        debtType: {
-          period: "período:",
-          withDebt: "Tenés horas pendientes",
-          withoutDebt: "No tenés horas pendientes"
-        },
-        debtBreakdown: {
-          debtForTheCurrentMonth: " Deuda del Mes Actual:",
-          debtItems: {
-            hoursRequired: "Horas Requeridas",
-            WeeklySystem: "Sistema Semanal",
-            hoursWorked: "Horas Trabajadas",
-            weeklyAverage: "Promedio Semanal",
-            hoursRemaining: "Horas Restantes",
-            costPerHour: "Costo por Hora"
+        form: {
+          typeLabel: "Tipo de Solicitud:",
+          types: {
+            hours: "  Registro de Horas",
+            payment: "  Pagos/Cuotas",
+            housing: "  Vivienda",
+            general: " 📝 Consulta General",
+            other: " ❓ Otro"
           },
-          progress: "Progreso Mensual:",
-          alertWarning: {
-            title: "⚠ Información Importante:",
-            thisDebt: "esta deuda",
-            include: "(incluye",
-            fromPreviousMonths: "de meses anteriores)",
-            nextmessage: "Se sumará automáticamente a tu próxima cuota mensual.",
-            sistemMessage: "Sistema: 21 horas por semana (84 horas por mes).",
-            excellentMessage: "🎉 ¡Excelente!",
-            excellentMessageDescription: "Cumpliste tus horas requeridas. No habrá cargos adicionales en tu cuota."
+          subjectLabel: "Asunto:",
+          subjectPlaceholder: "Ej: Problema con mi asignación de vivienda",
+          descriptionLabel: "Descripción:",
+          descriptionPlaceholder: "Ingresá la información detallada de tu solicitud...",
+          priorityLabel: "Prioridad:",
+          priorityUrgentHelp: "Seleccioná 'Alta' solo para casos urgentes",
+          priority: {
+            low: "Baja",
+            medium: "Media",
+            high: "Alta"
+          },
+          attachmentLabel: "Adjunto (opcional):",
+          attachmentHelp: "Subí un archivo (imagen o PDF, máx. 5MB)",
+          infoTitle: "Importante:",
+          infoText: "Tu solicitud será revisada por un administrador. Recibirás una notificación cuando sea atendida.",
+          submitButton: "Enviar Solicitud"
+        },
+        stats: {
+          pending: "Pendiente",
+          inReview: "En Revisión",
+          resolved: "Resuelta"
+        },
+        filters: {
+          status: "Estado:",
+          type: "Tipo:",
+          allStates: "Todos los estados",
+          allTypes: "Todos los tipos",
+          pending: "Pendiente",
+          inReview: "En Revisión",
+          resolved: "Resuelta",
+          rejected: "Rechazada"
+        },
+
+        loading: "Cargando solicitudes..."
+      },
+
+      housing: {
+        title: " Mi Vivienda",
+        subtitle: "Información de la Vivienda",
+        loading: "Cargando...",
+        noAssigned: "No tenés una vivienda asignada"
+      },
+
+      billing: {
+        title: " Mis Cuotas",
+        description: "Gestioná los pagos de tu vivienda y tu deuda por horas",
+        stats: {
+          pending: "Pendientes",
+          paid: "Pagadas",
+          overdue: "Vencidas"
+        },
+        filters: {
+          month: "Mes:",
+          year: "Año:",
+          status: "Estado:",
+          allMonths: "Todos los meses",
+          allYears: "Todos los años",
+          allStates: "Todos los estados",
+          pending: "Pendiente",
+          paid: "Pagada",
+          overdue: "Vencida"
+        },
+        loading: "Cargando cuotas...",
+        paymentModal: {
+          title: "Realizar Pago",
+          paymentMethod: "Método de Pago",
+          voucherNumber: "Número de Comprobante",
+          voucherNumberPlaceholder: "Ej: 123456789",
+          voucherNumberHelp: "Opcional: número de referencia o transacción",
+          uploadVoucher: "Comprobante de Pago",
+          uploadHelp: "Subí una foto o PDF del comprobante (máx. 5MB)",
+          importantTitle: "⚠️ Importante:",
+          important1: "Asegurate de que el comprobante sea legible",
+          important2: "El pago será revisado por un administrador",
+          important3: "Recibirás una notificación cuando sea validado",
+          cancel: "Cancelar",
+          submit: "Enviar Pago",
+          methods: {
+            transfer: "Transferencia Bancaria",
+            deposit: "Depósito en Efectivo",
+            check: "Cheque",
+            cash: "Efectivo"
           }
+        },
+
+        debtStatus: {
+          title: " Estado de Deuda por Horas",
+          calculating: "Calculando deuda...",
+          debtType: {
+            period: "período:",
+            withDebt: "Tenés horas pendientes",
+            withoutDebt: "No tenés horas pendientes"
+          },
+          debtBreakdown: {
+            debtForTheCurrentMonth: " Deuda del Mes Actual:",
+            debtItems: {
+              hoursRequired: "Horas Requeridas",
+              WeeklySystem: "Sistema Semanal",
+              hoursWorked: "Horas Trabajadas",
+              weeklyAverage: "Promedio Semanal",
+              hoursRemaining: "Horas Restantes",
+              costPerHour: "Costo por Hora"
+            },
+            progress: "Progreso Mensual:",
+            alertWarning: {
+              title: "⚠ Información Importante:",
+              thisDebt: "esta deuda",
+              include: "(incluye",
+              fromPreviousMonths: "de meses anteriores)",
+              nextmessage: "Se sumará automáticamente a tu próxima cuota mensual.",
+              sistemMessage: "Sistema: 21 horas por semana (84 horas por mes).",
+              excellentMessage: "🎉 ¡Excelente!",
+              excellentMessageDescription: "Cumpliste tus horas requeridas. No habrá cargos adicionales en tu cuota."
+            }
+          }
+        },
+        payNow: "Pagar Ahora",
+        payBlocked: "Pago Bloqueado",
+        notFoundFilters: "No se encontraron cuotas con los filtros seleccionados.",
+        enabledPaymentPeriod: "Período de Pago Habilitado",
+        enabledPaymentPeriodMessage: "Ya podés realizar el pago de tu cuota. El período de pago está activo hasta fin de mes.",
+        pendingPayment: "⏳ Pago en Revisión",
+        noPendingPayment: " No tenés pagos pendientes",
+        blockedPayment: "Pago Bloqueado",
+        workingPeriod: " 🔒 Período de Trabajo Activo",
+        workingPeriodNote: "Podrás pagar en",
+        workingPeriodDays: "día",
+        pending: {
+          title: "Otros Pendientes",
+        },
+        summary: {
+          currentMonth: "Resumen del Mes Actual",
+          previousMonthsDebt: "Deuda de Meses Anteriores",
+          previousMonthsDebtNote: "(aún sin pagar)",
+          hoursNotWorkedDebt: "Deuda por Horas no Trabajadas",
+          hoursNotWorkedDebtNote: "($160 por hora × horas faltantes)",
+          noHoursNotWorkedDebt: "¡No adeudás horas!",
+          totalDue: "Total a Pagar",
+          totalPaid: "Total Pagado",
+          totalOverdue: "Total Vencido",
+          housingFee: " Cuota Habitacional:",
+          houseFee: "Total de tu Vivienda",
+          paymentCompleted: " 🎉 ¡Pago realizado con éxito!",
+          paymentSuccess: "Pagaste correctamente la cuota de",
+          paymentInReviewNote: "Tu pago está siendo procesado.",
+          paymentEnabled: "Pago Disponible",
+          paymentEnabledNote: "Ya podés realizar el pago.",
+          dueFeeExpired: "❌ Cuota Vencida",
+          dueFeeExpiredNote: "La deuda se acumulará.",
+          openPaymentPeriod: "⚠️ Período de Pago Abierto",
+          paid: " Pagada",
+          inReview: "⏳ En Revisión",
+          overdue: "❌ Vencida",
+          day: "DÍA",
+          toPay: "A PAGAR",
+          total: "TOTAL",
+          paymentBreakdown: " Detalle del Pago:",
+          unworkedHoursDebt: " Deuda por Horas no Trabajadas:",
+          totalPaidTxt: " Total Pagado:"
+        },
+        history: {
+          title: "Historial de Pagos",
+          empty: "No hay pagos registrados.",
+          loading: "Cargando historial..."
         }
       },
-      payNow: "Pagar Ahora",
-      payBlocked: "Pago Bloqueado",
-      notFoundFilters: "No se encontraron cuotas con los filtros seleccionados.",
-      enabledPaymentPeriod: "Período de Pago Habilitado",
-      enabledPaymentPeriodMessage: "Ya podés realizar el pago de tu cuota. El período de pago está activo hasta fin de mes.",
-      pendingPayment: "⏳ Pago en Revisión",
-      noPendingPayment: " No tenés pagos pendientes",
-      blockedPayment: "Pago Bloqueado",
-      workingPeriod: " 🔒 Período de Trabajo Activo",
-      workingPeriodNote: "Podrás pagar en",
-      workingPeriodDays: "día",
-      pending: {
-        title: "Otros Pendientes",
-      },
-      summary: {
-        currentMonth: "Resumen del Mes Actual",
-        previousMonthsDebt: "Deuda de Meses Anteriores",
-        previousMonthsDebtNote: "(aún sin pagar)",
-        hoursNotWorkedDebt: "Deuda por Horas no Trabajadas",
-        hoursNotWorkedDebtNote: "($160 por hora × horas faltantes)",
-        noHoursNotWorkedDebt: "¡No adeudás horas!",
-        totalDue: "Total a Pagar",
-        totalPaid: "Total Pagado",
-        totalOverdue: "Total Vencido",
-        housingFee: " Cuota Habitacional:",
-        houseFee: "Total de tu Vivienda",
-        paymentCompleted: " 🎉 ¡Pago realizado con éxito!",
-        paymentSuccess: "Pagaste correctamente la cuota de",
-        paymentInReviewNote: "Tu pago está siendo procesado.",
-        paymentEnabled: "Pago Disponible",
-        paymentEnabledNote: "Ya podés realizar el pago.",
-        dueFeeExpired: "❌ Cuota Vencida",
-        dueFeeExpiredNote: "La deuda se acumulará.",
-        openPaymentPeriod: "⚠️ Período de Pago Abierto",
-        paid: " Pagada",
-        inReview: "⏳ En Revisión",
-        overdue: "❌ Vencida",
-        day: "DÍA",
-        toPay: "A PAGAR",
-        total: "TOTAL",
-        paymentBreakdown: " Detalle del Pago:",
-        unworkedHoursDebt: " Deuda por Horas no Trabajadas:",
-        totalPaidTxt: " Total Pagado:"
-      },
-      history: {
-        title: "Historial de Pagos",
-        empty: "No hay pagos registrados.",
-        loading: "Cargando historial..."
-      }
-    },
 
-    hours: {
-      title: " Registro de Horas",
-      currentTime: "Hora actual",
-      registering: "Registrando...",
-      clockIn: "Registrar Entrada",
-      clockOut: "Registrar Salida",
-      activeSession: "Sesión Activa",
-      entryTime: "Entrada:",
-      stats: {
-        weekHours: "Horas esta Semana",
-        daysWorked: "Días Trabajados",
-        monthHours: "Horas este Mes"
-      },
-      weeklySummary: {
-        title: "📅 Resumen Semanal",
-        refresh: "Actualizar",
-        loading: "Cargando resumen...",
-        calendarHeader: {
-          week: "Semana del ",
-          to: "al",
-          daysWorked: "📅 Días Trabajados: "
+      hours: {
+        title: " Registro de Horas",
+        currentTime: "Hora actual",
+        registering: "Registrando...",
+        clockIn: "Registrar Entrada",
+        clockOut: "Registrar Salida",
+        activeSession: "Sesión Activa",
+        entryTime: "Entrada:",
+        stats: {
+          weekHours: "Horas esta Semana",
+          daysWorked: "Días Trabajados",
+          monthHours: "Horas este Mes"
         },
-        days: {
-          monday: "Lunes",
-          tuesday: "Martes",
-          wednesday: "Miércoles",
-          thursday: "Jueves",
-          friday: "Viernes",
-          saturday: "Sábado",
-          sunday: "Domingo",
-          content: {
+        weeklySummary: {
+          title: "📅 Resumen Semanal",
+          refresh: "Actualizar",
+          loading: "Cargando resumen...",
+          calendarHeader: {
+            week: "Semana del ",
+            to: "al",
+            daysWorked: "📅 Días Trabajados: "
+          },
+          days: {
+            monday: "Lunes",
+            tuesday: "Martes",
+            wednesday: "Miércoles",
+            thursday: "Jueves",
+            friday: "Viernes",
+            saturday: "Sábado",
+            sunday: "Domingo",
+            content: {
+              inProgress: "En curso",
+              entry: "Entrada:",
+              exit: "Salida:",
+              total: "Total:",
+              withoutRegistration: "sin registro",
+              status: {
+                approved: "Aprobado",
+                pending: "Pendiente",
+                rejected: "Rechazado"
+              }
+            }
+          }
+        },
+        history: {
+          title: " Historial de Registros",
+          startDate: "Fecha inicio",
+          endDate: "Fecha fin",
+          filter: "Filtrar",
+          loading: "Cargando registros...",
+          table: {
+            columns: {
+              date: "Fecha",
+              day: "Día",
+              entry: "Entrada",
+              exit: "Salida",
+              total: "Total",
+              actions: "Acciones"
+            },
             inProgress: "En curso",
-            entry: "Entrada:",
-            exit: "Salida:",
-            total: "Total:",
-            withoutRegistration: "sin registro",
-            status: {
-              approved: "Aprobado",
-              pending: "Pendiente",
-              rejected: "Rechazado"
+            row: {
+              days: {
+                sun: "Dom",
+                mon: "Lun",
+                tue: "Mar",
+                wed: "Mié",
+                thu: "Jue",
+                fri: "Vie",
+                sat: "Sáb"
+              }
             }
           }
         }
       },
-      history: {
-        title: " Historial de Registros",
-        startDate: "Fecha inicio",
-        endDate: "Fecha fin",
-        filter: "Filtrar",
-        loading: "Cargando registros...",
-        table: {
-          columns: {
-            date: "Fecha",
-            day: "Día",
-            entry: "Entrada",
-            exit: "Salida",
-            total: "Total",
-            actions: "Acciones"
-          },
-          inProgress: "En curso",
-          row: {
-            days: {
-              sun: "Dom",
-              mon: "Lun",
-              tue: "Mar",
-              wed: "Mié",
-              thu: "Jue",
-              fri: "Vie",
-              sat: "Sáb"
-            }
-          }
+
+      tasks: {
+        title: " Mis Tareas",
+        stats: {
+          pending: "Pendientes",
+          inProgress: "En Progreso",
+          completed: "Completadas"
+        },
+        individualTasks: {
+          noTasks: "No tenés tareas individuales asignadas."
+        },
+        start: "Inicio:",
+        end: "Fin:",
+        createdBy: "Creada por:",
+        core: "Núcleo",
+        updateProgress: "Actualizar Progreso",
+        reportProgress: "Reportar Avance",
+        materials: "Materiales",
+        viewFullDetails: "Ver Detalles Completos",
+        showCompleted: "Mostrar completadas",
+        assignedTasks: "Mis Tareas Asignadas",
+        individual: " Tareas Individuales",
+        family: " Tareas del Núcleo Familiar",
+        loading: "Cargando tareas...",
+        inicio: "Inicio:",
+        fin: "Fin:",
+        creadoPor: "Creada por:",
+        nucleo: "Núcleo",
+
+        tareaVencida: "Esta tarea está vencida.",
+        fechaLimitePasada: "La fecha límite ya pasó.",
+
+        actualizarProgreso: "Actualizar Progreso",
+        reportarAvance: "Reportar Avance",
+        materiales: "Materiales",
+        verDetallesCompletos: "Ver Detalles Completos",
+
+        tareaCompletada: "✓ Tarea completada"
+      },
+
+      documents: {
+        title: "📄 Mis Documentos",
+        subtitle: "Documentación",
+        description: "Accedé a todos tus documentos relacionados con la cooperativa.",
+        stats: {
+          documents: "Documentos",
+          contracts: "Contratos",
+          invoices: "Recibos"
         }
-      }
-    },
-
-    tasks: {
-      title: " Mis Tareas",
-      stats: {
-        pending: "Pendientes",
-        inProgress: "En Progreso",
-        completed: "Completadas"
-      },
-      individualTasks: {
-        noTasks: "No tenés tareas individuales asignadas."
-      },
-      start: "Inicio:",
-      end: "Fin:",
-      createdBy: "Creada por:",
-      core: "Núcleo",
-      updateProgress: "Actualizar Progreso",
-      reportProgress: "Reportar Avance",
-      materials: "Materiales",
-      viewFullDetails: "Ver Detalles Completos",
-      showCompleted: "Mostrar completadas",
-      assignedTasks: "Mis Tareas Asignadas",
-      individual: " Tareas Individuales",
-      family: " Tareas del Núcleo Familiar",
-      loading: "Cargando tareas...",
-      inicio: "Inicio:",
-      fin: "Fin:",
-      creadoPor: "Creada por:",
-      nucleo: "Núcleo",
-
-      tareaVencida: "Esta tarea está vencida.",
-      fechaLimitePasada: "La fecha límite ya pasó.",
-
-      actualizarProgreso: "Actualizar Progreso",
-      reportarAvance: "Reportar Avance",
-      materiales: "Materiales",
-      verDetallesCompletos: "Ver Detalles Completos",
-
-      tareaCompletada: "✓ Tarea completada"
-    },
-
-    documents: {
-      title: "📄 Mis Documentos",
-      subtitle: "Documentación",
-      description: "Accedé a todos tus documentos relacionados con la cooperativa.",
-      stats: {
-        documents: "Documentos",
-        contracts: "Contratos",
-        invoices: "Recibos"
       }
     }
-  }
-},
+  },
 
   en: {
     // Common
@@ -761,8 +761,6 @@ es: {
       december: "December"
     },
 
-    
-
     // Home (Landing Page)
     home: {
       pageTitle: "Gestcoop — Housing Cooperative",
@@ -800,24 +798,23 @@ es: {
       loginError: "Incorrect credentials. Please try again."
     },
 
-  
     // Dashboard Admin
     dashboardAdmin: {
       pageTitle: "Gestcoop — Admin Panel",
 
 
-       sections: {
-    home: "Home",
-    reports: "Reports",
-    users: "Users",
-    family: "Family Unit",
-    housing: "Housing",
-    billing: "Billing",
-    notifications: "Notifications",
-    materials: "Materials",
-    tasks: "Tasks",
-    requests: "Requests"
-  },
+      sections: {
+        home: "Home",
+        reports: "Reports",
+        users: "Users",
+        family: "Family Unit",
+        housing: "Housing",
+        billing: "Billing",
+        notifications: "Notifications",
+        materials: "Materials",
+        tasks: "Tasks",
+        requests: "Requests"
+      },
       home: {
         title: "Home - Administrative Panel",
         welcome: "Welcome to the Administration Panel",
@@ -843,7 +840,39 @@ es: {
         filterSent: "Sent (Pending Approval)",
         filterAccepted: "Accepted",
         filterRejected: "Rejected",
-        searchPlaceholder: "Search user..."
+        searchPlaceholder: "Search user...",
+        table: {
+          columns: {
+            name: "Name",
+            email: "Email",
+            status: "Status",
+            role: "Role",
+            unit: "Family Unit",
+            actions: "Actions",
+            actionsOptions: {
+              approved: "Approved",
+              rejected: "Rejected",
+              pending: "Pending",
+              sent: "Sent",
+              active: "Active",
+              inactive: "Inactive"
+            },
+            idCard: "ID Card",
+            isApproved: "Is Approved",
+            isRejected: "Is Rejected",
+          },
+          modal: {
+              idCard: "ID Card:",
+              email: "Email:",
+              address: "Address:",
+              birthDate: "Birth Date:",
+              role: "Role:",
+              unit: "Family Unit:",
+              dateOfEntry: "Date of Entry:",
+              withoutUnit: "without unit",
+              closeButton: "Close"
+            },
+        },
       },
 
       notifications: {
@@ -881,13 +910,45 @@ es: {
         selectPeriod: " Select Period",
         selectMonth: "Select month...",
         selectYear: "Select year...",
+        generating: "Generating Report...",
+        error: "Error:",
+        errorGeneratingReport: "Error generating report.",
         generate: "Generate Report",
         exportCSV: "Export CSV",
         totalUsers: "Total Users",
         hoursWorked: "Hours Worked",
         completedTasks: "Completed Tasks",
         avgCompliance: "Average Compliance",
-        detailByUser: " Detail by User"
+        detailByUser: " Detail by User",
+        table: {
+          columns: {
+            user: "User",
+            housing: "Housing",
+            hours: "Hours",
+            compliance: "Compliance",
+            debt: "Debt",
+            tasks: "Tasks",
+            fee: "fee",
+            status: "Status"
+          },
+          rows: {
+            unassigned: "Unassigned",
+            completed: "% Completed",
+            withoutTasks: "Without Tasks",
+            status: {
+              unasigned: "Unassigned",
+              paid: "Paid",
+              pending: "Pending",
+              overdue: "Overdue"
+            },
+            statusLevel: {
+              critical: "Critical",
+              good: "Good",
+              regular: "Regular",
+              excellent: "Excellent"
+            },
+          }
+        },
       },
 
       housing: {
@@ -1059,7 +1120,7 @@ es: {
           membersTitle: "Members of the Unit",
           closeModal: "Close"
         },
-        bannerUnit:{
+        bannerUnit: {
           joinMessage: "Do you want to join a Family Core?",
           unitDescription: "Family units allow sharing housing and tasks. Explore the available units and submit a request.",
           viewUnitsButton: "View Units"
@@ -1094,7 +1155,7 @@ es: {
         notSpecified: "Not specified",
         notAvailable: "Not available",
         saving: "Saving...",
-        table:{
+        table: {
           field: "Field",
           information: "Information"
         }
@@ -1204,7 +1265,7 @@ es: {
           title: "No Assigned Housing",
           description1: "You currently do not have a housing assigned in the system.",
           description2: "Don't worry, you can request one by following the steps below.",
-          request: { 
+          request: {
             title: "Formal Request",
             description: "Send an official request through the system. It will be reviewed by the administrative team, and you will receive a response in the next few days.",
             button: "Create Request"
@@ -1222,10 +1283,10 @@ es: {
           description: "To apply for a home or inquire about the allocation process, you can use any of these options:",
           closeButton: "close",
           option1: {
-              title: " Option 1: Formal Request",
-              description: "Send a request from the 'Requests' section of the system. It will be reviewed and processed by the administrative team.",
-              button: "create request"
-            },
+            title: " Option 1: Formal Request",
+            description: "Send a request from the 'Requests' section of the system. It will be reviewed and processed by the administrative team.",
+            button: "create request"
+          },
           option2: {
             title: "📞 Option 2: Direct Contact",
             description: "You can also contact the administration directly:",
@@ -1329,6 +1390,7 @@ es: {
           hoursNotWorkedDebt: "Debt from Hours Not Worked",
           hoursNotWorkedDebtNote: "($160 per hour × missing hours)",
           noHoursNotWorkedDebt: "No hours owed!",
+          notFoundFilters: "No fees found with the selected filters.",
           totalDue: "Total Due",
           totalPaid: "Total Paid",
           totalOverdue: "Total Overdue",
@@ -1340,18 +1402,27 @@ es: {
           paymentEnabled: "Payment Available",
           paymentEnabledNote: "You can make the payment now.",
           dueFeeExpired: "❌ Overdue Installment",
-          dueFeeExpiredNote: "The debt will pile up.",
+          dueFeeExpiredNote: "This payment was not made on time. The debt will accrue to the next month.",
           openPaymentPeriod: "⚠️ Open Payment Period",
-          paid: " Paid",
-          inReview: "⏳ In Review",
-          overdue: "❌ Overdue",
+          blockedPayment: "Payment Blocked",
+          paid: "PAID",
+          inReview: "⏳ IN REVIEW",
+          overdue: "❌ OVERDUE",
+          closeMonth: "CLOSE MONTH",
           day: "DAY",
           toPay: "TO PAY",
           total: "TOTAL",
           totalPaid: "PAID",
           paymentBreakdown: " Payment Breakdown:",
           unworkedHoursDebt: " Debt from Unworked Hours:",
-          totalPaid: " Total Amount Paid:"
+          totalPaid: " Total Amount Paid:",
+          periodOfWorkInProgress: " 🔒 Period of Work in Progress",
+          periodOfWorkInProgressNote1: "The payment period will be enabled in",
+          periodOfWorkInProgressNote2: "(from the 25th of the month).",
+          periodOfWorkInProgressNote3: "For now, focus on achieving your goals.",
+          periodOfWorkInProgressNote4: "21 hours per week",
+          periodOfWorkInProgressNote5: "to avoid additional charges.",
+          otherPendingFees: " Other Fees Pending",
         },
         history: {
           title: "Payment History",
@@ -1368,6 +1439,8 @@ es: {
         clockOut: "Clock Out",
         activeSession: "Active session",
         entryTime: "Entry:",
+        markEntry: "Mark Entry",
+        markExit: "Mark Exit",
         stats: {
           weekHours: "Hours this Week",
           daysWorked: "Days Worked",
@@ -1376,11 +1449,14 @@ es: {
         weeklySummary: {
           title: "📅 Weekly Summary",
           refresh: "Refresh",
-          loading: "Loading summary...",
+          loading: "Loading weekly summary...",
+          errorConnection: "Connection error",
+          errorLoadingSummary: "Error loading weekly summary",
           calendarHeader: {
             week: "Week of ",
             to: "to",
-            daysWorked: "📅 Days Worked: "
+            daysWorked: "📅 Days Worked: ",
+            total: " Total: "
           },
           days: {
             monday: "Monday",
@@ -1404,20 +1480,62 @@ es: {
             }
           },
         },
+        months: {
+          january: "January",
+          february: "February",
+          march: "March",
+          april: "April",
+          may: "May",
+          june: "June",
+          july: "July",
+          august: "August",
+          september: "September",
+          october: "October",
+          november: "November",
+          december: "December"
+        },
+        widget: {
+          title1: "debt of hours",
+          title2: "no outstanding hours",
+          progressMonthly: "Monthly Progress",
+          box: {
+            hoursWorked: "Hours Worked",
+            hoursRequired: "Hours Required",
+            hoursRemaining: "Hours Remaining",
+          },
+          breakdownItem: {
+            currentMonth: "Current Month",
+            cumulative: "Cumulative",
+          },
+        },
         history: {
           title: " Records History",
           startDate: "Start date",
           endDate: "End date",
           filter: "Filter",
           loading: "Loading records...",
+          noRecords: "No records were found to display",
+          errorLoading: "Error loading records",
+          connectionError: "Connection error",
           table: {
             columns: {
               date: "Date",
               day: "Day",
               entry: "Entry",
               exit: "Exit",
+              hoursWorked: "Hours Worked",
+              hoursJustified: "Hours Justified",
+              hoursTotal: "Total Hours",
+              status: "Status",
               total: "Total",
-              actions: "Actions"
+              actions: "Actions",
+              justify: "Justify",
+              openRegistration: "Open Registration",
+              statusTypes: {
+                completed: "✓ Completed",
+                pending: "⏳ in progress",
+                rejected: "Rejected"
+              },
             },
             inProgress: "In progress",
             row: {
@@ -1431,12 +1549,18 @@ es: {
                 sat: "Sat"
               },
             },
-          }
+          },
+          modal: {
+            descriptionTitle: "Record Description",
+            dateLabel: "Date:",
+            closeButton: "Close"
+          },
         }
       },
       tasks: {
         title: " My Tasks",
-
+        errorLoading: "Error loading tasks",
+        connectionError: "Connection error loading tasks",
         stats: {
           pending: "Pending",
           inProgress: "In Progress",
@@ -1449,7 +1573,7 @@ es: {
         start: "Start:",
         end: "End:",
         createdBy: "Created by:",
-        core: "Core",
+        unit: "unit",
         updateProgress: "Update Progress",
         reportProgress: "Report Progress",
         materials: "Materials",
@@ -1462,17 +1586,32 @@ es: {
         inicio: "Start:",
         fin: "End:",
         creadoPor: "Created by:",
-        nucleo: "Core",
-
-        tareaVencida: "This task is overdue.",
-        fechaLimitePasada: "The deadline has already passed.",
+        expiredTask: "This task is overdue.",
+        expiredTaskDesc: "The deadline has already passed.",
 
         actualizarProgreso: "Update Progress",
         reportarAvance: "Report Progress",
         materiales: "Materials",
-        verDetallesCompletos: "View Full Details",
+        viewDetails: "View Full Details",
 
-        tareaCompletada: "✓ Task completed"
+        taskCompleted: "✓ Task completed",
+        materialsModal: {
+          necessary: "necessary",
+          necessaryMaterials: "Necessary Materials",
+          available: "available",
+          insufficient: "insufficient",
+          noMaterialsRequiered: "No materials required for this task",
+          closeButton: "Close",
+          viewFullDetails: "View Full Details",
+          startDate: "Start Date",
+          endDate: "End Date",
+          status: "Status",
+          createdBy: "Created by",
+          priority: "Priority",
+          reportedProgress: "Reported Progress",
+          noReportedProgress: "No progress reported yet",
+          viewAttachmentFile: " 📎View Attachment File"
+        },
       },
 
 
