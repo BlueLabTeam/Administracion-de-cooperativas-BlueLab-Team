@@ -282,23 +282,120 @@ const translations = {
         searchMaterial: "Buscar material...",
         noMaterialsAssigned: "No hay materiales asignados",
         createTask: "Crear Tarea",
-        createdTasks: "Tareas Creadas"
+        createdTasks: "Tareas Creadas",
+        add: "Agregar",
+        quantityPlaceholder: "Cantidad",
+        maxAvailable: "máx",
+        stockUnits: "unidades",
+        availableMaterials: "Materiales Disponibles",
+        taskOverdue: "This task is overdue. Limit date has passed",
+        cancelTask: "Cancelar Tarea",
+        completed:  "Completada"
       },
 
+
       requests: {
-        title: " Gestión de Solicitudes",
+        title: "Gestión de Solicitudes",
+        tableTitle: "Todas las Solicitudes",
+
         inReview: "En Revisión",
         resolved: "Resueltas",
-        highPriority: "Alta Prioridad",
+        highPriority: "Prioridad Alta",
+
         filterAllStates: "Todos los estados",
         filterAllTypes: "Todos los tipos",
         filterAllPriorities: "Todas las prioridades",
+
+        // Tipos de solicitud
         typeHours: "Registro de Horas",
         typePayment: "Pagos/Cuotas",
         typeHousing: "Vivienda",
         typeGeneral: "Consulta General",
-        typeOther: "Otro"
+        typeOther: "Otro",
+
+        // Columnas
+        columnUser: "Usuario",
+        columnSubject: "Asunto",
+        columnType: "Tipo",
+        columnStatus: "Estado",
+        columnPriority: "Prioridad",
+        columnDate: "Fecha",
+        columnReplies: "Respuestas",
+        columnActions: "Acciones",
+
+        // Detalles
+        userInfo: "Información del Usuario",
+        details: "Detalles de la Solicitud",
+        description: "Descripción",
+        viewAttachment: "Ver Archivo Adjunto",
+        reply: "Responder",
+
+        // Para coincidencia exacta con renderDetalleCompleto
+        detailsTitle: "Detalles de la Solicitud",
+        descriptionTitle: "Descripción",
+
+        // Claves faltantes 
+        name: "Nombre",
+        email: "Correo Electrónico",
+        document: "Documento",
+        date: "Fecha",
+        type: "Tipo",
+        status: "Estado",
+        priority: "Prioridad",
+        close: "Cerrar",
+        notificationNoteTitle: "Nota",
+        conversation: "Conversación",
+        markInReview: "Marcar En Revisión",
+        markResolved: "Marcar Resuelta",
+        reject: "Rechazar",
+
+        // Extendidos
+        conversation: "Conversación",
+        quickActions: "Acciones Rápidas",
+        noRepliesYet: "Sin respuestas aún",
+        administrator: "Administrador",
+        viewFile: "Ver Archivo",
+
+        // Acciones
+        markInReview: "Marcar En Revisión",
+        markResolved: "Marcar como Resuelta",
+        reject: "Rechazar",
+
+        noResults: "No hay solicitudes con los filtros seleccionados",
+
+        // Estados
+        statePending: "Pendiente",
+        stateInReview: "En Revisión",
+        stateResolved: "Resuelta",
+        stateRejected: "Rechazada",
+
+        // Prioridades
+        priorityLow: "Baja",
+        priorityMedium: "Media",
+        priorityHigh: "Alta",
+
+        // Modal responder
+        respondAsAdmin: "Responder como Administrador",
+        messageLabel: "Mensaje",
+        messagePlaceholder: "Escribe tu respuesta al usuario...",
+        attachmentLabel: "Archivo Adjunto (Opcional)",
+        attachmentHelp: "Puedes adjuntar documentos de respaldo",
+        notificationNote: "El usuario recibirá una notificación sobre tu respuesta.",
+        sendResponse: "Enviar Respuesta",
+        sending: "Enviando...",
+
+        // Cambio de estado
+        confirmStateChange: "¿Cambiar estado a",
+
+        // Mensajes
+        successResponse: "Respuesta enviada correctamente",
+        errorResponse: "Error al enviar la respuesta",
+        successStateChange: "Estado actualizado correctamente",
+        errorStateChange: "Error al cambiar el estado",
+        errorLoadDetail: "Error al cargar detalle",
+        errorConnection: "Error de conexión"
       }
+
     },
 
     // Dashboard User
@@ -334,16 +431,17 @@ const translations = {
           viewAll: "Ver Todo",
           more: "más"
         },
-      bannerUnit: {
-  joinMessage: "¿Quieres unirte a un Núcleo Familiar?",
-  unitDescription: "Los núcleos familiares permiten compartir vivienda y tareas. Explora los núcleos disponibles y envía una solicitud.",
-  viewUnitsButton: "Ver Núcleos",
-},
+        bannerUnit: {
+          joinMessage: "¿Quieres unirte a un Núcleo Familiar?",
+          unitDescription: "Los núcleos familiares permiten compartir vivienda y tareas. Explora los núcleos disponibles y envía una solicitud.",
+          viewUnitsButton: "Ver Núcleos",
+        },
 
-modalunirse: { 
-  title: "Núcleos Disponibles", 
-  description: "No estás en ningún núcleo. **Elige el núcleo deseado** y presiona 'Enviar Petición' para **ir a la sección de solicitudes** y gestionar tu petición con un administrador.", 
-  detail: "Ver Núcleos", },
+        modalunirse: {
+          title: "Núcleos Disponibles",
+          description: "No estás en ningún núcleo. **Elige el núcleo deseado** y presiona 'Enviar Petición' para **ir a la sección de solicitudes** y gestionar tu petición con un administrador.",
+          detail: "Ver Núcleos",
+        },
 
 
 
@@ -875,16 +973,16 @@ modalunirse: {
             isRejected: "Is Rejected",
           },
           modal: {
-              idCard: "ID Card:",
-              email: "Email:",
-              address: "Address:",
-              birthDate: "Birth Date:",
-              role: "Role:",
-              unit: "Family Unit:",
-              dateOfEntry: "Date of Entry:",
-              withoutUnit: "without unit",
-              closeButton: "Close"
-            },
+            idCard: "ID Card:",
+            email: "Email:",
+            address: "Address:",
+            birthDate: "Birth Date:",
+            role: "Role:",
+            unit: "Family Unit:",
+            dateOfEntry: "Date of Entry:",
+            withoutUnit: "without unit",
+            closeButton: "Close"
+          },
         },
       },
 
@@ -925,7 +1023,7 @@ modalunirse: {
             constituents: "Constituents",
             actions: "Actions"
           },
-          rows : {
+          rows: {
             noName: "without name",
             noMembers: "No members in this unit",
             member: "member",
@@ -937,7 +1035,7 @@ modalunirse: {
               membersTitle: "Unit Members",
               noMembers: "No members in this unit",
               editButton: "Edit Unit",
-              modalEdit:{
+              modalEdit: {
                 title: "Edit Family Unit",
                 nameLabel: "Unit Name *",
                 namePlaceholder: "Ex: The Smiths",
@@ -1053,11 +1151,11 @@ modalunirse: {
             assignedTo: "Assigned To",
             actions: "Actions"
           },
-          rows : {
+          rows: {
             noAssigned: "Not assigned",
             noHousings: "No housings registered",
             createFirstHousing: "Create the first housing",
-            status:{
+            status: {
               available: "Available",
               occupied: "Occupied",
               maintenance: "Under Maintenance"
@@ -1162,23 +1260,135 @@ modalunirse: {
         searchMaterial: "Search material...",
         noMaterialsAssigned: "No materials assigned",
         createTask: "Create Task",
-        createdTasks: "Created Tasks"
+        createdTasks: "Created Tasks",
+        add: "Add",
+        quantityPlaceholder: "Quantity",
+        maxAvailable: "max",
+        stockUnits: "units",
+        availableMaterials: "Available Materials",
+        materialsAssigned: "Materials Assigned",
+        priorityLow: "Low",
+        priorityMedium: "Medium",
+        priorityHigh: "High",
+        statePending: "Pending",
+        stateInProgress: "In Progress",
+        stateCompleted: "Completed",
+        stateCanceled: "Canceled",
+        start: "Start:",
+        end: "End:",
+        createdBy: "Created by:",
+        assignedTo: "Assigned to:",
+        generalProgress: "General Progress",
+        cancelTask: "Cancel Task",
+        completed:  "Completed",
+        required: "Required",
       },
 
       requests: {
-        title: " Request Management",
+        title: "Request Management",
+        tableTitle: "User Requests",
+
         inReview: "In Review",
         resolved: "Resolved",
         highPriority: "High Priority",
+
         filterAllStates: "All states",
         filterAllTypes: "All types",
         filterAllPriorities: "All priorities",
+
+        // Types
         typeHours: "Hours Log",
         typePayment: "Payments/Fees",
         typeHousing: "Housing",
         typeGeneral: "General Inquiry",
-        typeOther: "Other"
+        typeOther: "Other",
+
+        // Columns
+        columnUser: "User",
+        columnSubject: "Subject",
+        columnType: "Type",
+        columnStatus: "Status",
+        columnPriority: "Priority",
+        columnDate: "Date",
+        columnReplies: "Replies",
+        columnActions: "Actions",
+
+        // Details
+        userInfo: "User Information",
+        details: "Request Details",
+        description: "Description",
+        viewAttachment: "View Attachment",
+        reply: "Reply",
+
+        // Titles used in HTML
+        detailsTitle: "Request Details",
+        descriptionTitle: "Description",
+
+        // **Added for the Detail modal**
+        name: "Name",
+        email: "Email",
+        document: "Document",
+        date: "Date",
+        type: "Type",
+        status: "Status",
+        priority: "Priority",
+        close: "Close",
+        notificationNoteTitle: "Note",
+        conversation: "Conversation",
+        markInReview: "markInReview",
+        markResolved: "markResolved",
+        reject: "Reject",
+
+
+        // Extended UI
+        conversation: "Conversation",
+        quickActions: "Quick Actions",
+        noRepliesYet: "No replies yet",
+        administrator: "Administrator",
+        viewFile: "View File",
+
+        // Actions
+        markInReview: "Mark as In Review",
+        markResolved: "Mark as Resolved",
+        reject: "Reject",
+
+        noResults: "No requests match the selected filters",
+
+        // Statuses
+        statePending: "Pending",
+        stateInReview: "In Review",
+        stateResolved: "Resolved",
+        stateRejected: "Rejected",
+
+        // Priorities
+        priorityLow: "Low",
+        priorityMedium: "Medium",
+        priorityHigh: "High",
+
+        // Respond modal
+        respondAsAdmin: "Reply as Administrator",
+        messageLabel: "Message",
+        messagePlaceholder: "Write your response to the user...",
+        attachmentLabel: "Attachment (Optional)",
+        attachmentHelp: "You may attach supporting documents",
+        notificationNote: "The user will receive a notification about your response.",
+        sendResponse: "Send Response",
+        sending: "Sending...",
+
+        // State change
+        confirmStateChange: "Change status to",
+
+        // Messages
+        successResponse: "Response sent successfully",
+        errorResponse: "Error sending the response",
+        successStateChange: "Status updated successfully",
+        errorStateChange: "Error updating status",
+        errorLoadDetail: "Error loading details",
+        errorConnection: "Connection error"
       }
+
+
+
     },
 
     // Dashboard User
@@ -1229,11 +1439,11 @@ modalunirse: {
           viewUnitsButton: "View Units",
           modalDescription: "You are not in any core. Choose your desired core and press 'Send Request' to go to the requests section and manage your request with an administrator."
         },
-         modalunirse: {
-  title: "Available Cores",
-  description: "You are not in any core. **Choose the desired core** and press 'Send Request' to **go to the requests section** and manage your request with an administrator.",
-  detail: "View Cores",
-},
+        modalunirse: {
+          title: "Available Cores",
+          description: "You are not in any core. **Choose the desired core** and press 'Send Request' to **go to the requests section** and manage your request with an administrator.",
+          detail: "View Cores",
+        },
 
         stats: {
           contributions: "Current Contributions",
@@ -1262,7 +1472,7 @@ modalunirse: {
         currentPasswordPlaceholder: "Leave blank if you don't want to change it",
         newPassword: "New Password",
         confirmPassword: "Confirm New Password",
-        
+
         notSpecified: "Not specified",
         notAvailable: "Not available",
         saving: "Saving...",
