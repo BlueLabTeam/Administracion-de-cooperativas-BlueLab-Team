@@ -174,7 +174,7 @@
                                 <i class="fas fa-boxes"></i>
                             </button>
                             
-                            <button class="btn-small btn-secondary" 
+                            <button class="btn-small btn-primary" 
                                     onclick="MaterialesModule.edit(${material.id_material})" 
                                     title="Editar">
                                 <i class="fas fa-edit"></i>

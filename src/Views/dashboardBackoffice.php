@@ -90,7 +90,8 @@
 
 					<div class="form-group">
 						<label for="mensaje" data-i18n="dashboardAdmin.notifications.messageLabel">Mensaje:</label>
-						<textarea id="mensaje" name="mensaje" rows="4" required></textarea>
+					<textarea id="mensaje" name="mensaje" rows="4" required style="resize: none;"></textarea>
+
 					</div>
 
 					<div class="form-group">
@@ -314,7 +315,12 @@
             
             <div class="material-form-group">
                 <label for="vivienda-observaciones" data-i18n="common.observations">Observaciones</label>
-                <textarea id="vivienda-observaciones" data-i18n-placeholder="dashboardAdmin.housing.observationsPlaceholder" placeholder="Notas adicionales..."></textarea>
+                <textarea 
+    id="vivienda-observaciones" 
+    data-i18n-placeholder="dashboardAdmin.housing.observationsPlaceholder" 
+    placeholder="Notas adicionales..."
+    style="resize: none;">
+</textarea>
             </div>
             
             <div class="material-form-actions">
@@ -366,7 +372,7 @@
 
             <div class="form-group">
                 <label for="asignar-observaciones" data-i18n="common.observations">Observaciones</label>
-                <textarea id="asignar-observaciones" rows="3"></textarea>
+                <textarea id="asignar-observaciones" rows="3" required style="resize: none;"></textarea>
             </div>
 
             <div class="form-actions">
@@ -616,7 +622,7 @@
                 <label style="color:#6C757D;font-size:13px;font-weight:600;display:block;margin-bottom:8px;">
                     Observaciones (opcional):
                 </label>
-                <textarea id="validar-observaciones" rows="3" placeholder="Agrega comentarios sobre esta validación..." style="width:100%;padding:12px;border:2px solid #E8EBF0;border-radius:8px;font-size:14px;font-family:inherit;resize:vertical;"></textarea>
+                <textarea id="validar-observaciones" rows="3" placeholder="Agrega comentarios sobre esta validación..." style="width:100%;padding:12px;border:2px solid #E8EBF0;border-radius:8px;font-size:14px;font-family:inherit;resize:vertical;"required style="resize: none;"></textarea>
             </div>
             
             <!-- Botones -->
@@ -674,7 +680,7 @@
 					
 					<div class="material-form-group">
 						<label for="material-caracteristicas" data-i18n="dashboardAdmin.materials.characteristics">Características / Descripción</label>
-						<textarea id="material-caracteristicas" data-i18n-placeholder="dashboardAdmin.materials.characteristicsPlaceholder" placeholder="Describe el material, sus especificaciones, etc."  maxlength="250"></textarea>
+						<textarea id="material-caracteristicas" data-i18n-placeholder="dashboardAdmin.materials.characteristicsPlaceholder" placeholder="Describe el material, sus especificaciones, etc."  maxlength="250"required style="resize: none;"></textarea>
 					</div>
 					
 					<div class="material-form-actions">
@@ -732,7 +738,7 @@
 
 					<div class="form-group">
 						<label for="descripcion_tarea" data-i18n="dashboardAdmin.tasks.descriptionLabel">Descripción:</label>
-						<textarea id="descripcion_tarea" name="descripcion" rows="8" required></textarea>
+						<textarea id="descripcion_tarea" name="descripcion" rows="8" required required style="resize: none;"></textarea>
 					</div>
 				</div>
 

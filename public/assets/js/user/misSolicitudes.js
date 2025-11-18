@@ -310,19 +310,21 @@ function abrirModalNuevaSolicitud() {
                             <i class="fas fa-align-left"></i> <span data-i18n="dashboardUser.requests.form.descriptionLabel">Descripción *</span>
                         </label>
                         <textarea 
-                            id="descripcion-solicitud" 
-                            name="descripcion"
-                            rows="6"
-                            maxlength="250"
-                            placeholder="Describe detalladamente tu solicitud..."
-                            required
-                            style="resize: vertical; width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; font-size: 14px;"
-                            oninput="actualizarContadorCaracteres(this)"
-                            data-i18n-placeholder="dashboardUser.requests.form.descriptionPlaceholder"
-                        ></textarea>
-                        <small id="charCount" style="color: #666; display: block; text-align: right; margin-top: 4px;">
-                            0 / 250 caracteres
-                        </small>
+    id="descripcion-solicitud" 
+    name="descripcion"
+    rows="6"
+    maxlength="250"
+    placeholder="Describe detalladamente tu solicitud..."
+    required
+    style="resize: none; width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; font-size: 14px;"
+    oninput="actualizarContadorCaracteres(this)"
+    data-i18n-placeholder="dashboardUser.requests.form.descriptionPlaceholder"
+></textarea>
+
+<small id="charCount" style="color: #666; display: block; text-align: right; margin-top: 4px;">
+    0 / 250 caracteres
+</small>
+
                     </div>
 
                     <div class="form-group">
@@ -607,7 +609,7 @@ function responderSolicitud(solicitudId) {
                             rows="6"
                             placeholder="Escribe tu respuesta o información adicional..."
                             data-i18n-placeholder="dashboardUser.requests.answerForm.responsePlaceholder"
-                            required></textarea>
+                            required required style="resize: none;"></textarea>
                     </div>
 
                     <div class="form-group">
