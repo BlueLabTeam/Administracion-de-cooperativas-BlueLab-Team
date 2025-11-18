@@ -47,12 +47,12 @@ public function generarReporteMensual()
         $anioActual = intval(date('Y'));
         $anioValido = ($anio >= 2025 && $anio <= ($anioActual + 5));
 
-        error_log("🔍 VALIDACIONES:");
+        error_log(" VALIDACIONES:");
         error_log("   Mes válido (1-12)? " . ($mesValido ? 'SÍ' : 'NO'));
         error_log("   Año válido (2025-" . ($anioActual + 5) . ")? " . ($anioValido ? 'SÍ' : 'NO'));
 
         if (!$mesValido || !$anioValido) {
-            error_log("❌ VALIDACIÓN FALLÓ");
+            error_log(" VALIDACIÓN FALLÓ");
             error_log("   Condición 1: mes=$mes (debe ser 1-12)");
             error_log("   Condición 2: anio=$anio (debe ser 2020-" . ($anioActual + 5) . ")");
             

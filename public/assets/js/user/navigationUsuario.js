@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Cargar datos según la sección
                 cargarDatosSeccionUsuario(section);
             } else {
-                console.error(`❌ [NAV-USER] Sección no encontrada: ${section}-section`);
+                console.error(` [NAV-USER] Sección no encontrada: ${section}-section`);
             }
         });
     });
@@ -89,7 +89,7 @@ function cargarDatosSeccionUsuario(section) {
             if (typeof inicializarSeccionHoras === 'function') {
                 inicializarSeccionHoras();
             } else {
-                console.error('❌ [NAV-USER] inicializarSeccionHoras no definida');
+                console.error(' [NAV-USER] inicializarSeccionHoras no definida');
             }
             break;
 
@@ -99,7 +99,7 @@ function cargarDatosSeccionUsuario(section) {
             if (typeof loadUserTasks === 'function') {
                 loadUserTasks();
             } else {
-                console.error('❌ [NAV-USER] loadUserTasks no definida');
+                console.error(' [NAV-USER] loadUserTasks no definida');
             }
             break;
 
@@ -119,7 +119,7 @@ function cargarDatosSeccionUsuario(section) {
             if (typeof inicializarSeccionCuotas === 'function') {
                 inicializarSeccionCuotas();
             } else {
-                console.error('❌ [NAV-USER] inicializarSeccionCuotas no definida');
+                console.error(' [NAV-USER] inicializarSeccionCuotas no definida');
             }
             break;
 
@@ -129,7 +129,7 @@ function cargarDatosSeccionUsuario(section) {
             if (typeof loadMisSolicitudes === 'function') {
                 loadMisSolicitudes();
             } else {
-                console.error('❌ [NAV-USER] loadMisSolicitudes no definida');
+                console.error(' [NAV-USER] loadMisSolicitudes no definida');
             }
             break;
 
@@ -154,7 +154,7 @@ function verificarFuncionDisponible(nombreFuncion, seccion) {
         console.log(` [NAV-USER] ${nombreFuncion} disponible para ${seccion}`);
         return true;
     } else {
-        console.error(`❌ [NAV-USER] ${nombreFuncion} NO está definida para ${seccion}`);
+        console.error(` [NAV-USER] ${nombreFuncion} NO está definida para ${seccion}`);
         return false;
     }
 }
@@ -172,7 +172,7 @@ function navegarASeccion(seccionNombre) {
     if (menuItem) {
         menuItem.click();
     } else {
-        console.error(`❌ [NAV-USER] No se encontró menu item para: ${seccionNombre}`);
+        console.error(` [NAV-USER] No se encontró menu item para: ${seccionNombre}`);
     }
 }
 
@@ -201,7 +201,7 @@ function obtenerSeccionActual() {
  */
 function onCambioSeccion(callback) {
     if (typeof callback !== 'function') {
-        console.error('❌ [NAV-USER] onCambioSeccion requiere una función');
+        console.error(' [NAV-USER] onCambioSeccion requiere una función');
         return;
     }
     

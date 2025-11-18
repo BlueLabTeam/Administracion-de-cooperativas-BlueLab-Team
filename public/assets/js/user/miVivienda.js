@@ -29,7 +29,7 @@ function loadMyVivienda() {
     const container = document.getElementById('myViviendaContainer');
 
     if (!container) {
-        console.error('❌ Container myViviendaContainer NO encontrado');
+        console.error(' Container myViviendaContainer NO encontrado');
         return;
     }
 
@@ -65,13 +65,13 @@ function loadMyVivienda() {
                     renderSinVivienda(container);
                 }
             } else {
-                console.error('❌ Error en respuesta:', data.message);
+                console.error(' Error en respuesta:', data.message);
                 renderError(container, data.message);
             }
         })
         .catch(error => {
             console.error('==========================================');
-            console.error('❌ ERROR CAPTURADO:');
+            console.error(' ERROR CAPTURADO:');
             console.error('   - Mensaje:', error.message);
             console.error('   - Stack:', error.stack);
             console.error('==========================================');
@@ -85,7 +85,7 @@ function loadMyVivienda() {
 }
 
 // ==========================================
-// 🎨 RENDERIZAR VIVIENDA (DISEÑO PREMIUM)
+//  RENDERIZAR VIVIENDA (DISEÑO PREMIUM)
 // ==========================================
 
 /**
@@ -774,7 +774,7 @@ function renderSinVivienda(container) {
  * Renderizar mensaje de error
  */
 function renderError(container, mensaje) {
-    console.error('❌ Renderizando error:', mensaje);
+    console.error(' Renderizando error:', mensaje);
     
     container.innerHTML = `
         <div style="

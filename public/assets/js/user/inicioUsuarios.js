@@ -1,7 +1,6 @@
 // ==========================================
-//  MÓDULO: INICIO USUARIO
+//  MÓDULO: INICIO USUARIO (CORREGIDO)
 // Gestiona la sección de inicio del dashboard de usuario
-// Incluye: notificaciones, núcleo familiar, datos de perfil
 // ==========================================
 
 console.log('🟢 Cargando módulo de inicio de usuario');
@@ -12,29 +11,22 @@ let verificacionEnCurso = false;
 
 // ========== INICIALIZACIÓN ==========
 document.addEventListener('DOMContentLoaded', function() {
-    console.log(' Inicializando módulo de inicio');
+    console.log('📋 Inicializando módulo de inicio');
     
-    // Cargar datos del usuario
     cargarDatosUsuario();
-    
-    // Cargar notificaciones
     loadNotifications();
     setInterval(loadNotifications, 120000); // Cada 2 minutos
     
-    // Verificar estado de núcleo (después de un momento)
     setTimeout(() => {
         if (!nucleoYaCargado && !verificacionEnCurso) {
             verificarEstadoNucleo();
         }
     }, 500);
     
-    // Listener para cuando se hace click en "Inicio"
     const inicioMenuItem = document.querySelector('.menu li[data-section="inicio"]');
     if (inicioMenuItem) {
         inicioMenuItem.addEventListener('click', function() {
-            console.log(' Click en sección Inicio');
-            
-            // Solo recargar núcleo si no se ha mostrado aún
+            console.log('🖱️ Click en sección Inicio');
             if (!nucleoYaCargado) {
                 setTimeout(() => {
                     verificarEstadoNucleo();
@@ -48,9 +40,6 @@ document.addEventListener('DOMContentLoaded', function() {
 //  SISTEMA DE NOTIFICACIONES
 // ==========================================
 
-/**
- * Cargar notificaciones del usuario
- */
 async function loadNotifications() {
     try {
         const response = await fetch('/api/notifications/user');
@@ -69,20 +58,15 @@ async function loadNotifications() {
     }
 }
 
-/**
- * Renderizar lista de notificaciones
- */
 function renderNotifications(notifications, unreadCount) {
     const badge = document.getElementById('notificationsBadge');
     const list = document.getElementById('notificationsList');
 
     if (!badge || !list) return;
 
-    // Actualizar badge
     badge.textContent = unreadCount;
     badge.className = 'notifications-badge' + (unreadCount === 0 ? ' zero' : '');
 
-    // Renderizar lista
     if (notifications.length === 0) {
         list.innerHTML = '<div class="no-notifications" data-i18n="dashboardUser.home.notificationsContent.noNotifications">No tienes notificaciones</div>';
         i18n.translatePage();
@@ -112,22 +96,16 @@ function renderNotifications(notifications, unreadCount) {
     i18n.translatePage();
 }
 
-/**
- * Obtener icono según tipo de notificación
- */
 function getTipoIcon(tipo) {
     const icons = {
-        'info': '',
+        'info': 'ℹ️',
         'importante': '⚠️',
-        'urgente': '',
+        'urgente': '🔥',
         'exito': ''
     };
-    return icons[tipo] || '';
+    return icons[tipo] || 'ℹ️';
 }
 
-/**
- * Formatear fecha relativa
- */
 function formatearFecha(fecha) {
     const ahora = new Date();
     const diff = ahora - fecha;
@@ -147,9 +125,6 @@ function formatearFecha(fecha) {
     });
 }
 
-/**
- * Marcar notificación como leída
- */
 async function markAsRead(notifId, element) {
     if (!element.classList.contains('unread')) return;
 
@@ -183,12 +158,7 @@ async function markAsRead(notifId, element) {
 // 👨‍👩‍👧 SISTEMA DE NÚCLEO FAMILIAR
 // ==========================================
 
-/**
- * Verificar si el usuario tiene núcleo o debe solicitar uno
- *  CON PROTECCIÓN CONTRA DUPLICADOS
- */
 async function verificarEstadoNucleo() {
-    // PROTECCIÓN: Evitar múltiples ejecuciones simultáneas
     if (verificacionEnCurso) {
         console.log('⏳ Verificación ya en curso, saltando...');
         return;
@@ -200,59 +170,53 @@ async function verificarEstadoNucleo() {
     }
     
     verificacionEnCurso = true;
-    console.log('🔍 Verificando estado de núcleo...');
+    console.log(' Verificando estado de núcleo...');
     
     try {
         const response = await fetch('/api/users/my-profile');
         const data = await response.json();
         
-        console.log(' Datos de perfil:', data);
+        console.log('📄 Datos de perfil:', data);
         
         if (data.success && data.user) {
-            // 🎯 BUSCAR SECCIÓN DE INICIO
             const inicioSection = document.getElementById('inicio-section');
             
             if (!inicioSection) {
-                console.error('❌ No se encontró la sección de inicio');
+                console.error(' No se encontró la sección de inicio');
                 verificacionEnCurso = false;
                 return;
             }
             
-            // LIMPIAR CUALQUIER CARD/BANNER ANTERIOR
+            // LIMPIAR elementos anteriores
             const elementosAnteriores = inicioSection.querySelectorAll('.nucleo-info-card, .banner-nucleo-invitation');
-            
             if (elementosAnteriores.length > 0) {
                 console.log('🗑️ Removiendo', elementosAnteriores.length, 'elementos anteriores');
                 elementosAnteriores.forEach(el => el.remove());
             }
             
             const idNucleo = data.user.id_nucleo;
-            console.log('🔍 id_nucleo del usuario:', idNucleo);
+            console.log(' id_nucleo del usuario:', idNucleo);
             
             if (idNucleo) {
-                //  TIENE NÚCLEO - Mostrar info
+                
                 console.log(' Usuario tiene núcleo:', idNucleo);
                 await mostrarInfoNucleoEnInicio(idNucleo, inicioSection);
             } else {
-                // ❌ NO TIENE NÚCLEO - Mostrar banner
+                
                 console.log('⚠️ Usuario sin núcleo, mostrando banner');
                 mostrarBannerNucleoEnInicio(inicioSection);
             }
             
-            //  Marcar como cargado
             nucleoYaCargado = true;
             console.log(' Núcleo cargado correctamente');
         }
     } catch (error) {
-        console.error('❌ Error al verificar núcleo:', error);
+        console.error(' Error al verificar núcleo:', error);
     } finally {
         verificacionEnCurso = false;
     }
 }
 
-/**
- * Mostrar información del núcleo en la sección de inicio
- */
 async function mostrarInfoNucleoEnInicio(idNucleo, inicioSection) {
     try {
         console.log('📡 Cargando info del núcleo para inicio...');
@@ -261,7 +225,7 @@ async function mostrarInfoNucleoEnInicio(idNucleo, inicioSection) {
         const data = await response.json();
         
         if (!data.success || !data.nucleo) {
-            console.error('❌ Error al cargar núcleo');
+            console.error(' Error al cargar núcleo');
             return;
         }
         
@@ -274,7 +238,6 @@ async function mostrarInfoNucleoEnInicio(idNucleo, inicioSection) {
         let miembrosHTML = '';
         
         if (miembros.length > 0) {
-            // Mostrar hasta 4 miembros
             const miembrosMostrar = miembros.slice(0, 4);
             const miembrosRestantes = miembros.length - 4;
             
@@ -343,7 +306,7 @@ async function mostrarInfoNucleoEnInicio(idNucleo, inicioSection) {
                         backdrop-filter: blur(10px);
                         flex-shrink: 0;
                     ">
-                        👨‍👩‍👧
+                        
                     </div>
                     <div style="flex: 1;">
                         <p style="margin: 0 0 5px 0; opacity: 0.9; font-size: 13px; font-weight: 500;" data-i18n="dashboardUser.home.nucleoInfoCard.title">
@@ -390,7 +353,6 @@ async function mostrarInfoNucleoEnInicio(idNucleo, inicioSection) {
             </div>
         `;
         
-        // Insertar después del título
         const tituloInicio = inicioSection.querySelector('.section-title, h2');
         if (tituloInicio) {
             tituloInicio.insertAdjacentHTML('afterend', infoHTML);
@@ -401,14 +363,13 @@ async function mostrarInfoNucleoEnInicio(idNucleo, inicioSection) {
         console.log(' Card de núcleo insertado en inicio');
         
     } catch (error) {
-        console.error('❌ Error al mostrar núcleo en inicio:', error);
+        console.error(' Error al mostrar núcleo en inicio:', error);
     }
 }
 
-/**
- * Mostrar banner para unirse a un núcleo
- */
 function mostrarBannerNucleoEnInicio(inicioSection) {
+    console.log('📢 Mostrando banner de invitación a núcleo');
+    
     const banner = `
         <div class="banner-nucleo-invitation" style="
             background: linear-gradient(135deg, #69b2d5 0%, #1b1397 100%); 
@@ -422,35 +383,39 @@ function mostrarBannerNucleoEnInicio(inicioSection) {
             <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
                 <div style="font-size: 48px;"></div>
                 <div style="flex: 1; min-width: 250px;">
-                    <h3 style="margin: 0 0 10px 0; font-size: 20px;" data-i18n="dashboardUser.home.bannerUnit.joinMessage">¿Quieres unirte a un Núcleo Familiar?</h3>
-                    <p style="margin: 0; opacity: 0.9;" data-i18n="dashboardUser.home.bannerUnit.unitDescription">
+                    <h3 style="margin: 0 0 10px 0; font-size: 20px;" data-i18n="dashboardUser.home.bannerUnit.joinMessage">
+                        ¿Quieres unirte a un Núcleo Familiar?
+                    </h3>
+                    <p style="margin: 0; opacity: 0.9;" data-i18n="dashboardUser.home.modalunirse.unitDescription">
                         Los núcleos familiares permiten compartir viviendas y tareas. 
                         Explora los núcleos disponibles y envía una solicitud.
                     </p>
                 </div>
                 <button 
-                    onclick="abrirModalNucleosDisponibles()" 
-                    class="btn btn-light"
+                    onclick="mostrarNucleosDisponibles()" 
+                    class="btn btn-primary"
                     style="
                         padding: 12px 24px; 
-                        font-weight: 600; 
-                        background: white; 
-                        color: #667eea; 
-                        border: none; 
-                        border-radius: 8px; 
+                        font-weight: 700; 
+                        background: #00bcd4; 
+                        color: white; 
+                        border: 2px solid #00bcd4; 
+                        border-radius: 25px; 
                         cursor: pointer;
-                        transition: all 0.3s ease;
+                        transition: all 0.3s ease-in-out;
                         white-space: nowrap;
+                        text-transform: uppercase;
+                        letter-spacing: 1px;
+                        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
                     "
-                    onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.2)';"
-                    onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none';">
+                    onmouseover="this.style.background='#0097a7'; this.style.borderColor='#0097a7'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 15px rgba(0,0,0,0.3)';"
+                    onmouseout="this.style.background='#00bcd4'; this.style.borderColor='#00bcd4'; this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 4px rgba(0,0,0,0.2)';">
                     <i class="fas fa-users"></i> <span data-i18n="dashboardUser.home.bannerUnit.viewUnitsButton">Ver Núcleos</span>
                 </button>
             </div>
         </div>
     `;
     
-    // Insertar al principio (después del título)
     const tituloInicio = inicioSection.querySelector('.section-title, h2');
     
     if (tituloInicio) {
@@ -463,16 +428,116 @@ function mostrarBannerNucleoEnInicio(inicioSection) {
     console.log(' Banner de núcleo insertado en inicio');
 }
 
-/**
- * Ver detalles del núcleo desde el inicio
- */
+async function mostrarNucleosDisponibles() {
+    console.log(' Cargando núcleos disponibles...');
+    
+    try {
+        const response = await fetch('/api/nucleos/disponibles');
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+            alert(' No se pudo conectar al servidor para cargar los núcleos disponibles.');
+            return;
+        }
+
+        const nucleosDisponibles = data.nucleos || [];
+        console.log('📋 Núcleos encontrados:', nucleosDisponibles.length);
+
+        let nucleosHTML = '';
+        if (nucleosDisponibles.length > 0) {
+            nucleosHTML = `
+                <div class="nucleos-grid" style="display: grid; gap: 15px; margin-top: 20px;">
+                    ${nucleosDisponibles.map(nucleo => `
+                        <div style="
+                            background: #ffffff;
+                            padding: 20px;
+                            border-radius: 10px;
+                            border: 1px solid #e0e0e0;
+                            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                            flex-wrap: wrap;
+                            transition: box-shadow 0.2s;
+                        " onmouseover="this.style.boxShadow='0 6px 10px rgba(0, 0, 0, 0.1)'" onmouseout="this.style.boxShadow='0 4px 6px rgba(0, 0, 0, 0.05)'">
+                            
+                            <div style="flex: 1; min-width: 180px;">
+                                <i class="fas fa-home" style="color: #69b2d5; margin-right: 8px;"></i>
+                                <strong style="color: #1b1397; display: block; font-size: 16px; margin-bottom: 4px;">
+                                    ${nucleo.nombre_nucleo}
+                                </strong>
+                               <small style="color: #6c757d;">
+    <i class="fas fa-users" style="margin-right: 4px;"></i> 
+    <span data-i18n="dashboardUser.home.modalunirse.detail"></span>: 
+    ${nucleo.total_miembros || 0}
+</small>
+
+                            </div>
+                            
+                           
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        } else {
+            nucleosHTML = '<p style="color: #999; text-align: center; margin-top: 20px; padding: 20px; border: 1px dashed #ccc; border-radius: 8px;" data-i18n="dashboardUser.home.availableCores.noCores">No hay núcleos disponibles para unirse en este momento.</p>';
+        }
+
+        const modal = `
+          <div id="detallesNucleoModal" class="material-modal" onclick="cerrarModalDetallesNucleo()" style="display: flex;">
+    <div class="material-modal-content" onclick="event.stopPropagation()" style="max-width: 600px; width: 90%; background: #f9f9f9; border-radius: 15px; overflow: hidden;">
+        <div class="material-modal-header" style="background: linear-gradient(90deg, #69b2d5, #1b1397); color: white; padding: 20px 24px; border-bottom: none;">
+            <h3 style="margin: 0; font-size: 22px; display: flex; align-items: center;">
+                <i class="fas fa-search" style="margin-right: 10px;"></i>
+                <span data-i18n="dashboardUser.home.modalunirse.title">Núcleos Disponibles</span>
+            </h3>
+            <button class="close-material-modal" onclick="cerrarModalDetallesNucleo()" style="color: white; opacity: 0.8; font-size: 30px; top: 10px; right: 15px;">&times;</button>
+        </div>
+        
+        <div style="padding: 24px;">
+          <p 
+    data-i18n="dashboardUser.home.modalunirse.description"
+    style="margin-bottom: 25px; color: #555; border-left: 3px solid #69b2d5; padding-left: 10px;"
+>
+    No estás en ningún núcleo. **Elige el núcleo deseado** y presiona 'Enviar Petición' para **ir a la sección de solicitudes** y gestionar tu petición con un administrador.
+</p>
+
+                        ${nucleosHTML}
+                        
+                        <div class="form-actions" style="margin-top: 30px; text-align: right;">
+                           
+                               
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        const existingModal = document.getElementById('detallesNucleoModal');
+        if (existingModal) existingModal.remove();
+
+        document.body.insertAdjacentHTML('beforeend', modal);
+        if (typeof i18n !== 'undefined' && i18n.translatePage) { 
+            i18n.translatePage();
+        }
+        document.body.style.overflow = 'hidden';
+
+    } catch (error) {
+        console.error(' Error al cargar núcleos disponibles:', error);
+        alert(' Error al cargar los núcleos disponibles. Verifica la conexión con la API.');
+    }
+}
+
+
+
+
 async function verDetallesNucleoDesdeInicio(idNucleo) {
     try {
         const response = await fetch(`/api/nucleos/mi-nucleo-info`);
         const data = await response.json();
         
         if (!data.success) {
-            alert('❌ Error al cargar detalles del núcleo');
+            alert(' Error al cargar detalles del núcleo');
             return;
         }
         
@@ -520,7 +585,6 @@ async function verDetallesNucleoDesdeInicio(idNucleo) {
             `;
         } else {
             miembrosHTML = '<p style="color: #999; text-align: center; margin-top: 20px;" data-i18n="dashboardUser.home.withoutMembers">No hay miembros en este núcleo</p>';
-            i18n.translatePage();
         }
         
         const modal = `
@@ -577,35 +641,26 @@ async function verDetallesNucleoDesdeInicio(idNucleo) {
         
         document.body.insertAdjacentHTML('beforeend', modal);
         i18n.translatePage();
-        
-        // Prevenir scroll del body
         document.body.style.overflow = 'hidden';
         
     } catch (error) {
         console.error('Error al cargar detalles del núcleo:', error);
-        alert('❌ Error al cargar los detalles del núcleo');
+        alert(' Error al cargar los detalles del núcleo');
     }
 }
 
-/**
- * Cerrar modal de detalles de núcleo
- */
 function cerrarModalDetallesNucleo() {
     const modal = document.getElementById('detallesNucleoModal');
     if (modal) {
         modal.remove();
     }
-    
-    // Restaurar scroll del body
     document.body.style.overflow = '';
 }
+
 // ==========================================
 //  DATOS DEL USUARIO
 // ==========================================
 
-/**
- * Cargar datos del usuario al iniciar
- */
 async function cargarDatosUsuario() {
     try {
         const response = await fetch('/api/users/my-profile');
@@ -617,7 +672,6 @@ async function cargarDatosUsuario() {
         const data = await response.json();
         
         if (data.success && data.user) {
-            // Actualizar header
             const nombreElement = document.getElementById('user-name-header');
             if (nombreElement) {
                 nombreElement.textContent = data.user.nombre_completo || 'Usuario';
@@ -646,10 +700,15 @@ window.markAsRead = markAsRead;
 window.verificarEstadoNucleo = verificarEstadoNucleo;
 window.verDetallesNucleoDesdeInicio = verDetallesNucleoDesdeInicio;
 window.cargarDatosUsuario = cargarDatosUsuario;
+window.mostrarNucleosDisponibles = mostrarNucleosDisponibles;
+window.enviarSolicitudNucleo = enviarSolicitudNucleo;
+window.cerrarModalDetallesNucleo = cerrarModalDetallesNucleo;
 
 console.log(' Módulo de inicio de usuario cargado completamente');
-console.log(' Funciones exportadas:', {
+console.log('📦 Funciones exportadas:', {
     loadNotifications: typeof window.loadNotifications,
     verificarEstadoNucleo: typeof window.verificarEstadoNucleo,
-    cargarDatosUsuario: typeof window.cargarDatosUsuario
+    cargarDatosUsuario: typeof window.cargarDatosUsuario,
+    mostrarNucleosDisponibles: typeof window.mostrarNucleosDisponibles,
+    enviarSolicitudNucleo: typeof window.enviarSolicitudNucleo
 });

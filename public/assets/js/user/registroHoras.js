@@ -13,7 +13,7 @@ let registroAbiertoData = null;
 
 // ========== INICIALIZACIÓN ==========
 document.addEventListener('DOMContentLoaded', function () {
-    console.log('✅ Inicializando módulo de horas');
+    console.log(' Inicializando módulo de horas');
 
     // Iniciar reloj en tiempo real
     updateClock();
@@ -113,7 +113,7 @@ async function cargarDeudaHorasWidget() {
         const response = await fetch('/api/horas/deuda-actual');
         const data = await response.json();
         
-        console.log('✅ Deuda de horas recibida:', data);
+        console.log(' Deuda de horas recibida:', data);
         
         if (data.success && data.deuda) {
             renderDeudaHorasWidget(data.deuda);
@@ -122,7 +122,7 @@ async function cargarDeudaHorasWidget() {
         }
 
     } catch (error) {
-        console.error('❌ Error al cargar deuda:', error);
+        console.error(' Error al cargar deuda:', error);
         container.innerHTML = '<p class="error">Error de conexión</p>';
     }
 }
@@ -253,10 +253,10 @@ async function inicializarSeccionHoras() {
             cargarDeudaHorasWidget()
         ]);
 
-        console.log('✅ Sección inicializada correctamente');
+        console.log(' Sección inicializada correctamente');
 
     } catch (error) {
-        console.error('❌ Error al inicializar:', error);
+        console.error(' Error al inicializar:', error);
         alert('Error al cargar la información. Por favor, recarga la página.');
     }
 }
@@ -272,27 +272,27 @@ async function verificarRegistroAbierto() {
 
         // DEBUG: Ver respuesta cruda
         const responseText = await response.text();
-        console.log('🔍 Response status:', response.status);
-        console.log('🔍 Response text:', responseText.substring(0, 500));
+        console.log(' Response status:', response.status);
+        console.log(' Response text:', responseText.substring(0, 500));
 
         // Intentar parsear JSON
         let data;
         try {
             data = JSON.parse(responseText);
         } catch (parseError) {
-            console.error('❌ Error parsing JSON:', parseError);
-            console.error('❌ Response completo:', responseText);
+            console.error(' Error parsing JSON:', parseError);
+            console.error(' Response completo:', responseText);
             throw new Error('El servidor devolvió HTML en lugar de JSON. Revisa los logs de PHP.');
         }
 
-        console.log('✅ Verificación de registro:', data);
+        console.log(' Verificación de registro:', data);
 
         if (data.success && data.registro) {
             // Hay un registro abierto
             registroAbiertoId = data.registro.id_registro;
             registroAbiertoData = data.registro;
             mostrarBotonSalida(data.registro.hora_entrada);
-            console.log('✅ Registro abierto encontrado:', registroAbiertoId);
+            console.log(' Registro abierto encontrado:', registroAbiertoId);
         } else {
             // No hay registro abierto
             registroAbiertoId = null;
@@ -302,7 +302,7 @@ async function verificarRegistroAbierto() {
         }
 
     } catch (error) {
-        console.error('❌ Error en verificarRegistroAbierto:', error);
+        console.error(' Error en verificarRegistroAbierto:', error);
         mostrarBotonEntrada();
     }
 }
@@ -336,7 +336,7 @@ function mostrarBotonSalida(horaEntrada) {
 
 // ========== MARCAR ENTRADA ==========
 async function marcarEntrada() {
-    console.log('✅ Iniciando marcación de entrada');
+    console.log(' Iniciando marcación de entrada');
 
     const descripcion = prompt('Describe brevemente tu trabajo de hoy (opcional):');
     if (descripcion === null) {
@@ -367,7 +367,7 @@ async function marcarEntrada() {
         console.log('📥 Respuesta del servidor:', data);
 
         if (data.success) {
-            alert(`✅ ${data.message}\nHora registrada: ${data.hora_entrada}`);
+            alert(` ${data.message}\nHora registrada: ${data.hora_entrada}`);
             registroAbiertoId = data.id_registro;
 
             // Restablecer botón antes de recargar
@@ -377,15 +377,15 @@ async function marcarEntrada() {
 
             await inicializarSeccionHoras();
         } else {
-            alert(`❌ ${data.message}`);
+            alert(` ${data.message}`);
             btnEntrada.disabled = false;
             btnEntrada.innerHTML = '<i class="fas fa-sign-in-alt"></i> <span data-i18n="dashboardUser.hours.markEntry">Marcar Entrada</span>';
             i18n.translatePage();
         }
 
     } catch (error) {
-        console.error('❌ Error al marcar entrada:', error);
-        alert('❌ Error de conexión. Por favor, intenta nuevamente.');
+        console.error(' Error al marcar entrada:', error);
+        alert(' Error de conexión. Por favor, intenta nuevamente.');
         btnEntrada.disabled = false;
         btnEntrada.innerHTML = '<i class="fas fa-sign-in-alt"></i> <span data-i18n="dashboardUser.hours.markEntry">Marcar Entrada</span>';
         i18n.translatePage();
@@ -394,10 +394,10 @@ async function marcarEntrada() {
 
 // ========== MARCAR SALIDA ==========
 async function marcarSalida() {
-    console.log('✅ Iniciando marcación de salida');
+    console.log(' Iniciando marcación de salida');
 
     if (!registroAbiertoId) {
-        alert('❌ No hay registro activo para cerrar');
+        alert(' No hay registro activo para cerrar');
         return;
     }
 
@@ -430,7 +430,7 @@ async function marcarSalida() {
         console.log('📥 Respuesta del servidor:', data);
 
         if (data.success) {
-            alert(`✅ ${data.message}\n\n⏱️ Total trabajado: ${data.total_horas} horas`);
+            alert(` ${data.message}\n\n⏱️ Total trabajado: ${data.total_horas} horas`);
             registroAbiertoId = null;
             registroAbiertoData = null;
 
@@ -441,15 +441,15 @@ async function marcarSalida() {
 
             await inicializarSeccionHoras();
         } else {
-            alert(`❌ ${data.message}`);
+            alert(` ${data.message}`);
             btnSalida.disabled = false;
             btnSalida.innerHTML = btnHTML;
             i18n.translatePage();
         }
 
     } catch (error) {
-        console.error('❌ Error al marcar salida:', error);
-        alert('❌ Error de conexión. Por favor, intenta nuevamente.');
+        console.error(' Error al marcar salida:', error);
+        alert(' Error de conexión. Por favor, intenta nuevamente.');
         btnSalida.disabled = false;
         btnSalida.innerHTML = btnHTML;
         i18n.translatePage();
@@ -488,10 +488,10 @@ async function cargarEstadisticas() {
             }
         }
 
-        console.log('✅ Estadísticas actualizadas');
+        console.log(' Estadísticas actualizadas');
 
     } catch (error) {
-        console.error('❌ Error al cargar estadísticas:', error);
+        console.error(' Error al cargar estadísticas:', error);
     }
 }
 
@@ -508,14 +508,14 @@ async function loadResumenSemanal() {
 
         if (data.success && data.resumen) {
             renderResumenSemanal(data.resumen);
-            console.log('✅ Resumen semanal cargado');
+            console.log(' Resumen semanal cargado');
         } else {
             container.innerHTML = '<p class="error" data-i18n="dashboardUser.hours.weeklySummary.errorLoading">Error al cargar resumen semanal</p>';
             i18n.translatePage();
         }
 
     } catch (error) {
-        console.error('❌ Error al cargar resumen semanal:', error);
+        console.error(' Error al cargar resumen semanal:', error);
         container.innerHTML = '<p class="error" data-i18n="dashboardUser.hours.weeklySummary.errorConnection">Error de conexión</p>';
         i18n.translatePage();
     }
@@ -646,14 +646,14 @@ async function loadMisRegistros() {
 
         if (data.success && data.registros) {
             renderHistorialRegistros(data.registros);
-            console.log(`✅ ${data.registros.length} registros cargados`);
+            console.log(` ${data.registros.length} registros cargados`);
         } else {
             container.innerHTML = '<p class="error" data-i18n="dashboardUser.hours.history.errorLoading">Error al cargar registros</p>';
             i18n.translatePage();
         }
 
     } catch (error) {
-        console.error('❌ Error al cargar registros:', error);
+        console.error(' Error al cargar registros:', error);
         container.innerHTML = '<p class="error" data-i18n="dashboardUser.hours.history.connectionError">Error de conexión</p>';
         i18n.translatePage();
     }
@@ -976,7 +976,7 @@ async function filtrarRegistros() {
         return;
     }
 
-    console.log(`🔍 Filtrando registros: ${fechaInicio} a ${fechaFin}`);
+    console.log(` Filtrando registros: ${fechaInicio} a ${fechaFin}`);
     await loadMisRegistros();
 }
 
@@ -990,8 +990,8 @@ window.filtrarRegistros = filtrarRegistros;
 window.toggleDeudaDetalle = toggleDeudaDetalle;
 window.cargarDeudaHorasWidget = cargarDeudaHorasWidget;
 
-console.log('✅ Módulo de registro de horas cargado completamente');
-console.log('✅ Funciones exportadas:', {
+console.log(' Módulo de registro de horas cargado completamente');
+console.log(' Funciones exportadas:', {
     inicializarSeccionHoras: typeof window.inicializarSeccionHoras,
     marcarEntrada: typeof window.marcarEntrada,
     marcarSalida: typeof window.marcarSalida,

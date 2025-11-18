@@ -261,7 +261,7 @@ async function submitProfileEdit(event) {
     
     // Confirmar cambios
     if (!confirm('¿Estás seguro de guardar los cambios?')) {
-        console.log('❌ Usuario canceló la actualización');
+        console.log(' Usuario canceló la actualización');
         return;
     }
     
@@ -315,12 +315,12 @@ async function submitProfileEdit(event) {
                 }, 1000);
             }
         } else {
-            console.error('❌ Error en respuesta:', data);
-            alert('❌ ' + data.message);
+            console.error(' Error en respuesta:', data);
+            alert(' ' + data.message);
         }
     } catch (error) {
-        console.error('❌ Error al actualizar perfil:', error);
-        alert('❌ Error de conexión al guardar cambios');
+        console.error(' Error al actualizar perfil:', error);
+        alert(' Error de conexión al guardar cambios');
     } finally {
         // Restaurar botón
         if (submitBtn) {

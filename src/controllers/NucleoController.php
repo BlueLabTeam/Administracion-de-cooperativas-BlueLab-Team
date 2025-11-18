@@ -304,42 +304,48 @@ class NucleoController
      * Crear solicitud para unirse a un núcleo (Usuario)
      */
     public function solicitarUnirse()
-    {
-        header('Content-Type: application/json');
+{
+    header('Content-Type: application/json');
 
-        if (!isset($_SESSION['user_id'])) {
-            http_response_code(401);
-            echo json_encode(['success' => false, 'message' => 'No autenticado']);
+    if (!isset($_SESSION['user_id'])) {
+        http_response_code(401);
+        echo json_encode(['success' => false, 'message' => 'No autenticado']);
+        exit();
+    }
+
+    try {
+        // 🔑 CAMBIO CLAVE: Leer el cuerpo JSON de la solicitud
+        $input = file_get_contents('php://input');
+        $data = json_decode($input, true); // Decodificar a un array asociativo
+
+        // Obtener idNucleo y mensaje del array decodificado
+        $idNucleo = $data['id_nucleo'] ?? null;
+        $mensaje = $data['mensaje'] ?? '';
+
+        if (!$idNucleo) {
+            http_response_code(400); // Se mantiene el 400, pero ahora está validando la data decodificada
+            echo json_encode(['success' => false, 'message' => 'ID de núcleo requerido']);
             exit();
         }
 
-        try {
-            $idNucleo = $_POST['id_nucleo'] ?? null;
-            $mensaje = $_POST['mensaje'] ?? '';
+        $solicitudId = $this->nucleoModel->crearSolicitudNucleo(
+            $_SESSION['user_id'],
+            $idNucleo,
+            $mensaje
+        );
 
-            if (!$idNucleo) {
-                echo json_encode(['success' => false, 'message' => 'ID de núcleo requerido']);
-                exit();
-            }
-
-            $solicitudId = $this->nucleoModel->crearSolicitudNucleo(
-                $_SESSION['user_id'],
-                $idNucleo,
-                $mensaje
-            );
-
-            echo json_encode([
-                'success' => true,
-                'message' => 'Solicitud enviada correctamente. Espera la aprobación del administrador.',
-                'id_solicitud' => $solicitudId
-            ]);
-        } catch (\Exception $e) {
-            error_log("Error en solicitarUnirse: " . $e->getMessage());
-            http_response_code(400);
-            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
-        }
-        exit();
+        echo json_encode([
+            'success' => true,
+            'message' => 'Solicitud enviada correctamente. Espera la aprobación del administrador.',
+            'id_solicitud' => $solicitudId
+        ]);
+    } catch (\Exception $e) {
+        error_log("Error en solicitarUnirse: " . $e->getMessage());
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => 'Error al procesar la solicitud']);
     }
+    exit();
+}
 
     /**
      * Obtener solicitudes del usuario actual

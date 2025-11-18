@@ -333,7 +333,7 @@ public function getResumenDeuda($idUsuario)
                 ];
             }
 
-            error_log("🔍 No existe cuota, procediendo a crear...");
+            error_log(" No existe cuota, procediendo a crear...");
 
             // Buscar vivienda personal
             $stmtVivienda = $this->conn->prepare("
@@ -349,7 +349,7 @@ public function getResumenDeuda($idUsuario)
 
             // Si no tiene vivienda personal, buscar por nucleo
             if (!$vivienda) {
-                error_log("🔍 No tiene vivienda personal, buscando por núcleo...");
+                error_log(" No tiene vivienda personal, buscando por núcleo...");
                 $stmtViviendaNucleo = $this->conn->prepare("
                     SELECT av.id_vivienda, v.id_tipo
                     FROM Asignacion_Vivienda av
@@ -678,7 +678,7 @@ error_log(" Deuda acumulada de meses anteriores: $$deudaAnterior");
     {
         try {
             error_log("===========================================");
-            error_log("🔍 [getCuotasUsuario] INICIO");
+            error_log(" [getCuotasUsuario] INICIO");
             error_log("Usuario ID: $idUsuario");
             error_log("Filtros recibidos: " . json_encode($filtros));
             
@@ -776,7 +776,7 @@ error_log(" Deuda acumulada de meses anteriores: $$deudaAnterior");
                 error_log("   - pendiente_asignacion: " . ($resultados[0]['pendiente_asignacion'] ?? 'NULL'));
             } else {
                 error_log("⚠️ NO SE ENCONTRARON CUOTAS");
-                error_log("🔍 Verificando si existen cuotas en la tabla directa...");
+                error_log(" Verificando si existen cuotas en la tabla directa...");
                 
                 $checkDirecto = $this->conn->prepare("
                     SELECT COUNT(*) as total FROM Cuotas_Mensuales WHERE id_usuario = ?
@@ -815,11 +815,11 @@ public function liquidarCuotaForzada($cuotaId, $adminId)
         error_log(" [MODELO] liquidarCuotaForzada iniciado");
         error_log("🔑 Cuota ID: $cuotaId");
         error_log(" Admin ID: $adminId");
-        error_log("🔍 Conexión BD: " . ($this->conn ? "OK" : "NULL"));
+        error_log(" Conexión BD: " . ($this->conn ? "OK" : "NULL"));
         
         //  VALIDACIÓN: Verificar que tenemos conexión a BD
         if (!$this->conn) {
-            error_log("❌ [MODELO] No hay conexión a base de datos");
+            error_log(" [MODELO] No hay conexión a base de datos");
             return [
                 'success' => false,
                 'message' => 'Error: No hay conexión a base de datos'
@@ -846,8 +846,8 @@ public function liquidarCuotaForzada($cuotaId, $adminId)
             ");
             
             if (!$stmt) {
-                error_log("❌ [MODELO] Error al preparar statement");
-                error_log("❌ [MODELO] PDO Error: " . json_encode($this->conn->errorInfo()));
+                error_log(" [MODELO] Error al preparar statement");
+                error_log(" [MODELO] PDO Error: " . json_encode($this->conn->errorInfo()));
                 return [
                     'success' => false,
                     'message' => 'Error al preparar consulta SQL'
@@ -857,8 +857,8 @@ public function liquidarCuotaForzada($cuotaId, $adminId)
             $executed = $stmt->execute([$cuotaId]);
             
             if (!$executed) {
-                error_log("❌ [MODELO] Error al ejecutar query");
-                error_log("❌ [MODELO] Error info: " . json_encode($stmt->errorInfo()));
+                error_log(" [MODELO] Error al ejecutar query");
+                error_log(" [MODELO] Error info: " . json_encode($stmt->errorInfo()));
                 return [
                     'success' => false,
                     'message' => 'Error al ejecutar consulta'
@@ -868,7 +868,7 @@ public function liquidarCuotaForzada($cuotaId, $adminId)
             $cuota = $stmt->fetch(\PDO::FETCH_ASSOC);
             
         } catch (\PDOException $e) {
-            error_log("❌ [MODELO] PDOException en SELECT: " . $e->getMessage());
+            error_log(" [MODELO] PDOException en SELECT: " . $e->getMessage());
             return [
                 'success' => false,
                 'message' => 'Error de base de datos: ' . $e->getMessage()
@@ -876,7 +876,7 @@ public function liquidarCuotaForzada($cuotaId, $adminId)
         }
         
         if (!$cuota) {
-            error_log("❌ [MODELO] Cuota no encontrada: $cuotaId");
+            error_log(" [MODELO] Cuota no encontrada: $cuotaId");
             return [
                 'success' => false,
                 'message' => 'Cuota no encontrada'
@@ -942,8 +942,8 @@ $ejecutado = $updateStmt->execute([
 ]);
         
         if (!$ejecutado) {
-            error_log("❌ [MODELO] Error al actualizar cuota");
-            error_log("❌ [MODELO] Error SQL: " . json_encode($updateStmt->errorInfo()));
+            error_log(" [MODELO] Error al actualizar cuota");
+            error_log(" [MODELO] Error SQL: " . json_encode($updateStmt->errorInfo()));
             return [
                 'success' => false,
                 'message' => 'Error al actualizar la cuota en la base de datos'
@@ -1025,8 +1025,8 @@ $ejecutado = $updateStmt->execute([
         ];
         
     } catch (\Exception $e) {
-        error_log("❌ [MODELO] Excepción en liquidarCuotaForzada: " . $e->getMessage());
-        error_log("❌ [MODELO] Stack: " . $e->getTraceAsString());
+        error_log(" [MODELO] Excepción en liquidarCuotaForzada: " . $e->getMessage());
+        error_log(" [MODELO] Stack: " . $e->getTraceAsString());
         error_log("===========================================");
         
         return [
@@ -1217,7 +1217,7 @@ public function validarPago($pagoId, $idAdmin, $accion, $observaciones = '')
 {
     try {
         error_log("═══════════════════════════════════════");
-        error_log("🔍 [validarPago] INICIO");
+        error_log(" [validarPago] INICIO");
         error_log("Pago ID: $pagoId");
         error_log("Acción: $accion");
         

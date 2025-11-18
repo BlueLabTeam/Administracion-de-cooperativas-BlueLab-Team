@@ -17,7 +17,7 @@ class Reporte
     public function generarReporteMensual($mes, $anio)
     {
         error_log("=== INICIO Reporte::generarReporteMensual ===");
-        error_log("🔍 Generando reporte para: MES=$mes, AÑO=$anio");
+        error_log(" Generando reporte para: MES=$mes, AÑO=$anio");
         
         try {
             $usuarios = $this->getUsuariosConVivienda();
