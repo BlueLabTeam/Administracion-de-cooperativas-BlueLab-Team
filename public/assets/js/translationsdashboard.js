@@ -840,7 +840,39 @@ const translations = {
         filterSent: "Sent (Pending Approval)",
         filterAccepted: "Accepted",
         filterRejected: "Rejected",
-        searchPlaceholder: "Search user..."
+        searchPlaceholder: "Search user...",
+        table: {
+          columns: {
+            name: "Name",
+            email: "Email",
+            status: "Status",
+            role: "Role",
+            unit: "Family Unit",
+            actions: "Actions",
+            actionsOptions: {
+              approved: "Approved",
+              rejected: "Rejected",
+              pending: "Pending",
+              sent: "Sent",
+              active: "Active",
+              inactive: "Inactive"
+            },
+            idCard: "ID Card",
+            isApproved: "Is Approved",
+            isRejected: "Is Rejected",
+          },
+          modal: {
+              idCard: "ID Card:",
+              email: "Email:",
+              address: "Address:",
+              birthDate: "Birth Date:",
+              role: "Role:",
+              unit: "Family Unit:",
+              dateOfEntry: "Date of Entry:",
+              withoutUnit: "without unit",
+              closeButton: "Close"
+            },
+        },
       },
 
       notifications: {
@@ -888,7 +920,7 @@ const translations = {
         completedTasks: "Completed Tasks",
         avgCompliance: "Average Compliance",
         detailByUser: " Detail by User",
-        table:{
+        table: {
           columns: {
             user: "User",
             housing: "Housing",
@@ -903,13 +935,13 @@ const translations = {
             unassigned: "Unassigned",
             completed: "% Completed",
             withoutTasks: "Without Tasks",
-            status:{
+            status: {
               unasigned: "Unassigned",
               paid: "Paid",
               pending: "Pending",
               overdue: "Overdue"
             },
-            statusLevel:{
+            statusLevel: {
               critical: "Critical",
               good: "Good",
               regular: "Regular",
@@ -1449,21 +1481,21 @@ const translations = {
           },
         },
         months: {
-            january: "January",
-            february: "February",
-            march: "March",
-            april: "April",
-            may: "May",
-            june: "June",
-            july: "July",
-            august: "August",
-            september: "September",
-            october: "October",
-            november: "November",
-            december: "December"
-          },
-        widget:{
-          title1: "debt of hours", 
+          january: "January",
+          february: "February",
+          march: "March",
+          april: "April",
+          may: "May",
+          june: "June",
+          july: "July",
+          august: "August",
+          september: "September",
+          october: "October",
+          november: "November",
+          december: "December"
+        },
+        widget: {
+          title1: "debt of hours",
           title2: "no outstanding hours",
           progressMonthly: "Monthly Progress",
           box: {
@@ -1518,7 +1550,7 @@ const translations = {
               },
             },
           },
-          modal:{
+          modal: {
             descriptionTitle: "Record Description",
             dateLabel: "Date:",
             closeButton: "Close"
@@ -1568,7 +1600,7 @@ const translations = {
           necessaryMaterials: "Necessary Materials",
           available: "available",
           insufficient: "insufficient",
-          noMaterialsRequiered: "No materials required for this task",  
+          noMaterialsRequiered: "No materials required for this task",
           closeButton: "Close",
           viewFullDetails: "View Full Details",
           startDate: "Start Date",
