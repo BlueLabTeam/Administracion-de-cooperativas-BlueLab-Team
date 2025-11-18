@@ -160,7 +160,7 @@ function renderNucleosTable(nucleos) {
     i18n.translatePage();
 }
 
-// ========== MOSTRAR MODAL CREAR ==========
+
 // ========== MOSTRAR MODAL CREAR ==========
 function showCreateNucleoModal() {
     loadUsersForNucleo().then(usuarios => {
