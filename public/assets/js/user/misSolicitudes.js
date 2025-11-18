@@ -52,7 +52,7 @@ async function loadMisSolicitudes() {
     const container = document.getElementById('misSolicitudesContainer');
     
     if (!container) {
-        console.error('❌ Container "misSolicitudesContainer" NO ENCONTRADO');
+        console.error(' Container "misSolicitudesContainer" NO ENCONTRADO');
         console.log('Elementos disponibles con "solicitudes":', 
             document.querySelectorAll('[id*="solicitud"]'));
         return;
@@ -92,11 +92,11 @@ async function loadMisSolicitudes() {
             data = JSON.parse(responseText);
             console.log(' JSON parseado correctamente');
         } catch (parseError) {
-            console.error('❌ Error al parsear JSON:', parseError);
+            console.error(' Error al parsear JSON:', parseError);
             console.error('📄 Respuesta completa:', responseText);
             container.innerHTML = `
                 <div class="error">
-                    <h3 data-i18n="dashboardUser.requests.error.titleParsingJson">❌ Error de Servidor</h3>
+                    <h3 data-i18n="dashboardUser.requests.error.titleParsingJson"> Error de Servidor</h3>
                     <p data-i18n="dashboardUser.requests.error.messageParsingJson">El servidor devolvió HTML en lugar de JSON</p>
                     <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px; overflow: auto; max-height: 300px;">${responseText.substring(0, 1000)}</pre>
                     <button class="btn btn-primary" onclick="loadMisSolicitudes()">
@@ -125,10 +125,10 @@ async function loadMisSolicitudes() {
             
             console.log(' Renderizado completado');
         } else {
-            console.error('❌ success = false');
+            console.error(' success = false');
             container.innerHTML = `
                 <div class="error">
-                    <h3 data-i18n="dashboardUser.requests.error.title">❌ Error</h3>
+                    <h3 data-i18n="dashboardUser.requests.error.title"> Error</h3>
                     <p>${data.message || 'Error desconocido'}</p>
                     <button class="btn btn-primary" onclick="loadMisSolicitudes()">
                         <i class="fas fa-sync"></i> <span data-i18n="dashboardUser.requests.error.button">Reintentar</span>
@@ -140,14 +140,14 @@ async function loadMisSolicitudes() {
 
     } catch (error) {
         console.error('==========================================');
-        console.error('❌ ERROR CAPTURADO:');
+        console.error(' ERROR CAPTURADO:');
         console.error('   - Mensaje:', error.message);
         console.error('   - Stack:', error.stack);
         console.error('==========================================');
         
         container.innerHTML = `
             <div class="error">
-                <h3 data-i18n="dashboardUser.requests.error.titleConnection">❌ Error de Conexión</h3>
+                <h3 data-i18n="dashboardUser.requests.error.titleConnection"> Error de Conexión</h3>
                 <p>${error.message}</p>
                 <button class="btn btn-primary" onclick="loadMisSolicitudes()">
                     <i class="fas fa-sync"></i> <span data-i18n="dashboardUser.requests.error.button">Reintentar</span>
@@ -456,8 +456,8 @@ async function submitNuevaSolicitud(event) {
         try {
             data = JSON.parse(responseText);
         } catch (parseError) {
-            console.error('❌ Error parsing JSON:', parseError);
-            console.error('❌ Response completo:', responseText);
+            console.error(' Error parsing JSON:', parseError);
+            console.error(' Response completo:', responseText);
             throw new Error('El servidor devolvió HTML en lugar de JSON. Revisa los logs de PHP.');
         }
 
@@ -468,15 +468,15 @@ async function submitNuevaSolicitud(event) {
             cerrarModalNuevaSolicitud();
             loadMisSolicitudes();
         } else {
-            alert('❌ ' + data.message);
+            alert(' ' + data.message);
             submitBtn.disabled = false;
             submitBtn.innerHTML = btnHTML;
         }
 
     } catch (error) {
-        console.error('❌ Error completo:', error);
-        console.error('❌ Stack:', error.stack);
-        alert('❌ Error de conexión: ' + error.message);
+        console.error(' Error completo:', error);
+        console.error(' Stack:', error.stack);
+        alert(' Error de conexión: ' + error.message);
         submitBtn.disabled = false;
         submitBtn.innerHTML = btnHTML;
     }
@@ -678,14 +678,14 @@ async function submitRespuesta(event, solicitudId) {
             cerrarModalResponder();
             loadMisSolicitudes();
         } else {
-            alert('❌ ' + data.message);
+            alert(' ' + data.message);
             submitBtn.disabled = false;
             submitBtn.innerHTML = btnHTML;
         }
 
     } catch (error) {
         console.error('Error:', error);
-        alert('❌ Error de conexión');
+        alert(' Error de conexión');
         submitBtn.disabled = false;
         submitBtn.innerHTML = btnHTML;
     }

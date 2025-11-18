@@ -30,7 +30,7 @@ async function loadNucleosFamiliares() {
     const container = document.getElementById('nucleosTableContainer');
 
     if (!container) {
-        console.error('❌ [NÚCLEOS] Container no encontrado');
+        console.error(' [NÚCLEOS] Container no encontrado');
         return;
     }
 
@@ -51,7 +51,7 @@ async function loadNucleosFamiliares() {
             container.innerHTML = `<p class="error">Error: ${data.message}</p>`;
         }
     } catch (error) {
-        console.error('❌ [NÚCLEOS] Error:', error);
+        console.error(' [NÚCLEOS] Error:', error);
         container.innerHTML = '<p class="error">Error de conexión</p>';
     }
 }
@@ -161,6 +161,7 @@ function renderNucleosTable(nucleos) {
 }
 
 
+
 // ========== MOSTRAR MODAL CREAR ==========
 function showCreateNucleoModal() {
     loadUsersForNucleo().then(usuarios => {
@@ -196,7 +197,7 @@ function showCreateNucleoModal() {
                                        class="material-input search-input-nucleo"
                                        placeholder="Buscar usuario..." 
                                        onkeyup="NucleosModule.filterUsers()">
-                                <span class="search-icon">🔍</span>
+                                <span class="search-icon"></span>
                             </div>
 
                             <!-- LISTA DE USUARIOS DEBAJO -->
@@ -229,7 +230,7 @@ function showCreateNucleoModal() {
         document.body.insertAdjacentHTML('beforeend', modalHTML);
         document.body.style.overflow = 'hidden';
     }).catch(error => {
-        console.error('❌ [NÚCLEOS] Error:', error);
+        console.error(' [NÚCLEOS] Error:', error);
         alert('Error al cargar usuarios');
     });
 }
@@ -287,7 +288,7 @@ async function loadUsersForNucleo(nucleoId = null) {
         }
         throw new Error('Error al cargar usuarios');
     } catch (error) {
-        console.error('❌ [NÚCLEOS] Error al cargar usuarios:', error);
+        console.error(' [NÚCLEOS] Error al cargar usuarios:', error);
         throw error;
     }
 }
@@ -338,11 +339,11 @@ async function submitCreateNucleo(event) {
             closeCreateNucleoModal();
             loadNucleosFamiliares();
         } else {
-            alert('❌ Error: ' + data.message);
+            alert(' Error: ' + data.message);
         }
     } catch (error) {
-        console.error('❌ [NÚCLEOS] Error:', error);
-        alert('❌ Error de conexión');
+        console.error(' [NÚCLEOS] Error:', error);
+        alert(' Error de conexión');
     }
 }
 
@@ -357,11 +358,11 @@ async function viewNucleoDetails(nucleoId) {
         if (data.success) {
             showNucleoDetailsModal(data.nucleo, data.miembros);
         } else {
-            alert('❌ Error: ' + data.message);
+            alert(' Error: ' + data.message);
         }
     } catch (error) {
-        console.error('❌ [NÚCLEOS] Error:', error);
-        alert('❌ Error de conexión');
+        console.error(' [NÚCLEOS] Error:', error);
+        alert(' Error de conexión');
     }
 }
 
@@ -470,7 +471,7 @@ async function editNucleo(nucleoId) {
                                        placeholder="Buscar usuario..."
                                        onkeyup="NucleosModule.filterUsersEdit()" 
                                        data-i18n-placeholder="dashboardAdmin.family.table.rows.modal.modalEdit.membersUnitsPlaceholder">
-                                <span class="search-icon">🔍</span>
+                                <span class="search-icon"></span>
                             </div>
 
                             <!-- LISTA DE USUARIOS DEBAJO -->
@@ -498,8 +499,8 @@ async function editNucleo(nucleoId) {
         document.body.insertAdjacentHTML('beforeend', modalHTML);
         i18n.translatePage();
     } catch (error) {
-        console.error('❌ [NÚCLEOS] Error:', error);
-        alert('❌ Error al cargar datos del núcleo');
+        console.error(' [NÚCLEOS] Error:', error);
+        alert(' Error al cargar datos del núcleo');
     }
 }
 
@@ -576,11 +577,11 @@ async function submitEditNucleo(event, nucleoId) {
             closeEditNucleoModal();
             loadNucleosFamiliares();
         } else {
-            alert('❌ Error: ' + data.message);
+            alert(' Error: ' + data.message);
         }
     } catch (error) {
-        console.error('❌ [NÚCLEOS] Error:', error);
-        alert('❌ Error de conexión');
+        console.error(' [NÚCLEOS] Error:', error);
+        alert(' Error de conexión');
     }
 }
 
@@ -605,11 +606,11 @@ async function deleteNucleo(nucleoId) {
             alert(' ' + data.message);
             loadNucleosFamiliares();
         } else {
-            alert('❌ Error: ' + data.message);
+            alert(' Error: ' + data.message);
         }
     } catch (error) {
-        console.error('❌ [NÚCLEOS] Error:', error);
-        alert('❌ Error de conexión');
+        console.error(' [NÚCLEOS] Error:', error);
+        alert(' Error de conexión');
     }
 }
 

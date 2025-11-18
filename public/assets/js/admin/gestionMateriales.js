@@ -51,7 +51,7 @@
         const container = document.getElementById('materialesTableContainer');
 
         if (!container) {
-            console.error('❌ [MATERIALES] Container no encontrado');
+            console.error(' [MATERIALES] Container no encontrado');
             return;
         }
 
@@ -72,7 +72,7 @@
                 container.innerHTML = `<p class="error">Error: ${data.message}</p>`;
             }
         } catch (error) {
-            console.error('❌ [MATERIALES] Error:', error);
+            console.error(' [MATERIALES] Error:', error);
             container.innerHTML = '<p class="error">Error de conexión</p>';
         }
     };
@@ -214,7 +214,7 @@
                         renderMaterialesTable(data.materiales);
                     }
                 })
-                .catch(error => console.error('❌ [MATERIALES] Error:', error));
+                .catch(error => console.error(' [MATERIALES] Error:', error));
         }, 300);
     };
 
@@ -227,7 +227,7 @@
         const modal = document.getElementById('materialModal');
 
         if (!modal) {
-            console.error('❌ [MATERIALES] Modal no encontrado');
+            console.error(' [MATERIALES] Modal no encontrado');
             alert('ERROR: Modal no encontrado en el DOM');
             return;
         }
@@ -258,11 +258,11 @@
                 document.getElementById('materialModal').style.display = 'flex';
                 document.body.style.overflow = 'hidden';
             } else {
-                alert('❌ Error al cargar material');
+                alert(' Error al cargar material');
             }
         } catch (error) {
-            console.error('❌ [MATERIALES] Error:', error);
-            alert('❌ Error al cargar material');
+            console.error(' [MATERIALES] Error:', error);
+            alert(' Error al cargar material');
         }
     };
 
@@ -312,11 +312,11 @@
                 window.closeMaterialModal();
                 window.loadMateriales();
             } else {
-                alert('❌ Error: ' + (data.message || 'Error al guardar material'));
+                alert(' Error: ' + (data.message || 'Error al guardar material'));
             }
         } catch (error) {
-            console.error('❌ [MATERIALES] Error:', error);
-            alert('❌ Error de conexión');
+            console.error(' [MATERIALES] Error:', error);
+            alert(' Error de conexión');
         }
     };
 
@@ -339,11 +339,11 @@
                 alert(' Material eliminado');
                 window.loadMateriales();
             } else {
-                alert('❌ Error: ' + (data.message || 'Error al eliminar'));
+                alert(' Error: ' + (data.message || 'Error al eliminar'));
             }
         } catch (error) {
-            console.error('❌ [MATERIALES] Error:', error);
-            alert('❌ Error de conexión');
+            console.error(' [MATERIALES] Error:', error);
+            alert(' Error de conexión');
         }
     };
 
@@ -398,11 +398,11 @@
                 window.closeStockModal();
                 window.loadMateriales();
             } else {
-                alert('❌ Error: ' + (data.message || 'Error al actualizar stock'));
+                alert(' Error: ' + (data.message || 'Error al actualizar stock'));
             }
         } catch (error) {
-            console.error('❌ [MATERIALES] Error:', error);
-            alert('❌ Error de conexión');
+            console.error(' [MATERIALES] Error:', error);
+            alert(' Error de conexión');
         }
     };
 
@@ -413,7 +413,7 @@
         const container = document.getElementById('materiales-tarea-list');
 
         if (!container) {
-            console.error('❌ [MATERIALES] Container materiales-tarea-list no encontrado');
+            console.error(' [MATERIALES] Container materiales-tarea-list no encontrado');
             return;
         }
 
@@ -444,7 +444,7 @@
                 `;
             }
         } catch (error) {
-            console.error('❌ [MATERIALES] Error:', error);
+            console.error(' [MATERIALES] Error:', error);
             container.innerHTML = `
                 <div class="error-state">
                     <i class="fas fa-times-circle"></i>

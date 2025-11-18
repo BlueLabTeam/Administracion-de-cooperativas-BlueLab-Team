@@ -75,7 +75,7 @@ async function inicializarSeccionCuotas() {
         
         //  VERIFICACIÓN CRÍTICA
         if (typeof window.deudaHorasActual === 'undefined' || window.deudaHorasActual === null) {
-            console.error('❌ [ERROR CRÍTICO] deudaHorasActual NO está definida!');
+            console.error(' [ERROR CRÍTICO] deudaHorasActual NO está definida!');
             console.error('   Forzando a 0 para evitar errores...');
             window.deudaHorasActual = 0;
         } else {
@@ -103,7 +103,7 @@ async function inicializarSeccionCuotas() {
         
     } catch (error) {
         console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        console.error('❌ [INIT CUOTAS] Error al inicializar:', error);
+        console.error(' [INIT CUOTAS] Error al inicializar:', error);
         console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
         alert('Error al cargar la información de cuotas');
     }
@@ -140,7 +140,7 @@ async function generarCuotaMesActualSiNoExiste() {
             });
             
             const dataGenerar = await responseGenerar.json();
-            console.log('🔍 RESPUESTA COMPLETA DE GENERAR:', dataGenerar);
+            console.log(' RESPUESTA COMPLETA DE GENERAR:', dataGenerar);
             
             if (dataGenerar.success) {
                 console.log(' Cuota generada:', dataGenerar.message);
@@ -157,7 +157,7 @@ async function generarCuotaMesActualSiNoExiste() {
             console.log(' Cuota del mes ya existe');
         }
     } catch (error) {
-        console.error('❌ Error al verificar/generar cuota:', error);
+        console.error(' Error al verificar/generar cuota:', error);
     }
 }
 
@@ -194,7 +194,7 @@ async function loadDeudaHorasParaCuotas() {
             
             //  VERIFICAR que se asignó correctamente
             if (window.deudaHorasActual === 0 && deudaEnPesos > 0) {
-                console.error('❌ [DEUDA HORAS] ERROR: Deuda no se asignó correctamente!');
+                console.error(' [DEUDA HORAS] ERROR: Deuda no se asignó correctamente!');
                 window.deudaHorasActual = deudaEnPesos; // Forzar asignación
             }
             
@@ -204,7 +204,7 @@ async function loadDeudaHorasParaCuotas() {
         }
         
     } catch (error) {
-        console.error('❌ [DEUDA HORAS] Error al cargar:', error);
+        console.error(' [DEUDA HORAS] Error al cargar:', error);
         window.deudaHorasActual = 0;
     }
     
@@ -394,10 +394,10 @@ function renderMisCuotasOrganizadas(cuotas) {
     console.log('   monto_cuota:', montoCuota);
     console.log('   deuda_meses_anteriores:', deudaAcumuladaAnterior);
     console.log('   deuda_horas_actual:', deudaHoras);
-    console.log('   ✅ TOTAL A PAGAR:', montoTotal);
+    console.log('    TOTAL A PAGAR:', montoTotal);
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     
-    // 🔍 VERIFICAR ESTADOS (LÓGICA EXACTA DE renderSeccionDestacada)
+    //  VERIFICAR ESTADOS (LÓGICA EXACTA DE renderSeccionDestacada)
     const estadoFinal = cuotaMasReciente.estado_actual || cuotaMasReciente.estado;
     const estadoPago = cuotaMasReciente.estado_pago || '';
     const estadoUsuario = cuotaMasReciente.estado_usuario || '';
@@ -406,7 +406,7 @@ function renderMisCuotasOrganizadas(cuotas) {
     const tienePagoPendiente = cuotaMasReciente.id_pago && estadoPago === 'pendiente' && !pagoAprobado;
     const estaPagada = estadoFinal === 'pagada' || pagoAprobado;
     
-    console.log('🔍 [ESTADOS] Verificación completa:', {
+    console.log(' [ESTADOS] Verificación completa:', {
         estado_final: estadoFinal,
         estado_pago: estadoPago,
         estado_usuario: estadoUsuario,
@@ -415,7 +415,7 @@ function renderMisCuotasOrganizadas(cuotas) {
         esta_pagada: estaPagada
     });
     
-    // 🔍 VERIFICAR PERIODO DE PAGO
+    //  VERIFICAR PERIODO DE PAGO
     const hoy = new Date();
     const diaActual = hoy.getDate();
     const mesActual = hoy.getMonth() + 1;
@@ -554,7 +554,7 @@ function renderMisCuotasOrganizadas(cuotas) {
     
     container.innerHTML = html;
     i18n.translatePage();
-    console.log('✅ [RENDER] Completado\n');
+    console.log(' [RENDER] Completado\n');
 }
 
 // Función para toggle del historial completo
@@ -760,7 +760,7 @@ function renderSeccionDestacada(
                       puedePagar ? '<span data-i18n="dashboardUser.billing.summary.openPaymentPeriod">⚠️ PERIODO DE PAGO ABIERTO</span>' : 
                       esMesCuota && diasParaPagar > 0 ? `🔒 ${diasParaPagar} <span data-i18n="dashboardUser.billing.summary.day">DÍA</span>${diasParaPagar !== 1 ? 'S' : ''} <span data-i18n="dashboardUser.billing.summary.toPay">PARA PAGAR</span>` :
                       !esMesCuota ? '<span data-i18n="dashboardUser.billing.summary.closeMonth">MES CERRADO</span>' :
-                      '<span data-i18n="dashboardUser.billing.summary.overdue">❌ VENCIDA</span>'}
+                      '<span data-i18n="dashboardUser.billing.summary.overdue"> VENCIDA</span>'}
                 </span>
             </div>
             
@@ -932,7 +932,7 @@ function renderEstadoPago(estaPagada, tienePagoPendiente, puedePagar, diasParaPa
     
     return `
         <div class="alert-error" style="margin-top: 20px;">
-            <strong style="color: #f44336;" data-i18n="dashboardUser.billing.summary.dueFeeExpired">❌ Cuota Vencida</strong>
+            <strong style="color: #f44336;" data-i18n="dashboardUser.billing.summary.dueFeeExpired"> Cuota Vencida</strong>
             <p style="color: rgba(255, 255, 255, 0.9); margin: 10px 0 0 0;" data-i18n="dashboardUser.billing.summary.dueFeeExpiredNote">
                 Esta cuota no fue pagada a tiempo. La deuda se acumulará al siguiente mes.
             </p>
@@ -1126,7 +1126,7 @@ async function abrirPagarDeudaTotal(cuotaId, montoTotal) {
         const data = await response.json();
         
         if (!data.success) {
-            alert('❌ Error al cargar información de la cuota');
+            alert(' Error al cargar información de la cuota');
             return;
         }
         
@@ -1244,7 +1244,7 @@ async function abrirPagarDeudaTotal(cuotaId, montoTotal) {
 
     } catch (error) {
         console.error('Error:', error);
-        alert('❌ Error al cargar información');
+        alert(' Error al cargar información');
     }
 }
 
@@ -1319,13 +1319,13 @@ async function submitPagarCuota(event) {
             closePagarCuotaModal();
             await inicializarSeccionCuotas();
         } else {
-            alert('❌ ' + data.message);
+            alert(' ' + data.message);
             submitBtn.disabled = false;
             submitBtn.innerHTML = btnHTML;
         }
     } catch (error) {
         console.error('Error:', error);
-        alert('❌ Error al enviar el pago');
+        alert(' Error al enviar el pago');
         submitBtn.disabled = false;
         submitBtn.innerHTML = btnHTML;
     }
@@ -1451,7 +1451,7 @@ async function verificarCambiosCuotas() {
             // Crear checksum para detectar cambios
             const checksum = `${cuotaActual.id_cuota}-${cuotaActual.estado}-${cuotaActual.estado_pago || 'none'}-${cuotaActual.estado_usuario || 'none'}`;
             
-            console.log('🔍 [POLLING] Verificando cuota:', {
+            console.log(' [POLLING] Verificando cuota:', {
                 id: cuotaActual.id_cuota,
                 estado: cuotaActual.estado,
                 estado_pago: cuotaActual.estado_pago,
@@ -1488,7 +1488,7 @@ async function verificarCambiosCuotas() {
             }
         }
     } catch (error) {
-        console.error('❌ [POLLING] Error verificando cambios:', error);
+        console.error(' [POLLING] Error verificando cambios:', error);
     }
 }
 
@@ -1517,7 +1517,7 @@ async function recargarSeccionCuotas() {
         console.log(' [RELOAD] Recarga completada exitosamente');
         
     } catch (error) {
-        console.error('❌ [RELOAD] Error en recarga:', error);
+        console.error(' [RELOAD] Error en recarga:', error);
     }
 }
 

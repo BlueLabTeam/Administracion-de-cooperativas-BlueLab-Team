@@ -74,7 +74,7 @@ const SolicitudesAdmin = {
             }
 
         } catch (error) {
-            console.error('❌ Error:', error);
+            console.error(' Error:', error);
             container.innerHTML = '<p class="error">Error de conexión</p>';
         }
     },
@@ -547,14 +547,14 @@ const SolicitudesAdmin = {
                 this.loadAllSolicitudes();
                 this.loadEstadisticas();
             } else {
-                alert('❌ ' + data.message);
+                alert(' ' + data.message);
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = btnHTML;
             }
 
         } catch (error) {
             console.error('Error:', error);
-            alert('❌ Error de conexión');
+            alert(' Error de conexión');
             submitBtn.disabled = false;
             submitBtn.innerHTML = btnHTML;
         }
@@ -590,12 +590,12 @@ const SolicitudesAdmin = {
                 this.loadAllSolicitudes();
                 this.loadEstadisticas();
             } else {
-                alert('❌ ' + data.message);
+                alert(' ' + data.message);
             }
 
         } catch (error) {
             console.error('Error:', error);
-            alert('❌ Error de conexión');
+            alert(' Error de conexión');
         }
     }
 };

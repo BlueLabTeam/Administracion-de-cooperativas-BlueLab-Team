@@ -62,7 +62,7 @@
             
        
         } catch (error) {
-            console.error('❌ [TAREAS] Error al inicializar:', error);
+            console.error(' [TAREAS] Error al inicializar:', error);
         }
     };
 
@@ -88,7 +88,7 @@
         const container = document.getElementById('taskUsersList');
 
         if (!container) {
-            console.error('❌ [TAREAS] Container taskUsersList no encontrado');
+            console.error(' [TAREAS] Container taskUsersList no encontrado');
             return;
         }
 
@@ -102,7 +102,7 @@
                 container.innerHTML = '<p class="error">Error al cargar usuarios</p>';
             }
         } catch (error) {
-            console.error('❌ [TAREAS] Error:', error);
+            console.error(' [TAREAS] Error:', error);
             container.innerHTML = '<p class="error">Error de conexión</p>';
         }
     };
@@ -133,7 +133,7 @@
         const container = document.getElementById('taskNucleosList');
 
         if (!container) {
-            console.error('❌ [TAREAS] Container taskNucleosList no encontrado');
+            console.error(' [TAREAS] Container taskNucleosList no encontrado');
             return;
         }
 
@@ -147,7 +147,7 @@
                 container.innerHTML = '<p class="error">Error al cargar núcleos</p>';
             }
         } catch (error) {
-            console.error('❌ [TAREAS] Error:', error);
+            console.error(' [TAREAS] Error:', error);
             container.innerHTML = '<p class="error">Error de conexión</p>';
         }
     };
@@ -237,11 +237,11 @@
 
                 window.loadAllTasks();
             } else {
-                alert('❌ Error: ' + data.message);
+                alert(' Error: ' + data.message);
             }
         } catch (error) {
-            console.error('❌ [TAREAS] Error:', error);
-            alert('❌ Error al crear tarea');
+            console.error(' [TAREAS] Error:', error);
+            alert(' Error al crear tarea');
         }
     };
 
@@ -269,7 +269,7 @@
                 container.innerHTML = '<p class="error">Error al cargar tareas</p>';
             }
         } catch (error) {
-            console.error('❌ [TAREAS] Error:', error);
+            console.error(' [TAREAS] Error:', error);
             container.innerHTML = '<p class="error">Error de conexión</p>';
         }
     };
@@ -406,11 +406,11 @@
             if (data.success) {
                 mostrarDetallesTarea(data.tarea, data.avances);
             } else {
-                alert('❌ Error: ' + data.message);
+                alert(' Error: ' + data.message);
             }
         } catch (error) {
-            console.error('❌ [TAREAS] Error:', error);
-            alert('❌ Error de conexión');
+            console.error(' [TAREAS] Error:', error);
+            alert(' Error de conexión');
         }
     };
 
@@ -477,11 +477,11 @@
                     alert(' Esta tarea no tiene materiales asignados');
                 }
             } else {
-                alert('❌ Error: ' + (data.message || 'Error desconocido'));
+                alert(' Error: ' + (data.message || 'Error desconocido'));
             }
         } catch (error) {
-            console.error('❌ [TAREAS] Error:', error);
-            alert('❌ Error de conexión');
+            console.error(' [TAREAS] Error:', error);
+            alert(' Error de conexión');
         }
     };
 
@@ -569,11 +569,11 @@
                 alert(' ' + data.message);
                 window.loadAllTasks();
             } else {
-                alert('❌ Error: ' + data.message);
+                alert(' Error: ' + data.message);
             }
         } catch (error) {
-            console.error('❌ [TAREAS] Error:', error);
-            alert('❌ Error al cancelar tarea');
+            console.error(' [TAREAS] Error:', error);
+            alert(' Error al cancelar tarea');
         }
     };
 

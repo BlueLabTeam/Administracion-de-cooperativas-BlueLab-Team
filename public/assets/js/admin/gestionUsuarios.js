@@ -631,7 +631,7 @@ const GestionUsuarios = (function () {
          * Ver detalles de usuario
          */
         verDetalles: async function (userId) {
-            console.log('🔍 [USUARIOS] Cargando detalles del usuario:', userId);
+            console.log(' [USUARIOS] Cargando detalles del usuario:', userId);
 
             try {
                 const response = await fetch(`${ENDPOINTS.DETAILS}?id_usuario=${userId}`);
@@ -645,11 +645,11 @@ const GestionUsuarios = (function () {
                 if (data.success && data.user) {
                     mostrarModalDetallesUsuario(data.user);
                 } else {
-                    alert('❌ Error: ' + (data.message || 'No se pudieron cargar los detalles'));
+                    alert(' Error: ' + (data.message || 'No se pudieron cargar los detalles'));
                 }
             } catch (error) {
                 console.error('✗ [USUARIOS] Error:', error);
-                alert('❌ Error de conexión: ' + error.message);
+                alert(' Error de conexión: ' + error.message);
             }
         },
 

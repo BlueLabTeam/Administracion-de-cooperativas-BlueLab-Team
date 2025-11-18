@@ -35,7 +35,7 @@
         const usersList = document.getElementById('usersList');
 
         if (!usersList) {
-            console.error('❌ [NOTIFICACIONES] Container usersList no encontrado');
+            console.error(' [NOTIFICACIONES] Container usersList no encontrado');
             return;
         }
 
@@ -56,7 +56,7 @@
                 usersList.innerHTML = '<p class="error">Error: ' + data.message + '</p>';
             }
         } catch (error) {
-            console.error('❌ [NOTIFICACIONES] Error:', error);
+            console.error(' [NOTIFICACIONES] Error:', error);
             usersList.innerHTML = '<p class="error">Error de conexión</p>';
         }
     };
@@ -157,11 +157,11 @@
                     cb.checked = false;
                 });
             } else {
-                alert('❌ Error: ' + data.message);
+                alert(' Error: ' + data.message);
             }
         } catch (error) {
-            console.error('❌ [NOTIFICACIONES] Error:', error);
-            alert('❌ Error al enviar notificación');
+            console.error(' [NOTIFICACIONES] Error:', error);
+            alert(' Error al enviar notificación');
         } finally {
             submitBtn.disabled = false;
             submitBtn.innerHTML = originalBtnText;

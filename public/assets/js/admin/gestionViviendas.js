@@ -40,7 +40,7 @@ async function loadViviendas() {
     const container = document.getElementById('viviendasTableContainer');
 
     if (!container) {
-        console.error('❌ [VIVIENDAS] Container no encontrado');
+        console.error(' [VIVIENDAS] Container no encontrado');
         return;
     }
 
@@ -61,7 +61,7 @@ async function loadViviendas() {
             container.innerHTML = `<p class="error">Error: ${data.message}</p>`;
         }
     } catch (error) {
-        console.error('❌ [VIVIENDAS] Error:', error);
+        console.error(' [VIVIENDAS] Error:', error);
         container.innerHTML = '<p class="error" data-i18n="dashboardAdmin.housing.connectionError">Error de conexión</p>';
         i18n.translatePage();
     }
@@ -216,7 +216,7 @@ async function loadTiposVivienda() {
             }
         }
     } catch (error) {
-        console.error('❌ [VIVIENDAS] Error al cargar tipos:', error);
+        console.error(' [VIVIENDAS] Error al cargar tipos:', error);
     }
 }
 
@@ -227,7 +227,7 @@ function showCreateViviendaModal() {
     const modal = document.getElementById('viviendaModal');
     
     if (!modal) {
-        console.error('❌ [VIVIENDAS] Modal no encontrado');
+        console.error(' [VIVIENDAS] Modal no encontrado');
         alert('ERROR: Modal no encontrado. Recarga la página.');
         return;
     }
@@ -248,7 +248,7 @@ function showCreateViviendaModal() {
         
         setupModalNoCloseOutside(modal);
     }).catch(error => {
-        console.error('❌ [VIVIENDAS] Error:', error);
+        console.error(' [VIVIENDAS] Error:', error);
         alert('Error al cargar tipos de vivienda');
     });
 }
@@ -260,7 +260,7 @@ function editVivienda(id) {
     const modal = document.getElementById('viviendaModal');
     
     if (!modal) {
-        console.error('❌ [VIVIENDAS] Modal no encontrado');
+        console.error(' [VIVIENDAS] Modal no encontrado');
         alert('ERROR: Modal no encontrado. Recarga la página.');
         return;
     }
@@ -289,7 +289,7 @@ function editVivienda(id) {
             alert('Error al cargar vivienda');
         }
     }).catch(error => {
-        console.error('❌ [VIVIENDAS] Error:', error);
+        console.error(' [VIVIENDAS] Error:', error);
         alert('Error al cargar vivienda');
     });
 }
@@ -336,11 +336,11 @@ async function saveVivienda(event) {
             closeViviendaModal();
             loadViviendas();
         } else {
-            alert('❌ Error: ' + (data.message || 'Error al guardar vivienda'));
+            alert(' Error: ' + (data.message || 'Error al guardar vivienda'));
         }
     } catch (error) {
-        console.error('❌ [VIVIENDAS] Error:', error);
-        alert('❌ Error de conexión');
+        console.error(' [VIVIENDAS] Error:', error);
+        alert(' Error de conexión');
     }
 }
 
@@ -353,11 +353,11 @@ async function viewViviendaDetails(id) {
         if (data.success && data.vivienda) {
             showViviendaDetailsModal(data.vivienda);
         } else {
-            alert('❌ Error al cargar detalles');
+            alert(' Error al cargar detalles');
         }
     } catch (error) {
-        console.error('❌ [VIVIENDAS] Error:', error);
-        alert('❌ Error de conexión');
+        console.error(' [VIVIENDAS] Error:', error);
+        alert(' Error de conexión');
     }
 }
 
@@ -409,7 +409,7 @@ async function asignarVivienda(viviendaId, numeroVivienda) {
         ]);
 
         if (!usuariosResponse.success || !nucleosResponse.success) {
-            alert('❌ Error al cargar datos');
+            alert(' Error al cargar datos');
             return;
         }
 
@@ -419,8 +419,8 @@ async function asignarVivienda(viviendaId, numeroVivienda) {
         mostrarModalAsignacion(viviendaId, numeroVivienda, usuarios, nucleos);
 
     } catch (error) {
-        console.error('❌ [VIVIENDAS] Error:', error);
-        alert('❌ Error al cargar datos');
+        console.error(' [VIVIENDAS] Error:', error);
+        alert(' Error al cargar datos');
     }
 }
 
@@ -635,7 +635,7 @@ async function submitAsignacion(event, viviendaId) {
     const tipo = document.querySelector('input[name="tipoAsignacion"]:checked')?.value;
     
     if (!tipo) {
-        alert('❌ Debes seleccionar el tipo de asignación');
+        alert(' Debes seleccionar el tipo de asignación');
         return;
     }
 
@@ -645,14 +645,14 @@ async function submitAsignacion(event, viviendaId) {
     if (tipo === 'usuario') {
         const usuarioId = document.getElementById('selectUsuario').value;
         if (!usuarioId) {
-            alert('❌ Debes seleccionar un usuario');
+            alert(' Debes seleccionar un usuario');
             return;
         }
         formData.append('usuario_id', usuarioId);
     } else {
         const nucleoId = document.getElementById('selectNucleo').value;
         if (!nucleoId) {
-            alert('❌ Debes seleccionar un núcleo familiar');
+            alert(' Debes seleccionar un núcleo familiar');
             return;
         }
         formData.append('nucleo_id', nucleoId);
@@ -671,12 +671,12 @@ async function submitAsignacion(event, viviendaId) {
             closeAsignarModal();
             loadViviendas();
         } else {
-            alert('❌ Error: ' + data.message);
+            alert(' Error: ' + data.message);
         }
         
     } catch (error) {
-        console.error('❌ [VIVIENDAS] Error:', error);
-        alert('❌ Error de conexión');
+        console.error(' [VIVIENDAS] Error:', error);
+        alert(' Error de conexión');
     }
 }
 
@@ -701,12 +701,12 @@ async function desasignarVivienda(asignacionId) {
             alert(' ' + data.message);
             loadViviendas();
         } else {
-            alert('❌ Error: ' + data.message);
+            alert(' Error: ' + data.message);
         }
         
     } catch (error) {
-        console.error('❌ [VIVIENDAS] Error:', error);
-        alert('❌ Error de conexión');
+        console.error(' [VIVIENDAS] Error:', error);
+        alert(' Error de conexión');
     }
 }
 
@@ -731,11 +731,11 @@ async function deleteVivienda(id, numero) {
             alert(' Vivienda eliminada');
             loadViviendas();
         } else {
-            alert('❌ Error: ' + (data.message || 'Error al eliminar'));
+            alert(' Error: ' + (data.message || 'Error al eliminar'));
         }
     } catch (error) {
-        console.error('❌ [VIVIENDAS] Error:', error);
-        alert('❌ Error de conexión');
+        console.error(' [VIVIENDAS] Error:', error);
+        alert(' Error de conexión');
     }
 }
 
