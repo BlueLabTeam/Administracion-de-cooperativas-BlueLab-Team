@@ -1028,7 +1028,60 @@ const translations = {
         housing: "Housing",
         assignTo: "Assign to *",
         individualUser: "Individual User",
-        familyNucleus: "Family Unit"
+        familyNucleus: "Family Unit",
+        loadingHousings: "Loading housings...",
+        connectionError: "Connection error.",
+        table: {
+          columns: {
+            housingNumber: "Housing Number",
+            address: "Address",
+            type: "Type",
+            status: "Status",
+            assignedTo: "Assigned To",
+            actions: "Actions"
+          },
+          rows : {
+            noAssigned: "Not assigned",
+            noHousings: "No housings registered",
+            createFirstHousing: "Create the first housing",
+            status:{
+              available: "Available",
+              occupied: "Occupied",
+              maintenance: "Under Maintenance"
+            },
+            modalDetails: {
+              title: "Hosing ",
+              address: "Address:",
+              type: "Type:",
+              squareMeters: "meters²:",
+              status: "Status:",
+              construction: "Construction: ",
+              closeButton: "Close",
+              editButton: "Edit"
+            },
+            modalEdit: {
+              title: "Edit Housing",
+              selectType: {
+                placeholder: "Select type...",
+              },
+            },
+            modalAssign: {
+              title: "Assign Housing",
+              housing: "Housing:",
+              assignmentType: "Assignment Type ",
+              individualUser: "Individual User",
+              assignToIndividual: "Assign to Individual User",
+              familyUnit: "Family Unit",
+              assignToFamily: "Assign to Family Unit",
+              selectUser: "Select User:",
+              selectFamilyUnit: "Select Family Unit:",
+              unnamedFamilyUnit: "Unnamed Family Unit",
+              members: "Members",
+              cancelButton: "Cancel",
+              assignButton: "Assign Housing"
+            },
+          },
+        },
       },
 
       billing: {
