@@ -55,6 +55,9 @@ services:
       - db_data:/var/lib/mysql
       - ./docker/db/master/init-master.sh:/docker-entrypoint-initdb.d/init-master.sh
       - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./sql/triggers.sql:/docker-entrypoint-initdb.d/triggers.sql
+      - ./sql/procedures.sql:/docker-entrypoint-initdb.d/procedures.sql
+      - ./sql/views.sql:/docker-entrypoint-initdb.d/views.sql
       - ./sql/seeds.sql:/docker-entrypoint-initdb.d/seeds.sql
       - ./docker/db/master/config/:/etc/mysql/conf.d/master.cnf
 
