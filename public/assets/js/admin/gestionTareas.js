@@ -379,7 +379,7 @@
                     ` : ''}
                     ${!tarea.esCancelada ? `
                         <div class="task-actions">
-                            <button class="btn btn-small btn-view" onclick="TareasModule.viewDetails(${tarea.id_tarea})">Ver Detalles</button>
+                            
                             <button class="btn btn-small btn-materiales" onclick="TareasModule.viewMaterials(${tarea.id_tarea})">
                                 <i class="fas fa-boxes"></i> Materiales
                             </button>

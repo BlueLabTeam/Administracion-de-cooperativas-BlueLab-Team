@@ -486,7 +486,7 @@ async function mostrarNucleosDisponibles() {
                 <div class="material-modal-content" onclick="event.stopPropagation()" style="max-width: 600px; width: 90%; background: #f9f9f9; border-radius: 15px; overflow: hidden;">
                     <div class="material-modal-header" style="background: linear-gradient(90deg, #69b2d5, #1b1397); color: white; padding: 20px 24px; border-bottom: none;">
                         <h3 style="margin: 0; font-size: 22px; display: flex; align-items: center;">
-                            <i class="fas fa-search" style="margin-right: 10px;"></i>
+                        
                             <span data-i18n="dashboardUser.home.availableCores.title">Núcleos Disponibles</span>
                         </h3>
                         <button class="close-material-modal" onclick="cerrarModalDetallesNucleo()" style="color: white; opacity: 0.8; font-size: 30px; top: 10px; right: 15px;">&times;</button>
@@ -500,9 +500,8 @@ async function mostrarNucleosDisponibles() {
                         ${nucleosHTML}
                         
                         <div class="form-actions" style="margin-top: 30px; text-align: right;">
-                            <button type="button" class="btn btn-secondary" onclick="cerrarModalDetallesNucleo()" style="background: #e9ecef; color: #333; border: none; padding: 10px 20px; border-radius: 8px;">
-                                <i class="fas fa-times"></i> <span data-i18n="dashboardUser.home.availableCores.closeModal">Cerrar</span>
-                            </button>
+                           
+                               
                         </div>
                     </div>
                 </div>
