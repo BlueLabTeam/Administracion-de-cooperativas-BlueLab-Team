@@ -908,7 +908,7 @@ modalunirse: {
         typeSuccess: "Success",
         recipientsLabel: "Recipients:",
         selectAll: "Select All",
-        sendButton: "Send Notification"
+        sendButton: "Send Notification",
       },
 
       family: {
@@ -1233,7 +1233,19 @@ modalunirse: {
         saveMaterial: "Save Material",
         updateStock: "Update Stock",
         material: "Material",
-        availableQuantity: "Available Quantity *"
+        availableQuantity: "Available Quantity *",
+        stockAvailable: "Available",
+        stockLow: "Low Stock",
+        stockOut: "Out",
+        table: {
+          columns: {
+            id: "ID",
+            material: "Material",
+            caracteristics: "Caracteristics",
+            stock: "Stock",
+            actions: "Actions",
+          },
+        },
       },
 
       tasks: {
