@@ -127,7 +127,7 @@
 			<div class="info-card">
 				<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
 					<h3 data-i18n="dashboardAdmin.family.registered">Núcleos Familiares Registrados</h3>
-					<button class="btn btn-primary" onclick="showCreateNucleoForm()" data-i18n="dashboardAdmin.family.createNew">
+					<button class="btn btn-primary" onclick="NucleosModule.showCreateModal()" data-i18n="dashboardAdmin.family.createNew">
 						Crear Nuevo Núcleo
 					</button>
 				</div>

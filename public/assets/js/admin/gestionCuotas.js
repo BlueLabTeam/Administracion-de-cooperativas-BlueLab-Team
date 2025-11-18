@@ -471,12 +471,12 @@
             
             // Botón ver comprobante
             if (cuota.comprobante_archivo) {
-                html += '<button class="btn-small btn-secondary" onclick="window.open(\'/files/?path=' + cuota.comprobante_archivo + '\',\'_blank\')" title="Ver Comprobante"><i class="fas fa-image"></i></button>';
+                html += '<button class="btn-small btn-primary" onclick="window.open(\'/files/?path=' + cuota.comprobante_archivo + '\',\'_blank\')" title="Ver Comprobante"><i class="fas fa-image"></i></button>';
             }
             
             // Botón justificar horas
             if (usuarioId) {
-                html += '<button class="btn-small btn-info" onclick="abrirModalJustificarHorasCuota(' + usuarioId + ', \'' + nombreEscaped + '\', ' + cuota.mes + ', ' + cuota.anio + ', ' + horasTrabajadas + ', ' + horasJustificadas + ', ' + horasRequeridas + ')" title="Justificar Horas"><i class="fas fa-clock"></i></button>';
+                html += '<button class="btn-small btn-primary" onclick="abrirModalJustificarHorasCuota(' + usuarioId + ', \'' + nombreEscaped + '\', ' + cuota.mes + ', ' + cuota.anio + ', ' + horasTrabajadas + ', ' + horasJustificadas + ', ' + horasRequeridas + ')" title="Justificar Horas"><i class="fas fa-clock"></i></button>';
             }
             
             // Botón validar pago
@@ -486,7 +486,7 @@
             
             // Botón liquidar deuda
             if (estadoFinal !== 'pagada') {
-                html += '<button class="btn-small btn-success" onclick="liquidarDeudaCuota(' + cuota.id_cuota + ')" title="Liquidar Deuda"><i class="fas fa-hand-holding-usd"></i></button>';
+                html += '<button class="btn-small btn-primary" onclick="liquidarDeudaCuota(' + cuota.id_cuota + ')" title="Liquidar Deuda"><i class="fas fa-hand-holding-usd"></i></button>';
             }
             
             // ❌ BOTÓN ACTUALIZAR HORAS REMOVIDO

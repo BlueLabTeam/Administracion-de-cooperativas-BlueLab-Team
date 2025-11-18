@@ -532,3 +532,123 @@
         grid-template-columns: 1fr;
     }
 }
+
+.search-wrapper-nucleo {
+    position: relative;
+    margin-bottom: 16px;
+}
+
+.search-input-nucleo {
+    width: 100%;
+    padding: 12px 40px 12px 16px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: border-color 0.3s;
+}
+
+.search-input-nucleo:focus {
+    outline: none;
+    border-color: #4CAF50;
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+}
+
+.search-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+.users-list-container-nucleo {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 8px;
+    background: #fafafa;
+}
+
+.user-checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    margin-bottom: 8px;
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.user-checkbox-item:hover {
+    background: #f5f5f5;
+    border-color: #4CAF50;
+}
+
+.user-checkbox-item.selected {
+    background: #e8f5e9;
+    border-color: #4CAF50;
+}
+
+.user-checkbox-item.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: #f5f5f5;
+}
+
+.user-checkbox-item input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.user-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.user-name {
+    font-weight: 600;
+    color: #333;
+    font-size: 14px;
+}
+
+.user-email {
+    font-size: 12px;
+    color: #666;
+}
+
+.user-badges {
+    display: flex;
+    gap: 6px;
+}
+
+.badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.badge-warning {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.badge-success {
+    background: #d4edda;
+    color: #155724;
+}
+
+.no-users-message {
+    text-align: center;
+    padding: 32px;
+    color: #666;
+    font-style: italic;
+}
