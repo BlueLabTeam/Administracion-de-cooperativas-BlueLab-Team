@@ -26,8 +26,21 @@
     // ========== FUNCIONES AUXILIARES ==========
 
     function obtenerNombreMes(mes) {
-        const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-                       'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+        const meses = [
+  '<span data-i18n="dashboardAdmin.billing.table.months.january">Enero</span>',
+  '<span data-i18n="dashboardAdmin.billing.table.months.february">Febrero</span>',
+  '<span data-i18n="dashboardAdmin.billing.table.months.march">Marzo</span>',
+  '<span data-i18n="dashboardAdmin.billing.table.months.april">Abril</span>',
+  '<span data-i18n="dashboardAdmin.billing.table.months.may">Mayo</span>',
+  '<span data-i18n="dashboardAdmin.billing.table.months.june">Junio</span>',
+  '<span data-i18n="dashboardAdmin.billing.table.months.july">Julio</span>',
+  '<span data-i18n="dashboardAdmin.billing.table.months.august">Agosto</span>',
+  '<span data-i18n="dashboardAdmin.billing.table.months.september">Septiembre</span>',
+  '<span data-i18n="dashboardAdmin.billing.table.months.october">Octubre</span>',
+  '<span data-i18n="dashboardAdmin.billing.table.months.november">Noviembre</span>',
+  '<span data-i18n="dashboardAdmin.billing.table.months.december">Diciembre</span>'
+];
+
         return meses[parseInt(mes) - 1] || mes;
     }
 
@@ -88,8 +101,8 @@
             return;
         }
         
-        container.innerHTML = '<p class="loading">Cargando precios...</p>';
-        
+        container.innerHTML = '<p class="loading" data-i18n="dashboardAdmin.billing.cardType.loadingPrices">Cargando precios...</p>';
+        i18n.translatePage();
         try {
             const response = await fetch('/api/cuotas/precios');
             const data = await response.json();
@@ -97,11 +110,13 @@
             if (data.success) {
                 renderPreciosCuotas(data.precios);
             } else {
-                container.innerHTML = '<p class="error">Error: ' + data.message + '</p>';
+                container.innerHTML = '<p class="error"><span data-i18n="dashboardAdmin.billing.cardType.error">Error:</span> ' + data.message + '</p>';
+                i18n.translatePage();
             }
         } catch (error) {
             console.error(' [CUOTAS] Error:', error);
-            container.innerHTML = '<p class="error">Error de conexión</p>';
+            container.innerHTML = '<p class="error" data-i18n="dashboardAdmin.billing.cardType.connectionError">Error de conexión</p>';
+            i18n.translatePage();
         }
     };
 
@@ -110,7 +125,8 @@
         container.innerHTML = '';
         
         if (!precios || precios.length === 0) {
-            container.innerHTML = '<p>No hay precios configurados</p>';
+            container.innerHTML = '<p data-i18n="dashboardAdmin.billing.cardType.notPricesConfigured">No hay precios configurados</p>';
+            i18n.translatePage();
             return;
         }
 
@@ -128,22 +144,48 @@
             html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">';
             html += '<div><span style="font-size:40px;">' + icono + '</span><h4 style="color:' + COLORS.primary + ';margin:10px 0 0 0;">' + precio.tipo_vivienda + '</h4></div>';
             html += '</div>';
-            html += '<div style="margin:20px 0;"><span style="color:' + COLORS.gray500 + ';font-size:13px;">Cuota Mensual:</span><br><span style="color:' + COLORS.primary + ';font-size:32px;font-weight:700;">$' + monto + '</span></div>';
+            html +=
+'<div style="margin:20px 0;">' +
+    '<span style="color:' + COLORS.gray500 + ';font-size:13px;" data-i18n="dashboardAdmin.billing.table.cardType.quota">Cuota Mensual:</span><br>' +
+    '<span style="color:' + COLORS.primary + ';font-size:32px;font-weight:700;">' +
+        '$' + monto +
+    '</span>' +
+'</div>';
+
             html += '<div style="display:flex;justify-content:space-between;padding-top:15px;border-top:1px solid ' + COLORS.gray100 + ';">';
-            html += '<small style="color:' + COLORS.gray500 + ';">Vigente desde: ' + fecha + '</small>';
-            html += '<button class="btn-small btn-edit" onclick="editarPrecioCuota(' + precio.id_tipo + ',\'' + precio.tipo_vivienda + '\',' + precio.monto_mensual + ')"><i class="fas fa-edit"></i> Editar</button>';
+            html +=
+    '<small style="color:' + COLORS.gray500 + ';">' +
+        '<span data-i18n="dashboardAdmin.billing.table.cardType.date">Vigente desde:</span> ' +
+        fecha +
+    '</small>';
+
+        html +=
+    '<button class="btn-small btn-edit" onclick="editarPrecioCuota(' +
+        precio.id_tipo + ',\'' + precio.tipo_vivienda + '\',' + precio.monto_mensual +
+    ')"><i class="fas fa-edit"></i> <span data-i18n="dashboardAdmin.billing.cardType.botton">Editar</span></button>';
+
             html += '</div></div>';
         });
         
         html += '</div>';
         container.innerHTML = html;
+        i18n.translatePage();
     }
 
     // ========== EDITAR PRECIO ==========
 
     window.editarPrecioCuota = function(idTipo, nombreTipo, montoActual) {
         document.getElementById('precio-id-tipo').value = idTipo;
-        document.getElementById('precio-tipo-nombre').innerHTML = '<strong style="font-size:18px;color:' + COLORS.primary + ';">' + nombreTipo + '</strong><p style="margin:10px 0 0 0;font-size:13px;color:' + COLORS.gray500 + ';">Monto actual: $' + parseFloat(montoActual).toLocaleString('es-UY', {minimumFractionDigits: 2}) + '</p>';
+        document.getElementById('precio-tipo-nombre').innerHTML =
+    '<strong style="font-size:18px;color:' + COLORS.primary + ';">' +
+        nombreTipo +
+    '</strong>' +
+    '<p style="margin:10px 0 0 0;font-size:13px;color:' + COLORS.gray500 + ';">' +
+        '<span data-i18n="dashboardAdmin.billing.cardType.modalUpdate.currentAmount">Monto actual:</span> ' +
+        '$' + parseFloat(montoActual).toLocaleString("es-UY", { minimumFractionDigits: 2 }) +
+    '</p>';
+    i18n.translatePage();
+
         document.getElementById('precio-monto').value = '';
         document.getElementById('editarPrecioModal').style.display = 'flex';
     };
@@ -267,7 +309,7 @@
             return;
         }
         
-        container.innerHTML = '<p class="loading">Cargando cuotas...</p>';
+        container.innerHTML = '<p class="loading" data-i18n="dashboardAdmin.billing.cardType.loading">Cargando cuotas...</p>';
         
         try {
             const mes = document.getElementById('admin-filtro-mes') ? document.getElementById('admin-filtro-mes').value : '';
@@ -403,16 +445,16 @@
         }
 
         let html = '<div style="overflow-x:auto;border-radius:12px;box-shadow:' + COLORS.shadow + ';"><table style="width:100%;border-collapse:collapse;background:' + COLORS.white + ';min-width:1400px;"><thead><tr style="background:linear-gradient(135deg,' + COLORS.primary + ' 0%,' + COLORS.primaryDark + ' 100%);color:' + COLORS.white + ';">';
-        html += '<th style="padding:15px 12px;text-align:left;">Usuario</th>';
-        html += '<th style="padding:15px 12px;text-align:left;">Vivienda</th>';
-        html += '<th style="padding:15px 12px;text-align:center;">Período</th>';
-        html += '<th style="padding:15px 12px;text-align:right;">Monto</th>';
-        html += '<th style="padding:15px 12px;text-align:center;">Estado</th>';
-        html += '<th style="padding:15px 12px;text-align:center;">Horas Trabajadas</th>';
-        html += '<th style="padding:15px 12px;text-align:center;">Horas Justificadas</th>';
-        html += '<th style="padding:15px 12px;text-align:center;">Horas Netas</th>';
-        html += '<th style="padding:15px 12px;text-align:center;">Vencimiento</th>';
-        html += '<th style="padding:15px 12px;text-align:center;">Acciones</th>';
+        html += '<th style="padding:15px 12px;text-align:left;" data-i18n="dashboardAdmin.billing.table.columns.user">Usuario</th>';
+        html += '<th style="padding:15px 12px;text-align:left;" data-i18n="dashboardAdmin.billing.table.columns.housing">Vivienda</th>';
+        html += '<th style="padding:15px 12px;text-align:center;" data-i18n="dashboardAdmin.billing.table.columns.period">Período</th>';
+        html += '<th style="padding:15px 12px;text-align:right;" data-i18n="dashboardAdmin.billing.table.columns.mount">Monto</th>';
+        html += '<th style="padding:15px 12px;text-align:center;" data-i18n="dashboardAdmin.billing.table.columns.status">Estado</th>';
+        html += '<th style="padding:15px 12px;text-align:center;" data-i18n="dashboardAdmin.billing.table.columns.hoursWorked">Horas Trabajadas</th>';
+        html += '<th style="padding:15px 12px;text-align:center;" data-i18n="dashboardAdmin.billing.table.columns.hoursJustified">Horas Justificadas</th>';
+        html += '<th style="padding:15px 12px;text-align:center;" data-i18n="dashboardAdmin.billing.table.columns.totalHours">Horas Netas</th>';
+        html += '<th style="padding:15px 12px;text-align:center;" data-i18n="dashboardAdmin.billing.table.columns.expiration">Vencimiento</th>';
+        html += '<th style="padding:15px 12px;text-align:center;" data-i18n="dashboardAdmin.billing.table.columns.actions">Acciones</th>';
         html += '</tr></thead><tbody>';
         
         cuotas.forEach(function(cuota) {
@@ -496,6 +538,7 @@
         
         html += '</tbody></table></div>';
         container.innerHTML = html;
+        i18n.translatePage();
     }
 
     // ========== MODAL JUSTIFICAR HORAS ==========
@@ -515,28 +558,28 @@
                     <button onclick="closeJustificarHorasCuotaModal()" class="modal-close-btn">×</button>
                     
                     <h2 style="color:${COLORS.primary};margin-bottom:20px;">
-                        <i class="fas fa-clock"></i> Justificar Horas
+                        <i class="fas fa-clock"></i> <span data-i18n="dashboardAdmin.billing.table.modalJustificationHours.title">Justificar Horas</span>
                     </h2>
                     
                     <div style="background:${COLORS.gray50};padding:20px;border-radius:8px;margin-bottom:20px;">
-                        <p><strong>Usuario:</strong> ${nombreUsuario}</p>
-                        <p><strong>Período:</strong> ${nombreMes} ${anio}</p>
+                        <p><strong data-i18n="dashboardAdmin.billing.table.modalJustificationHours.user">Usuario:</strong> ${nombreUsuario}</p>
+                        <p><strong data-i18n="dashboardAdmin.billing.table.modalJustificationHours.period">Período:</strong> ${nombreMes} ${anio}</p>
                         <hr style="margin:15px 0;border:none;border-top:1px solid ${COLORS.gray100};">
                         <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;">
                             <div>
-                                <small style="color:${COLORS.gray500};">Horas Trabajadas</small>
+                                <small style="color:${COLORS.gray500};" data-i18n="dashboardAdmin.billing.table.modalJustificationHours.hoursWorked">Horas Trabajadas</small>
                                 <p style="font-size:20px;font-weight:700;color:${COLORS.primary};margin:5px 0;">${horasTrabajadas.toFixed(1)}h</p>
                             </div>
                             <div>
-                                <small style="color:${COLORS.gray500};">Ya Justificadas</small>
+                                <small style="color:${COLORS.gray500};" data-i18n="dashboardAdmin.billing.table.modalJustificationHours.hoursJustifiedLabel">Ya Justificadas</small>
                                 <p style="font-size:20px;font-weight:700;color:${COLORS.warning};margin:5px 0;">${horasJustificadas.toFixed(1)}h</p>
                             </div>
                             <div>
-                                <small style="color:${COLORS.gray500};">Horas Requeridas</small>
+                                <small style="color:${COLORS.gray500};" data-i18n="dashboardAdmin.billing.table.modalJustificationHours.hoursRequired">Horas Requeridas</small>
                                 <p style="font-size:20px;font-weight:700;color:${COLORS.gray700};margin:5px 0;">${horasRequeridas.toFixed(1)}h</p>
                             </div>
                             <div>
-                                <small style="color:${COLORS.gray500};">Disponibles para Justificar</small>
+                                <small style="color:${COLORS.gray500};" data-i18n="dashboardAdmin.billing.table.modalJustificationHours.hoursAvailable">Disponibles para Justificar</small>
                                 <p style="font-size:20px;font-weight:700;color:${COLORS.success};margin:5px 0;">${horasDisponibles.toFixed(1)}h</p>
                             </div>
                         </div>
@@ -545,7 +588,7 @@
                     <form id="justificarHorasForm" onsubmit="submitJustificarHorasCuota(event, ${idUsuario}, ${mes}, ${anio})">
                         
                         <div class="form-group">
-                            <label>Horas a Justificar <span style="color:${COLORS.danger};">*</span></label>
+                            <label data-i18n="dashboardAdmin.billing.table.modalJustificationHours.hoursToJustify">Horas a Justificar <span style="color:${COLORS.danger};">*</span></label>
                             <input type="number" 
                                    id="justificar-horas-cantidad" 
                                    step="0.1" 
@@ -554,41 +597,41 @@
                                    required 
                                    class="form-control"
                                    placeholder="Ej: 2.5">
-                            <small style="color:${COLORS.gray500};">Máximo: ${horasDisponibles.toFixed(1)} horas</small>
+                            <small style="color:${COLORS.gray500};"><span data-i18n="dashboardAdmin.billing.table.modalJustificationHours.maximum">Máximo:</span> ${horasDisponibles.toFixed(1)} <span data-i18n="dashboardAdmin.billing.table.modalJustificationHours.hours">horas</span></small>
                         </div>
                         
                         <div class="form-group">
-                            <label>Motivo de la Justificación <span style="color:${COLORS.danger};">*</span></label>
+                            <label data-i18n="dashboardAdmin.billing.table.modalJustificationHours.justifyMotive">Motivo de la Justificación <span style="color:${COLORS.danger};">*</span></label>
                             <textarea id="justificar-motivo" 
                                       required 
                                       rows="4" 
                                       class="form-control"
-                                      placeholder="Ej: Licencia médica, trámites personales, etc."></textarea>
+                                      placeholder="Ej: Licencia médica, trámites personales, etc." data-i18n-placeholder="dashboardAdmin.billing.table.modalJustificationHours.justifyMessagePlaceholder"></textarea>
                         </div>
                         
                         <div class="form-group">
-                            <label>Observaciones (opcional)</label>
+                            <label data-i18n="dashboardAdmin.billing.table.modalJustificationHours.observations">Observaciones (opcional)</label>
                             <textarea id="justificar-observaciones" 
                                       rows="2" 
                                       class="form-control"
-                                      placeholder="Información adicional..."></textarea>
+                                      placeholder="Información adicional..." data-i18n-placeholder="dashboardAdmin.billing.table.modalJustificationHours.aditionalInformationPlaceholder"></textarea>
                         </div>
                         
                         <div class="form-group">
-                            <label>Archivo Adjunto (opcional)</label>
+                            <label data-i18n="dashboardAdmin.billing.table.modalJustificationHours.attachmentLabel">Archivo Adjunto (opcional)</label>
                             <input type="file" 
                                    id="justificar-archivo" 
                                    class="form-control"
                                    accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
-                            <small style="color:${COLORS.gray500};">Formatos: PDF, JPG, PNG, DOC, DOCX</small>
+                            <small style="color:${COLORS.gray500};" data-i18n="dashboardAdmin.billing.table.modalJustificationHours.formats">Formatos: PDF, JPG, PNG, DOC, DOCX</small>
                         </div>
                         
                         <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:25px;">
                             <button type="button" onclick="closeJustificarHorasCuotaModal()" class="btn btn-secondary">
-                                <i class="fas fa-times"></i> Cancelar
+                                <i class="fas fa-times"></i> <span data-i18n="dashboardAdmin.billing.table.modalJustificationHours.cancelButton">Cancelar</span>
                             </button>
                             <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save"></i> Justificar Horas
+                                <i class="fas fa-save"></i> <span data-i18n="dashboardAdmin.billing.table.modalJustificationHours.button">Justificar Horas</span>
                             </button>
                         </div>
                     </form>
@@ -600,6 +643,7 @@
         if (modalAnterior) modalAnterior.remove();
         
         document.body.insertAdjacentHTML('beforeend', modalHTML);
+        i18n.translatePage();
     };
 
     window.closeJustificarHorasCuotaModal = function() {
@@ -697,8 +741,8 @@
             const mes = cuota.mes || new Date().getMonth() + 1;
             const anio = cuota.anio || new Date().getFullYear();
             const montoTotal = parseFloat(cuota.monto_total || cuota.monto || 0);
-            const metodoPago = cuota.metodo_pago || 'Transferencia';
-            const numeroComprobante = cuota.numero_comprobante || 'Sin número';
+            const metodoPago = cuota.metodo_pago || '<span data-i18n="dashboardAdmin.billing.table.modalValidatePayment.transferMethod">Transferencia</span>';
+            const numeroComprobante = cuota.numero_comprobante || '<span data-i18n="dashboardAdmin.billing.table.modalValidatePayment.noNumber">Sin número</span>';
             const fechaPago = cuota.fecha_pago || new Date().toISOString().split('T')[0];
             const comprobanteArchivo = cuota.comprobante_archivo || null;
             
@@ -707,7 +751,7 @@
                     <div class="material-modal-content" onclick="event.stopPropagation()" style="max-width: 700px;">
                         <div class="material-modal-header">
                             <h3>
-                                <i class="fas fa-check-circle"></i> Validar Pago
+                                <i class="fas fa-check-circle"></i> <span data-i18n="dashboardAdmin.billing.table.modalValidatePayment.title">Validar Pago</span>
                             </h3>
                             <button class="close-material-modal" onclick="closeValidarPagoModal()">&times;</button>
                         </div>
@@ -717,27 +761,27 @@
                         <div class="info-grid-box" style="background: #f8f9fa; padding: 20px; border-radius: 12px; margin-bottom: 20px; border-left: 4px solid #005CB9;">
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                                 <div>
-                                    <small style="color: #6c757d; font-size: 12px; text-transform: uppercase; font-weight: 600;">Usuario</small>
+                                    <small style="color: #6c757d; font-size: 12px; text-transform: uppercase; font-weight: 600;" data-i18n="dashboardAdmin.billing.table.modalValidatePayment.user">Usuario</small>
                                     <p style="font-weight: 600; margin: 5px 0; font-size: 15px;">${nombreCompleto}</p>
                                 </div>
                                 <div>
-                                    <small style="color: #6c757d; font-size: 12px; text-transform: uppercase; font-weight: 600;">Período</small>
+                                    <small style="color: #6c757d; font-size: 12px; text-transform: uppercase; font-weight: 600;" data-i18n="dashboardAdmin.billing.table.modalValidatePayment.period">Período</small>
                                     <p style="font-weight: 600; margin: 5px 0; font-size: 15px;">${obtenerNombreMes(mes)} ${anio}</p>
                                 </div>
                                 <div>
-                                    <small style="color: #6c757d; font-size: 12px; text-transform: uppercase; font-weight: 600;">Monto</small>
+                                    <small style="color: #6c757d; font-size: 12px; text-transform: uppercase; font-weight: 600;" data-i18n="dashboardAdmin.billing.table.modalValidatePayment.amount">Monto</small>
                                     <p style="font-size: 22px; font-weight: 700; color: #005CB9; margin: 5px 0;">${montoTotal.toLocaleString('es-UY', {minimumFractionDigits: 2})}</p>
                                 </div>
                                 <div>
-                                    <small style="color: #6c757d; font-size: 12px; text-transform: uppercase; font-weight: 600;">Método de Pago</small>
+                                    <small style="color: #6c757d; font-size: 12px; text-transform: uppercase; font-weight: 600;" data-i18n="dashboardAdmin.billing.table.modalValidatePayment.paymentMethod">Método de Pago</small>
                                     <p style="font-weight: 600; margin: 5px 0; font-size: 15px;">${metodoPago}</p>
                                 </div>
                                 <div>
-                                    <small style="color: #6c757d; font-size: 12px; text-transform: uppercase; font-weight: 600;">Número de Comprobante</small>
+                                    <small style="color: #6c757d; font-size: 12px; text-transform: uppercase; font-weight: 600;" data-i18n="dashboardAdmin.billing.table.modalValidatePayment.receiptNumber">Número de Comprobante</small>
                                     <p style="font-weight: 600; margin: 5px 0; font-size: 15px;">${numeroComprobante}</p>
                                 </div>
                                 <div>
-                                    <small style="color: #6c757d; font-size: 12px; text-transform: uppercase; font-weight: 600;">Fecha de Pago</small>
+                                    <small style="color: #6c757d; font-size: 12px; text-transform: uppercase; font-weight: 600;" data-i18n="dashboardAdmin.billing.table.modalValidatePayment.paymentDate">Fecha de Pago</small>
                                     <p style="font-weight: 600; margin: 5px 0; font-size: 15px;">${formatearFechaUY(fechaPago)}</p>
                                 </div>
                             </div>
@@ -745,7 +789,7 @@
                         
                         <div class="form-group" style="margin-bottom: 20px;">
                             <label style="font-weight: 600; margin-bottom: 10px; display: block;">
-                                <i class="fas fa-file-image"></i> Comprobante:
+                                <i class="fas fa-file-image"></i> <span data-i18n="dashboardAdmin.billing.table.modalValidatePayment.paymentReceipt">Comprobante:</span>
                             </label>
                             <div style="text-align: center; padding: 20px; background: #f8f9fa; border-radius: 12px; border: 2px dashed #dee2e6;">
                                 ${comprobanteArchivo ? 
@@ -754,37 +798,37 @@
                                          onclick="window.open('/files/?path=${comprobanteArchivo}','_blank')"
                                          title="Click para ver en tamaño completo">
                                      <p style="margin-top: 10px; color: #6c757d; font-size: 13px;">
-                                        <i class="fas fa-search-plus"></i> Click en la imagen para ampliar
+                                        <i class="fas fa-search-plus"></i> <span data-i18n="dashboardAdmin.billing.table.modalValidatePayment.clickToEnlarge">Click en la imagen para ampliar</span>
                                      </p>` 
                                     : `<div style="padding: 40px;">
                                         <i class="fas fa-file-invoice" style="font-size: 48px; color: #dee2e6; margin-bottom: 10px;"></i>
-                                        <p style="color: #6c757d; margin: 0;">Sin comprobante adjunto</p>
+                                        <p style="color: #6c757d; margin: 0;" data-i18n="dashboardAdmin.billing.table.modalValidatePayment.withoutReceipt">Sin comprobante adjunto</p>
                                        </div>`}
                             </div>
                         </div>
                         
                         <div class="form-group">
                             <label for="validar-observaciones">
-                                <i class="fas fa-comment-alt"></i> Observaciones (opcional)
+                                <i class="fas fa-comment-alt"></i> <span data-i18n="dashboardAdmin.billing.table.modalValidatePayment.observations">Observaciones (opcional)</span>
                             </label>
                             <textarea 
                                 id="validar-observaciones" 
                                 rows="3" 
                                 class="form-control"
                                 placeholder="Agrega comentarios sobre la validación..."
-                                style="resize: vertical;"></textarea>
-                            <small class="form-help">Estas observaciones serán visibles para el usuario</small>
+                                style="resize: vertical;" data-i18n="dashboardAdmin.billing.table.modalValidatePayment.observationsPlaceholder"></textarea>
+                            <small class="form-help" data-i18n="dashboardAdmin.billing.table.modalValidatePayment.observationsDescription">Estas observaciones serán visibles para el usuario</small>
                         </div>
                         
                         <div class="form-actions" style="justify-content: flex-end; gap: 10px;">
                             <button onclick="closeValidarPagoModal()" class="btn btn-secondary">
-                                <i class="fas fa-times"></i> Cancelar
+                                <i class="fas fa-times"></i> <span data-i18n="dashboardAdmin.billing.table.modalValidatePayment.cancelButton">Cancelar</span>
                             </button>
                             <button onclick="submitValidarPago('rechazar')" class="btn btn-danger">
-                                <i class="fas fa-times-circle"></i> Rechazar
+                                <i class="fas fa-times-circle"></i> <span data-i18n="dashboardAdmin.billing.table.modalValidatePayment.rejectButton">Rechazar</span>
                             </button>
                             <button onclick="submitValidarPago('aprobar')" class="btn btn-success">
-                                <i class="fas fa-check-circle"></i> Aprobar
+                                <i class="fas fa-check-circle"></i> <span data-i18n="dashboardAdmin.billing.table.modalValidatePayment.validateButton">Validar Pago</span>
                             </button>
                         </div>
                     </div>
@@ -796,6 +840,7 @@
             
             document.body.insertAdjacentHTML('beforeend', modalHTML);
             document.body.style.overflow = 'hidden';
+            i18n.translatePage();
             
             const modalOverlay = document.getElementById('validarPagoModal');
             modalOverlay.addEventListener('click', function(e) {
@@ -1084,6 +1129,7 @@
         `;
         
         document.head.insertAdjacentHTML('beforeend', estilos);
+        i18n.translatePage();
     }
 
     // ========== INICIALIZACIÓN ==========
