@@ -34,8 +34,8 @@ async function loadNucleosFamiliares() {
         return;
     }
 
-    container.innerHTML = '<p class="loading">Cargando núcleos...</p>';
-
+    container.innerHTML = '<p class="loading" data-i18n="dashboardAdmin.family.loadingUnits">Cargando núcleos...</p>';
+    i18n.translatePage();
     try {
         const response = await fetch('/api/nucleos/all', {
             method: 'GET',
@@ -79,11 +79,11 @@ function renderNucleosTable(nucleos) {
                 <thead>
                     <tr style="background: linear-gradient(135deg, #005CB9 0%, #004494 100%); color: #FFFFFF;">
                         <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">ID</th>
-                        <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;">Nombre del Núcleo</th>
-                        <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;">Dirección</th>
-                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Miembros</th>
-                        <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;">Integrantes</th>
-                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Acciones</th>
+                        <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;" data-i18n="dashboardAdmin.family.table.columns.name">Nombre del Núcleo</th>
+                        <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;" data-i18n="dashboardAdmin.family.table.columns.address">Dirección</th>
+                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;" data-i18n="dashboardAdmin.family.table.columns.members">Miembros</th>
+                        <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;" data-i18n="dashboardAdmin.family.table.columns.constituents">Integrantes</th>
+                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;" data-i18n="dashboardAdmin.family.table.columns.actions">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -107,7 +107,7 @@ function renderNucleosTable(nucleos) {
                 </td>
                 
                 <td style="padding: 14px 12px; font-size: 13px;">
-                    <div style="font-weight: 600; color: #495057;">${nucleo.nombre_nucleo || 'Sin nombre'}</div>
+                    <div style="font-weight: 600; color: #495057;">${nucleo.nombre_nucleo || '<span data-i18n="dashboardAdmin.family.table.rows.noName">Sin nombre</span>'}</div>
                 </td>
                 
                 <td style="padding: 14px 12px; font-size: 13px; color: #495057;">
@@ -123,13 +123,13 @@ function renderNucleosTable(nucleos) {
                         font-weight: 600;
                         background: ${totalMiembros > 0 ? '#4CAF50' : '#E8EBF0'};
                         color: ${totalMiembros > 0 ? '#FFFFFF' : '#6C757D'};
-                    ">${totalMiembros} ${totalMiembros === 1 ? 'miembro' : 'miembros'}</span>
+                    ">${totalMiembros} ${totalMiembros === 1 ? '<span data-i18n="dashboardAdmin.family.table.rows.member">miembro</span>' : '<span data-i18n="dashboardAdmin.family.table.rows.members">miembros</span>'}</span>
                 </td>
                 
                 <td style="padding: 14px 12px; font-size: 13px;">
                     ${integrantes !== 'Sin miembros' 
                         ? `<div style="color: #495057;">${integrantes}</div>` 
-                        : '<span style="color: #6C757D; font-style: italic;">Sin miembros</span>'}
+                        : '<span style="color: #6C757D; font-style: italic;" data-i18n="dashboardAdmin.family.table.rows.noMembers">Sin miembros</span>'}
                 </td>
                 
                 <td style="padding: 14px 12px;">
@@ -157,6 +157,7 @@ function renderNucleosTable(nucleos) {
 
     html += '</tbody></table></div>';
     container.innerHTML = html;
+    i18n.translatePage();
 }
 
 // ========== MOSTRAR MODAL CREAR ==========
@@ -385,14 +386,14 @@ function showNucleoDetailsModal(nucleo, miembros) {
                         <strong>ID:</strong> ${nucleo.id_nucleo}
                     </div>
                     <div class="detail-item">
-                        <strong>Dirección:</strong> ${nucleo.direccion || 'No especificada'}
+                        <strong data-i18n="dashboardAdmin.family.table.rows.modal.address">Dirección:</strong> ${nucleo.direccion || '<span data-i18n="dashboardAdmin.family.table.rows.modal.addressNotSpecified">No especificada</span>'}
                     </div>
                     <div class="detail-item">
-                        <strong>Total Miembros:</strong> ${miembros.length}
+                        <strong data-i18n="dashboardAdmin.family.table.rows.modal.membersTotal">Total Miembros:</strong> ${miembros.length}
                     </div>
                 </div>
                 
-                <h3 style="margin-top: 30px; margin-bottom: 15px;">Miembros del Núcleo</h3>
+                <h3 style="margin-top: 30px; margin-bottom: 15px;" data-i18n="dashboardAdmin.family.table.rows.modal.membersTitle">Miembros del Núcleo</h3>
                 
                 ${miembros.length > 0 ? `
                     <div class="miembros-grid">
@@ -412,13 +413,13 @@ function showNucleoDetailsModal(nucleo, miembros) {
                             </div>
                         `).join('')}
                     </div>
-                ` : '<p class="no-data">No hay miembros asignados</p>'}
+                ` : '<p class="no-data" data-i18n="dashboardAdmin.family.table.rows.modal.noMembers">No hay miembros asignados</p>'}
                 
                 <div class="form-actions" style="margin-top: 30px;">
-                    <button class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">
+                    <button class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()" data-i18n="dashboardAdmin.family.table.rows.modal.closeButton">
                         Cerrar
                     </button>
-                    <button class="btn btn-primary" onclick="this.closest('.modal-overlay').remove(); NucleosModule.edit(${nucleo.id_nucleo})">
+                    <button class="btn btn-primary" onclick="this.closest('.modal-overlay').remove(); NucleosModule.edit(${nucleo.id_nucleo})" data-i18n="dashboardAdmin.family.table.rows.modal.editButton">
                         Editar
                     </button>
                 </div>
@@ -427,6 +428,7 @@ function showNucleoDetailsModal(nucleo, miembros) {
     `;
 
     document.body.insertAdjacentHTML('beforeend', modalHTML);
+    i18n.translatePage();
 }
 
 // ========== EDITAR NÚCLEO ==========
@@ -448,7 +450,7 @@ async function editNucleo(nucleoId) {
             <div id="nucleoModal" class="material-modal" style="display: flex;">
                 <div class="material-modal-content">
                     <div class="material-modal-header">
-                        <h3>Editar Núcleo Familiar</h3>
+                        <h3 data-i18n="dashboardAdmin.family.table.rows.modal.modalEdit.title">Editar Núcleo Familiar</h3>
                         <button class="close-material-modal" onclick="NucleosModule.closeEditModal()">&times;</button>
                     </div>
                     
@@ -456,24 +458,24 @@ async function editNucleo(nucleoId) {
                         <input type="hidden" value="${nucleoId}">
 
                         <div class="material-form-group">
-                            <label for="edit_nombre_nucleo">Nombre del Núcleo *</label>
+                            <label for="edit_nombre_nucleo" data-i18n="dashboardAdmin.family.table.rows.modal.modalEdit.nameLabel">Nombre del Núcleo *</label>
                             <input type="text" id="edit_nombre_nucleo" name="nombre_nucleo"
                                    value="${nucleo.nombre_nucleo || ''}" required>
                         </div>
 
                         <div class="material-form-group">
-                            <label for="edit_direccion_nucleo">Dirección</label>
+                            <label for="edit_direccion_nucleo" data-i18n="dashboardAdmin.family.table.rows.modal.modalEdit.addressLabel">Dirección</label>
                             <input type="text" id="edit_direccion_nucleo" name="direccion"
                                    value="${nucleo.direccion || ''}">
                         </div>
 
                         <div class="material-form-group">
-                            <label>Miembros del Núcleo *</label>
+                            <label data-i18n="dashboardAdmin.family.table.rows.modal.modalEdit.membersUnitsLabel">Miembros del Núcleo *</label>
                             <div class="user-selection-nucleo">
                                 <input type="text" id="search-users-nucleo-edit"
                                        class="material-input"
                                        placeholder="Buscar usuario..."
-                                       onkeyup="NucleosModule.filterUsersEdit()">
+                                       onkeyup="NucleosModule.filterUsersEdit()" data-i18n-placeholder="dashboardAdmin.family.table.rows.modal.modalEdit.membersUnitsPlaceholder">
 
                                 <div id="usersListNucleoEdit" class="users-checkboxes-nucleo">
                                     ${renderUsersCheckboxesEdit(usuarios, miembrosActuales, nucleoId)}
@@ -482,10 +484,10 @@ async function editNucleo(nucleoId) {
                         </div>
 
                         <div class="material-form-actions">
-                            <button type="button" class="btn btn-secondary" onclick="NucleosModule.closeEditModal()">
+                            <button type="button" class="btn btn-secondary" onclick="NucleosModule.closeEditModal()" data-i18n="dashboardAdmin.family.table.rows.modal.modalEdit.cancelButton">
                                 Cancelar
                             </button>
-                            <button type="submit" class="btn btn-primary">
+                            <button type="submit" class="btn btn-primary" data-i18n="dashboardAdmin.family.table.rows.modal.modalEdit.saveButton">
                                 Guardar Cambios
                             </button>
                         </div>
@@ -498,6 +500,7 @@ async function editNucleo(nucleoId) {
         if (existing) existing.remove();
 
         document.body.insertAdjacentHTML('beforeend', modalHTML);
+        i18n.translatePage();
     } catch (error) {
         console.error('❌ [NÚCLEOS] Error:', error);
         alert('❌ Error al cargar datos del núcleo');
@@ -524,7 +527,7 @@ function renderUsersCheckboxesEdit(usuarios, miembrosActuales, nucleoIdActual) {
                     <strong>${user.nombre_completo}</strong>
                     <small>${user.email}</small>
                     ${enOtroNucleo ? '<span class="badge-warning">En otro núcleo</span>' : ''}
-                    ${esMiembroActual && !enOtroNucleo ? '<span class="badge-success">Miembro actual</span>' : ''}
+                    ${esMiembroActual && !enOtroNucleo ? '<span class="badge-success" data-i18n="dashboardAdmin.family.table.rows.modal.modalEdit.actualMember">Miembro actual</span>' : ''}
                 </span>
             </label>
         `;

@@ -44,8 +44,8 @@ async function loadViviendas() {
         return;
     }
 
-    container.innerHTML = '<p class="loading">Cargando viviendas...</p>';
-
+    container.innerHTML = '<p class="loading" data-i18n="dashboardAdmin.housing.loadingHousings">Cargando viviendas...</p>';
+    i18n.translatePage();
     try {
         const response = await fetch('/api/viviendas/all', {
             method: 'GET',
@@ -62,7 +62,8 @@ async function loadViviendas() {
         }
     } catch (error) {
         console.error('❌ [VIVIENDAS] Error:', error);
-        container.innerHTML = '<p class="error">Error de conexión</p>';
+        container.innerHTML = '<p class="error" data-i18n="dashboardAdmin.housing.connectionError">Error de conexión</p>';
+        i18n.translatePage();
     }
 }
 
@@ -74,9 +75,9 @@ function renderViviendasTable(viviendas) {
         container.innerHTML = `
             <div style="text-align: center; padding: 60px 20px;">
                 <i class="fas fa-home" style="font-size: 48px; color: #E8EBF0; display: block; margin-bottom: 15px;"></i>
-                <p style="color: #6C757D; margin-bottom: 20px;">No hay viviendas registradas</p>
+                <p style="color: #6C757D; margin-bottom: 20px;" data-i18n="dashboardAdmin.housing.table.rows.noHousings">No hay viviendas registradas</p>
                 <button class="btn btn-primary" onclick="ViviendasModule.showCreateModal()">
-                    <i class="fas fa-plus"></i> Crear Primera Vivienda
+                    <i class="fas fa-plus"></i> <span data-i18n="dashboardAdmin.housing.table.rows.createFirstHousing">Crear Primera Vivienda</span>
                 </button>
             </div>
         `;
@@ -89,12 +90,12 @@ function renderViviendasTable(viviendas) {
                 <thead>
                     <tr style="background: linear-gradient(135deg, ${COLORS.primary} 0%, ${COLORS.primaryDark} 100%); color: ${COLORS.white};">
                         <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">ID</th>
-                        <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;">Número</th>
-                        <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;">Dirección</th>
-                        <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;">Tipo</th>
-                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Estado</th>
-                        <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;">Asignada a</th>
-                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Acciones</th>
+                        <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;" data-i18n="dashboardAdmin.housing.table.columns.housingNumber">Número</th>
+                        <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;" data-i18n="dashboardAdmin.housing.table.columns.address">Dirección</th>
+                        <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;" data-i18n="dashboardAdmin.housing.table.columns.type">Tipo</th>
+                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;" data-i18n="dashboardAdmin.housing.table.columns.status">Estado</th>
+                        <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;" data-i18n="dashboardAdmin.housing.table.columns.assignedTo">Asignada a</th>
+                        <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;" data-i18n="dashboardAdmin.housing.table.columns.actions">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -108,13 +109,13 @@ function renderViviendasTable(viviendas) {
         let estadoText = '';
         if (vivienda.estado === 'disponible') {
             estadoColor = COLORS.success;
-            estadoText = 'Disponible';
+            estadoText = '<span data-i18n="dashboardAdmin.housing.table.rows.status.available">Disponible</span>';
         } else if (vivienda.estado === 'ocupada') {
             estadoColor = COLORS.primary;
-            estadoText = 'Ocupada';
+            estadoText = '<span data-i18n="dashboardAdmin.housing.table.rows.status.occupied">Ocupada</span>';
         } else if (vivienda.estado === 'mantenimiento') {
             estadoColor = COLORS.warning;
-            estadoText = 'Mantenimiento';
+            estadoText = '<span data-i18n="dashboardAdmin.housing.table.rows.status.maintenance">Mantenimiento</span>';
         }
 
         html += `
@@ -154,7 +155,7 @@ function renderViviendasTable(viviendas) {
                 <td style="padding: 14px 12px; font-size: 13px;">
                     ${asignada !== '-' 
                         ? `<div style="color: ${COLORS.gray700};">${asignada}</div>` 
-                        : `<span style="color: ${COLORS.gray500}; font-style: italic;">Sin asignar</span>`}
+                        : `<span style="color: ${COLORS.gray500}; font-style: italic;" data-i18n="dashboardAdmin.housing.table.rows.noAssigned">Sin asignar</span>`}
                 </td>
                 
                 <td style="padding: 14px 12px;">
@@ -196,6 +197,7 @@ function renderViviendasTable(viviendas) {
 
     html += '</tbody></table></div>';
     container.innerHTML = html;
+    i18n.translatePage();
 }
 
 // ========== CARGAR TIPOS DE VIVIENDA ==========
@@ -207,7 +209,7 @@ async function loadTiposVivienda() {
         if (data.success) {
             const select = document.getElementById('vivienda-tipo');
             if (select) {
-                select.innerHTML = '<option value="">Seleccione...</option>';
+                select.innerHTML = '<option value="" data-i18n="dashboardAdmin.housing.table.rows.modalEdit.selectType.placeholder">Seleccione...</option>';
                 data.tipos.forEach(tipo => {
                     select.innerHTML += `<option value="${tipo.id_tipo}">${tipo.nombre} (${tipo.habitaciones} hab.)</option>`;
                 });
@@ -366,14 +368,14 @@ function showViviendaDetailsModal(vivienda) {
             <div class="modal-content-large">
                 <button class="modal-close-btn" onclick="this.closest('.modal-overlay').remove()">×</button>
                 
-                <h2 class="modal-title">Vivienda ${vivienda.numero_vivienda}</h2>
+                <h2 class="modal-title"><span data-i18n="dashboardAdmin.housing.table.rows.modalDetails.title">Vivienda</span> ${vivienda.numero_vivienda}</h2>
                 
                 <div class="vivienda-details-grid">
-                    <div class="detail-item"><strong>Dirección:</strong> ${vivienda.direccion || 'No especificada'}</div>
-                    <div class="detail-item"><strong>Tipo:</strong> ${vivienda.tipo_nombre} (${vivienda.habitaciones} hab.)</div>
-                    <div class="detail-item"><strong>Estado:</strong> ${formatEstadoVivienda(vivienda.estado)}</div>
-                    <div class="detail-item"><strong>Metros²:</strong> ${vivienda.metros_cuadrados || '-'}</div>
-                    <div class="detail-item"><strong>Construcción:</strong> ${vivienda.fecha_construccion || '-'}</div>
+                    <div class="detail-item"><strong data-i18n="dashboardAdmin.housing.table.rows.modalDetails.address">Dirección:</strong> ${vivienda.direccion || 'No especificada'}</div>
+                    <div class="detail-item"><strong data-i18n="dashboardAdmin.housing.table.rows.modalDetails.type">Tipo:</strong> ${vivienda.tipo_nombre} (${vivienda.habitaciones} hab.)</div>
+                    <div class="detail-item"><strong data-i18n="dashboardAdmin.housing.table.rows.modalDetails.status">Estado:</strong> ${formatEstadoVivienda(vivienda.estado)}</div>
+                    <div class="detail-item"><strong data-i18n="dashboardAdmin.housing.table.rows.modalDetails.squareMeters">Metros²:</strong> ${vivienda.metros_cuadrados || '-'}</div>
+                    <div class="detail-item"><strong data-i18n="dashboardAdmin.housing.table.rows.modalDetails.construction">Construcción:</strong> ${vivienda.fecha_construccion || '-'}</div>
                 </div>
                 
                 ${vivienda.observaciones ? `
@@ -384,14 +386,15 @@ function showViviendaDetailsModal(vivienda) {
                 ` : ''}
                 
                 <div class="form-actions" style="margin-top: 30px;">
-                    <button class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">Cerrar</button>
-                    <button class="btn btn-primary" onclick="this.closest('.modal-overlay').remove(); ViviendasModule.edit(${vivienda.id_vivienda})">Editar</button>
+                    <button class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()" data-i18n="dashboardAdmin.housing.table.rows.modalDetails.closeButton">Cerrar</button>
+                    <button class="btn btn-primary" onclick="this.closest('.modal-overlay').remove(); ViviendasModule.edit(${vivienda.id_vivienda})" data-i18n="dashboardAdmin.housing.table.rows.modalDetails.editButton">Editar</button>
                 </div>
             </div>
         </div>
     `;
 
     document.body.insertAdjacentHTML('beforeend', modal);
+    i18n.translatePage();
 }
 
 // ========== ASIGNAR VIVIENDA - MODAL ÚNICO ==========
@@ -470,10 +473,10 @@ function mostrarModalAsignacion(viviendaId, numeroVivienda, usuarios, nucleos) {
                        onmouseout="this.style.background='rgba(255,255,255,0.2)'">×</button>
                     
                     <h2 style="margin: 0; font-size: 22px; font-weight: 600;">
-                        <i class="fas fa-user-plus"></i> Asignar Vivienda
+                        <i class="fas fa-user-plus"></i> <span data-i18n="dashboardAdmin.housing.table.rows.modalAssign.title">Asignar Vivienda</span>
                     </h2>
                     <p style="margin: 8px 0 0 0; opacity: 0.9; font-size: 14px;">
-                        Vivienda: <strong>${numeroVivienda}</strong>
+                        <span data-i18n="dashboardAdmin.housing.table.rows.modalAssign.housing">Vivienda:</span> <strong>${numeroVivienda}</strong>
                     </p>
                 </div>
 
@@ -482,7 +485,7 @@ function mostrarModalAsignacion(viviendaId, numeroVivienda, usuarios, nucleos) {
                     <!-- Tipo de asignación -->
                     <div class="form-group" style="margin-bottom: 25px;">
                         <label style="display: block; margin-bottom: 10px; font-weight: 600; color: ${COLORS.gray700};">
-                            Tipo de Asignación <span style="color: red;">*</span>
+                            <span data-i18n="dashboardAdmin.housing.table.rows.modalAssign.assignmentType">Tipo de Asignación</span> <span style="color: red;">*</span>
                         </label>
                         <div style="display: flex; gap: 15px;">
                             <label style="
@@ -502,10 +505,10 @@ function mostrarModalAsignacion(viviendaId, numeroVivienda, usuarios, nucleos) {
                                 <div>
                                     <div style="font-weight: 600; color: ${COLORS.gray700};">
                                         <i class="fas fa-user" style="margin-right: 8px; color: ${COLORS.primary};"></i>
-                                        Usuario Individual
+                                        <span data-i18n="dashboardAdmin.housing.table.rows.modalAssign.individualUser">Usuario Individual</span>
                                     </div>
                                     <div style="font-size: 12px; color: ${COLORS.gray500}; margin-top: 3px;">
-                                        Asignar a una persona
+                                        <span data-i18n="dashboardAdmin.housing.table.rows.modalAssign.assignToIndividual">Asignar a una persona</span>
                                     </div>
                                 </div>
                             </label>
@@ -527,10 +530,10 @@ function mostrarModalAsignacion(viviendaId, numeroVivienda, usuarios, nucleos) {
                                 <div>
                                     <div style="font-weight: 600; color: ${COLORS.gray700};">
                                         <i class="fas fa-users" style="margin-right: 8px; color: ${COLORS.success};"></i>
-                                        Núcleo Familiar
+                                        <span data-i18n="dashboardAdmin.housing.table.rows.modalAssign.familyUnit">Núcleo Familiar</span>
                                     </div>
                                     <div style="font-size: 12px; color: ${COLORS.gray500}; margin-top: 3px;">
-                                        Asignar a una familia
+                                        <span data-i18n="dashboardAdmin.housing.table.rows.modalAssign.assignToFamily">Asignar a una familia</span>
                                     </div>
                                 </div>
                             </label>
@@ -540,7 +543,7 @@ function mostrarModalAsignacion(viviendaId, numeroVivienda, usuarios, nucleos) {
                     <!-- Lista de Usuarios -->
                     <div id="usuariosContainer" style="display: none;">
                         <label style="display: block; margin-bottom: 10px; font-weight: 600; color: ${COLORS.gray700};">
-                            Seleccionar Usuario <span style="color: red;">*</span>
+                            <span data-i18n="dashboardAdmin.housing.table.rows.modalAssign.selectUser">Seleccionar Usuario</span> <span style="color: red;">*</span>
                         </label>
                         <select id="selectUsuario" class="form-control" style="
                             width: 100%;
@@ -560,7 +563,7 @@ function mostrarModalAsignacion(viviendaId, numeroVivienda, usuarios, nucleos) {
                     <!-- Lista de Núcleos -->
                     <div id="nucleosContainer" style="display: none;">
                         <label style="display: block; margin-bottom: 10px; font-weight: 600; color: ${COLORS.gray700};">
-                            Seleccionar Núcleo Familiar <span style="color: red;">*</span>
+                            <span data-i18n="dashboardAdmin.housing.table.rows.modalAssign.selectFamilyUnit">Seleccionar Núcleo Familiar</span> <span style="color: red;">*</span>
                         </label>
                         <select id="selectNucleo" class="form-control" style="
                             width: 100%;
@@ -572,7 +575,7 @@ function mostrarModalAsignacion(viviendaId, numeroVivienda, usuarios, nucleos) {
                         ">
                             <option value="">-- Seleccione un núcleo --</option>
                             ${nucleos.map(n => `
-                                <option value="${n.id_nucleo}">${n.nombre_nucleo || 'Núcleo sin nombre'} (${n.total_miembros} miembros)</option>
+                                <option value="${n.id_nucleo}">${n.nombre_nucleo || '<span data-i18n="dashboardAdmin.housing.table.rows.modalAssign.unnamedFamilyUnit">Núcleo sin nombre</span>'} (${n.total_miembros} <span data-i18n="dashboardAdmin.housing.table.rows.modalAssign.members">miembros</span>)</option>
                             `).join('')}
                         </select>
                     </div>
@@ -580,10 +583,11 @@ function mostrarModalAsignacion(viviendaId, numeroVivienda, usuarios, nucleos) {
                     <!-- Botones -->
                     <div style="display: flex; gap: 10px; margin-top: 30px; justify-content: flex-end;">
                         <button type="button" onclick="closeAsignarModal()" class="btn btn-secondary">
-                            <i class="fas fa-times"></i> Cancelar
+                            <i class="fas fa-times"></i> 
+                            <span data-i18n="dashboardAdmin.housing.table.rows.modalAssign.cancelButton">Cancelar</span>
                         </button>
                         <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-check"></i> Asignar Vivienda
+                            <i class="fas fa-check"></i> <span data-i18n="dashboardAdmin.housing.table.rows.modalAssign.assignButton">Asignar Vivienda</span>
                         </button>
                     </div>
                 </form>
@@ -593,6 +597,7 @@ function mostrarModalAsignacion(viviendaId, numeroVivienda, usuarios, nucleos) {
 
     document.body.insertAdjacentHTML('beforeend', modalHTML);
     document.body.style.overflow = 'hidden';
+    i18n.translatePage();
 }
 
 // ========== TOGGLE ENTRE LISTAS ==========

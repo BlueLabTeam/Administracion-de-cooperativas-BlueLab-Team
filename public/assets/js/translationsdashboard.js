@@ -894,6 +894,7 @@ const translations = {
         title: "Family Unit Management",
         registered: "Registered Family Units",
         createNew: "Create New Unit",
+        loadingUnits: "Loading family units...",
         infoTitle: "Information about Family Units",
         infoWhat: "What is a family unit?",
         infoWhatDesc: "Group of users who share housing or are related",
@@ -902,7 +903,43 @@ const translations = {
         infoUsers: "User management:",
         infoUsersDesc: "A user can belong to only one unit",
         infoDelete: "Deletion:",
-        infoDeleteDesc: "When deleting a unit, users are NOT deleted, only unlinked"
+        infoDeleteDesc: "When deleting a unit, users are NOT deleted, only unlinked",
+        table: {
+          columns: {
+            name: "Unit Name",
+            members: "Members",
+            address: "Address",
+            constituents: "Constituents",
+            actions: "Actions"
+          },
+          rows : {
+            noName: "without name",
+            noMembers: "No members in this unit",
+            member: "member",
+            members: "members",
+            modal: {
+              address: "Address:",
+              addressNotSpecified: "No address specified",
+              membersTotal: "Total Members:",
+              membersTitle: "Unit Members",
+              noMembers: "No members in this unit",
+              editButton: "Edit Unit",
+              modalEdit:{
+                title: "Edit Family Unit",
+                nameLabel: "Unit Name *",
+                namePlaceholder: "Ex: The Smiths",
+                addressLabel: "Address",
+                addressPlaceholder: "Ex: Block B, 2nd Floor",
+                membersUnitsLabel: "Unit Members *",
+                membersUnitsPlaceholder: "Select members...",
+                cancelButton: "Cancel",
+                saveButton: "Save Changes",
+                actualMember: "Actual Member"
+              },
+              closeButton: "Close"
+            },
+          },
+        },
       },
 
       reports: {
@@ -991,7 +1028,60 @@ const translations = {
         housing: "Housing",
         assignTo: "Assign to *",
         individualUser: "Individual User",
-        familyNucleus: "Family Unit"
+        familyNucleus: "Family Unit",
+        loadingHousings: "Loading housings...",
+        connectionError: "Connection error.",
+        table: {
+          columns: {
+            housingNumber: "Housing Number",
+            address: "Address",
+            type: "Type",
+            status: "Status",
+            assignedTo: "Assigned To",
+            actions: "Actions"
+          },
+          rows : {
+            noAssigned: "Not assigned",
+            noHousings: "No housings registered",
+            createFirstHousing: "Create the first housing",
+            status:{
+              available: "Available",
+              occupied: "Occupied",
+              maintenance: "Under Maintenance"
+            },
+            modalDetails: {
+              title: "Hosing ",
+              address: "Address:",
+              type: "Type:",
+              squareMeters: "meters²:",
+              status: "Status:",
+              construction: "Construction: ",
+              closeButton: "Close",
+              editButton: "Edit"
+            },
+            modalEdit: {
+              title: "Edit Housing",
+              selectType: {
+                placeholder: "Select type...",
+              },
+            },
+            modalAssign: {
+              title: "Assign Housing",
+              housing: "Housing:",
+              assignmentType: "Assignment Type ",
+              individualUser: "Individual User",
+              assignToIndividual: "Assign to Individual User",
+              familyUnit: "Family Unit",
+              assignToFamily: "Assign to Family Unit",
+              selectUser: "Select User:",
+              selectFamilyUnit: "Select Family Unit:",
+              unnamedFamilyUnit: "Unnamed Family Unit",
+              members: "Members",
+              cancelButton: "Cancel",
+              assignButton: "Assign Housing"
+            },
+          },
+        },
       },
 
       billing: {
