@@ -95,14 +95,14 @@ const ReportesMensuales = (function() {
                 <table style="width: 100%; border-collapse: collapse; background: ${COLORS.white}; min-width: 1000px;">
                     <thead>
                         <tr style="background: linear-gradient(135deg, ${COLORS.primary} 0%, ${COLORS.primaryDark} 100%); color: ${COLORS.white};">
-                            <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;">Usuario</th>
-                            <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;">Vivienda</th>
-                            <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Horas</th>
-                            <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Cumplimiento</th>
-                            <th style="padding: 15px 12px; text-align: right; font-weight: 600; font-size: 13px;">Deuda ($)</th>
-                            <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Tareas</th>
-                            <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Cuota</th>
-                            <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Estado</th>
+                            <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;" data-i18n="dashboardAdmin.reports.table.columns.user">Usuario</th>
+                            <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;" data-i18n="dashboardAdmin.reports.table.columns.housing">Vivienda</th>
+                            <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;" data-i18n="dashboardAdmin.reports.table.columns.hours">Horas</th>
+                            <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;" data-i18n="dashboardAdmin.reports.table.columns.compliance">Cumplimiento</th>
+                            <th style="padding: 15px 12px; text-align: right; font-weight: 600; font-size: 13px;" data-i18n="dashboardAdmin.reports.table.columns.debt">Deuda ($)</th>
+                            <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;" data-i18n="dashboardAdmin.reports.table.columns.tasks">Tareas</th>
+                            <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;" data-i18n="dashboardAdmin.reports.table.columns.fee">Cuota</th>
+                            <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;" data-i18n="dashboardAdmin.reports.table.columns.status">Estado</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -117,29 +117,29 @@ const ReportesMensuales = (function() {
             else if (cumplimiento >= 50) cumplimientoColor = COLORS.warning;
             
             let estadoColor = COLORS.danger;
-            let estadoText = 'Crítico';
+            let estadoText = '<span data-i18n="dashboardAdmin.reports.table.rows.statusLevel.critical">Crítico</span>';
             if (usuario.estado_general === 'excelente') {
                 estadoColor = COLORS.success;
-                estadoText = 'Excelente';
+                estadoText = '<span data-i18n="dashboardAdmin.reports.table.rows.statusLevel.excellent">Excelente</span>';
             } else if (usuario.estado_general === 'bueno') {
                 estadoColor = COLORS.primary;
-                estadoText = 'Bueno';
+                estadoText = '<span data-i18n="dashboardAdmin.reports.table.rows.statusLevel.good">Bueno</span>';
             } else if (usuario.estado_general === 'regular') {
                 estadoColor = COLORS.warning;
-                estadoText = 'Regular';
+                estadoText = '<span data-i18n="dashboardAdmin.reports.table.rows.statusLevel.regular">Regular</span>';
             }
             
             let cuotaColor = COLORS.gray500;
-            let cuotaText = 'Sin cuota';
+            let cuotaText = '<span data-i18n="dashboardAdmin.reports.table.rows.status.unassigned">Sin cuota</span>';
             if (usuario.estado_cuota === 'pagada') {
                 cuotaColor = COLORS.success;
-                cuotaText = 'Pagada';
+                cuotaText = '<span data-i18n="dashboardAdmin.reports.table.rows.status.paid">Pagada</span>';
             } else if (usuario.estado_cuota === 'pendiente') {
                 cuotaColor = COLORS.warning;
-                cuotaText = 'Pendiente';
+                cuotaText = '<span data-i18n="dashboardAdmin.reports.table.rows.status.pending">Pendiente</span>';
             } else if (usuario.estado_cuota === 'vencida') {
                 cuotaColor = COLORS.danger;
-                cuotaText = 'Vencida';
+                cuotaText = '<span data-i18n="dashboardAdmin.reports.table.rows.status.overdue">Vencida</span>';
             }
             
             html += `
@@ -153,7 +153,7 @@ const ReportesMensuales = (function() {
                     </td>
                     
                     <td style="padding: 14px 12px; font-size: 13px; color: ${COLORS.gray700};">
-                        <div style="font-weight: 600;">${usuario.vivienda || 'Sin asignar'}</div>
+                        <div style="font-weight: 600;">${usuario.vivienda || '<span data-i18n="dashboardAdmin.reports.table.rows.unassigned">Sin asignar</span>'}</div>
                         ${usuario.tipo_vivienda ? `<div style="font-size: 11px; color: ${COLORS.gray500}; margin-top: 3px;">${usuario.tipo_vivienda}</div>` : ''}
                     </td>
                     
@@ -185,7 +185,7 @@ const ReportesMensuales = (function() {
                         <div>${usuario.tareas_completadas || 0}/${usuario.tareas_asignadas || 0}</div>
                         ${(usuario.tareas_asignadas || 0) > 0 ? 
                             `<div style="font-size: 11px; color: ${COLORS.gray500}; margin-top: 3px;">${usuario.progreso_tareas || 0}% completado</div>` : 
-                            `<div style="font-size: 11px; color: ${COLORS.gray500}; margin-top: 3px;">Sin tareas</div>`
+                            `<div style="font-size: 11px; color: ${COLORS.gray500}; margin-top: 3px;" data-i18n="dashboardAdmin.reports.table.rows.withoutTasks">Sin tareas</div>`
                         }
                     </td>
                     
@@ -210,6 +210,7 @@ const ReportesMensuales = (function() {
         
         html += '</tbody></table></div>';
         container.innerHTML = html;
+        i18n.translatePage();
     }
 
     /**
@@ -255,8 +256,8 @@ const ReportesMensuales = (function() {
             }
             
             const container = document.getElementById('reporteTableContainer');
-            container.innerHTML = '<p style="text-align: center; padding: 40px; color: #005CB9;"><i class="fas fa-spinner fa-spin"></i> Generando reporte...</p>';
-            
+            container.innerHTML = '<p style="text-align: center; padding: 40px; color: #005CB9;"><i class="fas fa-spinner fa-spin"></i> <span data-i18n="dashboardAdmin.reports.generating">Generando reporte...</span></p>';
+            i18n.translatePage();
             mostrarContenedores(false);
             
             try {
@@ -300,12 +301,14 @@ const ReportesMensuales = (function() {
                     this.mostrarReporte(data.reporte);
                 } else {
                     alert('✗ ' + (data.message || 'Error al generar reporte'));
-                    container.innerHTML = `<p style="text-align: center; padding: 40px; color: #dc3545;">${data.message || 'Error al generar reporte'}</p>`;
+                    container.innerHTML = `<p style="text-align: center; padding: 40px; color: #dc3545;">${data.message || '<span data-i18n="dashboardAdmin.reports.errorGeneratingReport">Error al generar reporte</span>'}</p>`;
+                    i18n.translatePage();
                 }
             } catch (error) {
                 console.error('✗ [REPORTE] Error:', error);
                 alert('✗ Error al generar reporte: ' + error.message);
-                container.innerHTML = `<p style="text-align: center; padding: 40px; color: #dc3545;">Error: ${error.message}</p>`;
+                container.innerHTML = `<p style="text-align: center; padding: 40px; color: #dc3545;"><span data-i18n="dashboardAdmin.reports.error">Error:</span> ${error.message}</p>`;
+                i18n.translatePage();
             }
         },
 
@@ -329,8 +332,8 @@ const ReportesMensuales = (function() {
             actualizarEstadisticas(reporte.resumen);
             mostrarContenedores(true);
             renderTablaReporte(reporte.usuarios);
-            
-         
+            i18n.translatePage();
+        
         },
 
         /**

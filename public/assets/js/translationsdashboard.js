@@ -878,13 +878,45 @@ const translations = {
         selectPeriod: " Select Period",
         selectMonth: "Select month...",
         selectYear: "Select year...",
+        generating: "Generating Report...",
+        error: "Error:",
+        errorGeneratingReport: "Error generating report.",
         generate: "Generate Report",
         exportCSV: "Export CSV",
         totalUsers: "Total Users",
         hoursWorked: "Hours Worked",
         completedTasks: "Completed Tasks",
         avgCompliance: "Average Compliance",
-        detailByUser: " Detail by User"
+        detailByUser: " Detail by User",
+        table:{
+          columns: {
+            user: "User",
+            housing: "Housing",
+            hours: "Hours",
+            compliance: "Compliance",
+            debt: "Debt",
+            tasks: "Tasks",
+            fee: "fee",
+            status: "Status"
+          },
+          rows: {
+            unassigned: "Unassigned",
+            completed: "% Completed",
+            withoutTasks: "Without Tasks",
+            status:{
+              unasigned: "Unassigned",
+              paid: "Paid",
+              pending: "Pending",
+              overdue: "Overdue"
+            },
+            statusLevel:{
+              critical: "Critical",
+              good: "Good",
+              regular: "Regular",
+              excellent: "Excellent"
+            },
+          }
+        },
       },
 
       housing: {
