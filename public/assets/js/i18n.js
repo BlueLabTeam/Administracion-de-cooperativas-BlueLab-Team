@@ -1,4 +1,4 @@
-// i18n.js - Sistema de internacionalización mejorado
+
 (function() {
   'use strict';
 
@@ -243,7 +243,7 @@
     
     // Verificar que translations esté disponible
     if (typeof translations === 'undefined') {
-      console.error('❌ translations.js no está cargado. Reintentando en 100ms...');
+      console.error(' translations.js no está cargado. Reintentando en 100ms...');
       setTimeout(init, 100);
       return;
     }

@@ -446,3 +446,875 @@
         font-size: var(--font-size-3xl);
     }
 }
+
+
+/* ========================================
+   ESTILOS PARA CUOTAS PENDIENTES MEJORADAS
+   ======================================== */
+
+.cuotas-pendientes-section {
+    background: linear-gradient(135deg, #fff5f5 0%, #ffe0e0 100%);
+    border-radius: 16px;
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 8px 24px rgba(244, 67, 54, 0.15);
+}
+
+/* Header con banner de alerta */
+.cuotas-pendientes-header {
+    margin-bottom: 30px;
+}
+
+.alert-banner-pendientes {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    background: linear-gradient(135deg, #f44336 0%, #e53935 100%);
+    color: white;
+    padding: 20px 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
+}
+
+.alert-icon-container {
+    flex-shrink: 0;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    font-size: 24px;
+}
+
+.alert-content {
+    flex: 1;
+}
+
+.alert-title {
+    margin: 0 0 5px 0;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.alert-subtitle {
+    margin: 0;
+    font-size: 14px;
+    opacity: 0.95;
+}
+
+.alert-badge {
+    flex-shrink: 0;
+}
+
+.badge-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 45px;
+    height: 45px;
+    background: white;
+    color: #f44336;
+    font-size: 20px;
+    font-weight: 700;
+    border-radius: 50%;
+    padding: 0 10px;
+}
+
+/* Grid de cuotas pendientes */
+.cuotas-grid-pendientes {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+/* Tarjeta de cuota pendiente */
+.cuota-pendiente-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    border-left: 5px solid #f44336;
+}
+
+.cuota-pendiente-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+/* Variantes según nivel de atraso */
+.card-atraso-critico {
+    border-left-color: #b71c1c;
+    background: linear-gradient(135deg, #ffffff 0%, #ffebee 100%);
+}
+
+.card-atraso-alto {
+    border-left-color: #d32f2f;
+}
+
+.card-atraso-medio {
+    border-left-color: #f44336;
+}
+
+/* Banner de urgencia */
+.cuota-urgencia-banner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: linear-gradient(135deg, #ff5252 0%, #f44336 100%);
+    color: white;
+    padding: 12px 15px;
+}
+
+.urgencia-indicator {
+    flex-shrink: 0;
+    font-size: 20px;
+}
+
+.urgencia-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.urgencia-label {
+    font-size: 11px;
+    opacity: 0.9;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.urgencia-dias {
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.orden-badge {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.25);
+    border-radius: 50%;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+/* Header de la tarjeta */
+.cuota-pendiente-header {
+    padding: 20px 20px 15px 20px;
+}
+
+.periodo-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.periodo-titulo {
+    margin: 0;
+    font-size: 18px;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.periodo-titulo i {
+    color: #f44336;
+}
+
+.vivienda-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #f5f5f5;
+    color: #666;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    width: fit-content;
+}
+
+/* Monto destacado */
+.cuota-monto-destacado {
+    background: linear-gradient(135deg, #fff9f9 0%, #fff5f5 100%);
+    padding: 20px;
+    margin: 0 20px 15px 20px;
+    border-radius: 12px;
+    border: 2px solid #ffebee;
+}
+
+.monto-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: #666;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+.monto-valor-grande {
+    font-size: 32px;
+    font-weight: 700;
+    color: #f44336;
+    line-height: 1;
+    margin-bottom: 12px;
+}
+
+.monto-desglose-mini {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-top: 12px;
+    border-top: 1px solid #ffcdd2;
+}
+
+.desglose-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    color: #666;
+}
+
+.desglose-item span {
+    opacity: 0.9;
+}
+
+.desglose-item.warning {
+    color: #ff9800;
+}
+
+.desglose-item.error {
+    color: #f44336;
+}
+
+/* Información adicional */
+.cuota-info-adicional {
+    padding: 0 20px 15px 20px;
+}
+
+.info-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.info-col {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    background: #f9f9f9;
+    border-radius: 8px;
+}
+
+.info-col i {
+    font-size: 18px;
+    color: #f44336;
+}
+
+.info-col > div {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.info-label {
+    font-size: 11px;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.info-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+}
+
+/* Estado del pago */
+.cuota-estado-pago {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0 20px 15px 20px;
+    padding: 12px;
+    border-radius: 8px;
+}
+
+.cuota-estado-pago.en-revision {
+    background: #e3f2fd;
+    color: #1976d2;
+}
+
+.cuota-estado-pago.rechazado {
+    background: #ffebee;
+    color: #c62828;
+}
+
+.cuota-estado-pago i {
+    font-size: 20px;
+}
+
+.cuota-estado-pago strong {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 2px;
+}
+
+.cuota-estado-pago small {
+    font-size: 12px;
+    opacity: 0.8;
+}
+
+/* Acciones */
+.cuota-pendiente-acciones {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 10px;
+    padding: 20px;
+    background: #fafafa;
+    border-top: 1px solid #f0f0f0;
+}
+
+.btn-pagar-pendiente {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 14px;
+}
+
+.btn-primary-gradient {
+    background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+    color: white;
+    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+}
+
+.btn-primary-gradient:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+}
+
+.btn-disabled {
+    background: #e0e0e0;
+    color: #999;
+    cursor: not-allowed;
+}
+
+.btn-ver-detalle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 12px 16px;
+    background: white;
+    color: #666;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 14px;
+}
+
+.btn-ver-detalle:hover {
+    background: #f5f5f5;
+    border-color: #bdbdbd;
+}
+
+/* Footer informativo */
+.cuotas-pendientes-footer {
+    margin-top: 20px;
+}
+
+.info-box {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    border-left: 4px solid #ff9800;
+}
+
+.info-box i {
+    font-size: 24px;
+    color: #ff9800;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.info-box p {
+    margin: 0;
+    color: #666;
+    line-height: 1.6;
+    font-size: 14px;
+}
+
+.info-box strong {
+    color: #333;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .cuotas-grid-pendientes {
+        grid-template-columns: 1fr;
+    }
+    
+    .alert-banner-pendientes {
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
+    }
+    
+    .cuota-pendiente-acciones {
+        grid-template-columns: 1fr;
+    }
+    
+    .monto-valor-grande {
+        font-size: 28px;
+    }
+    
+    .info-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .cuotas-pendientes-section {
+        padding: 20px 15px;
+    }
+    
+    .alert-banner-pendientes {
+        padding: 15px;
+    }
+    
+    .periodo-titulo {
+        font-size: 16px;
+    }
+    
+    .monto-valor-grande {
+        font-size: 24px;
+    }
+}
+
+/* ==========================================
+   HISTORIAL DE CUOTAS - DISEÑO MEJORADO
+   ==========================================*/
+
+/* ==========================================
+   HISTORIAL DE CUOTAS - DISEÑO MEJORADO
+   ==========================================*/
+
+/* Header del historial con toggle */
+.historial-header-toggle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background: linear-gradient(135deg, #f5f5f5 0%, #ffffff 100%);
+    border-radius: 10px;
+    margin-bottom: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    user-select: none;
+    border: 2px solid #e0e0e0;
+}
+
+.historial-header-toggle:hover {
+    background: linear-gradient(135deg, #eeeeee 0%, #f9f9f9 100%);
+    border-color: #bdbdbd;
+}
+
+.historial-count-badge {
+    background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.toggle-historial-btn {
+    background: rgba(76, 175, 80, 0.1);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.toggle-historial-btn i {
+    color: #4caf50;
+    font-size: 16px;
+    transition: transform 0.3s ease;
+}
+
+.historial-header-toggle:hover .toggle-historial-btn {
+    background: rgba(76, 175, 80, 0.2);
+}
+
+.historial-content-wrapper {
+    max-height: 5000px;
+    overflow: hidden;
+    transition: max-height 0.5s ease, opacity 0.3s ease;
+    opacity: 1;
+}
+
+.historial-content-wrapper.hidden {
+    max-height: 0;
+    opacity: 0;
+}
+
+/* Tarjeta principal del historial */
+.cuota-historial-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    border: 1px solid #e0e0e0;
+}
+
+.cuota-historial-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+/* Header del historial */
+.cuota-historial-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    background: linear-gradient(135deg, #f5f5f5 0%, #ffffff 100%);
+    border-bottom: 2px solid #e8f5e9;
+}
+
+.periodo-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+}
+
+.periodo-badge i {
+    color: #4caf50;
+    font-size: 18px;
+}
+
+/* Container derecho del header (estado + botón eliminar) */
+.cuota-header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.estado-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.badge-pagada {
+    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+    color: #2e7d32;
+    border: 1px solid #a5d6a7;
+}
+
+.badge-pagada i {
+    font-size: 14px;
+}
+
+/* Botón ocultar pago */
+.btn-ocultar-pago {
+    background: #9e9e9e;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+}
+
+.btn-ocultar-pago:hover {
+    background: #757575;
+    transform: scale(1.05);
+}
+
+.btn-ocultar-pago i {
+    pointer-events: none;
+}
+
+/* Animación para ocultar */
+@keyframes slideOut {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+        max-height: 1000px;
+    }
+    to {
+        opacity: 0;
+        transform: translateX(-20px);
+        max-height: 0;
+    }
+}
+
+/* Cuerpo del historial */
+.cuota-historial-body {
+    padding: 24px 20px;
+}
+
+/* Monto pagado destacado */
+.monto-pagado-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+    padding: 20px;
+    background: linear-gradient(135deg, #e8f5e9 0%, #f1f8f4 100%);
+    border-radius: 10px;
+    margin-bottom: 20px;
+    border: 2px solid #c8e6c9;
+}
+
+.monto-label {
+    font-size: 12px;
+    color: #666;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.monto-valor {
+    font-size: 32px;
+    font-weight: 700;
+    color: #2e7d32;
+    line-height: 1;
+}
+
+/* Desglose del historial */
+.desglose-historial {
+    background: #f9f9f9;
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 20px;
+    border: 1px solid #e0e0e0;
+}
+
+.desglose-titulo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.3s ease;
+    padding: 8px;
+    border-radius: 6px;
+}
+
+.desglose-titulo:hover {
+    background: #f0f0f0;
+}
+
+.desglose-titulo i {
+    color: #4caf50;
+    font-size: 15px;
+}
+
+.toggle-icon {
+    margin-left: auto;
+    transition: transform 0.3s ease;
+    color: #666 !important;
+    font-size: 12px !important;
+}
+
+.desglose-titulo.collapsed .toggle-icon {
+    transform: rotate(-90deg);
+}
+
+.desglose-items {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 500px;
+    overflow: hidden;
+    transition: max-height 0.3s ease, opacity 0.3s ease;
+    opacity: 1;
+}
+
+.desglose-items.hidden {
+    max-height: 0;
+    opacity: 0;
+    margin-top: 0;
+}
+
+.desglose-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    background: white;
+    border-radius: 6px;
+    font-size: 13px;
+    border-left: 3px solid #4caf50;
+}
+
+.desglose-row.desglose-extra {
+    border-left-color: #ff9800;
+}
+
+.desglose-concepto {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #666;
+    font-weight: 500;
+}
+
+.desglose-concepto i {
+    font-size: 12px;
+    color: #ff9800;
+}
+
+.desglose-monto {
+    font-weight: 700;
+    color: #333;
+}
+
+/* Grid de información */
+.info-historial-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.info-historial-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px;
+    background: #fafafa;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    transition: all 0.2s ease;
+}
+
+.info-historial-item:hover {
+    background: #f5f5f5;
+    border-color: #bdbdbd;
+}
+
+.info-historial-item i {
+    font-size: 20px;
+    color: #4caf50;
+    flex-shrink: 0;
+}
+
+.info-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.info-label {
+    font-size: 11px;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+.info-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+}
+
+/* Responsive para historial */
+@media (max-width: 768px) {
+    .info-historial-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .cuota-historial-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .cuota-header-right {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .monto-valor {
+        font-size: 28px;
+    }
+    
+    .cuota-historial-body {
+        padding: 20px 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .monto-pagado-container {
+        padding: 16px;
+    }
+    
+    .monto-valor {
+        font-size: 24px;
+    }
+    
+    .desglose-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+    }
+    
+    .info-historial-item {
+        padding: 12px;
+    }
+    
+    .btn-ocultar-pago {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+}

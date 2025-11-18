@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Cargar datos según la sección
                 cargarDatosSeccion(section);
             } else {
-                console.error(`❌ [NAV] Sección no encontrada: ${section}`);
+                console.error(` [NAV] Sección no encontrada: ${section}`);
             }
         });
     });
@@ -57,7 +57,7 @@ function cargarDatosSeccion(section) {
             if (typeof loadUsersForTable === 'function') {
                 loadUsersForTable();
             } else {
-                console.error('❌ [NAV] loadUsersForTable no definida');
+                console.error(' [NAV] loadUsersForTable no definida');
             }
             break;
 
@@ -66,7 +66,7 @@ function cargarDatosSeccion(section) {
             if (typeof loadUsersForNotifications === 'function') {
                 loadUsersForNotifications();
             } else {
-                console.error('❌ [NAV] loadUsersForNotifications no definida');
+                console.error(' [NAV] loadUsersForNotifications no definida');
             }
             break;
 
@@ -75,7 +75,7 @@ function cargarDatosSeccion(section) {
             if (typeof loadNucleosFamiliares === 'function') {
                 loadNucleosFamiliares();
             } else {
-                console.error('❌ [NAV] loadNucleosFamiliares no definida');
+                console.error(' [NAV] loadNucleosFamiliares no definida');
             }
             break;
 
@@ -94,7 +94,7 @@ function cargarDatosSeccion(section) {
             if (typeof loadMateriales === 'function') {
                 loadMateriales();
             } else {
-                console.error('❌ [NAV] loadMateriales no definida');
+                console.error(' [NAV] loadMateriales no definida');
             }
             break;
 
@@ -121,21 +121,21 @@ function cargarDatosSeccion(section) {
              
                 loadPreciosCuotas();
             } else {
-                console.error('❌ [NAV] loadPreciosCuotas NO está definida');
+                console.error(' [NAV] loadPreciosCuotas NO está definida');
             }
             
             if (typeof loadAllCuotasAdmin === 'function') {
     
                 loadAllCuotasAdmin();
             } else {
-                console.error('❌ [NAV] loadAllCuotasAdmin NO está definida');
+                console.error(' [NAV] loadAllCuotasAdmin NO está definida');
             }
             
             if (typeof loadEstadisticasCuotas === 'function') {
              
                 loadEstadisticasCuotas();
             } else {
-                console.error('❌ [NAV] loadEstadisticasCuotas NO está definida');
+                console.error(' [NAV] loadEstadisticasCuotas NO está definida');
             }
             break;
 
@@ -154,7 +154,7 @@ function cargarDatosSeccion(section) {
             if (typeof inicializarReportes === 'function') {
                 inicializarReportes();
             } else {
-                console.error('❌ [NAV] inicializarReportes no definida');
+                console.error(' [NAV] inicializarReportes no definida');
             }
             break;
 

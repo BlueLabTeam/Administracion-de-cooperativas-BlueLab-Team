@@ -84,7 +84,7 @@
     window.loadPreciosCuotas = async function() {
         const container = document.getElementById('preciosCuotasContainer');
         if (!container) {
-            console.error('❌ [CUOTAS] Container no encontrado');
+            console.error(' [CUOTAS] Container no encontrado');
             return;
         }
         
@@ -100,7 +100,7 @@
                 container.innerHTML = '<p class="error">Error: ' + data.message + '</p>';
             }
         } catch (error) {
-            console.error('❌ [CUOTAS] Error:', error);
+            console.error(' [CUOTAS] Error:', error);
             container.innerHTML = '<p class="error">Error de conexión</p>';
         }
     };
@@ -119,7 +119,7 @@
         let html = '<div class="precios-grid">';
         
         precios.forEach(function(precio) {
-            const iconos = { 1: '🏠', 2: '🏡', 3: '🏘️' };
+            const iconos = { 1: '', 2: '🏡', 3: '🏘️' };
             const icono = iconos[precio.habitaciones] || '🏘️';
             const monto = parseFloat(precio.monto_mensual).toLocaleString('es-UY', {minimumFractionDigits: 2});
             const fecha = formatearFechaUY(precio.fecha_vigencia_desde);
@@ -179,15 +179,15 @@
             const data = await response.json();
             
             if (data.success) {
-                alert('✅ ' + data.message);
+                alert(' ' + data.message);
                 window.closeEditarPrecioModal();
                 await window.loadPreciosCuotas();
             } else {
-                alert('❌ ' + data.message);
+                alert(' ' + data.message);
             }
         } catch (error) {
-            console.error('❌ Error:', error);
-            alert('❌ Error al actualizar');
+            console.error(' Error:', error);
+            alert(' Error al actualizar');
         }
     };
 
@@ -214,15 +214,15 @@
             const data = await response.json();
             
             if (data.success) {
-                alert('✅ ' + data.message);
+                alert(' ' + data.message);
                 await window.loadAllCuotasAdmin();
                 await window.loadEstadisticasCuotas();
             } else {
-                alert('❌ ' + data.message);
+                alert(' ' + data.message);
             }
         } catch (error) {
-            console.error('❌ Error:', error);
-            alert('❌ Error al generar cuotas');
+            console.error(' Error:', error);
+            alert(' Error al generar cuotas');
         }
     };
 
@@ -254,7 +254,7 @@
                 if (montoEl) montoEl.textContent = '$' + parseFloat(stats.monto_cobrado || 0).toLocaleString('es-UY', {minimumFractionDigits: 2});
             }
         } catch (error) {
-            console.error('❌ [CUOTAS] Error:', error);
+            console.error(' [CUOTAS] Error:', error);
         }
     };
 
@@ -263,7 +263,7 @@
     window.loadAllCuotasAdmin = async function() {
         const container = document.getElementById('allCuotasAdminContainer');
         if (!container) {
-            console.error('❌ [CUOTAS] Container no encontrado');
+            console.error(' [CUOTAS] Container no encontrado');
             return;
         }
         
@@ -290,21 +290,21 @@
                 container.innerHTML = '<p class="error">Error: ' + data.message + '</p>';
             }
         } catch (error) {
-            console.error('❌ [CUOTAS] Error:', error);
+            console.error(' [CUOTAS] Error:', error);
             container.innerHTML = '<p class="error">Error de conexión</p>';
         }
     };
 
     // ========== ENRIQUECER CUOTAS CON HORAS ==========
     async function enriquecerCuotasConHoras(cuotas) {
-        console.log(`🔍 Enriqueciendo ${cuotas.length} cuotas con datos de horas...`);
+        console.log(` Enriqueciendo ${cuotas.length} cuotas con datos de horas...`);
         
         const promises = cuotas.map(async (cuota) => {
             try {
                 const usuarioId = cuota.usuario_id || cuota.id_usuario;
                 
                 if (!usuarioId) {
-                    console.error('❌ No se encontró usuario_id en cuota:', cuota);
+                    console.error(' No se encontró usuario_id en cuota:', cuota);
                     cuota.horas_trabajadas = 0;
                     cuota.horas_justificadas_registros = 0;
                     cuota.horas_justificadas_manuales = 0;
@@ -349,7 +349,7 @@
                         }
                     }
                 } catch (error) {
-                    console.error(`❌ Error obteniendo registros:`, error);
+                    console.error(` Error obteniendo registros:`, error);
                 }
                 
                 cuota.horas_trabajadas = horasTrabajadas;
@@ -373,14 +373,14 @@
                         }
                     }
                 } catch (error) {
-                    console.error(`❌ Error obteniendo justificaciones:`, error);
+                    console.error(` Error obteniendo justificaciones:`, error);
                 }
                 
                 cuota.horas_justificadas_manuales = horasJustificadasManuales;
                 cuota.horas_netas = Math.max(0, horasTrabajadas - horasJustificadasRegistros - horasJustificadasManuales);
                 
             } catch (error) {
-                console.error('❌ Error general:', error);
+                console.error(' Error general:', error);
                 cuota.horas_trabajadas = 0;
                 cuota.horas_justificadas_registros = 0;
                 cuota.horas_justificadas_manuales = 0;
@@ -449,7 +449,6 @@
             html += '<td style="padding:14px 12px;text-align:center;">';
             html += '<div style="display:flex;flex-direction:column;align-items:center;gap:5px;">';
             html += '<strong style="font-size:16px;color:' + colorProgreso + ';">' + horasTrabajadas.toFixed(2) + 'h</strong>';
-            html += '<div style="width:80px;height:6px;background:#e0e0e0;border-radius:3px;overflow:hidden;">';
             html += '<div style="width:' + Math.min(progresoHoras, 100) + '%;height:100%;background:' + colorProgreso + ';transition:width 0.3s;"></div>';
             html += '</div>';
             html += '<small style="color:' + COLORS.gray500 + ';">de ' + horasRequeridas + 'h</small>';
@@ -472,12 +471,12 @@
             
             // Botón ver comprobante
             if (cuota.comprobante_archivo) {
-                html += '<button class="btn-small btn-secondary" onclick="window.open(\'/files/?path=' + cuota.comprobante_archivo + '\',\'_blank\')" title="Ver Comprobante"><i class="fas fa-image"></i></button>';
+                html += '<button class="btn-small btn-primary" onclick="window.open(\'/files/?path=' + cuota.comprobante_archivo + '\',\'_blank\')" title="Ver Comprobante"><i class="fas fa-image"></i></button>';
             }
             
             // Botón justificar horas
             if (usuarioId) {
-                html += '<button class="btn-small btn-info" onclick="abrirModalJustificarHorasCuota(' + usuarioId + ', \'' + nombreEscaped + '\', ' + cuota.mes + ', ' + cuota.anio + ', ' + horasTrabajadas + ', ' + horasJustificadas + ', ' + horasRequeridas + ')" title="Justificar Horas"><i class="fas fa-clock"></i></button>';
+                html += '<button class="btn-small btn-primary" onclick="abrirModalJustificarHorasCuota(' + usuarioId + ', \'' + nombreEscaped + '\', ' + cuota.mes + ', ' + cuota.anio + ', ' + horasTrabajadas + ', ' + horasJustificadas + ', ' + horasRequeridas + ')" title="Justificar Horas"><i class="fas fa-clock"></i></button>';
             }
             
             // Botón validar pago
@@ -487,10 +486,10 @@
             
             // Botón liquidar deuda
             if (estadoFinal !== 'pagada') {
-                html += '<button class="btn-small btn-success" onclick="liquidarDeudaCuota(' + cuota.id_cuota + ')" title="Liquidar Deuda"><i class="fas fa-hand-holding-usd"></i></button>';
+                html += '<button class="btn-small btn-primary" onclick="liquidarDeudaCuota(' + cuota.id_cuota + ')" title="Liquidar Deuda"><i class="fas fa-hand-holding-usd"></i></button>';
             }
             
-            // ❌ BOTÓN ACTUALIZAR HORAS REMOVIDO
+            //  BOTÓN ACTUALIZAR HORAS REMOVIDO
             
             html += '</div></td></tr>';
         });
@@ -503,7 +502,7 @@
     
     window.abrirModalJustificarHorasCuota = function(idUsuario, nombreUsuario, mes, anio, horasTrabajadas, horasJustificadas, horasRequeridas) {
         if (!idUsuario || idUsuario === 'undefined') {
-            alert('❌ Error: No se pudo identificar al usuario');
+            alert(' Error: No se pudo identificar al usuario');
             return;
         }
         
@@ -662,17 +661,17 @@
             }
             
             if (data.success) {
-                alert('✅ ' + data.message);
+                alert(' ' + data.message);
                 window.closeJustificarHorasCuotaModal();
                 await window.loadAllCuotasAdmin();
                 await window.loadEstadisticasCuotas();
             } else {
-                alert('❌ ' + (data.message || 'Error desconocido'));
+                alert(' ' + (data.message || 'Error desconocido'));
             }
             
         } catch (error) {
-            console.error('❌ Error:', error);
-            alert('❌ Error al justificar horas: ' + error.message);
+            console.error(' Error:', error);
+            alert(' Error al justificar horas: ' + error.message);
         } finally {
             ocultarCargando();
         }
@@ -688,7 +687,7 @@
             const data = await response.json();
             
             if (!data.success) {
-                alert('❌ Error al cargar información del pago');
+                alert(' Error al cargar información del pago');
                 ocultarCargando();
                 return;
             }
@@ -808,8 +807,8 @@
             ocultarCargando();
             
         } catch (error) {
-            console.error('❌ Error:', error);
-            alert('❌ Error al cargar información del pago');
+            console.error(' Error:', error);
+            alert(' Error al cargar información del pago');
             ocultarCargando();
         }
     };
@@ -825,12 +824,12 @@
         const observaciones = document.getElementById('validar-observaciones')?.value || '';
         
         if (!idPago) {
-            alert('❌ Error: No se pudo identificar el ID del pago');
+            alert(' Error: No se pudo identificar el ID del pago');
             return;
         }
         
         const textoAccion = accion === 'aprobar' ? 'aprobar' : 'rechazar';
-        const emojiAccion = accion === 'aprobar' ? '✅' : '❌';
+        const emojiAccion = accion === 'aprobar' ? '' : '';
         
         if (!confirm(`${emojiAccion} ¿Confirmas que deseas ${textoAccion} este pago?`)) {
             return;
@@ -857,7 +856,7 @@
             
             if (data.success) {
                 const mensajeExito = data.message || `Pago ${accion === 'aprobar' ? 'aprobado' : 'rechazado'} correctamente`;
-                alert(`✅ ${mensajeExito}`);
+                alert(` ${mensajeExito}`);
                 
                 closeValidarPagoModal();
                 
@@ -869,13 +868,13 @@
                 }
             } else {
                 const mensajeError = data.message || 'Error al validar el pago';
-                alert(`❌ ${mensajeError}`);
+                alert(` ${mensajeError}`);
                 btns.forEach(btn => btn.disabled = false);
             }
             
         } catch (error) {
-            console.error('❌ Error:', error);
-            alert('❌ Error al validar pago. Por favor, intenta nuevamente.');
+            console.error(' Error:', error);
+            alert(' Error al validar pago. Por favor, intenta nuevamente.');
             btns.forEach(btn => btn.disabled = false);
         } finally {
             ocultarCargando();
@@ -902,15 +901,15 @@
             const data = await response.json();
             
             if (data.success) {
-                alert('✅ ' + data.message);
+                alert(' ' + data.message);
                 await window.loadAllCuotasAdmin();
                 await window.loadEstadisticasCuotas();
             } else {
-                alert('❌ ' + data.message);
+                alert(' ' + data.message);
             }
         } catch (error) {
-            console.error('❌ Error:', error);
-            alert('❌ Error al liquidar');
+            console.error(' Error:', error);
+            alert(' Error al liquidar');
         } finally {
             ocultarCargando();
         }
@@ -1093,8 +1092,8 @@
         poblarSelectorAnios();
         agregarEstilosCSS();
         
-        console.log('✅ [CUOTAS] Módulo cargado completamente');
-        console.log('✅ [CUOTAS] Funciones disponibles:', {
+        console.log(' [CUOTAS] Módulo cargado completamente');
+        console.log(' [CUOTAS] Funciones disponibles:', {
             loadPreciosCuotas: typeof window.loadPreciosCuotas,
             loadAllCuotasAdmin: typeof window.loadAllCuotasAdmin,
             loadEstadisticasCuotas: typeof window.loadEstadisticasCuotas,

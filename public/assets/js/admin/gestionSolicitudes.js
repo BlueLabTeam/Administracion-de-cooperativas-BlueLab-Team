@@ -74,7 +74,7 @@ const SolicitudesAdmin = {
             }
 
         } catch (error) {
-            console.error('❌ Error:', error);
+            console.error(' Error:', error);
             container.innerHTML = '<p class="error">Error de conexión</p>';
         }
     },
@@ -211,7 +211,7 @@ const SolicitudesAdmin = {
                 
                 <td style="padding: 14px 12px;">
                     <div style="display: flex; gap: 5px; justify-content: center; flex-wrap: wrap;">
-                        <button class="btn-small btn-secondary" 
+                        <button class="btn-small btn-primary" 
                                 onclick="SolicitudesAdmin.verDetalle(${sol.id_solicitud})" 
                                 title="Ver detalle">
                             <i class="fas fa-eye"></i>
@@ -471,11 +471,14 @@ const SolicitudesAdmin = {
                                 <i class="fas fa-comment"></i> Mensaje *
                             </label>
                             <textarea 
-                                id="mensaje-respuesta-admin" 
-                                name="mensaje"
-                                rows="6"
-                                placeholder="Escribe tu respuesta al usuario..."
-                                required></textarea>
+    id="mensaje-respuesta-admin" 
+    name="mensaje"
+    rows="6"
+    placeholder="Escribe tu respuesta al usuario..."
+    required
+    style="resize: none;"
+></textarea>
+
                         </div>
 
                         <div class="form-group-admin">
@@ -544,14 +547,14 @@ const SolicitudesAdmin = {
                 this.loadAllSolicitudes();
                 this.loadEstadisticas();
             } else {
-                alert('❌ ' + data.message);
+                alert(' ' + data.message);
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = btnHTML;
             }
 
         } catch (error) {
             console.error('Error:', error);
-            alert('❌ Error de conexión');
+            alert(' Error de conexión');
             submitBtn.disabled = false;
             submitBtn.innerHTML = btnHTML;
         }
@@ -587,12 +590,12 @@ const SolicitudesAdmin = {
                 this.loadAllSolicitudes();
                 this.loadEstadisticas();
             } else {
-                alert('❌ ' + data.message);
+                alert(' ' + data.message);
             }
 
         } catch (error) {
             console.error('Error:', error);
-            alert('❌ Error de conexión');
+            alert(' Error de conexión');
         }
     }
 };

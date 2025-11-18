@@ -313,20 +313,7 @@ const GestionUsuarios = (function () {
                 <td style="padding: 14px 12px;">
                     <div style="display: flex; gap: 5px; justify-content: center; flex-wrap: wrap;">
                         
-                        <button class="btn-small btn-secondary" 
-                                onclick="GestionUsuarios.verDetalles(${user.id_usuario})"
-                                title="Ver detalles"
-                                style="
-                                    padding: 5px 10px;
-                                    background: #6C757D;
-                                    color: white;
-                                    border: none;
-                                    border-radius: 4px;
-                                    cursor: pointer;
-                                    font-size: 12px;
-                                ">
-                            <i class="fas fa-eye"></i>
-                        </button>
+                   
                         
                         ${hasPayment && isPending ? `
                             <button class="btn-small btn-info" 
@@ -644,7 +631,7 @@ const GestionUsuarios = (function () {
          * Ver detalles de usuario
          */
         verDetalles: async function (userId) {
-            console.log('🔍 [USUARIOS] Cargando detalles del usuario:', userId);
+            console.log(' [USUARIOS] Cargando detalles del usuario:', userId);
 
             try {
                 const response = await fetch(`${ENDPOINTS.DETAILS}?id_usuario=${userId}`);
@@ -658,11 +645,11 @@ const GestionUsuarios = (function () {
                 if (data.success && data.user) {
                     mostrarModalDetallesUsuario(data.user);
                 } else {
-                    alert('❌ Error: ' + (data.message || 'No se pudieron cargar los detalles'));
+                    alert(' Error: ' + (data.message || 'No se pudieron cargar los detalles'));
                 }
             } catch (error) {
                 console.error('✗ [USUARIOS] Error:', error);
-                alert('❌ Error de conexión: ' + error.message);
+                alert(' Error de conexión: ' + error.message);
             }
         },
 

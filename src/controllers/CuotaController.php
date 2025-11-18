@@ -51,8 +51,8 @@ class CuotaController
             ];
             
             error_log("===========================================");
-            error_log("🔍 [getMisCuotas] Usuario ID: $userId");
-            error_log("🔍 Filtros: " . json_encode($filtros));
+            error_log(" [getMisCuotas] Usuario ID: $userId");
+            error_log(" Filtros: " . json_encode($filtros));
             
             $cuotas = $this->cuotaModel->getCuotasUsuario($userId, $filtros);
             
@@ -353,8 +353,8 @@ public function liquidarCuota()
         echo json_encode($resultado, JSON_UNESCAPED_UNICODE);
 
     } catch (\Exception $e) {
-        error_log("❌ [CONTROLLER] Error en liquidarCuota: " . $e->getMessage());
-        error_log("❌ [CONTROLLER] Stack: " . $e->getTraceAsString());
+        error_log(" [CONTROLLER] Error en liquidarCuota: " . $e->getMessage());
+        error_log(" [CONTROLLER] Stack: " . $e->getTraceAsString());
         
         http_response_code(500);
         echo json_encode([

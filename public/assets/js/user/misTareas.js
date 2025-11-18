@@ -262,7 +262,7 @@ function addTaskAvance(tareaId) {
     
     //  Validar que tareaId existe
     if (!tareaId || tareaId === 'undefined') {
-        alert('❌ Error: ID de tarea inválido');
+        alert(' Error: ID de tarea inválido');
         console.error('tareaId recibido:', tareaId);
         return;
     }
@@ -320,12 +320,12 @@ function addTaskAvance(tareaId) {
                     console.error('Detalles del error:', data);
                 }
             } catch (parseError) {
-                console.error('❌ Error parsing JSON:', parseError);
+                console.error(' Error parsing JSON:', parseError);
                 alert('Error del servidor: ' + text);
             }
         })
         .catch(error => {
-            console.error('❌ Error:', error);
+            console.error(' Error:', error);
             alert('Error al reportar avance');
         });
 }

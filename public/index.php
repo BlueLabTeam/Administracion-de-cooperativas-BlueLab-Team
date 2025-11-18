@@ -106,7 +106,7 @@ $privateRoutes = [
     '/api/nucleos/delete',       
     '/api/nucleos/users-available',
     '/api/nucleos/disponibles',
-    '/api/nucleos/solicitar-unirse',
+    '/api/nucleos/solicitar-union',
     '/api/nucleos/mi-nucleo-info',
     '/api/nucleos/mis-solicitudes',
     '/api/nucleos/cancelar-solicitud',
@@ -338,7 +338,7 @@ switch ($uri) {
     case '/api/nucleos/disponibles':
         (new App\controllers\NucleoController())->getNucleosDisponibles();
         break;
-    case '/api/nucleos/solicitar-unirse':
+    case '/api/nucleos/solicitar-union':
         (new App\controllers\NucleoController())->solicitarUnirse();
         break;
     case '/api/nucleos/mis-solicitudes':

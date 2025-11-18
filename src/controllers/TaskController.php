@@ -265,7 +265,6 @@ class TaskController
         $comentario = $_POST['comentario'] ?? '';
         $progresoReportado = intval($_POST['progreso_reportado'] ?? 0);
 
-        //  VALIDACIÓN CON DEBUG MEJORADO
         if (empty($tareaId) || empty($comentario)) {
             echo json_encode([
                 'success' => false, 
@@ -279,9 +278,8 @@ class TaskController
                 ]
             ]);
             return;
-        } //  ESTA LLAVE FALTABA - CIERRA EL IF DE VALIDACIÓN
+        } 
 
-        //  AHORA EL CÓDIGO DE ARCHIVO ESTÁ EN EL NIVEL CORRECTO
         $archivoPath = null;
         if (isset($_FILES['archivo']) && $_FILES['archivo']['error'] === UPLOAD_ERR_OK) {
             $uploadDir = _DIR_ . '/../../storage/avances/';

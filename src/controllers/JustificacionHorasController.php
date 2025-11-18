@@ -38,11 +38,11 @@ class JustificacionHorasController
             error_log("FILES: " . json_encode(array_keys($_FILES)));
             error_log("SESSION completa: " . json_encode($_SESSION));
 
-            // ✅ VERIFICAR SESIÓN (con múltiples campos posibles)
+            //  VERIFICAR SESIÓN (con múltiples campos posibles)
             $userId = $_SESSION['user_id'] ?? $_SESSION['id_usuario'] ?? $_SESSION['usuario_id'] ?? null;
             
             if (!$userId) {
-                error_log("❌ No hay user_id en sesión");
+                error_log(" No hay user_id en sesión");
                 http_response_code(401);
                 echo json_encode([
                     'success' => false,
@@ -51,7 +51,7 @@ class JustificacionHorasController
                 exit();
             }
 
-            // ✅ VERIFICAR PERMISOS DE ADMIN (con múltiples campos posibles)
+            //  VERIFICAR PERMISOS DE ADMIN (con múltiples campos posibles)
             $isAdmin = false;
             
             // Método 1: Campo is_admin
@@ -70,7 +70,7 @@ class JustificacionHorasController
             }
             
             if (!$isAdmin) {
-                error_log("❌ Usuario no es admin");
+                error_log(" Usuario no es admin");
                 error_log("   - is_admin: " . json_encode($_SESSION['is_admin'] ?? null));
                 error_log("   - id_rol: " . json_encode($_SESSION['id_rol'] ?? null));
                 error_log("   - rol: " . json_encode($_SESSION['rol'] ?? null));
@@ -82,9 +82,9 @@ class JustificacionHorasController
                 exit();
             }
 
-            error_log("✅ Permisos OK - Admin verificado");
+            error_log(" Permisos OK - Admin verificado");
 
-            // ✅ VALIDAR CAMPOS REQUERIDOS
+            //  VALIDAR CAMPOS REQUERIDOS
             $requiredFields = ['id_usuario', 'mes', 'anio', 'horas_justificadas', 'motivo'];
             $missingFields = [];
             
@@ -95,7 +95,7 @@ class JustificacionHorasController
             }
             
             if (!empty($missingFields)) {
-                error_log("❌ Campos faltantes: " . implode(', ', $missingFields));
+                error_log(" Campos faltantes: " . implode(', ', $missingFields));
                 http_response_code(400);
                 echo json_encode([
                     'success' => false,
@@ -105,7 +105,7 @@ class JustificacionHorasController
                 exit();
             }
 
-            // ✅ EXTRAER Y VALIDAR DATOS
+            //  EXTRAER Y VALIDAR DATOS
             $idUsuario = intval($_POST['id_usuario']);
             $mes = intval($_POST['mes']);
             $anio = intval($_POST['anio']);
@@ -114,7 +114,7 @@ class JustificacionHorasController
             $observaciones = isset($_POST['observaciones']) ? trim($_POST['observaciones']) : null;
             $idAdmin = $userId;
 
-            error_log("✅ Datos validados:");
+            error_log(" Datos validados:");
             error_log("   - Usuario: $idUsuario");
             error_log("   - Período: $mes/$anio");
             error_log("   - Horas: $horasJustificadas");
@@ -149,14 +149,14 @@ class JustificacionHorasController
                 exit();
             }
 
-            // ✅ PROCESAR ARCHIVO ADJUNTO
+            //  PROCESAR ARCHIVO ADJUNTO
             $archivoAdjunto = null;
             if (isset($_FILES['archivo']) && $_FILES['archivo']['error'] === UPLOAD_ERR_OK) {
                 $uploadDir = __DIR__ . '/../../storage/justificaciones/';
                 
                 if (!is_dir($uploadDir)) {
                     mkdir($uploadDir, 0755, true);
-                    error_log("✅ Directorio creado: $uploadDir");
+                    error_log(" Directorio creado: $uploadDir");
                 }
 
                 $extension = pathinfo($_FILES['archivo']['name'], PATHINFO_EXTENSION);
@@ -176,13 +176,13 @@ class JustificacionHorasController
 
                 if (move_uploaded_file($_FILES['archivo']['tmp_name'], $rutaDestino)) {
                     $archivoAdjunto = 'justificaciones/' . $nombreArchivo;
-                    error_log("✅ Archivo guardado: $archivoAdjunto");
+                    error_log(" Archivo guardado: $archivoAdjunto");
                 } else {
                     error_log("⚠️ Error al mover archivo");
                 }
             }
 
-            // ✅ CREAR JUSTIFICACIÓN
+            //  CREAR JUSTIFICACIÓN
             error_log("📝 Llamando al modelo para crear justificación...");
             $resultado = $this->justificacionModel->crearJustificacion(
                 $idUsuario,
@@ -195,13 +195,13 @@ class JustificacionHorasController
                 $observaciones
             );
 
-            error_log("✅ Resultado del modelo: " . json_encode($resultado));
+            error_log(" Resultado del modelo: " . json_encode($resultado));
 
             http_response_code($resultado['success'] ? 200 : 400);
             echo json_encode($resultado);
 
         } catch (\Exception $e) {
-            error_log("❌ Exception en crearJustificacion: " . $e->getMessage());
+            error_log(" Exception en crearJustificacion: " . $e->getMessage());
             error_log("Stack trace: " . $e->getTraceAsString());
             http_response_code(500);
             echo json_encode([
@@ -254,7 +254,7 @@ class JustificacionHorasController
             ]);
 
         } catch (\Exception $e) {
-            error_log("❌ Error en getJustificacionesUsuario: " . $e->getMessage());
+            error_log(" Error en getJustificacionesUsuario: " . $e->getMessage());
             http_response_code(500);
             echo json_encode([
                 'success' => false,
@@ -306,7 +306,7 @@ class JustificacionHorasController
             echo json_encode($resultado);
 
         } catch (\Exception $e) {
-            error_log("❌ Error en eliminarJustificacion: " . $e->getMessage());
+            error_log(" Error en eliminarJustificacion: " . $e->getMessage());
             http_response_code(500);
             echo json_encode([
                 'success' => false,
