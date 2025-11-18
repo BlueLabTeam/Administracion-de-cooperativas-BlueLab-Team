@@ -2,7 +2,7 @@
 
 
 // Contraseña a hashear
-$password = 'adminadmin';
+$password = 'prueba123';
 
 // Generar el hash
 $hash = password_hash($password, PASSWORD_DEFAULT);
