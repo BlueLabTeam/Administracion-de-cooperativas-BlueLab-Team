@@ -161,9 +161,8 @@ function renderNucleosTable(nucleos) {
 }
 
 // ========== MOSTRAR MODAL CREAR ==========
+// ========== MOSTRAR MODAL CREAR ==========
 function showCreateNucleoModal() {
-
-    
     loadUsersForNucleo().then(usuarios => {
         const modalHTML = `
             <div id="createNucleoModal" class="material-modal" style="display: flex;">
@@ -190,18 +189,24 @@ function showCreateNucleoModal() {
 
                         <div class="material-form-group">
                             <label>Seleccionar Miembros del Núcleo *</label>
-                            <div class="user-selection-nucleo">
+                            
+                            <!-- BÚSQUEDA ARRIBA -->
+                            <div class="search-wrapper-nucleo">
                                 <input type="text" id="search-users-nucleo" 
-                                       class="material-input"
+                                       class="material-input search-input-nucleo"
                                        placeholder="Buscar usuario..." 
                                        onkeyup="NucleosModule.filterUsers()">
-                                <div id="usersListNucleo" class="users-checkboxes-nucleo">
-                                    ${renderUsersCheckboxes(usuarios)}
-                                </div>
-                                <small style="color: #6C757D; font-size: 12px;">
-                                    Selecciona los miembros que formarán parte de este núcleo
-                                </small>
+                                <span class="search-icon">🔍</span>
                             </div>
+
+                            <!-- LISTA DE USUARIOS DEBAJO -->
+                            <div id="usersListNucleo" class="users-list-container-nucleo">
+                                ${renderUsersCheckboxes(usuarios)}
+                            </div>
+                            
+                            <small class="helper-text-nucleo">
+                                Selecciona los miembros que formarán parte de este núcleo
+                            </small>
                         </div>
 
                         <div class="material-form-actions">
@@ -232,53 +237,41 @@ function showCreateNucleoModal() {
 // ========== RENDERIZAR CHECKBOXES DE USUARIOS ==========
 function renderUsersCheckboxes(usuarios) {
     if (!usuarios || usuarios.length === 0) {
-        return '<p style="color: #6C757D; text-align: center; padding: 20px;">No hay usuarios disponibles</p>';
+        return '<p class="no-users-message">No hay usuarios disponibles</p>';
     }
 
     return usuarios.map(usuario => {
         const isInNucleo = usuario.id_nucleo !== null;
-        const isDisabled = isInNucleo ? 'disabled' : '';
-        const checkboxStyle = isInNucleo ? 'opacity: 0.5; cursor: not-allowed;' : 'cursor: pointer;';
+        
+        // Manejar diferentes posibles nombres de campos
+        const nombreCompleto = usuario.nombre_completo || 
+                              `${usuario.nombre || ''} ${usuario.apellido || ''}`.trim() ||
+                              usuario.email ||
+                              'Usuario sin nombre';
+        
+        const identificacion = usuario.cedula || usuario.ci || usuario.email || 'N/A';
         
         return `
-            <label style="
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                padding: 10px 12px;
-                background: ${isInNucleo ? '#FFF3E0' : '#FFFFFF'};
-                border: 1px solid ${isInNucleo ? '#FFB74D' : '#E0E0E0'};
-                border-radius: 6px;
-                ${checkboxStyle}
-                transition: all 0.2s ease;
-            ">
+            <label class="user-checkbox-item ${isInNucleo ? 'disabled in-nucleo' : ''}">
                 <input type="checkbox" 
                        name="miembros[]" 
                        value="${usuario.id_usuario}" 
-                       ${isDisabled}>
-                <div style="flex: 1;">
-                    <div style="font-weight: 500; color: ${isInNucleo ? '#795548' : '#212529'};">
-                        ${usuario.nombre} ${usuario.apellido}
-                    </div>
-                    <div style="font-size: 12px; color: ${isInNucleo ? '#8D6E63' : '#6C757D'};">
-                        CI: ${usuario.cedula}
-                    </div>
-                </div>
+                       ${isInNucleo ? 'disabled' : ''}>
+                
+                <span class="user-info">
+                    <span class="user-name">${nombreCompleto}</span>
+                    <span class="user-email">CI: ${identificacion}</span>
+                </span>
+                
                 ${isInNucleo ? `
-                    <span style="
-                        font-size: 11px;
-                        color: #E65100;
-                        background: #FFE0B2;
-                        padding: 4px 10px;
-                        border-radius: 12px;
-                        font-weight: 600;
-                    ">Ya en núcleo</span>
+                    <span class="user-badges">
+                        <span class="badge badge-warning">Ya en núcleo</span>
+                    </span>
                 ` : ''}
             </label>
         `;
     }).join('');
 }
-
 // ========== CARGAR USUARIOS DISPONIBLES ==========
 async function loadUsersForNucleo(nucleoId = null) {
     try {
@@ -433,8 +426,6 @@ function showNucleoDetailsModal(nucleo, miembros) {
 
 // ========== EDITAR NÚCLEO ==========
 async function editNucleo(nucleoId) {
-   
-    
     try {
         const [detailsData, usuarios] = await Promise.all([
             fetch(`/api/nucleos/details?nucleo_id=${nucleoId}`).then(r => r.json()),
@@ -471,15 +462,20 @@ async function editNucleo(nucleoId) {
 
                         <div class="material-form-group">
                             <label data-i18n="dashboardAdmin.family.table.rows.modal.modalEdit.membersUnitsLabel">Miembros del Núcleo *</label>
-                            <div class="user-selection-nucleo">
+                            
+                            <!-- BÚSQUEDA ARRIBA -->
+                            <div class="search-wrapper-nucleo">
                                 <input type="text" id="search-users-nucleo-edit"
-                                       class="material-input"
+                                       class="material-input search-input-nucleo"
                                        placeholder="Buscar usuario..."
-                                       onkeyup="NucleosModule.filterUsersEdit()" data-i18n-placeholder="dashboardAdmin.family.table.rows.modal.modalEdit.membersUnitsPlaceholder">
+                                       onkeyup="NucleosModule.filterUsersEdit()" 
+                                       data-i18n-placeholder="dashboardAdmin.family.table.rows.modal.modalEdit.membersUnitsPlaceholder">
+                                <span class="search-icon">🔍</span>
+                            </div>
 
-                                <div id="usersListNucleoEdit" class="users-checkboxes-nucleo">
-                                    ${renderUsersCheckboxesEdit(usuarios, miembrosActuales, nucleoId)}
-                                </div>
+                            <!-- LISTA DE USUARIOS DEBAJO -->
+                            <div id="usersListNucleoEdit" class="users-list-container-nucleo">
+                                ${renderUsersCheckboxesEdit(usuarios, miembrosActuales, nucleoId)}
                             </div>
                         </div>
 
@@ -510,7 +506,7 @@ async function editNucleo(nucleoId) {
 // ========== RENDERIZAR USUARIOS PARA EDICIÓN ==========
 function renderUsersCheckboxesEdit(usuarios, miembrosActuales, nucleoIdActual) {
     if (!usuarios || usuarios.length === 0) {
-        return '<p>No hay usuarios disponibles</p>';
+        return '<p class="no-users-message">No hay usuarios disponibles</p>';
     }
 
     return usuarios.map(user => {
@@ -519,15 +515,17 @@ function renderUsersCheckboxesEdit(usuarios, miembrosActuales, nucleoIdActual) {
         const disabled = enOtroNucleo;
 
         return `
-            <label>
+            <label class="user-checkbox-item ${disabled ? 'disabled' : ''} ${esMiembroActual ? 'selected' : ''}">
                 <input type="checkbox" name="usuarios[]" value="${user.id_usuario}"
                        ${esMiembroActual ? 'checked' : ''}
                        ${disabled ? 'disabled' : ''}>
-                <span>
-                    <strong>${user.nombre_completo}</strong>
-                    <small>${user.email}</small>
-                    ${enOtroNucleo ? '<span class="badge-warning">En otro núcleo</span>' : ''}
-                    ${esMiembroActual && !enOtroNucleo ? '<span class="badge-success" data-i18n="dashboardAdmin.family.table.rows.modal.modalEdit.actualMember">Miembro actual</span>' : ''}
+                <span class="user-info">
+                    <span class="user-name">${user.nombre_completo}</span>
+                    <span class="user-email">${user.email}</span>
+                </span>
+                <span class="user-badges">
+                    ${enOtroNucleo ? '<span class="badge badge-warning">En otro núcleo</span>' : ''}
+                    ${esMiembroActual && !enOtroNucleo ? '<span class="badge badge-success" data-i18n="dashboardAdmin.family.table.rows.modal.modalEdit.actualMember">Miembro actual</span>' : ''}
                 </span>
             </label>
         `;
