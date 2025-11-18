@@ -41,19 +41,22 @@ async function loadUserTasks() {
             renderUserTasks(data.tareas_usuario, 'tareasUsuarioList');
             renderUserTasks(data.tareas_nucleo, 'tareasNucleoList', true);
             updateTasksSummary(data.tareas_usuario, data.tareas_nucleo);
+            i18n.translatePage();
         } else {
             console.error('Error al cargar tareas:', data.message || data);
             document.getElementById('tareasUsuarioList').innerHTML =
-                '<div class="no-tasks">Error al cargar tareas</div>';
+                '<div class="no-tasks" data-i18n="dashboardUser.tasks.errorLoading">Error al cargar tareas</div>';
             document.getElementById('tareasNucleoList').innerHTML =
-                '<div class="no-tasks">Error al cargar tareas</div>';
+                '<div class="no-tasks" data-i18n="dashboardUser.tasks.errorLoading">Error al cargar tareas</div>';
+            i18n.translatePage();
         }
     } catch (error) {
         console.error('Error:', error);
         document.getElementById('tareasUsuarioList').innerHTML =
-            '<div class="no-tasks">Error de conexión al cargar tareas</div>';
+            '<div class="no-tasks" data-i18n="dashboardUser.tasks.connectionError">Error de conexión al cargar tareas</div>';
         document.getElementById('tareasNucleoList').innerHTML =
-            '<div class="no-tasks">Error de conexión al cargar tareas</div>';
+            '<div class="no-tasks" data-i18n="dashboardUser.tasks.connectionError">Error de conexión al cargar tareas</div>';
+            i18n.translatePage();
     }
 }
 
@@ -66,7 +69,8 @@ function renderUserTasks(tareas, containerId, esNucleo = false) {
     const container = document.getElementById(containerId);
 
     if (!tareas || tareas.length === 0) {
-        container.innerHTML = '<div class="no-tasks">No tienes tareas asignadas</div>';
+        container.innerHTML = '<div class="no-tasks" data-i18n="dashboardUser.tasks.individualTasks.noTasks">No tienes tareas asignadas</div>';
+        i18n.translatePage();
         return;
     }
 
@@ -123,16 +127,16 @@ function renderUserTasks(tareas, containerId, esNucleo = false) {
                             ${estadoTexto}
                         </span>
                    
-                        ${esNucleo ? '<span class="task-badge" style="background: #6f42c1; color: white;">Núcleo</span>' : ''}
+                        ${esNucleo ? '<span class="task-badge" style="background: #6f42c1; color: white;" data-i18n="dashboardUser.tasks.unit">Núcleo</span>' : ''}
                     </div>
                 </div>
                 
                 <p class="user-task-description">${tarea.descripcion}</p>
                 
                 <div class="user-task-meta">
-                    <div><strong>Inicio:</strong> ${fechaInicio}</div>
-                    <div><strong>Fin:</strong> ${fechaFin}</div>
-                    <div><strong>Creado por:</strong> ${tarea.creador}</div>
+                    <div><strong data-i18n="dashboardUser.tasks.start">Inicio:</strong> ${fechaInicio}</div>
+                    <div><strong data-i18n="dashboardUser.tasks.end">Fin:</strong> ${fechaFin}</div>
+                    <div><strong data-i18n="dashboardUser.tasks.createdBy">Creado por:</strong> ${tarea.creador}</div>
                 </div>
                 
                 <div class="progress-bar-container">
@@ -144,31 +148,32 @@ function renderUserTasks(tareas, containerId, esNucleo = false) {
                 ${tarea.esVencida ? `
                     <div class="alert-warning" style="margin-top: 15px;">
                         <i class="fas fa-exclamation-triangle"></i>
-                        <strong>Esta tarea está vencida.</strong> La fecha límite ya ha pasado.
+                        <strong data-i18n="dashboardUser.tasks.expiredTask">Esta tarea está vencida.</strong> <span data-i18n="dashboardUser.tasks.expiredTaskDesc">La fecha límite ya ha pasado.</span>
                     </div>
                 ` : ''}
                 
                 ${!tarea.esCompletada ? `
                     <div class="user-task-actions">
                         <button class="btn-small btn-update" onclick="updateTaskProgress(${tarea.id_asignacion}, '${esNucleo ? 'nucleo' : 'usuario'}', ${tarea.id_tarea})">
-                            Actualizar Progreso
+                            <span data-i18n="dashboardUser.tasks.updateProgress">Actualizar Progreso</span>
                         </button>
                         <button class="btn-small btn-avance" onclick="addTaskAvance(${tarea.id_tarea})">
-                            Reportar Avance
+                            <span data-i18n="dashboardUser.tasks.reportProgress">Reportar Avance</span>
                         </button>
                         <button class="btn-small btn-materiales" onclick="viewTaskMaterials(${tarea.id_tarea})" title="Ver materiales necesarios">
-                            <i class="fas fa-boxes"></i> Materiales
+                            <i class="fas fa-boxes"></i> <span data-i18n="dashboardUser.tasks.materials">Materiales</span>
                         </button>
                         <button class="btn-small btn-detalles" onclick="viewUserTaskDetails(${tarea.id_tarea})">
-                            Ver Detalles Completos
+                            <span data-i18n="dashboardUser.tasks.viewDetails">Ver Detalles Completos</span>
                         </button>
                     </div>
-                ` : '<p style="color: #28a745; margin-top: 10px;"><strong>✓ Tarea completada</strong></p>'}
+                ` : '<p style="color: #28a745; margin-top: 10px;"><strong data-i18n="dashboardUser.tasks.taskCompleted">✓ Tarea completada</strong></p>'}
             </div>
         `;
     }).join('');
 
     console.log(' [RENDER USER TASKS] Completado');
+    i18n.translatePage();
 }
 
 // ========== ACTUALIZAR RESUMEN DE TAREAS ==========
@@ -380,18 +385,18 @@ function showMaterialesModal(tareaId, materiales) {
                             <div class="material-quantities">
                                 <span class="quantity-item">
                                     <i class="fas fa-clipboard-list"></i>
-                                    Necesario: <strong>${material.cantidad_requerida}</strong>
+                                    <span data-i18n="dashboardUser.tasks.materialsModal.necessary">Necesario:</span> <strong>${material.cantidad_requerida}</strong>
                                 </span>
                                 <span class="quantity-item ${suficiente ? 'available' : 'unavailable'}">
                                     <i class="fas fa-warehouse"></i>
-                                    Disponible: <strong>${material.stock_disponible}</strong>
+                                    <span data-i18n="dashboardUser.tasks.materialsModal.available">Disponible:</span> <strong>${material.stock_disponible}</strong>
                                 </span>
                             </div>
                         </div>
                         <div class="material-status-badge">
                             ${suficiente ?
-                '<span class="badge-success"><i class="fas fa-check-circle"></i> Disponible</span>' :
-                '<span class="badge-warning"><i class="fas fa-exclamation-triangle"></i> Insuficiente</span>'
+                '<span class="badge-success"><i class="fas fa-check-circle"></i> <span data-i18n="dashboardUser.tasks.materialsModal.available">Disponible</span></span>' :
+                '<span class="badge-warning"><i class="fas fa-exclamation-triangle"></i> <span data-i18n="dashboardUser.tasks.materialsModal.insufficient">Insuficiente</span></span>'
             }
                         </div>
                     </div>
@@ -401,7 +406,7 @@ function showMaterialesModal(tareaId, materiales) {
     ` : `
         <div style="text-align: center; padding: 40px; background: #f8f9fa; border-radius: 8px;">
             <i class="fas fa-info-circle" style="font-size: 48px; color: #999; margin-bottom: 15px;"></i>
-            <p style="color: #666; margin: 0; font-size: 16px;">Esta tarea no requiere materiales específicos</p>
+            <p style="color: #666; margin: 0; font-size: 16px;" data-i18n="dashboardUser.tasks.materialsModal.noMaterialsRequired">Esta tarea no requiere materiales específicos</p>
         </div>
     `;
 
@@ -412,17 +417,17 @@ function showMaterialesModal(tareaId, materiales) {
                 
                 <h2 class="modal-detail-header">
                     <i class="fas fa-boxes" style="color: #667eea; margin-right: 10px;"></i>
-                    Materiales Necesarios
+                    <span data-i18n="dashboardUser.tasks.materialsModal.necessaryMaterials">Materiales Necesarios</span>
                 </h2>
                 
                 ${materialesHTML}
                 
                 <div class="modal-detail-footer" style="margin-top: 30px;">
                     <button onclick="document.getElementById('materialesModal').remove()" class="btn btn-secondary">
-                        Cerrar
+                        <span data-i18n="dashboardUser.tasks.materialsModal.closeButton">Cerrar</span>
                     </button>
                     <button onclick="document.getElementById('materialesModal').remove(); viewUserTaskDetails(${tareaId})" class="btn btn-primary">
-                        Ver Detalles Completos
+                        <span data-i18n="dashboardUser.tasks.materialsModal.viewFullDetails">Ver Detalles Completos</span>
                     </button>
                 </div>
             </div>
@@ -430,13 +435,14 @@ function showMaterialesModal(tareaId, materiales) {
     `;
 
     document.body.insertAdjacentHTML('beforeend', modal);
+    i18n.translatePage();
 }
 
 // ========== MODAL DE DETALLES COMPLETOS ==========
 function mostrarDetallesTareaUsuario(tarea, avances, materiales = []) {
     const materialesHTML = materiales && materiales.length > 0 ? `
         <div class="task-materials-section">
-            <h3><i class="fas fa-boxes"></i> Materiales Necesarios</h3>
+            <h3><i class="fas fa-boxes"></i> <span data-i18n="dashboardUser.tasks.materialsModal.necessaryMaterials">Materiales Necesarios</span></h3>
             <div class="materials-grid">
                 ${materiales.map(material => {
         const suficiente = material.stock_disponible >= material.cantidad_requerida;
@@ -451,18 +457,18 @@ function mostrarDetallesTareaUsuario(tarea, avances, materiales = []) {
                                 <div class="material-quantities">
                                     <span class="quantity-item">
                                         <i class="fas fa-clipboard-list"></i>
-                                        Necesario: <strong>${material.cantidad_requerida}</strong>
+                                        <span data-i18n="dashboardUser.tasks.materialsModal.necessary">Necesario:</span> <strong>${material.cantidad_requerida}</strong>
                                     </span>
                                     <span class="quantity-item ${suficiente ? 'available' : 'unavailable'}">
                                         <i class="fas fa-warehouse"></i>
-                                        Disponible: <strong>${material.stock_disponible}</strong>
+                                        <span data-i18n="dashboardUser.tasks.materialsModal.available">Disponible:</span> <strong>${material.stock_disponible}</strong>
                                     </span>
                                 </div>
                             </div>
                             <div class="material-status-badge">
                                 ${suficiente ?
-                '<span class="badge-success"><i class="fas fa-check-circle"></i> Disponible</span>' :
-                '<span class="badge-warning"><i class="fas fa-exclamation-triangle"></i> Insuficiente</span>'
+                '<span class="badge-success"><i class="fas fa-check-circle"></i> <span data-i18n="dashboardUser.tasks.materialsModal.available">Disponible</span></span>' :
+                '<span class="badge-warning"><i class="fas fa-exclamation-triangle"></i> <span data-i18n="dashboardUser.tasks.materialsModal.insufficient">Insuficiente</span></span>'
             }
                             </div>
                         </div>
@@ -473,7 +479,7 @@ function mostrarDetallesTareaUsuario(tarea, avances, materiales = []) {
     ` : `
         <div style="text-align: center; padding: 20px; background: #f8f9fa; border-radius: 8px; margin: 20px 0;">
             <i class="fas fa-info-circle" style="font-size: 32px; color: #999; margin-bottom: 10px;"></i>
-            <p style="color: #666; margin: 0;">Esta tarea no requiere materiales específicos</p>
+            <p style="color: #666; margin: 0;" data-i18n="dashboardUser.tasks.materialsModal.noSpecificMaterials">Esta tarea no requiere materiales específicos</p>
         </div>
     `;
 
@@ -490,31 +496,31 @@ function mostrarDetallesTareaUsuario(tarea, avances, materiales = []) {
                 
                 <div class="modal-detail-grid">
                     <div class="modal-detail-item">
-                        <strong>Fecha Inicio:</strong><br>
+                        <strong data-i18n="dashboardUser.tasks.materialsModal.startDate">Fecha Inicio:</strong><br>
                         ${new Date(tarea.fecha_inicio).toLocaleDateString('es-UY')}
                     </div>
                     <div class="modal-detail-item">
-                        <strong>Fecha Fin:</strong><br>
+                        <strong data-i18n="dashboardUser.tasks.materialsModal.endDate">Fecha Fin:</strong><br>
                         ${new Date(tarea.fecha_fin).toLocaleDateString('es-UY')}
                     </div>
                     <div class="modal-detail-item">
-                        <strong>Prioridad:</strong><br>
+                        <strong data-i18n="dashboardUser.tasks.materialsModal.priority">Prioridad:</strong><br>
                         ${formatPrioridad(tarea.prioridad)}
                     </div>
                     <div class="modal-detail-item">
-                        <strong>Estado:</strong><br>
+                        <strong data-i18n="dashboardUser.tasks.materialsModal.status">Estado:</strong><br>
                         ${formatEstadoUsuario(tarea.estado_usuario || tarea.estado)}
                     </div>
                 </div>
                 
                 <div style="padding: 10px; background: #d1ecf1; border-radius: 5px; margin-bottom: 20px;">
-                    <strong>Creado por:</strong> ${tarea.creador}
+                    <strong data-i18n="dashboardUser.tasks.materialsModal.createdBy">Creado por:</strong> ${tarea.creador}
                 </div>
                 
                 ${materialesHTML}
                 
                 ${avances && avances.length > 0 ? `
-                    <h3 style="margin-top: 30px; margin-bottom: 15px; color: #333;">Avances Reportados</h3>
+                    <h3 style="margin-top: 30px; margin-bottom: 15px; color: #333;" data-i18n="dashboardUser.tasks.materialsModal.reportedProgress">Avances Reportados</h3>
                     ${avances.map(avance => `
                         <div class="modal-detail-avance">
                             <div class="modal-detail-avance-header">
@@ -529,19 +535,20 @@ function mostrarDetallesTareaUsuario(tarea, avances, materiales = []) {
                                     </div>
                                 </div>
                             ` : ''}
-                            ${avance.archivo ? `<a href="/files/?path=${avance.archivo}" target="_blank" class="file-link">📎 Ver archivo adjunto</a>` : ''}
+                            ${avance.archivo ? `<a href="/files/?path=${avance.archivo}" target="_blank" class="file-link" data-i18n="dashboardUser.tasks.materialsModal.viewAttachedFile">📎 Ver archivo adjunto</a>` : ''}
                         </div>
                     `).join('')}
-                ` : '<p class="no-tasks">No hay avances reportados aún</p>'}
+                ` : '<p class="no-tasks" data-i18n="dashboardUser.tasks.materialsModal.noReportedProgress">No hay avances reportados aún</p>'}
                 
                 <div class="modal-detail-footer">
-                    <button onclick="document.getElementById('taskDetailModal').remove()" class="btn btn-secondary">Cerrar</button>
+                    <button onclick="document.getElementById('taskDetailModal').remove()" class="btn btn-secondary" data-i18n="dashboardUser.tasks.materialsModal.closeButton">Cerrar</button>
                 </div>
             </div>
         </div>
     `;
 
     document.body.insertAdjacentHTML('beforeend', modal);
+    i18n.translatePage();
 }
 
 // ========== FORMATEAR FECHA EN FORMATO UY ==========

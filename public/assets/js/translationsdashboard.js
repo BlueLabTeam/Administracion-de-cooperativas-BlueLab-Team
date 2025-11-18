@@ -1495,7 +1495,8 @@ const translations = {
       },
       tasks: {
         title: " My Tasks",
-
+        errorLoading: "Error loading tasks",
+        connectionError: "Connection error loading tasks",
         stats: {
           pending: "Pending",
           inProgress: "In Progress",
@@ -1508,7 +1509,7 @@ const translations = {
         start: "Start:",
         end: "End:",
         createdBy: "Created by:",
-        core: "Core",
+        unit: "unit",
         updateProgress: "Update Progress",
         reportProgress: "Report Progress",
         materials: "Materials",
@@ -1521,17 +1522,32 @@ const translations = {
         inicio: "Start:",
         fin: "End:",
         creadoPor: "Created by:",
-        nucleo: "Core",
-
-        tareaVencida: "This task is overdue.",
-        fechaLimitePasada: "The deadline has already passed.",
+        expiredTask: "This task is overdue.",
+        expiredTaskDesc: "The deadline has already passed.",
 
         actualizarProgreso: "Update Progress",
         reportarAvance: "Report Progress",
         materiales: "Materials",
-        verDetallesCompletos: "View Full Details",
+        viewDetails: "View Full Details",
 
-        tareaCompletada: "✓ Task completed"
+        taskCompleted: "✓ Task completed",
+        materialsModal: {
+          necessary: "necessary",
+          necessaryMaterials: "Necessary Materials",
+          available: "available",
+          insufficient: "insufficient",
+          noMaterialsRequiered: "No materials required for this task",  
+          closeButton: "Close",
+          viewFullDetails: "View Full Details",
+          startDate: "Start Date",
+          endDate: "End Date",
+          status: "Status",
+          createdBy: "Created by",
+          priority: "Priority",
+          reportedProgress: "Reported Progress",
+          noReportedProgress: "No progress reported yet",
+          viewAttachmentFile: " 📎View Attachment File"
+        },
       },
 
 
