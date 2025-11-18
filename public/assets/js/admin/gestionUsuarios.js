@@ -313,20 +313,7 @@ const GestionUsuarios = (function () {
                 <td style="padding: 14px 12px;">
                     <div style="display: flex; gap: 5px; justify-content: center; flex-wrap: wrap;">
                         
-                        <button class="btn-small btn-secondary" 
-                                onclick="GestionUsuarios.verDetalles(${user.id_usuario})"
-                                title="Ver detalles"
-                                style="
-                                    padding: 5px 10px;
-                                    background: #6C757D;
-                                    color: white;
-                                    border: none;
-                                    border-radius: 4px;
-                                    cursor: pointer;
-                                    font-size: 12px;
-                                ">
-                            <i class="fas fa-eye"></i>
-                        </button>
+                   
                         
                         ${hasPayment && isPending ? `
                             <button class="btn-small btn-info" 

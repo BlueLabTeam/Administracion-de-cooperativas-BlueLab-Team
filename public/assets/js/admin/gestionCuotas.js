@@ -449,7 +449,6 @@
             html += '<td style="padding:14px 12px;text-align:center;">';
             html += '<div style="display:flex;flex-direction:column;align-items:center;gap:5px;">';
             html += '<strong style="font-size:16px;color:' + colorProgreso + ';">' + horasTrabajadas.toFixed(2) + 'h</strong>';
-            html += '<div style="width:80px;height:6px;background:#e0e0e0;border-radius:3px;overflow:hidden;">';
             html += '<div style="width:' + Math.min(progresoHoras, 100) + '%;height:100%;background:' + colorProgreso + ';transition:width 0.3s;"></div>';
             html += '</div>';
             html += '<small style="color:' + COLORS.gray500 + ';">de ' + horasRequeridas + 'h</small>';

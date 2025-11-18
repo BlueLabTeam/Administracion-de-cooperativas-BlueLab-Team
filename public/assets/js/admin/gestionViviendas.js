@@ -160,7 +160,7 @@ function renderViviendasTable(viviendas) {
                 <td style="padding: 14px 12px;">
                     <div style="display: flex; gap: 5px; justify-content: center; flex-wrap: wrap;">
                         
-                        <button class="btn-small btn-secondary" 
+                        <button class="btn-small btn-primary" 
                                 onclick="ViviendasModule.viewDetails(${vivienda.id_vivienda})" 
                                 title="Ver detalles">
                             <i class="fas fa-eye"></i>
