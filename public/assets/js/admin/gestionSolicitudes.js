@@ -493,10 +493,17 @@ const SolicitudesAdmin = {
                             <small class="form-help-admin">Puedes adjuntar documentos de respaldo</small>
                         </div>
 
-                        <div class="alert-info-admin">
-                            <strong> Nota:</strong>
-                            <p>El usuario recibirá una notificación sobre tu respuesta.</p>
-                        </div>
+                      <div class="alert-info-admin">
+
+    <strong>Nota:</strong>
+    <p>
+        <span data-i18n="dashboardUser.home.modalunirse.members.detail"></span> 
+        El usuario recibirá una notificación sobre tu respuesta.
+    </p>
+
+</div>
+
+
 
                         <div class="form-actions-admin">
                             <button type="button" class="btn-small btn-secondary" onclick="SolicitudesAdmin.cerrarModalResponder()">

@@ -306,7 +306,7 @@ async function mostrarInfoNucleoEnInicio(idNucleo, inicioSection) {
                         backdrop-filter: blur(10px);
                         flex-shrink: 0;
                     ">
-                        👨‍👩‍👧
+                        
                     </div>
                     <div style="flex: 1;">
                         <p style="margin: 0 0 5px 0; opacity: 0.9; font-size: 13px; font-weight: 500;" data-i18n="dashboardUser.home.nucleoInfoCard.title">
@@ -386,7 +386,7 @@ function mostrarBannerNucleoEnInicio(inicioSection) {
                     <h3 style="margin: 0 0 10px 0; font-size: 20px;" data-i18n="dashboardUser.home.bannerUnit.joinMessage">
                         ¿Quieres unirte a un Núcleo Familiar?
                     </h3>
-                    <p style="margin: 0; opacity: 0.9;" data-i18n="dashboardUser.home.bannerUnit.unitDescription">
+                    <p style="margin: 0; opacity: 0.9;" data-i18n="dashboardUser.home.modalunirse.unitDescription">
                         Los núcleos familiares permiten compartir viviendas y tareas. 
                         Explora los núcleos disponibles y envía una solicitud.
                     </p>
@@ -466,10 +466,12 @@ async function mostrarNucleosDisponibles() {
                                 <strong style="color: #1b1397; display: block; font-size: 16px; margin-bottom: 4px;">
                                     ${nucleo.nombre_nucleo}
                                 </strong>
-                                <small style="color: #6c757d;">
-                                    <i class="fas fa-users" style="margin-right: 4px;"></i> 
-                                    Miembros: ${nucleo.total_miembros || 0}
-                                </small>
+                               <small style="color: #6c757d;">
+    <i class="fas fa-users" style="margin-right: 4px;"></i> 
+    <span data-i18n="dashboardUser.home.modalunirse.detail"></span>: 
+    ${nucleo.total_miembros || 0}
+</small>
+
                             </div>
                             
                            
@@ -482,21 +484,24 @@ async function mostrarNucleosDisponibles() {
         }
 
         const modal = `
-            <div id="detallesNucleoModal" class="material-modal" onclick="cerrarModalDetallesNucleo()" style="display: flex;">
-                <div class="material-modal-content" onclick="event.stopPropagation()" style="max-width: 600px; width: 90%; background: #f9f9f9; border-radius: 15px; overflow: hidden;">
-                    <div class="material-modal-header" style="background: linear-gradient(90deg, #69b2d5, #1b1397); color: white; padding: 20px 24px; border-bottom: none;">
-                        <h3 style="margin: 0; font-size: 22px; display: flex; align-items: center;">
-                        
-                            <span data-i18n="dashboardUser.home.availableCores.title">Núcleos Disponibles</span>
-                        </h3>
-                        <button class="close-material-modal" onclick="cerrarModalDetallesNucleo()" style="color: white; opacity: 0.8; font-size: 30px; top: 10px; right: 15px;">&times;</button>
-                    </div>
-                    
-                    <div style="padding: 24px;">
-                        <p data-i18n="dashboardUser.home.availableCores.description" style="margin-bottom: 25px; color: #555; border-left: 3px solid #69b2d5; padding-left: 10px;">
-                            No estás en ningún núcleo. Ve a la seccion solicitudes y pidele a un admin que te agregue.
-                        </p>
-                        
+          <div id="detallesNucleoModal" class="material-modal" onclick="cerrarModalDetallesNucleo()" style="display: flex;">
+    <div class="material-modal-content" onclick="event.stopPropagation()" style="max-width: 600px; width: 90%; background: #f9f9f9; border-radius: 15px; overflow: hidden;">
+        <div class="material-modal-header" style="background: linear-gradient(90deg, #69b2d5, #1b1397); color: white; padding: 20px 24px; border-bottom: none;">
+            <h3 style="margin: 0; font-size: 22px; display: flex; align-items: center;">
+                <i class="fas fa-search" style="margin-right: 10px;"></i>
+                <span data-i18n="dashboardUser.home.modalunirse.title">Núcleos Disponibles</span>
+            </h3>
+            <button class="close-material-modal" onclick="cerrarModalDetallesNucleo()" style="color: white; opacity: 0.8; font-size: 30px; top: 10px; right: 15px;">&times;</button>
+        </div>
+        
+        <div style="padding: 24px;">
+          <p 
+    data-i18n="dashboardUser.home.modalunirse.description"
+    style="margin-bottom: 25px; color: #555; border-left: 3px solid #69b2d5; padding-left: 10px;"
+>
+    No estás en ningún núcleo. **Elige el núcleo deseado** y presiona 'Enviar Petición' para **ir a la sección de solicitudes** y gestionar tu petición con un administrador.
+</p>
+
                         ${nucleosHTML}
                         
                         <div class="form-actions" style="margin-top: 30px; text-align: right;">

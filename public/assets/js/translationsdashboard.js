@@ -334,6 +334,19 @@ const translations = {
           viewAll: "Ver Todo",
           more: "más"
         },
+      bannerUnit: {
+  joinMessage: "¿Quieres unirte a un Núcleo Familiar?",
+  unitDescription: "Los núcleos familiares permiten compartir vivienda y tareas. Explora los núcleos disponibles y envía una solicitud.",
+  viewUnitsButton: "Ver Núcleos",
+},
+
+modalunirse: { 
+  title: "Núcleos Disponibles", 
+  description: "No estás en ningún núcleo. **Elige el núcleo deseado** y presiona 'Enviar Petición' para **ir a la sección de solicitudes** y gestionar tu petición con un administrador.", 
+  detail: "Ver Núcleos", },
+
+
+
         nucleoBanner: {
           title: "¿Quieres unirte a un Núcleo Familiar?",
           description: "Los núcleos familiares permiten compartir viviendas y tareas. Explora los núcleos disponibles y envía una solicitud.",
@@ -1213,8 +1226,15 @@ const translations = {
         bannerUnit: {
           joinMessage: "Do you want to join a Family Core?",
           unitDescription: "Family units allow sharing housing and tasks. Explore the available units and submit a request.",
-          viewUnitsButton: "View Units"
+          viewUnitsButton: "View Units",
+          modalDescription: "You are not in any core. Choose your desired core and press 'Send Request' to go to the requests section and manage your request with an administrator."
         },
+         modalunirse: {
+  title: "Available Cores",
+  description: "You are not in any core. **Choose the desired core** and press 'Send Request' to **go to the requests section** and manage your request with an administrator.",
+  detail: "View Cores",
+},
+
         stats: {
           contributions: "Current Contributions",
           hours: "Hours Worked",
@@ -1242,6 +1262,7 @@ const translations = {
         currentPasswordPlaceholder: "Leave blank if you don't want to change it",
         newPassword: "New Password",
         confirmPassword: "Confirm New Password",
+        
         notSpecified: "Not specified",
         notAvailable: "Not available",
         saving: "Saving...",
