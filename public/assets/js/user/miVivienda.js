@@ -1148,7 +1148,7 @@ function contactarAdministrador() {
 }
 
 // ==========================================
-// 🔄 EXPORTAR FUNCIONES GLOBALES
+//  EXPORTAR FUNCIONES GLOBALES
 // ==========================================
 
 window.loadMyVivienda = loadMyVivienda;

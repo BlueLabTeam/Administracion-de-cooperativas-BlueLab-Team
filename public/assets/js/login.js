@@ -9,7 +9,7 @@
           body: formData
         });
 
-        // DEBUG: Ver qué responde el servidor
+      
         ("Status:", response.status);
         const text = await response.text();
         ("Respuesta del servidor:", text);

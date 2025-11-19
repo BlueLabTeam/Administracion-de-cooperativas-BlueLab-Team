@@ -92,15 +92,15 @@
         // Si es un array (para listas), no aplicar directamente
         console.warn('Array translation for:', key);
       } else if (translation && translation !== key) {
-        // Solo traducir si NO tiene data-i18n-placeholder
-        // (para evitar sobrescribir labels que tienen inputs con placeholder)
+       
+       
         if (!element.hasAttribute('data-i18n-placeholder')) {
           element.textContent = translation;
         }
       }
     });
 
-    // Traducir placeholders (IMPORTANTE: solo afectar el atributo placeholder)
+    // Traducir placeholders 
     document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
       const key = element.getAttribute('data-i18n-placeholder');
       const translation = t(key);
@@ -161,14 +161,13 @@
       <button class="lang-btn" data-lang="en">EN</button>
     `;
 
-    // Intentar insertar en diferentes ubicaciones según la página
-    // 1. En el dashboard (user-controls)
+   
     const userControls = document.querySelector('.user-controls');
     if (userControls) {
-      // Insertar al principio de user-controls (antes de logout)
+     
       userControls.insertBefore(toggle, userControls.firstChild);
     } 
-    // 2. En el header normal
+
     else {
       const header = document.querySelector('header');
       if (header) {

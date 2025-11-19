@@ -116,7 +116,6 @@ function cargarDatosSeccion(section) {
 
         case 'cuotas':
         
-            // VERIFICAR QUE LAS FUNCIONES EXISTAN ANTES DE LLAMARLAS
             if (typeof loadPreciosCuotas === 'function') {
              
                 loadPreciosCuotas();
