@@ -2043,7 +2043,6 @@ const translations = {
 // Export for use in modules
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = translations;
-=======
 const translations = {
   es: {
     // Common
@@ -3982,9 +3981,9 @@ const translations = {
     }
   }
 };
+} 
 
 // Export for use in modules
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = translations;
->>>>>>> ff5e8b8e7b8a4ded46b3c279142bcdd3eebbe12f
 }
