@@ -195,10 +195,7 @@ class ViviendaController
         exit();
     }
 
-/**
- * 
- * FIX: Maneja correctamente NULL para id_usuario o id_nucleo
- */
+
   public function asignar()
 {
     // Limpiar output buffer
@@ -273,7 +270,6 @@ class ViviendaController
             exit();
         }
 
-        // 🔧 SOLUCIÓN: SQL condicional según el tipo de asignación
         if ($idUsuario) {
             //  Asignar a USUARIO - Solo insertar columnas necesarias
             error_log(" [ASIGNAR] Insertando asignación a USUARIO $idUsuario");

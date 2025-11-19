@@ -627,7 +627,7 @@
         const item = map[estado];
         if (!item) return estado;
 
-        // Devuelve un span compatible con i18n
+       
         return `<span data-i18n="${item.key}">${item.defaultText}</span>`;
     }
 
@@ -652,7 +652,7 @@
 
         if (!item) return prioridad;
 
-        // Crear el span para permitir correcta traducción de i18n
+        
         return `<span data-i18n="${item.key}">${item.defaultText}</span>`;
     }
 

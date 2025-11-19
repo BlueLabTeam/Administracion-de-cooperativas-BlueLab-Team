@@ -286,13 +286,13 @@ function addTaskAvance(tareaId) {
     }
 
     const formData = new FormData();
-    //  CAMBIO CRÍTICO: Usar 'id_tarea' en lugar de 'tarea_id'
+  
     formData.append('id_tarea', tareaId);
     formData.append('comentario', comentario.trim());
     formData.append('progreso_reportado', progresoNum);
 
     //  DEBUG: Ver qué estamos enviando
-    console.log('📤 Enviando a /api/tasks/add-avance:');
+    console.log(' Enviando a /api/tasks/add-avance:');
     console.log('   id_tarea:', tareaId);
     console.log('   comentario:', comentario.trim());
     console.log('   progreso_reportado:', progresoNum);

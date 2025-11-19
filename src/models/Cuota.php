@@ -1273,7 +1273,7 @@ public function validarPago($pagoId, $idAdmin, $accion, $observaciones = '')
             ");
             $stmtUsuario->execute([$infoPago['id_usuario']]);
             
-            // 🔥 NUEVO: Recalcular deuda acumulada
+        
             $this->recalcularDeudaAcumulada($infoPago['id_usuario']);
             error_log("✓ Deuda acumulada recalculada");
         }

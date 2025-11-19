@@ -117,7 +117,7 @@
 
         setTimeout(function () {
           ('Abriendo ' + social + '...');
-          // Aquí van los enlaces reales
+         
         }, 200);
       });
     });

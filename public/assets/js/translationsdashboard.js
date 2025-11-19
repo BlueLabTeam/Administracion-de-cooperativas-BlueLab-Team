@@ -1,4 +1,3 @@
-
 const translations = {
   es: {
     // Common
@@ -161,8 +160,8 @@ const translations = {
       },
 
       reports: {
-        title: " Reportes Mensuales",
-        selectPeriod: " Seleccionar Período",
+        title: "📊 Reportes Mensuales",
+        selectPeriod: "📅 Seleccionar Período",
         selectMonth: "Seleccionar mes...",
         selectYear: "Seleccionar año...",
         generate: "Generar Reporte",
@@ -171,7 +170,7 @@ const translations = {
         hoursWorked: "Horas Trabajadas",
         completedTasks: "Tareas Completadas",
         avgCompliance: "Cumplimiento Promedio",
-        detailByUser: " Detalle por Usuario"
+        detailByUser: "📋 Detalle por Usuario"
       },
 
       housing: {
@@ -218,26 +217,26 @@ const translations = {
       },
 
       billing: {
-        title: " Gestión de Cuotas Mensuales",
+        title: "💰 Gestión de Cuotas Mensuales",
         totalQuotas: "Total de Cuotas",
         paid: "Pagadas",
         pending: "Pendientes",
         amountCollected: "Monto Recaudado",
-        priceConfig: " Configuración de Precios",
-        quickActions: " Acciones Rápidas",
+        priceConfig: "⚙️ Configuración de Precios",
+        quickActions: "⚡ Acciones Rápidas",
         generateCurrentMonth: "Generar Cuotas del Mes Actual",
         filterAllYears: "Todos los años",
         filterAllMonths: "Todos los meses",
         filterAllStates: "Todos los estados",
         filterPending: "Pendiente",
         filterPaid: "Pagada",
-        allQuotas: " Todas las Cuotas",
+        allQuotas: "📋 Todas las Cuotas",
         updatePrice: "💵 Actualizar Precio de la Cuota",
         housingType: "Tipo de Vivienda",
         newMonthlyAmount: "Nuevo Monto Mensual *",
         amountPlaceholder: "Ej: 7500.00",
         priceChangeWarning: "Este cambio se aplicará a las nuevas cuotas generadas. Las ya existentes mantienen su valor original.",
-        validatePayment: " Validar Pago",
+        validatePayment: "✅ Validar Pago",
         observationsOptional: "Observaciones (opcional)",
         validationComments: "Comentarios sobre la validación..."
       },
@@ -278,7 +277,7 @@ const translations = {
         selectUsers: "Seleccionar Usuarios:",
         selectNuclei: "Seleccionar Núcleos:",
         selectAll: "Seleccionar Todos",
-        materialsNeeded: " Materiales necesarios para la tarea:",
+        materialsNeeded: "📦 Materiales necesarios para la tarea:",
         searchMaterial: "Buscar material...",
         noMaterialsAssigned: "No hay materiales asignados",
         createTask: "Crear Tarea",
@@ -288,20 +287,26 @@ const translations = {
         maxAvailable: "máx",
         stockUnits: "unidades",
         availableMaterials: "Materiales Disponibles",
-        taskOverdue: "This task is overdue. Limit date has passed",
+        taskOverdue: "Esta tarea está vencida. La fecha límite ha pasado",
         cancelTask: "Cancelar Tarea",
-        completed:  "Completada"
+        completed: "Completada"
       },
-
 
       requests: {
         title: "Gestión de Solicitudes",
         tableTitle: "Todas las Solicitudes",
+        highPriority: "Prioridad Alta",
+        noResults: "No hay solicitudes con los filtros seleccionados",
 
+        // Estados
         inReview: "En Revisión",
         resolved: "Resueltas",
-        highPriority: "Prioridad Alta",
+        statePending: "Pendiente",
+        stateInReview: "En Revisión",
+        stateResolved: "Resuelta",
+        stateRejected: "Rechazada",
 
+        // Filtros
         filterAllStates: "Todos los estados",
         filterAllTypes: "Todos los tipos",
         filterAllPriorities: "Todas las prioridades",
@@ -313,7 +318,12 @@ const translations = {
         typeGeneral: "Consulta General",
         typeOther: "Otro",
 
-        // Columnas
+        // Prioridades
+        priorityLow: "Baja",
+        priorityMedium: "Media",
+        priorityHigh: "Alta",
+
+        // Columnas de la tabla
         columnUser: "Usuario",
         columnSubject: "Asunto",
         columnType: "Tipo",
@@ -323,18 +333,20 @@ const translations = {
         columnReplies: "Respuestas",
         columnActions: "Acciones",
 
-        // Detalles
+        // Detalles de solicitud
         userInfo: "Información del Usuario",
         details: "Detalles de la Solicitud",
-        description: "Descripción",
-        viewAttachment: "Ver Archivo Adjunto",
-        reply: "Responder",
-
-        // Para coincidencia exacta con renderDetalleCompleto
         detailsTitle: "Detalles de la Solicitud",
-        descriptionTitle: "Descripción",
-
-        // Claves faltantes 
+        description: "Descripción",
+        descriptionTitle: "📝 Descripción",
+        conversation: "Conversación",
+        quickActions: "⚡ Acciones Rápidas",
+        viewAttachment: "Ver Archivo Adjunto",
+        noRepliesYet: "Sin respuestas aún",
+        administrator: "Administrador",
+        viewFile: "Ver Archivo",
+        
+        // Campos del detalle
         name: "Nombre",
         email: "Correo Electrónico",
         document: "Documento",
@@ -343,36 +355,13 @@ const translations = {
         status: "Estado",
         priority: "Prioridad",
         close: "Cerrar",
+        reply: "Responder",
         notificationNoteTitle: "Nota",
-        conversation: "Conversación",
-        markInReview: "Marcar En Revisión",
-        markResolved: "Marcar Resuelta",
-        reject: "Rechazar",
-
-        // Extendidos
-        conversation: "Conversación",
-        quickActions: "Acciones Rápidas",
-        noRepliesYet: "Sin respuestas aún",
-        administrator: "Administrador",
-        viewFile: "Ver Archivo",
 
         // Acciones
         markInReview: "Marcar En Revisión",
         markResolved: "Marcar como Resuelta",
         reject: "Rechazar",
-
-        noResults: "No hay solicitudes con los filtros seleccionados",
-
-        // Estados
-        statePending: "Pendiente",
-        stateInReview: "En Revisión",
-        stateResolved: "Resuelta",
-        stateRejected: "Rechazada",
-
-        // Prioridades
-        priorityLow: "Baja",
-        priorityMedium: "Media",
-        priorityHigh: "Alta",
 
         // Modal responder
         respondAsAdmin: "Responder como Administrador",
@@ -395,7 +384,6 @@ const translations = {
         errorLoadDetail: "Error al cargar detalle",
         errorConnection: "Error de conexión"
       }
-
     },
 
     // Dashboard User
@@ -416,7 +404,7 @@ const translations = {
       },
 
       home: {
-        title: " Inicio",
+        title: "🏠 Inicio",
         welcome: "Bienvenido",
         nucleoInfoCard: {
           title: "Tu Núcleo Familiar",
@@ -434,24 +422,20 @@ const translations = {
         bannerUnit: {
           joinMessage: "¿Quieres unirte a un Núcleo Familiar?",
           unitDescription: "Los núcleos familiares permiten compartir vivienda y tareas. Explora los núcleos disponibles y envía una solicitud.",
-          viewUnitsButton: "Ver Núcleos",
+          viewUnitsButton: "Ver Núcleos"
         },
-
         modalunirse: {
           title: "Núcleos Disponibles",
           description: "No estás en ningún núcleo. **Elige el núcleo deseado** y presiona 'Enviar Petición' para **ir a la sección de solicitudes** y gestionar tu petición con un administrador.",
-          detail: "Ver Núcleos",
+          detail: "Ver Núcleos"
         },
-
-
-
         nucleoBanner: {
           title: "¿Quieres unirte a un Núcleo Familiar?",
           description: "Los núcleos familiares permiten compartir viviendas y tareas. Explora los núcleos disponibles y envía una solicitud.",
           viewButton: "Ver Núcleos"
         },
         description: "Este es tu panel de usuario de la Cooperativa de Vivienda.",
-        notifications: " Notificaciones",
+        notifications: "🔔 Notificaciones",
         notificationsBadge: "0",
         loadingNotifications: "Cargando notificaciones...",
         notificationsContent: {
@@ -483,7 +467,7 @@ const translations = {
       },
 
       profile: {
-        title: " Mi Perfil",
+        title: "👤 Mi Perfil",
         personalInfo: "Información Personal",
         editProfile: "Editar Perfil",
         cancelEdit: "Cancelar",
@@ -507,26 +491,26 @@ const translations = {
       },
 
       requests: {
-        title: " Mis Solicitudes",
+        title: "📝 Mis Solicitudes",
         manage: "Gestioná tus solicitudes",
         description: "Enviá consultas, justificaciones o reportes al administrador",
         newRequest: "Nueva Solicitud",
         noRequests: "No tenés solicitudes",
         types: {
-          hours: "  Registro de Horas",
-          payment: "  Pagos/Cuotas",
-          housing: "  Vivienda",
-          general: " 📝 Consulta General",
-          other: " ❓ Otro"
+          hours: "⏱️ Registro de Horas",
+          payment: "💳 Pagos/Cuotas",
+          housing: "🏠 Vivienda",
+          general: "📝 Consulta General",
+          other: "❓ Otro"
         },
         form: {
           typeLabel: "Tipo de Solicitud:",
           types: {
-            hours: "  Registro de Horas",
-            payment: "  Pagos/Cuotas",
-            housing: "  Vivienda",
-            general: " 📝 Consulta General",
-            other: " ❓ Otro"
+            hours: "⏱️ Registro de Horas",
+            payment: "💳 Pagos/Cuotas",
+            housing: "🏠 Vivienda",
+            general: "📝 Consulta General",
+            other: "❓ Otro"
           },
           subjectLabel: "Asunto:",
           subjectPlaceholder: "Ej: Problema con mi asignación de vivienda",
@@ -560,19 +544,18 @@ const translations = {
           resolved: "Resuelta",
           rejected: "Rechazada"
         },
-
         loading: "Cargando solicitudes..."
       },
 
       housing: {
-        title: " Mi Vivienda",
+        title: "🏠 Mi Vivienda",
         subtitle: "Información de la Vivienda",
         loading: "Cargando...",
         noAssigned: "No tenés una vivienda asignada"
       },
 
       billing: {
-        title: " Mis Cuotas",
+        title: "💳 Mis Cuotas",
         description: "Gestioná los pagos de tu vivienda y tu deuda por horas",
         stats: {
           pending: "Pendientes",
@@ -612,9 +595,8 @@ const translations = {
             cash: "Efectivo"
           }
         },
-
         debtStatus: {
-          title: " Estado de Deuda por Horas",
+          title: "⏱️ Estado de Deuda por Horas",
           calculating: "Calculando deuda...",
           debtType: {
             period: "período:",
@@ -622,7 +604,7 @@ const translations = {
             withoutDebt: "No tenés horas pendientes"
           },
           debtBreakdown: {
-            debtForTheCurrentMonth: " Deuda del Mes Actual:",
+            debtForTheCurrentMonth: "💰 Deuda del Mes Actual:",
             debtItems: {
               hoursRequired: "Horas Requeridas",
               WeeklySystem: "Sistema Semanal",
@@ -650,13 +632,13 @@ const translations = {
         enabledPaymentPeriod: "Período de Pago Habilitado",
         enabledPaymentPeriodMessage: "Ya podés realizar el pago de tu cuota. El período de pago está activo hasta fin de mes.",
         pendingPayment: "⏳ Pago en Revisión",
-        noPendingPayment: " No tenés pagos pendientes",
+        noPendingPayment: "✅ No tenés pagos pendientes",
         blockedPayment: "Pago Bloqueado",
-        workingPeriod: " 🔒 Período de Trabajo Activo",
+        workingPeriod: "🔒 Período de Trabajo Activo",
         workingPeriodNote: "Podrás pagar en",
         workingPeriodDays: "día",
         pending: {
-          title: "Otros Pendientes",
+          title: "Otros Pendientes"
         },
         summary: {
           currentMonth: "Resumen del Mes Actual",
@@ -668,25 +650,25 @@ const translations = {
           totalDue: "Total a Pagar",
           totalPaid: "Total Pagado",
           totalOverdue: "Total Vencido",
-          housingFee: " Cuota Habitacional:",
+          housingFee: "🏠 Cuota Habitacional:",
           houseFee: "Total de tu Vivienda",
-          paymentCompleted: " 🎉 ¡Pago realizado con éxito!",
+          paymentCompleted: "🎉 ¡Pago realizado con éxito!",
           paymentSuccess: "Pagaste correctamente la cuota de",
           paymentInReviewNote: "Tu pago está siendo procesado.",
           paymentEnabled: "Pago Disponible",
           paymentEnabledNote: "Ya podés realizar el pago.",
-          dueFeeExpired: " Cuota Vencida",
+          dueFeeExpired: "⚠️ Cuota Vencida",
           dueFeeExpiredNote: "La deuda se acumulará.",
           openPaymentPeriod: "⚠️ Período de Pago Abierto",
-          paid: " Pagada",
+          paid: "✅ Pagada",
           inReview: "⏳ En Revisión",
-          overdue: " Vencida",
+          overdue: "❌ Vencida",
           day: "DÍA",
           toPay: "A PAGAR",
           total: "TOTAL",
-          paymentBreakdown: " Detalle del Pago:",
-          unworkedHoursDebt: " Deuda por Horas no Trabajadas:",
-          totalPaidTxt: " Total Pagado:"
+          paymentBreakdown: "📊 Detalle del Pago:",
+          unworkedHoursDebt: "⏱️ Deuda por Horas no Trabajadas:",
+          totalPaidTxt: "💰 Total Pagado:"
         },
         history: {
           title: "Historial de Pagos",
@@ -696,7 +678,7 @@ const translations = {
       },
 
       hours: {
-        title: " Registro de Horas",
+        title: "⏱️ Registro de Horas",
         currentTime: "Hora actual",
         registering: "Registrando...",
         clockIn: "Registrar Entrada",
@@ -740,7 +722,7 @@ const translations = {
           }
         },
         history: {
-          title: " Historial de Registros",
+          title: "📋 Historial de Registros",
           startDate: "Fecha inicio",
           endDate: "Fecha fin",
           filter: "Filtrar",
@@ -771,7 +753,7 @@ const translations = {
       },
 
       tasks: {
-        title: " Mis Tareas",
+        title: "✅ Mis Tareas",
         stats: {
           pending: "Pendientes",
           inProgress: "En Progreso",
@@ -790,22 +772,19 @@ const translations = {
         viewFullDetails: "Ver Detalles Completos",
         showCompleted: "Mostrar completadas",
         assignedTasks: "Mis Tareas Asignadas",
-        individual: " Tareas Individuales",
-        family: " Tareas del Núcleo Familiar",
+        individual: "👤 Tareas Individuales",
+        family: "👨‍👩‍👧‍👦 Tareas del Núcleo Familiar",
         loading: "Cargando tareas...",
         inicio: "Inicio:",
         fin: "Fin:",
         creadoPor: "Creada por:",
         nucleo: "Núcleo",
-
         tareaVencida: "Esta tarea está vencida.",
         fechaLimitePasada: "La fecha límite ya pasó.",
-
         actualizarProgreso: "Actualizar Progreso",
         reportarAvance: "Reportar Avance",
         materiales: "Materiales",
         verDetallesCompletos: "Ver Detalles Completos",
-
         tareaCompletada: "✓ Tarea completada"
       },
 
@@ -894,14 +873,10 @@ const translations = {
       hasAccount: "Already have an account?",
       registerLink: "Register here",
       loginLink: "Log in here",
-
-      // Register specific
       fullNameLabel: "Full Name *",
       idCardLabel: "ID Card / Document *",
       confirmPasswordLabel: "Confirm Password *",
       registerButton: "Create Account",
-
-      // Validation/Errors
       requiredField: "This field is required",
       invalidEmail: "Incorrect email format",
       passwordMismatch: "Passwords do not match",
@@ -912,7 +887,6 @@ const translations = {
     // Dashboard Admin
     dashboardAdmin: {
       pageTitle: "Gestcoop — Admin Panel",
-
 
       sections: {
         home: "Home",
@@ -926,6 +900,7 @@ const translations = {
         tasks: "Tasks",
         requests: "Requests"
       },
+
       home: {
         title: "Home - Administrative Panel",
         welcome: "Welcome to the Administration Panel",
@@ -970,7 +945,7 @@ const translations = {
             },
             idCard: "ID Card",
             isApproved: "Is Approved",
-            isRejected: "Is Rejected",
+            isRejected: "Is Rejected"
           },
           modal: {
             idCard: "ID Card:",
@@ -982,8 +957,8 @@ const translations = {
             dateOfEntry: "Date of Entry:",
             withoutUnit: "without unit",
             closeButton: "Close"
-          },
-        },
+          }
+        }
       },
 
       notifications: {
@@ -1048,14 +1023,14 @@ const translations = {
                 actualMember: "Actual Member"
               },
               closeButton: "Close"
-            },
-          },
-        },
+            }
+          }
+        }
       },
 
       reports: {
-        title: " Monthly Reports",
-        selectPeriod: " Select Period",
+        title: "📊 Monthly Reports",
+        selectPeriod: "📅 Select Period",
         selectMonth: "Select month...",
         selectYear: "Select year...",
         generating: "Generating Report...",
@@ -1067,7 +1042,7 @@ const translations = {
         hoursWorked: "Hours Worked",
         completedTasks: "Completed Tasks",
         avgCompliance: "Average Compliance",
-        detailByUser: " Detail by User",
+        detailByUser: "📋 Detail by User",
         table: {
           columns: {
             user: "User",
@@ -1094,9 +1069,9 @@ const translations = {
               good: "Good",
               regular: "Regular",
               excellent: "Excellent"
-            },
+            }
           }
-        },
+        }
       },
 
       housing: {
@@ -1161,7 +1136,7 @@ const translations = {
               maintenance: "Under Maintenance"
             },
             modalDetails: {
-              title: "Hosing ",
+              title: "Housing ",
               address: "Address:",
               type: "Type:",
               squareMeters: "meters²:",
@@ -1173,8 +1148,8 @@ const translations = {
             modalEdit: {
               title: "Edit Housing",
               selectType: {
-                placeholder: "Select type...",
-              },
+                placeholder: "Select type..."
+              }
             },
             modalAssign: {
               title: "Assign Housing",
@@ -1190,32 +1165,32 @@ const translations = {
               members: "Members",
               cancelButton: "Cancel",
               assignButton: "Assign Housing"
-            },
-          },
-        },
+            }
+          }
+        }
       },
 
       billing: {
-        title: " Monthly Fee Management",
+        title: "💰 Monthly Fee Management",
         totalQuotas: "Total Fees",
         paid: "Paid",
         pending: "Pending",
         amountCollected: "Amount Collected",
-        priceConfig: " Price Configuration",
-        quickActions: " Quick Actions",
+        priceConfig: "⚙️ Price Configuration",
+        quickActions: "⚡ Quick Actions",
         generateCurrentMonth: "Generate Current Month Fees",
         filterAllYears: "All years",
         filterAllMonths: "All months",
         filterAllStates: "All states",
         filterPending: "Pending",
         filterPaid: "Paid",
-        allQuotas: " All Fees",
+        allQuotas: "📋 All Fees",
         updatePrice: "💵 Update Fee Price",
         housingType: "Housing Type",
         newMonthlyAmount: "New Monthly Amount *",
         amountPlaceholder: "Ex: 7500.00",
         priceChangeWarning: "This change will apply to new fees that are generated. Existing fees will maintain their original amount.",
-        validatePayment: " Validate Fee Payment",
+        validatePayment: "✅ Validate Fee Payment",
         observationsOptional: "Observations (optional)",
         validationComments: "Comments about validation..."
       },
@@ -1256,7 +1231,7 @@ const translations = {
         selectUsers: "Select Users:",
         selectNuclei: "Select Family Units:",
         selectAll: "Select All",
-        materialsNeeded: " Materials needed for this task:",
+        materialsNeeded: "📦 Materials needed for this task:",
         searchMaterial: "Search material...",
         noMaterialsAssigned: "No materials assigned",
         createTask: "Create Task",
@@ -1280,30 +1255,43 @@ const translations = {
         assignedTo: "Assigned to:",
         generalProgress: "General Progress",
         cancelTask: "Cancel Task",
-        completed:  "Completed",
+        completed: "Completed",
         required: "Required",
+        taskOverdue: "This task is overdue. Deadline has passed"
       },
 
       requests: {
         title: "Request Management",
         tableTitle: "User Requests",
+        highPriority: "High Priority",
+        noResults: "No requests match the selected filters",
 
+        // States
         inReview: "In Review",
         resolved: "Resolved",
-        highPriority: "High Priority",
+        statePending: "Pending",
+        stateInReview: "In Review",
+        stateResolved: "Resolved",
+        stateRejected: "Rejected",
 
+        // Filters
         filterAllStates: "All states",
         filterAllTypes: "All types",
         filterAllPriorities: "All priorities",
 
-        // Types
+        // Request types
         typeHours: "Hours Log",
         typePayment: "Payments/Fees",
         typeHousing: "Housing",
         typeGeneral: "General Inquiry",
         typeOther: "Other",
 
-        // Columns
+        // Priorities
+        priorityLow: "Low",
+        priorityMedium: "Medium",
+        priorityHigh: "High",
+
+        // Table columns
         columnUser: "User",
         columnSubject: "Subject",
         columnType: "Type",
@@ -1313,18 +1301,20 @@ const translations = {
         columnReplies: "Replies",
         columnActions: "Actions",
 
-        // Details
+        // Request details
         userInfo: "User Information",
         details: "Request Details",
-        description: "Description",
-        viewAttachment: "View Attachment",
-        reply: "Reply",
-
-        // Titles used in HTML
         detailsTitle: "Request Details",
-        descriptionTitle: "Description",
-
-        // **Added for the Detail modal**
+        description: "Description",
+        descriptionTitle: "📝 Description",
+        conversation: "Conversation",
+        quickActions: "⚡ Quick Actions",
+        viewAttachment: "View Attachment",
+        noRepliesYet: "No replies yet",
+        administrator: "Administrator",
+        viewFile: "View File",
+        
+        // Detail fields
         name: "Name",
         email: "Email",
         document: "Document",
@@ -1333,37 +1323,13 @@ const translations = {
         status: "Status",
         priority: "Priority",
         close: "Close",
+        reply: "Reply",
         notificationNoteTitle: "Note",
-        conversation: "Conversation",
-        markInReview: "markInReview",
-        markResolved: "markResolved",
-        reject: "Reject",
-
-
-        // Extended UI
-        conversation: "Conversation",
-        quickActions: "Quick Actions",
-        noRepliesYet: "No replies yet",
-        administrator: "Administrator",
-        viewFile: "View File",
 
         // Actions
         markInReview: "Mark as In Review",
         markResolved: "Mark as Resolved",
         reject: "Reject",
-
-        noResults: "No requests match the selected filters",
-
-        // Statuses
-        statePending: "Pending",
-        stateInReview: "In Review",
-        stateResolved: "Resolved",
-        stateRejected: "Rejected",
-
-        // Priorities
-        priorityLow: "Low",
-        priorityMedium: "Medium",
-        priorityHigh: "High",
 
         // Respond modal
         respondAsAdmin: "Reply as Administrator",
@@ -1386,9 +1352,6 @@ const translations = {
         errorLoadDetail: "Error loading details",
         errorConnection: "Connection error"
       }
-
-
-
     },
 
     // Dashboard User
@@ -1409,42 +1372,64 @@ const translations = {
       },
 
       home: {
-        title: " Home",
+        title: "🏠 Home",
         welcome: "Welcome",
         nucleoInfoCard: {
           title: "Your Family Unit",
-          members: "Family unit members",
-          membersCount: 'member',
+          members: "Family unit members:",
+          membersCount: "member",
           viewAllButton: "View All",
+          noName: "No name",
+          address: "Address",
+          totalMembers: "member",
+          totalMembersPlural: "members",
+          nucleoMembers: "Unit Members",
+          viewAll: "View All",
+          more: "more",
           withoutMembers: "There are no members in this unit"
         },
         description: "This is your Housing Cooperative user panel.",
-        notifications: " Notifications",
+        notifications: "🔔 Notifications",
         notificationsBadge: "0",
         loadingNotifications: "Loading notifications...",
         notificationsContent: {
           noNotifications: "You have no notifications",
           errorNotifications: "Error loading notifications",
+          couldNotLoad: "Could not load notifications",
+          now: "Now",
+          minutesAgo: "",
+          minutesAgoSuffix: "min ago",
+          hoursAgo: "",
+          hoursAgoSuffix: "h ago",
+          daysAgo: "",
+          daysAgoSuffix: "d ago",
+          new: "NEW",
           newBadge: "NEW"
         },
         coreDetails: {
           coreInfoTitle: "Family Unit Information",
           totalMembers: "Total Members",
           membersTitle: "Members of the Unit",
-          closeModal: "Close"
+          closeModal: "Close",
+          noMembers: "No members in this unit",
+          you: "(You)"
         },
         bannerUnit: {
-          joinMessage: "Do you want to join a Family Core?",
+          joinMessage: "Do you want to join a Family Unit?",
           unitDescription: "Family units allow sharing housing and tasks. Explore the available units and submit a request.",
           viewUnitsButton: "View Units",
-          modalDescription: "You are not in any core. Choose your desired core and press 'Send Request' to go to the requests section and manage your request with an administrator."
+          modalDescription: "You are not in any unit. Choose your desired unit and press 'Send Request' to go to the requests section and manage your request with an administrator."
         },
         modalunirse: {
-          title: "Available Cores",
-          description: "You are not in any core. **Choose the desired core** and press 'Send Request' to **go to the requests section** and manage your request with an administrator.",
-          detail: "View Cores",
+          title: "Available Units",
+          description: "You are not in any unit. **Choose the desired unit** and press 'Send Request' to **go to the requests section** and manage your request with an administrator.",
+          detail: "View Units"
         },
-
+        nucleoBanner: {
+          title: "Do you want to join a Family Unit?",
+          description: "Family units allow sharing housing and tasks. Explore the available units and send a request.",
+          viewButton: "View Units"
+        },
         stats: {
           contributions: "Current Contributions",
           hours: "Hours Worked",
@@ -1453,7 +1438,7 @@ const translations = {
       },
 
       profile: {
-        title: " My Profile",
+        title: "👤 My Profile",
         personalInfo: "Personal Information",
         editProfile: "Edit Profile",
         cancelEdit: "Cancel",
@@ -1472,7 +1457,6 @@ const translations = {
         currentPasswordPlaceholder: "Leave blank if you don't want to change it",
         newPassword: "New Password",
         confirmPassword: "Confirm New Password",
-
         notSpecified: "Not specified",
         notAvailable: "Not available",
         saving: "Saving...",
@@ -1483,7 +1467,7 @@ const translations = {
       },
 
       requests: {
-        title: " My Requests",
+        title: "📝 My Requests",
         manage: "Manage your Requests",
         description: "Send queries, justifications or report problems to the administrator",
         newRequest: "New Request",
@@ -1492,20 +1476,20 @@ const translations = {
         viewDetail: "View Detail",
         reply: "Reply",
         types: {
-          hours: "  Hours Log",
-          payment: "  Payments/Fees",
-          housing: "  Housing",
-          general: " 📝 General Inquiry",
-          other: " ❓ Other"
+          hours: "⏱️ Hours Log",
+          payment: "💳 Payments/Fees",
+          housing: "🏠 Housing",
+          general: "📝 General Inquiry",
+          other: "❓ Other"
         },
         form: {
           typeLabel: "Type of Request *",
           types: {
-            hours: "  Hours Log",
-            payment: "  Payments/Fees",
-            housing: "  Housing",
-            general: " 📝 General Inquiry",
-            other: " ❓ Other"
+            hours: "⏱️ Hours Log",
+            payment: "💳 Payments/Fees",
+            housing: "🏠 Housing",
+            general: "📝 General Inquiry",
+            other: "❓ Other"
           },
           subjectLabel: "Subject *",
           subjectPlaceholder: "Example: Issue with my housing assignment",
@@ -1520,8 +1504,9 @@ const translations = {
           },
           attachmentLabel: "Attachment (optional):",
           attachmentHelp: "Upload a file (image or PDF, max. 5MB)",
-          infoTitle: " Information:",
+          infoTitle: "ℹ️ Information:",
           infoDescription: "Your request will be reviewed by an administrator. You will receive a notification when it is addressed.",
+          infoText: "Your request will be reviewed by an administrator. You will receive a notification when it is addressed.",
           submitButton: "Submit Request",
           cancelButton: "Cancel",
           sending: "Sending..."
@@ -1559,18 +1544,17 @@ const translations = {
           rejected: "Rejected"
         },
         error: {
-          title: " Error",
-          titleConnection: " Connection Error:",
-          titleParsingJson: " Error parsing JSON:",
+          title: "❌ Error",
+          titleConnection: "🔌 Connection Error:",
+          titleParsingJson: "⚠️ Error parsing JSON:",
           messageParsingJson: "The server returned HTML instead of JSON",
           button: "Retry"
         },
-
         loading: "Loading requests..."
       },
 
       housing: {
-        title: " My Housing",
+        title: "🏠 My Housing",
         subtitle: "Housing Information",
         loading: "Loading...",
         roomsTitle: "rooms",
@@ -1593,18 +1577,18 @@ const translations = {
           },
           advice: {
             title: "💡 Tip",
-            description: "When applying for housing, make sure to include relevant information such as the number of members in your household and any special needs. This will help assign you the most suitable housing.",
-          },
+            description: "When applying for housing, make sure to include relevant information such as the number of members in your household and any special needs. This will help assign you the most suitable housing."
+          }
         },
         error: {
-          button: "Retry",
+          button: "Retry"
         },
         contactAdmin: {
           title: "Contact Administration",
           description: "To apply for a home or inquire about the allocation process, you can use any of these options:",
           closeButton: "close",
           option1: {
-            title: " Option 1: Formal Request",
+            title: "📝 Option 1: Formal Request",
             description: "Send a request from the 'Requests' section of the system. It will be reviewed and processed by the administrative team.",
             button: "create request"
           },
@@ -1613,13 +1597,13 @@ const translations = {
             description: "You can also contact the administration directly:",
             phone: "phone",
             schedule: "schedule",
-            scheduleMessage: "Monday to Friday, 9:00 AM - 5:00 PM",
-          },
-        },
+            scheduleMessage: "Monday to Friday, 9:00 AM - 5:00 PM"
+          }
+        }
       },
 
       billing: {
-        title: " My Monthly Fees",
+        title: "💳 My Monthly Fees",
         description: "Manage your housing payments and hours debt",
         stats: {
           pending: "Pending",
@@ -1660,7 +1644,7 @@ const translations = {
           }
         },
         debtStatus: {
-          title: " Hours Debt Status",
+          title: "⏱️ Hours Debt Status",
           calculating: "Calculating debt...",
           debtType: {
             period: "period:",
@@ -1668,7 +1652,7 @@ const translations = {
             withoutDebt: "No outstanding hours"
           },
           debtBreakdown: {
-            debtForTheCurrentMonth: " Debt for the Current Month:",
+            debtForTheCurrentMonth: "💰 Debt for the Current Month:",
             debtItems: {
               hoursRequired: "Required Hours",
               WeeklySystem: "Weekly System",
@@ -1686,9 +1670,9 @@ const translations = {
               nextmessage: "It will be automatically added to your next monthly housing payment.",
               sistemMessage: "System: 21 hours per week (84 hours per month).",
               excellentMessage: "🎉 Excellent!",
-              excellentMessageDescription: "You have met your required hours. There will be no additional charges on your fee.",
+              excellentMessageDescription: "You have met your required hours. There will be no additional charges on your fee."
             }
-          },
+          }
         },
         payNow: "Pay Now",
         payBlocked: "Payment Blocked",
@@ -1696,13 +1680,13 @@ const translations = {
         enabledPaymentPeriod: "Enabled Payment Period",
         enabledPaymentPeriodMessage: "You can now make the payment of your fee. The payment period is active until the end of the month.",
         pendingPayment: "⏳ Payment Under Review",
-        noPendingPayment: " There are no pending payments",
+        noPendingPayment: "✅ There are no pending payments",
         blockedPayment: "Payment Blocked",
-        workingPeriod: " 🔒 Ongoing Work Period",
+        workingPeriod: "🔒 Ongoing Work Period",
         workingPeriodNote: "You will be able to pay in",
         workingPeriodDays: "day",
         pending: {
-          title: "Other Pending",
+          title: "Other Pending"
         },
         summary: {
           currentMonth: "Recap of Current Month",
@@ -1715,35 +1699,35 @@ const translations = {
           totalDue: "Total Due",
           totalPaid: "Total Paid",
           totalOverdue: "Total Overdue",
-          housingFee: " house Fee:",
+          housingFee: "🏠 House Fee:",
           houseFee: "Total for Your Housing",
-          paymentCompleted: " 🎉 Payment completed successfully!",
+          paymentCompleted: "🎉 Payment completed successfully!",
           paymentSuccess: "You have successfully paid your fee of",
           paymentInReviewNote: "Your payment is being processed.",
           paymentEnabled: "Payment Available",
           paymentEnabledNote: "You can make the payment now.",
-          dueFeeExpired: " Overdue Installment",
+          dueFeeExpired: "⚠️ Overdue Installment",
           dueFeeExpiredNote: "This payment was not made on time. The debt will accrue to the next month.",
           openPaymentPeriod: "⚠️ Open Payment Period",
           blockedPayment: "Payment Blocked",
-          paid: "PAID",
+          paid: "✅ PAID",
           inReview: "⏳ IN REVIEW",
-          overdue: " OVERDUE",
+          overdue: "❌ OVERDUE",
           closeMonth: "CLOSE MONTH",
           day: "DAY",
           toPay: "TO PAY",
           total: "TOTAL",
           totalPaid: "PAID",
-          paymentBreakdown: " Payment Breakdown:",
-          unworkedHoursDebt: " Debt from Unworked Hours:",
-          totalPaid: " Total Amount Paid:",
-          periodOfWorkInProgress: " 🔒 Period of Work in Progress",
+          paymentBreakdown: "📊 Payment Breakdown:",
+          unworkedHoursDebt: "⏱️ Debt from Unworked Hours:",
+          totalPaidTxt: "💰 Total Amount Paid:",
+          periodOfWorkInProgress: "🔒 Period of Work in Progress",
           periodOfWorkInProgressNote1: "The payment period will be enabled in",
           periodOfWorkInProgressNote2: "(from the 25th of the month).",
           periodOfWorkInProgressNote3: "For now, focus on achieving your goals.",
           periodOfWorkInProgressNote4: "21 hours per week",
           periodOfWorkInProgressNote5: "to avoid additional charges.",
-          otherPendingFees: " Other Fees Pending",
+          otherPendingFees: "📋 Other Fees Pending"
         },
         history: {
           title: "Payment History",
@@ -1753,7 +1737,7 @@ const translations = {
       },
 
       hours: {
-        title: " Hours Log",
+        title: "⏱️ Hours Log",
         currentTime: "Current time",
         registering: "Registering...",
         clockIn: "Clock In",
@@ -1797,9 +1781,9 @@ const translations = {
                 approved: "Approved",
                 pending: "Pending",
                 rejected: "Rejected"
-              },
+              }
             }
-          },
+          }
         },
         months: {
           january: "January",
@@ -1822,15 +1806,15 @@ const translations = {
           box: {
             hoursWorked: "Hours Worked",
             hoursRequired: "Hours Required",
-            hoursRemaining: "Hours Remaining",
+            hoursRemaining: "Hours Remaining"
           },
           breakdownItem: {
             currentMonth: "Current Month",
-            cumulative: "Cumulative",
-          },
+            cumulative: "Cumulative"
+          }
         },
         history: {
-          title: " Records History",
+          title: "📋 Records History",
           startDate: "Start date",
           endDate: "End date",
           filter: "Filter",
@@ -1856,7 +1840,7 @@ const translations = {
                 completed: "✓ Completed",
                 pending: "⏳ in progress",
                 rejected: "Rejected"
-              },
+              }
             },
             inProgress: "In progress",
             row: {
@@ -1868,18 +1852,19 @@ const translations = {
                 thu: "Thu",
                 fri: "Fri",
                 sat: "Sat"
-              },
-            },
+              }
+            }
           },
           modal: {
             descriptionTitle: "Record Description",
             dateLabel: "Date:",
             closeButton: "Close"
-          },
+          }
         }
       },
+
       tasks: {
-        title: " My Tasks",
+        title: "✅ My Tasks",
         errorLoading: "Error loading tasks",
         connectionError: "Connection error loading tasks",
         stats: {
@@ -1887,7 +1872,6 @@ const translations = {
           inProgress: "In Progress",
           completed: "Completed"
         },
-
         individualTasks: {
           noTasks: "You have no individual tasks assigned."
         },
@@ -1901,21 +1885,25 @@ const translations = {
         viewFullDetails: "View Full Details",
         showCompleted: "Show completed",
         assignedTasks: "My Assigned Tasks",
-        individual: " Individual Tasks",
-        family: " Family Unit Tasks",
+        individual: "👤 Individual Tasks",
+        family: "👨‍👩‍👧‍👦 Family Unit Tasks",
         loading: "Loading tasks...",
         inicio: "Start:",
         fin: "End:",
         creadoPor: "Created by:",
+        nucleo: "Unit",
         expiredTask: "This task is overdue.",
         expiredTaskDesc: "The deadline has already passed.",
-
+        tareaVencida: "This task is overdue.",
+        fechaLimitePasada: "The deadline has already passed.",
         actualizarProgreso: "Update Progress",
         reportarAvance: "Report Progress",
         materiales: "Materials",
         viewDetails: "View Full Details",
-
+        verDetallesCompletos: "View Full Details",
         taskCompleted: "✓ Task completed",
+        tareaCompletada: "✓ Task completed",
+        core: "Unit",
         materialsModal: {
           necessary: "necessary",
           necessaryMaterials: "Necessary Materials",
@@ -1931,10 +1919,9 @@ const translations = {
           priority: "Priority",
           reportedProgress: "Reported Progress",
           noReportedProgress: "No progress reported yet",
-          viewAttachmentFile: " 📎View Attachment File"
-        },
+          viewAttachmentFile: "📎 View Attachment File"
+        }
       },
-
 
       documents: {
         title: "📄 My Documents",
@@ -1949,7 +1936,6 @@ const translations = {
     }
   }
 };
-
 
 // Export for use in modules
 if (typeof module !== 'undefined' && module.exports) {

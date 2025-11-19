@@ -367,7 +367,7 @@ const SolicitudesAdmin = {
     },
 
    
-   // ========== RENDER DETALLE COMPLETO ==========
+   // ========== RENDER DETALLE  ==========
 renderDetalleCompleto: function(solicitud, respuestas, fecha) {
     return `
        
