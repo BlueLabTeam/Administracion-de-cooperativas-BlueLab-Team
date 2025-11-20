@@ -1,5 +1,5 @@
 // ==========================================
-// 🧭 MÓDULO: NAVEGACIÓN DE USUARIO
+//  MÓDULO: NAVEGACIÓN DE USUARIO
 // Sistema de navegación entre secciones del dashboard
 // ==========================================
 

@@ -1,5 +1,51 @@
 USE proyecto2025;
 
+SET FOREIGN_KEY_CHECKS = 0;
+
+TRUNCATE TABLE Respuestas_Solicitudes;
+TRUNCATE TABLE Solicitudes;
+TRUNCATE TABLE Solicitudes_Nucleo;
+
+TRUNCATE TABLE Justificaciones_Horas;
+
+TRUNCATE TABLE Pagos_Cuotas;
+TRUNCATE TABLE Cuotas_Mensuales;
+TRUNCATE TABLE Config_Cuotas;
+
+TRUNCATE TABLE pagos;
+
+TRUNCATE TABLE Registro_Horas;
+
+TRUNCATE TABLE Solicitud_Material;
+
+TRUNCATE TABLE Tarea_Avances;
+TRUNCATE TABLE Tarea_Material;
+TRUNCATE TABLE Tarea_Nucleo;
+TRUNCATE TABLE Tarea_Usuario;
+TRUNCATE TABLE Tareas;
+
+TRUNCATE TABLE usuario_notificaciones;
+TRUNCATE TABLE notificaciones;
+
+TRUNCATE TABLE Asignacion_Vivienda;
+
+TRUNCATE TABLE Viviendas;
+
+TRUNCATE TABLE Herramienta_Responsable;
+TRUNCATE TABLE Herramientas;
+
+TRUNCATE TABLE Proveedor_Material;
+TRUNCATE TABLE Materiales;
+TRUNCATE TABLE Proveedores;
+
+TRUNCATE TABLE Telefonos;
+
+TRUNCATE TABLE Usuario;
+TRUNCATE TABLE Nucleo_Familiar;
+TRUNCATE TABLE Rol;
+
+SET FOREIGN_KEY_CHECKS = 1;
+
 -- ================================
 -- ROLES
 -- ================================

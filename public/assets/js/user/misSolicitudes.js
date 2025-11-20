@@ -426,7 +426,7 @@ async function submitNuevaSolicitud(event) {
     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span data-i18n="dashboardUser.requests.form.sending">Enviando...</span>';
 
     try {
-        // 🔥 CREAR FormData CORRECTAMENTE
+        //  CREAR FormData 
         const formData = new FormData(form);
         
         //  DEBUG: Verificar contenido
@@ -483,7 +483,7 @@ async function submitNuevaSolicitud(event) {
 }
 
 // ==========================================
-// 👁️ VER DETALLE DE SOLICITUD
+//  VER DETALLE DE SOLICITUD
 // ==========================================
 
 /**
@@ -582,7 +582,7 @@ async function verDetalleSolicitud(solicitudId) {
 }
 
 // ==========================================
-// 💬 RESPONDER SOLICITUD
+//  RESPONDER SOLICITUD
 // ==========================================
 
 /**
@@ -692,7 +692,7 @@ async function submitRespuesta(event, solicitudId) {
 }
 
 // ==========================================
-// 🔧 FUNCIONES AUXILIARES
+//  FUNCIONES AUXILIARES
 // ==========================================
 
 /**
@@ -743,7 +743,7 @@ function truncarTexto(texto, maxLength) {
 }
 
 // ==========================================
-// 🔄 EXPORTAR FUNCIONES GLOBALES
+//  EXPORTAR FUNCIONES GLOBALES
 // ==========================================
 
 window.loadMisSolicitudes = loadMisSolicitudes;

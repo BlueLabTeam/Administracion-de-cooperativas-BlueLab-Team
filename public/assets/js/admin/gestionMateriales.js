@@ -99,11 +99,11 @@
                 <table style="width: 100%; border-collapse: collapse; background: ${COLORS.white}; min-width: 900px;">
                     <thead>
                         <tr style="background: linear-gradient(135deg, ${COLORS.primary} 0%, ${COLORS.primaryDark} 100%); color: ${COLORS.white};">
-                            <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">ID</th>
-                            <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;">Material</th>
-                            <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;">Características</th>
-                            <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Stock</th>
-                            <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Acciones</th>
+                            <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;" data-i18n="dashboardAdmin.materials.table.columns.id">ID</th>
+                            <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;" data-i18n="dashboardAdmin.materials.table.columns.material">Material</th>
+                            <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;" data-i18n="dashboardAdmin.materials.table.columns.caracteristics">Características</th>
+                            <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;" data-i18n="dashboardAdmin.materials.table.columns.stock">Stock</th>
+                            <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;" data-i18n="dashboardAdmin.materials.table.columns.actions">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -118,15 +118,15 @@
             
             if (stock === 0) {
                 stockColor = COLORS.danger;
-                stockText = 'Agotado';
+                stockText = '<span data-i18n="dashboardAdmin.materials.stockOut">Agotado</span>';
                 stockIcon = 'fa-times-circle';
             } else if (stock < 10) {
                 stockColor = COLORS.warning;
-                stockText = 'Stock Bajo';
+                stockText = '<span data-i18n="dashboardAdmin.materials.stockLow">Stock Bajo</span>';
                 stockIcon = 'fa-exclamation-triangle';
             } else {
                 stockColor = COLORS.success;
-                stockText = 'Disponible';
+                stockText = '<span data-i18n="dashboardAdmin.materials.stockAvailable">Disponible</span>';
                 stockIcon = 'fa-check-circle';
             }
 
@@ -192,6 +192,7 @@
 
         html += '</tbody></table></div>';
         container.innerHTML = html;
+        i18n.translatePage();
     }
 
     // ========== BUSCAR MATERIALES ==========
@@ -251,7 +252,7 @@
             const data = await response.json();
             
             if (data.success && data.material) {
-                document.getElementById('materialModalTitle').textContent = 'Editar Material';
+                document.getElementById('materialModalTitle').textContent= 'Editar Material';
                 document.getElementById('material-id').value = data.material.id_material;
                 document.getElementById('material-nombre').value = data.material.nombre;
                 document.getElementById('material-caracteristicas').value = data.material.caracteristicas || '';

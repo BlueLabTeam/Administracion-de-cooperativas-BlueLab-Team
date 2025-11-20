@@ -1,8 +1,8 @@
 
-(function() {
+(function () {
     'use strict';
-    
-  
+
+
 
     // Evitar carga duplicada
     if (window.TareasModuleCargado) {
@@ -29,45 +29,45 @@
 
     // ========== INICIALIZACIÓN ==========
     function inicializarModuloTareas() {
-       (' [TAREAS] Inicializando módulo...');
-        
+        (' [TAREAS] Inicializando módulo...');
+
         const tareasMenuItem = document.querySelector('.menu li[data-section="tareas"]');
         if (tareasMenuItem) {
-            tareasMenuItem.addEventListener('click', function() {
-            
+            tareasMenuItem.addEventListener('click', function () {
+
                 window.inicializarSeccionTareas();
             });
         }
-        
-  
+
+
     }
 
     // ========== INICIALIZAR SECCIÓN ==========
-    window.inicializarSeccionTareas = async function() {
-     
-        
+    window.inicializarSeccionTareas = async function () {
+
+
         try {
             await Promise.all([
                 window.loadTaskUsers(),
                 window.loadNucleos(),
                 window.loadAllTasks()
             ]);
-            
+
             // Cargar materiales después de un breve delay
             setTimeout(() => {
                 if (typeof MaterialesModule !== 'undefined' && MaterialesModule.loadForTask) {
                     MaterialesModule.loadForTask();
                 }
             }, 300);
-            
-       
+
+
         } catch (error) {
             console.error(' [TAREAS] Error al inicializar:', error);
         }
     };
 
     // ========== TOGGLE TIPO DE ASIGNACIÓN ==========
-    window.toggleAsignacion = function() {
+    window.toggleAsignacion = function () {
         const tipo = document.getElementById('tipo_asignacion').value;
         const usuariosSelector = document.getElementById('usuarios-selector');
         const nucleosSelector = document.getElementById('nucleos-selector');
@@ -82,9 +82,9 @@
     };
 
     // ========== CARGAR USUARIOS PARA TAREAS ==========
-    window.loadTaskUsers = async function() {
-    
-        
+    window.loadTaskUsers = async function () {
+
+
         const container = document.getElementById('taskUsersList');
 
         if (!container) {
@@ -95,7 +95,7 @@
         try {
             const response = await fetch('/api/tasks/users');
             const data = await response.json();
-            
+
             if (data.success) {
                 renderTaskUsers(data.usuarios);
             } else {
@@ -110,7 +110,7 @@
     // ========== RENDERIZAR USUARIOS ==========
     function renderTaskUsers(usuarios) {
         const container = document.getElementById('taskUsersList');
-        
+
         if (!usuarios || usuarios.length === 0) {
             container.innerHTML = '<p>No hay usuarios disponibles</p>';
             return;
@@ -127,9 +127,9 @@
     }
 
     // ========== CARGAR NÚCLEOS ==========
-    window.loadNucleos = async function() {
-      
-        
+    window.loadNucleos = async function () {
+
+
         const container = document.getElementById('taskNucleosList');
 
         if (!container) {
@@ -140,7 +140,7 @@
         try {
             const response = await fetch('/api/tasks/nucleos');
             const data = await response.json();
-            
+
             if (data.success) {
                 renderNucleos(data.nucleos);
             } else {
@@ -155,7 +155,7 @@
     // ========== RENDERIZAR NÚCLEOS ==========
     function renderNucleos(nucleos) {
         const container = document.getElementById('taskNucleosList');
-        
+
         if (!nucleos || nucleos.length === 0) {
             container.innerHTML = '<p>No hay núcleos familiares disponibles</p>';
             return;
@@ -173,22 +173,22 @@
     }
 
     // ========== TOGGLE SELECCIÓN ==========
-    window.toggleAllTaskUsers = function() {
+    window.toggleAllTaskUsers = function () {
         const checkboxes = document.querySelectorAll('input[name="usuarios[]"]');
         const allChecked = Array.from(checkboxes).every(cb => cb.checked);
         checkboxes.forEach(cb => cb.checked = !allChecked);
     };
 
-    window.toggleAllNucleos = function() {
+    window.toggleAllNucleos = function () {
         const checkboxes = document.querySelectorAll('input[name="nucleos[]"]');
         const allChecked = Array.from(checkboxes).every(cb => cb.checked);
         checkboxes.forEach(cb => cb.checked = !allChecked);
     };
 
     // ========== CREAR TAREA ==========
-    window.createTask = async function(event) {
+    window.createTask = async function (event) {
         event.preventDefault();
-      
+
 
         const form = event.target;
         const formData = new FormData(form);
@@ -218,13 +218,13 @@
         }
 
         try {
-            const response = await fetch('/api/tasks/create', { 
-                method: 'POST', 
-                body: formData 
+            const response = await fetch('/api/tasks/create', {
+                method: 'POST',
+                body: formData
             });
-            
+
             const data = await response.json();
-            
+
             if (data.success) {
                 alert(' ' + data.message);
                 form.reset();
@@ -246,12 +246,12 @@
     };
 
     // ========== CARGAR TODAS LAS TAREAS ==========
-    window.loadAllTasks = async function() {
-   
-        
+    window.loadAllTasks = async function () {
+
+
         const container = document.getElementById('tasksList');
         const filtro = document.getElementById('filtro-estado')?.value || '';
-        
+
         let url = '/api/tasks/all';
         if (filtro && filtro !== 'vencida') {
             url += `?estado=${filtro}`;
@@ -262,7 +262,7 @@
         try {
             const response = await fetch(url);
             const data = await response.json();
-            
+
             if (data.success) {
                 renderTasksList(data.tareas, filtro);
             } else {
@@ -276,8 +276,8 @@
 
     // ========== RENDERIZAR LISTA DE TAREAS ==========
     function renderTasksList(tareas, filtroActivo = '') {
-      
-        
+
+
         const container = document.getElementById('tasksList');
 
         if (!tareas || tareas.length === 0) {
@@ -354,10 +354,34 @@
                     </div>
                     <p class="task-description">${tarea.descripcion}</p>
                     <div class="task-meta">
-                        <div class="task-meta-item"><strong>Inicio:</strong> ${fechaInicio}</div>
-                        <div class="task-meta-item"><strong>Fin:</strong> ${fechaFin}</div>
-                        <div class="task-meta-item"><strong>Creado por:</strong> ${tarea.creador}</div>
-                        <div class="task-meta-item"><strong>Asignado a:</strong> ${asignados}</div>
+                       <div class="task-meta-item">
+    <strong>
+        <span data-i18n="dashboardAdmin.tasks.start">Inicio:</span>
+    </strong> 
+    ${fechaInicio}
+</div>
+
+<div class="task-meta-item">
+    <strong>
+        <span data-i18n="dashboardAdmin.tasks.end">Fin:</span>
+    </strong> 
+    ${fechaFin}
+</div>
+
+<div class="task-meta-item">
+    <strong>
+        <span data-i18n="dashboardAdmin.tasks.createdBy">Creado por:</span>
+    </strong> 
+    ${tarea.creador}
+</div>
+
+<div class="task-meta-item">
+    <strong>
+        <span data-i18n="dashboardAdmin.tasks.assignedTo">Asignado a:</span>
+    </strong> 
+    ${asignados}
+</div>
+
                     </div>
                     ${!tarea.esCancelada ? `
                         <div class="task-progress-section">
@@ -372,19 +396,19 @@
                         </div>
                     ` : ''}
                     ${tarea.esVencida ? `
-                        <div class="alert-warning">
-                            <i class="fas fa-exclamation-triangle"></i>
-                            <strong>Esta tarea está vencida.</strong> La fecha límite ya ha pasado.
-                        </div>
+          
                     ` : ''}
                     ${!tarea.esCancelada ? `
                         <div class="task-actions">
                             
                             <button class="btn btn-small btn-materiales" onclick="TareasModule.viewMaterials(${tarea.id_tarea})">
-                                <i class="fas fa-boxes"></i> Materiales
+                                <i class="fas fa-boxes"></i> Material
                             </button>
                             ${!tarea.esCompletada ? `
-                                <button class="btn btn-small btn-cancel" onclick="TareasModule.cancel(${tarea.id_tarea})">Cancelar Tarea</button>
+                               <button class="btn btn-small btn-cancel" onclick="TareasModule.cancel(${tarea.id_tarea})">
+    <span data-i18n="dashboardAdmin.tasks.cancelTask">Cancelar Tarea</span>
+</button>
+
                             ` : `
                                 <span style="color:${COLORS.success};font-weight:bold;padding:5px 10px">✓ Completada</span>
                             `}
@@ -396,13 +420,13 @@
     }
 
     // ========== VER DETALLES ==========
-    window.viewTaskDetails = async function(tareaId) {
-      
+    window.viewTaskDetails = async function (tareaId) {
+
 
         try {
             const response = await fetch(`/api/tasks/details?id=${tareaId}`);
             const data = await response.json();
-            
+
             if (data.success) {
                 mostrarDetallesTarea(data.tarea, data.avances);
             } else {
@@ -463,8 +487,8 @@
     }
 
     // ========== VER MATERIALES ==========
-    window.viewTaskMaterials = async function(tareaId) {
-       
+    window.viewTaskMaterials = async function (tareaId) {
+
 
         try {
             const response = await fetch(`/api/materiales/task-materials?id_tarea=${tareaId}`);
@@ -490,8 +514,8 @@
         const materialesHTML = `
             <div class="materials-grid">
                 ${materiales.map(material => {
-                    const suficiente = parseInt(material.stock_disponible) >= parseInt(material.cantidad_requerida);
-                    return `
+            const suficiente = parseInt(material.stock_disponible) >= parseInt(material.cantidad_requerida);
+            return `
                         <div class="material-card ${suficiente ? 'disponible' : 'insuficiente'}">
                             <div class="material-icon-box">
                                 <i class="fas fa-box"></i>
@@ -501,9 +525,10 @@
                                 ${material.caracteristicas ? `<p class="material-desc">${material.caracteristicas}</p>` : ''}
                                 <div class="material-quantities">
                                     <span class="quantity-item">
-                                        <i class="fas fa-clipboard-list"></i>
-                                        Requerido: <strong>${material.cantidad_requerida}</strong>
-                                    </span>
+    <i class="fas fa-clipboard-list"></i>
+    <span data-i18n="dashboardAdmin.tasks.required">Requerido:</span> 
+    <strong>${material.cantidad_requerida}</strong>
+</span>
                                     <span class="quantity-item ${suficiente ? 'available' : 'unavailable'}">
                                         <i class="fas fa-warehouse"></i>
                                         Stock: <strong>${material.stock_disponible}</strong>
@@ -512,15 +537,15 @@
                             </div>
                             <div class="material-status-badge">
                                 ${suficiente ?
-                                    '<span class="badge-success"><i class="fas fa-check-circle"></i> Disponible</span>' :
-                                    '<span class="badge-warning"><i class="fas fa-exclamation-triangle"></i> Stock Bajo</span>'
-                                }
+                    '<span class="badge-success"><i class="fas fa-check-circle"></i> Disponible</span>' :
+                    '<span class="badge-warning"><i class="fas fa-exclamation-triangle"></i> Stock Bajo</span>'
+                }
                             </div>
                         </div>
                     `;
-                }).join('')}
+        }).join('')}
             </div>
-        `;
+        `; i18n.translatePage();
 
         const modal = `
             <div id="materialesModalAdmin" class="modal-detail" onclick="if(event.target.id==='materialesModalAdmin') this.remove()">
@@ -551,7 +576,7 @@
     }
 
     // ========== CANCELAR TAREA ==========
-    window.cancelTask = async function(tareaId) {
+    window.cancelTask = async function (tareaId) {
         if (!confirm('¿Estás seguro de cancelar esta tarea?')) return;
 
         const formData = new FormData();
@@ -562,9 +587,9 @@
                 method: 'POST',
                 body: formData
             });
-            
+
             const data = await response.json();
-            
+
             if (data.success) {
                 alert(' ' + data.message);
                 window.loadAllTasks();
@@ -580,23 +605,58 @@
     // ========== FUNCIONES AUXILIARES ==========
 
     function formatEstado(estado) {
-        const estados = {
-            'pendiente': 'Pendiente',
-            'en_progreso': 'En Progreso',
-            'completada': 'Completada',
-            'cancelada': 'Cancelada'
+        const map = {
+            'pendiente': {
+                key: 'dashboardAdmin.tasks.statePending',
+                defaultText: 'Pendiente'
+            },
+            'en_progreso': {
+                key: 'dashboardAdmin.tasks.stateInProgress',
+                defaultText: 'En Progreso'
+            },
+            'completada': {
+                key: 'dashboardAdmin.tasks.stateCompleted',
+                defaultText: 'Completada'
+            },
+            'cancelada': {
+                key: 'dashboardAdmin.tasks.stateCanceled',
+                defaultText: 'Cancelada'
+            }
         };
-        return estados[estado] || estado;
+
+        const item = map[estado];
+        if (!item) return estado;
+
+       
+        return `<span data-i18n="${item.key}">${item.defaultText}</span>`;
     }
 
+
     function formatPrioridad(prioridad) {
-        const prioridades = {
-            'baja': 'Baja',
-            'media': 'Media',
-            'alta': 'Alta'
+        const map = {
+            'baja': {
+                key: 'dashboardAdmin.requests.priorityLow',
+                defaultText: 'Baja'
+            },
+            'media': {
+                key: 'dashboardAdmin.requests.priorityMedium',
+                defaultText: 'Media'
+            },
+            'alta': {
+                key: 'dashboardAdmin.requests.priorityHigh',
+                defaultText: 'Alta'
+            }
         };
-        return prioridades[prioridad] || prioridad;
+
+        const item = map[prioridad];
+
+        if (!item) return prioridad;
+
+        
+        return `<span data-i18n="${item.key}">${item.defaultText}</span>`;
     }
+
+
 
     function formatearFechaUY(fecha) {
         if (!fecha) return '-';
@@ -612,7 +672,7 @@
     // ========== EXPORTAR API PÚBLICA ==========
     window.TareasModule = {
         version: '1.0.0',
-        
+
         // Funciones principales
         init: inicializarModuloTareas,
         loadUsers: window.loadTaskUsers,

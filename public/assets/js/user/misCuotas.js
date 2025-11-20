@@ -68,12 +68,12 @@ async function inicializarSeccionCuotas() {
         await generarCuotaMesActualSiNoExiste();
         console.log(' [PASO 1/4] Cuota verificada/generada');
         
-        // 🔥 PASO 2: CARGAR DEUDA DE HORAS (CRÍTICO - DEBE COMPLETARSE)
+        //  PASO 2: CARGAR DEUDA DE HORAS 
         console.log('⏳ [PASO 2/4] Cargando deuda de horas...');
         const deudaCargada = await loadDeudaHorasParaCuotas();
         console.log(' [PASO 2/4] Deuda de horas cargada:', deudaCargada);
         
-        //  VERIFICACIÓN CRÍTICA
+        //  VERIFICACIÓN 
         if (typeof window.deudaHorasActual === 'undefined' || window.deudaHorasActual === null) {
             console.error(' [ERROR CRÍTICO] deudaHorasActual NO está definida!');
             console.error('   Forzando a 0 para evitar errores...');
@@ -162,7 +162,7 @@ async function generarCuotaMesActualSiNoExiste() {
 }
 
 // ==========================================
-// 💸 CARGAR DEUDA DE HORAS
+//  CARGAR DEUDA DE HORAS
 // ==========================================
 
 /**
@@ -178,12 +178,12 @@ async function loadDeudaHorasParaCuotas() {
         console.log('📥 [DEUDA HORAS] Respuesta recibida:', data);
         
         if (data.success && data.deuda) {
-            // 🔥 CRÍTICO: Calcular deuda correctamente
+          
             const deudaEnPesos = parseFloat(data.deuda.deuda_en_pesos || 0);
             const deudaMesActual = parseFloat(data.deuda.deuda_mes_actual || 0);
             const deudaAcumulada = parseFloat(data.deuda.deuda_acumulada || 0);
             
-            // Usar el campo correcto del backend
+            // Usar el campo  del backend
             window.deudaHorasActual = deudaEnPesos;
             
             console.log('💵 [DEUDA HORAS] Deuda calculada:');
@@ -192,7 +192,7 @@ async function loadDeudaHorasParaCuotas() {
             console.log('   - deuda_acumulada:', deudaAcumulada);
             console.log('    DEUDA FINAL ASIGNADA:', window.deudaHorasActual);
             
-            //  VERIFICAR que se asignó correctamente
+            //  VERIFICAR que se asignó 
             if (window.deudaHorasActual === 0 && deudaEnPesos > 0) {
                 console.error(' [DEUDA HORAS] ERROR: Deuda no se asignó correctamente!');
                 window.deudaHorasActual = deudaEnPesos; // Forzar asignación
@@ -263,7 +263,7 @@ async function loadInfoViviendaCuota() {
 }
 
 // ==========================================
-// 📥 CARGAR MIS CUOTAS
+//  CARGAR MIS CUOTAS
 // ==========================================
 
 /**
@@ -338,7 +338,7 @@ async function loadMisCuotas() {
 }
 
 // ==========================================
-// 🎨 RENDERIZAR CUOTAS ORGANIZADAS (MEJORADO)
+//  RENDERIZAR CUOTAS ORGANIZADAS (MEJORADO)
 // ==========================================
 
 /**
@@ -365,11 +365,11 @@ function renderMisCuotasOrganizadas(cuotas) {
     
     let html = '';
     
-    // 🏆 CUOTA DEL MES ACTUAL (DESTACADA)
+    //  CUOTA DEL MES ACTUAL (DESTACADA)
     const cuotaMasReciente = cuotas[0];
     console.log('🏆 [RENDER] Cuota más reciente:', cuotaMasReciente);
     
-    // 🔥 OBTENER DEUDA DE HORAS
+
     const deudaHoras = parseFloat(window.deudaHorasActual || 0);
     
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
@@ -377,8 +377,7 @@ function renderMisCuotasOrganizadas(cuotas) {
     console.log('   window.deudaHorasActual:', window.deudaHorasActual);
     console.log('   deudaHoras (parseado):', deudaHoras);
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-    
-    // 🔥 CALCULAR MONTOS
+   
     const montoCuota = parseFloat(
         cuotaMasReciente.monto_base || 
         cuotaMasReciente.monto_actual || 
@@ -390,7 +389,7 @@ function renderMisCuotasOrganizadas(cuotas) {
     const montoTotal = montoCuota + deudaAcumuladaAnterior + deudaHoras;
     
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-    console.log('🧮 [RENDER] CÁLCULO COMPLETO:');
+    console.log(' [RENDER] CÁLCULO COMPLETO:');
     console.log('   monto_cuota:', montoCuota);
     console.log('   deuda_meses_anteriores:', deudaAcumuladaAnterior);
     console.log('   deuda_horas_actual:', deudaHoras);
@@ -426,7 +425,7 @@ function renderMisCuotasOrganizadas(cuotas) {
     const puedePagar = esMesCuota && estaDentroPeriodoPago && !estaPagada && !tienePagoPendiente;
     const diasParaPagar = estaDentroPeriodoPago ? 0 : Math.max(0, 25 - diaActual);
     
-    // 🏆 RENDERIZAR SECCIÓN DESTACADA
+    //  RENDERIZAR SECCIÓN DESTACADA
     html += renderSeccionDestacada(
         cuotaMasReciente,
         montoCuota,
@@ -523,7 +522,7 @@ function renderMisCuotasOrganizadas(cuotas) {
         `;
     }
     
-    // 📚 SECCIÓN: HISTORIAL
+    // SECCIÓN: HISTORIAL
   html += `
     <div class="cuotas-section">
         <div class="historial-header-toggle" onclick="toggleHistorialCompleto()">
