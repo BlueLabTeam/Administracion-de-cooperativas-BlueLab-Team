@@ -6,7 +6,7 @@ UPLOADS_DIR="$PROJECT_DIR/storage/uploads"
 LOGS_DIR="$PROJECT_DIR/logs"
 
 # === Configuración de base de datos ===
-HOST="gestcoop_db_slave"
+HOST="gestcoop_db"
 USER="root"
 PASS="rootbluelab2025"
 DB="proyecto2025"
