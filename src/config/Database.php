@@ -14,14 +14,11 @@ class Database
     {
         if (self::$instance === null) {
 
-            $host = "192.168.5.50";
-            $db   = "agustin_fleitas";
-            $user = "agustin.fleitas";
-            $pass = "56751742";
-            $host = "192.168.5.50";
-            $db   = "bluelab";
-            $user = "agustin.fleitas";
-            $pass = "56751742";
+
+            $host = getenv('DB_HOST');
+            $db = getenv('DB_NAME');
+            $user = getenv('DB_USER');
+            $pass = getenv('DB_PASSWORD');
             $charset = 'utf8mb4';
 
 
