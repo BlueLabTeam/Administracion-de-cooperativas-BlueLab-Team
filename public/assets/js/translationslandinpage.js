@@ -23,9 +23,9 @@ const translations = {
       copy: "Todos los derechos reservados.",
       contact: {
         title: "Contacto",
-        address: "📍 Av. Principal 1234, Montevideo",
-        phone: "📞 094654987",
-        email: "✉️ cooperativa@gmail.com"
+        address: " Av. Principal 1234, Montevideo",
+        phone: " 094654987",
+        email: " cooperativa@gmail.com"
       },
       schedule: {
         title: "Horarios",
@@ -33,12 +33,12 @@ const translations = {
         saturday: "Sábados: 9:00 - 13:00",
         sunday: "Domingos: Cerrados"
       },
-      social: {
-        title: "Síguenos",
-        instagram: "📱 Instagram",
-        facebook: "📘 Facebook",
-        whatsapp: "💬 Whatsapp"
-      }
+     social: {
+  title: "Síguenos",
+  instagram: "Instagram",
+  facebook: "Facebook",
+  whatsapp: "WhatsApp"
+}
     },
     home: {
       welcome: {
@@ -201,9 +201,9 @@ const translations = {
       copy: "All rights reserved.",
       contact: {
         title: "Contact",
-        address: "📍 Main Ave. 1234, Montevideo",
-        phone: "📞 094654987",
-        email: "✉️ cooperativa@gmail.com"
+        address: " Main Ave. 1234, Montevideo",
+        phone: " 094654987",
+        email: " cooperativa@gmail.com"
       },
       schedule: {
         title: "Opening Hours",
@@ -213,9 +213,9 @@ const translations = {
       },
       social: {
         title: "Follow Us",
-        instagram: "📱 Instagram",
-        facebook: "📘 Facebook",
-        whatsapp: "💬 Whatsapp"
+  instagram: "Instagram",
+  facebook: "Facebook",
+  whatsapp: "WhatsApp"
       }
     },
     home: {
