@@ -27,19 +27,19 @@
           <div class="formulario__group">
             <label for="nombre_completo" class="formulario__label" data-i18n="register.fullName">Nombre completo</label>
             <input type="text" name="nombre_completo" id="nombre_completo" class="formulario__input" 
-                   data-i18n-placeholder="register.fullName" />
+                   data-i18n-placeholder="" />
           </div>
 
           <div class="formulario__group">
             <label for="CI" class="formulario__label" data-i18n="register.id">Carnet de identidad</label>
             <input type="text" name="CI" id="CI" class="formulario__input" 
-                   data-i18n-placeholder="register.id" />
+                   data-i18n-placeholder="" />
           </div>
 
           <div class="formulario__group">
             <label for="telefono" class="formulario__label" data-i18n="register.phone">Teléfono</label>
             <input type="number" name="telefono" id="telefono" class="formulario__input" 
-                   data-i18n-placeholder="register.phone" />
+                   data-i18n-placeholder="" />
           </div>
 
           <div class="formulario__group">
@@ -51,19 +51,19 @@
           <div class="formulario__group formulario__group--full">
             <label for="email" class="formulario__label" data-i18n="register.email">Email</label>
             <input type="email" name="email" id="email" class="formulario__input" 
-                   data-i18n-placeholder="register.email" />
+                   data-i18n-placeholder="" />
           </div>
 
           <div class="formulario__group formulario__group--full">
             <label for="direccion" class="formulario__label" data-i18n="register.address">Dirección</label>
             <input type="text" name="direccion" id="direccion" class="formulario__input" 
-                   data-i18n-placeholder="register.address" />
+                   data-i18n-placeholder="" />
           </div>
 
           <div class="formulario__group formulario__group--full">
             <label for="password" class="formulario__label" data-i18n="register.password">Contraseña</label>
             <input type="password" name="password" id="password" class="formulario__input" 
-                   data-i18n-placeholder="register.password" />
+                   data-i18n-placeholder="" />
           </div>
 
           <input type="submit" class="formulario__submit" data-i18n-value="register.submit" value="Enviar Solicitud" />
