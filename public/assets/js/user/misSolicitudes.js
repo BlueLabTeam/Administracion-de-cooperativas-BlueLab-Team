@@ -220,7 +220,7 @@ function renderMisSolicitudes(solicitudes) {
                 </div>
 
                 <div class="solicitud-footer">
-                    <button class="btn btn-secondary btn-small" onclick="verDetalleSolicitud(${sol.id_solicitud})">
+                    <button class="btn btn-primary btn-small" onclick="verDetalleSolicitud(${sol.id_solicitud})">
                         <i class="fas fa-eye"></i> <span data-i18n="dashboardUser.requests.viewDetail">Ver Detalle</span>
                     </button>
                     ${sol.estado !== 'resuelta' && sol.estado !== 'rechazada' ? `

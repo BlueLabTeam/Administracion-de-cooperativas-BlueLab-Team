@@ -7,18 +7,21 @@ use PDOException;
 
 class Database
 {
+
     private static ?PDO $instance = null;
 
     public static function getConnection(): PDO
     {
         if (self::$instance === null) {
 
-            $host = getenv('DB_HOST');
-            $db   = getenv('DB_NAME');
-            $user = getenv('DB_USER');
-            $pass = getenv('DB_PASSWORD');
+            $host = "192.168.5.50";
+            $db   = "agustin_fleitas";
+            $user = "agustin.fleitas";
+            $pass = "56751742";
             $charset = 'utf8mb4';
 
+
+            
             $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
             $options = [
                 PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,

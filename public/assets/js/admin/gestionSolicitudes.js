@@ -677,44 +677,44 @@ responder: function(solicitudId) {
     },
 
     // ========== CAMBIAR ESTADO ==========
-   cambiarEstado: async function(solicitudId, nuevoEstado) {
+   // ========== CAMBIAR ESTADO ==========
+cambiarEstado: async function(solicitudId, nuevoEstado) {
     const estadoTexto = {
-        'pendiente': i18next.t("requests.statusPending"),
-        'en_revision': i18next.t("requests.statusInReview"),
-        'resuelta': i18next.t("requests.statusResolved"),
-        'rechazada': i18next.t("requests.statusRejected")
+        'pendiente': 'Pendiente',
+        'en_revision': 'En Revisión',
+        'resuelta': 'Resuelta',
+        'rechazada': 'Rechazada'
     };
 
-   ;
-        if (!confirm(`¿Cambiar estado a "${estadoTexto[nuevoEstado]}"?`)) {
-            return;
-        }
-
-        try {
-            const formData = new FormData();
-            formData.append('id_solicitud', solicitudId);
-            formData.append('estado', nuevoEstado);
-
-            const response = await fetch('/api/solicitudes/update-estado', {
-                method: 'POST',
-                body: formData
-            });
-
-            const data = await response.json();
-
-            if (data.success) {
-                alert(' ' + data.message);
-                this.loadAllSolicitudes();
-                this.loadEstadisticas();
-            } else {
-                alert(' ' + data.message);
-            }
-
-        } catch (error) {
-            console.error('Error:', error);
-            alert(' Error de conexión');
-        }
+    if (!confirm(`¿Cambiar estado a "${estadoTexto[nuevoEstado]}"?`)) {
+        return;
     }
+
+    try {
+        const formData = new FormData();
+        formData.append('id_solicitud', solicitudId);
+        formData.append('estado', nuevoEstado);
+
+        const response = await fetch('/api/solicitudes/update-estado', {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            alert('✅ ' + data.message);
+            this.loadAllSolicitudes();
+            this.loadEstadisticas();
+        } else {
+            alert('❌ Error: ' + data.message);
+        }
+
+    } catch (error) {
+        console.error('❌ Error:', error);
+        alert('❌ Error de conexión');
+    }
+}
 };
 
 // ========== EXPORTAR ==========

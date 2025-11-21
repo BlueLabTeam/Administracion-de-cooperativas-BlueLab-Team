@@ -40,7 +40,7 @@ class NucleoController
 
         $nombreNucleo = $_POST['nombre_nucleo'] ?? '';
         $direccion = $_POST['direccion'] ?? '';
-        $usuariosIds = $_POST['usuarios'] ?? [];
+        $usuariosIds = $_POST['miembros'] ?? [];
 
         if (empty($nombreNucleo)) {
             echo json_encode(['success' => false, 'message' => 'El nombre del núcleo es obligatorio'], JSON_UNESCAPED_UNICODE);
