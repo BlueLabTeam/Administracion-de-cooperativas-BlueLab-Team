@@ -99,11 +99,11 @@
                 <table style="width: 100%; border-collapse: collapse; background: ${COLORS.white}; min-width: 900px;">
                     <thead>
                         <tr style="background: linear-gradient(135deg, ${COLORS.primary} 0%, ${COLORS.primaryDark} 100%); color: ${COLORS.white};">
-                            <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">ID</th>
-                            <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;">Material</th>
-                            <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;">Características</th>
-                            <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Stock</th>
-                            <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;">Acciones</th>
+                            <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;" data-i18n="dashboardAdmin.materials.table.columns.id">ID</th>
+                            <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;" data-i18n="dashboardAdmin.materials.table.columns.material">Material</th>
+                            <th style="padding: 15px 12px; text-align: left; font-weight: 600; font-size: 13px;" data-i18n="dashboardAdmin.materials.table.columns.caracteristics">Características</th>
+                            <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;" data-i18n="dashboardAdmin.materials.table.columns.stock">Stock</th>
+                            <th style="padding: 15px 12px; text-align: center; font-weight: 600; font-size: 13px;" data-i18n="dashboardAdmin.materials.table.columns.actions">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -118,15 +118,15 @@
             
             if (stock === 0) {
                 stockColor = COLORS.danger;
-                stockText = 'Agotado';
+                stockText = '<span data-i18n="dashboardAdmin.materials.stockOut">Agotado</span>';
                 stockIcon = 'fa-times-circle';
             } else if (stock < 10) {
                 stockColor = COLORS.warning;
-                stockText = 'Stock Bajo';
+                stockText = '<span data-i18n="dashboardAdmin.materials.stockLow">Stock Bajo</span>';
                 stockIcon = 'fa-exclamation-triangle';
             } else {
                 stockColor = COLORS.success;
-                stockText = 'Disponible';
+                stockText = '<span data-i18n="dashboardAdmin.materials.stockAvailable">Disponible</span>';
                 stockIcon = 'fa-check-circle';
             }
 
@@ -192,6 +192,7 @@
 
         html += '</tbody></table></div>';
         container.innerHTML = html;
+        i18n.translatePage();
     }
 
     // ========== BUSCAR MATERIALES ==========
@@ -251,7 +252,7 @@
             const data = await response.json();
             
             if (data.success && data.material) {
-                document.getElementById('materialModalTitle').textContent = 'Editar Material';
+                document.getElementById('materialModalTitle').textContent= 'Editar Material';
                 document.getElementById('material-id').value = data.material.id_material;
                 document.getElementById('material-nombre').value = data.material.nombre;
                 document.getElementById('material-caracteristicas').value = data.material.caracteristicas || '';
@@ -478,15 +479,29 @@
 
         let html = '';
 
+        html += `
+            <div class="materiales-summary">
+                <div class="summary-item">
+                    <i class="fas fa-boxes"></i>
+                    <span><strong>${materiales.length}</strong> materiales totales</span>
+                </div>
+                <div class="summary-item success">
+                    <i class="fas fa-check-circle"></i>
+                    <span><strong>${materialesDisponibles.length}</strong> disponibles</span>
+                </div>
+                ${materialesAgotados.length > 0 ? `
+                    <div class="summary-item error">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span><strong>${materialesAgotados.length}</strong> agotados</span>
+                    </div>
+                ` : ''}
+            </div>
+        `;
 
         if (materialesDisponibles.length > 0) {
             html += '<div class="materiales-section">';
-           html += `
-    <h4 class="section-subtitle" data-i18n="dashboardAdmin.tasks.availableMaterials">
-        <i class="fas fa-check-circle"></i> Materiales Disponibles
-    </h4>
-`;
-
+            html += '<h4 class="section-subtitle"><i class="fas fa-check-circle"></i> Materiales Disponibles</h4>';
+            
             html += materialesDisponibles.map(material => {
                 const stock = parseInt(material.stock) || 0;
                 const stockClass = stock < 10 ? 'bajo' : 'disponible';
@@ -500,12 +515,9 @@
                             <div class="material-selector-info">
                                 <div class="material-selector-name">
                                     <strong>${material.nombre}</strong>
-                                    <span class="stock-badge-small ${stockClass}"
-      data-i18n="dashboardAdmin.tasks.stockUnits"
-      data-i18n-options='{"stock": ${stock}}'>
-    <i class="fas fa-warehouse"></i> ${stock} unidades
-</span>
-
+                                    <span class="stock-badge-small ${stockClass}">
+                                        <i class="fas fa-warehouse"></i> ${stock} unidades
+                                    </span>
                                 </div>
                                 ${material.caracteristicas ? `
                                     <div class="material-description">
@@ -515,39 +527,23 @@
                             </div>
                         </div>
                         <div class="material-selector-actions">
-    <div class="quantity-control">
-        <label for="cantidad-${material.id_material}" data-i18n="dashboardAdmin.tasks.quantityPlaceholder">
-            Cantidad:
-        </label>
-
-        <input type="number"
-               class="material-cantidad-input"
-               id="cantidad-${material.id_material}"
-               min="1"
-               max="${stock}"
-               value="1"
-               placeholder="Cant."
-               data-i18n-placeholder="dashboardAdmin.tasks.quantityPlaceholder">
-
-     <span class="max-available"
-      data-i18n="dashboardAdmin.tasks.maxAvailable"
-      data-i18n-options='{"stock": ${stock}}'>
-    máx: ${stock}
-</span>
-
-    </div>
-</div>
-
-                          <button 
-    type="button"
-    class="btn btn-primary btn-add-material"
-    onclick="MaterialesModule.addToTask(${material.id_material}, '${material.nombre.replace(/'/g, "\\'")}', ${stock})"
-    data-i18n="dashboardAdmin.tasks.add"
-    title="Agregar a la tarea"
->
-    <i class="fas fa-plus"></i> <span data-i18n="dashboardAdmin.tasks.add">Agregar</span>
-</button>
-
+                            <div class="quantity-control">
+                                <label for="cantidad-${material.id_material}">Cantidad:</label>
+                                <input type="number" 
+                                       class="material-cantidad-input" 
+                                       id="cantidad-${material.id_material}"
+                                       min="1" 
+                                       max="${stock}"
+                                       value="1"
+                                       placeholder="Cant.">
+                                <span class="max-available">máx: ${stock}</span>
+                            </div>
+                            <button type="button" 
+                                    class="btn btn-primary btn-add-material" 
+                                    onclick="MaterialesModule.addToTask(${material.id_material}, '${material.nombre.replace(/'/g, "\\'")}', ${stock})"
+                                    title="Agregar a la tarea">
+                                <i class="fas fa-plus"></i> Agregar
+                            </button>
                         </div>
                     </div>
                 `;
@@ -652,7 +648,7 @@
 
         container.innerHTML = `
             <div class="materiales-asignados-header">
-                <strong><span data-i18n="dashboardAdmin.tasks.materialsAssigned">Materiales asignados</span> (${materialesAsignados.length}):</strong>
+                <strong>Materiales asignados (${materialesAsignados.length}):</strong>
             </div>
             ${materialesAsignados.map(material => `
                 <div class="material-asignado-item">
