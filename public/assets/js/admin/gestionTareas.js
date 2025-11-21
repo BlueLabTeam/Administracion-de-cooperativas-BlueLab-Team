@@ -417,6 +417,7 @@
                 </div>
             `;
         }).join('');
+        i18n.translatePage();
     }
 
     // ========== VER DETALLES ==========

@@ -18,6 +18,10 @@ class Database
             $db   = "agustin_fleitas";
             $user = "agustin.fleitas";
             $pass = "56751742";
+            $host = "192.168.5.50";
+            $db   = "bluelab";
+            $user = "agustin.fleitas";
+            $pass = "56751742";
             $charset = 'utf8mb4';
 
 
