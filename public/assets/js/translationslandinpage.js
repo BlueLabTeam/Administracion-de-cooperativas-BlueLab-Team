@@ -89,22 +89,22 @@ const translations = {
         title: "Proceso de incorporación",
         subtitle: "Para unirte a nuestro equipo, sigue estos pasos:",
         steps: [
-          {
-            title: "Solicitud inicial",
-            description: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Hic veritatis, repellendus possimus delectus accusamus ad nam eius id aliquam eos, quam itaque explicabo, voluptatibus pariatur iusto voluptatum animi deleniti quis."
-          },
-          {
-            title: "Evaluación de documentos",
-            description: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Hic veritatis, repellendus possimus delectus accusamus ad nam eius id aliquam eos, quam itaque explicabo, voluptatibus pariatur iusto voluptatum animi deleniti quis."
-          },
-          {
-            title: "Entrevista personal",
-            description: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Hic veritatis, repellendus possimus delectus accusamus ad nam eius id aliquam eos, quam itaque explicabo, voluptatibus pariatur iusto voluptatum animi deleniti quis."
-          },
-          {
-            title: "Aprobación final",
-            description: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Hic veritatis, repellendus possimus delectus accusamus ad nam eius id aliquam eos, quam itaque explicabo, voluptatibus pariatur iusto voluptatum animi deleniti quis."
-          }
+         {
+  title: "Solicitud inicial",
+  description: "El socio envía su solicitud de pago al administrador a través del sistema. Debe adjuntar el comprobante de pago correspondiente a la cuota mensual de la cooperativa. Esta solicitud queda registrada como 'pendiente' hasta que sea revisada por un administrador."
+},
+{
+  title: "Evaluación de documentos",
+  description: "El administrador revisa el comprobante de pago enviado por el socio. Verifica que el monto sea correcto, que la fecha corresponda al período actual y que toda la información del comprobante esté clara y completa. Si encuentra algún problema, puede rechazar la solicitud con observaciones."
+},
+{
+  title: "Verificación del pago",
+  description: "Una vez que el administrador confirma que el comprobante es válido y corresponde al pago de la cuota, procede a aprobar la solicitud. El sistema registra automáticamente la fecha de aprobación y el administrador que realizó la verificación."
+},
+{
+  title: "Aprobación final",
+  description: "Al aprobar la solicitud, el pago queda registrado en el historial del socio y su estado de cuenta se actualiza como 'al día'. El socio recibe la confirmación de que su pago ha sido procesado exitosamente y puede consultar su historial de pagos en cualquier momento desde su panel de usuario."
+}
         ]
       },
       faq: {
@@ -268,21 +268,21 @@ const translations = {
         subtitle: "To join our team, follow these steps:",
         steps: [
           {
-            title: "Initial Request",
-            description: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Hic veritatis, repellendus possimus delectus accusamus ad nam eius id aliquam eos, quam itaque explicabo, voluptatibus pariatur iusto voluptatum animi deleniti quis."
-          },
-          {
-            title: "Document Evaluation",
-            description: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Hic veritatis, repellendus possimus delectus accusamus ad nam eius id aliquam eos, quam itaque explicabo, voluptatibus pariatur iusto voluptatum animi deleniti quis."
-          },
-          {
-            title: "Personal Interview",
-            description: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Hic veritatis, repellendus possimus delectus accusamus ad nam eius id aliquam eos, quam itaque explicabo, voluptatibus pariatur iusto voluptatum animi deleniti quis."
-          },
-          {
-            title: "Final Approval",
-            description: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Hic veritatis, repellendus possimus delectus accusamus ad nam eius id aliquam eos, quam itaque explicabo, voluptatibus pariatur iusto voluptatum animi deleniti quis."
-          }
+  title: "Initial Request",
+  description: "The member submits their payment request to the administrator through the system. They must attach the payment receipt corresponding to the cooperative's monthly fee. This request is registered as 'pending' until it is reviewed by an administrator."
+},
+{
+  title: "Document Evaluation",
+  description: "The administrator reviews the payment receipt submitted by the member. They verify that the amount is correct, that the date corresponds to the current period, and that all receipt information is clear and complete. If any issues are found, they can reject the request with observations."
+},
+{
+  title: "Payment Verification",
+  description: "Once the administrator confirms that the receipt is valid and corresponds to the fee payment, they proceed to approve the request. The system automatically records the approval date and the administrator who performed the verification."
+},
+{
+  title: "Final Approval",
+  description: "Upon approval, the payment is registered in the member's history and their account status is updated as 'up to date'. The member receives confirmation that their payment has been successfully processed and can check their payment history at any time from their user panel."
+}
         ]
       },
       faq: {
