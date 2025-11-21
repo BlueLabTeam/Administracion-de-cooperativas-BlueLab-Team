@@ -578,7 +578,6 @@ function renderResumenSemanal(resumen) {
                 <span class="dia-fecha">${fechaFormateada}</span>
             </div>
             <div class="dia-badges">
-                ${esHoy ? '<span class="badge-hoy">HOY</span>' : ''}
                 ${esFinDeSemana ? '<span class="badge-finde"></span>' : ''}
             </div>
         </div>

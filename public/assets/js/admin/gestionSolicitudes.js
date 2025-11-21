@@ -679,10 +679,10 @@ responder: function(solicitudId) {
     // ========== CAMBIAR ESTADO ==========
    cambiarEstado: async function(solicitudId, nuevoEstado) {
     const estadoTexto = {
-        'pendiente': i18next.t("requests.statusPending"),
-        'en_revision': i18next.t("requests.statusInReview"),
-        'resuelta': i18next.t("requests.statusResolved"),
-        'rechazada': i18next.t("requests.statusRejected")
+        'pendiente': i18n.t("requests.statusPending"),
+        'en_revision': i18n.t("requests.statusInReview"),
+        'resuelta': i18n.t("requests.statusResolved"),
+        'rechazada': i18n.t("requests.statusRejected")
     };
 
    ;
